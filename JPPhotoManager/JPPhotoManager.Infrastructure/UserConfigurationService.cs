@@ -39,7 +39,8 @@ namespace JPPhotoManager.Infrastructure
 
         public string GetPicturesDirectory()
         {
-            return Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            //return Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            return Constants.PathLocation;
         }
 
         public string GetOneDriveDirectory()
@@ -125,16 +126,17 @@ namespace JPPhotoManager.Infrastructure
 
         public string GetInitialFolder()
         {
-            string result = configuration.GetValue<string>(INITIAL_DIRECTORY_KEY);
+            //string result = configuration.GetValue<string>(INITIAL_DIRECTORY_KEY);
 
-            if (string.IsNullOrEmpty(result))
-            {
-                result = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            }
+            //if (string.IsNullOrEmpty(result))
+            //{
+            //    result = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            //}
 
-            result = result.Replace(MY_PICTURES_VALUE, Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+            // Pictures folder location
+            //result = result.Replace(MY_PICTURES_VALUE, Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
 
-            return result;
+            return Constants.PathLocation;
         }
 
         public string[] AdditionalPhotosDirectories()
@@ -153,16 +155,19 @@ namespace JPPhotoManager.Infrastructure
 
         public string GetApplicationDataFolder()
         {
-            string result = configuration.GetValue<string>(APPLICATION_DATA_DIRECTORY_KEY);
+            //string result = configuration.GetValue<string>(APPLICATION_DATA_DIRECTORY_KEY);
 
-            if (string.IsNullOrEmpty(result))
-            {
-                result = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), APPLICATION_NAME);
-            }
+            //if (string.IsNullOrEmpty(result))
+            //{
+            //    result = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), APPLICATION_NAME);
+            //}
 
-            result = result.Replace(APPLICATION_DATA_VALUE, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+            //result = result.Replace(APPLICATION_DATA_VALUE, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 
-            return result;
+            //return result;
+
+            // path location to the catalog files back up
+            return Constants.PathBackUp;
         }
 
         public int GetCatalogBatchSize()
@@ -200,11 +205,11 @@ namespace JPPhotoManager.Infrastructure
             // TODO: Validate if some of the root folders are not valid or don't exist any longer.
             List<string> rootPaths = new()
             {
-                GetOneDriveDirectory(),
+                //GetOneDriveDirectory(),
                 GetPicturesDirectory()
             };
 
-            rootPaths.AddRange(AdditionalPhotosDirectories());
+            //rootPaths.AddRange(AdditionalPhotosDirectories());
 
             return rootPaths.ToArray();
         }
