@@ -65,6 +65,15 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="MoreActions" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Label x:Name="deleteAllLabel" DockPanel.Dock="Right" Padding="5" MouseLeftButtonDown="DeleteAllLabel_MouseLeftButtonDown" Content="DeleteAll" Style="{StaticResource ButtonStyle}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <Image Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Source="{ Binding CurrentDuplicatedAsset.Asset.ImageData }" Width="200" Height="150">

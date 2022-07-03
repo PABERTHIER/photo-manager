@@ -3,6 +3,7 @@ using JPPhotoManager.Infrastructure;
 using JPPhotoManager.UI.ViewModels;
 using log4net;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -36,6 +37,11 @@ namespace JPPhotoManager.UI.Windows
             get { return (FindDuplicatedAssetsViewModel)DataContext; }
         }
 
+        private List<DuplicatedSetViewModel> DuplicatedAssets
+        {
+            get { return ViewModel.GetAllDuplicatedAssets(); }
+        }
+
         private void DeleteLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
@@ -47,6 +53,32 @@ namespace JPPhotoManager.UI.Windows
                 // TODO: IN THE LIST BOXES, IF THE FILENAME INCLUDES _ IT IS NOT BEING SHOWN.
                 Console.WriteLine("Delete " + asset.FullPath);
                 // TODO: IF THE USER IS VIEWING THE FOLDER IN WHICH THE DUPLICATE WAS STORED, THE THUMBNAILS LIST WON'T REFRESH
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        private void DeleteAllLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                DuplicatedAssetViewModel viewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
+                Asset asset = viewModel.Asset;
+                var currentRootFolderPath = asset.Folder.Path;
+                var duplicatedAssets = DuplicatedAssets;
+
+                foreach (var duplicatedAssetList in duplicatedAssets)
+                {
+                    foreach (var duplicatedAsset in duplicatedAssetList)
+                    {
+                        if (duplicatedAsset.Asset.Folder.Path == currentRootFolderPath)
+                        {
+                            ViewModel.DeleteAsset(duplicatedAsset);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {

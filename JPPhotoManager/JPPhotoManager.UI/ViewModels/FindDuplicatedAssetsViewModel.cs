@@ -30,6 +30,11 @@ namespace JPPhotoManager.UI.ViewModels
             }
         }
 
+        public List<DuplicatedSetViewModel> GetAllDuplicatedAssets()
+        {
+            return _collection;
+        }
+
         public int DuplicatedAssetSetsPosition
         {
             get { return _duplicatedAssetSetsPosition; }
