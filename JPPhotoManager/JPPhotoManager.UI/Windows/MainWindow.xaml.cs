@@ -423,7 +423,7 @@ namespace JPPhotoManager.UI.Windows
 
         private async Task DoBackgroundWork()
         {
-            await CheckNewRelease();
+            //await CheckNewRelease(); // don't care if new release
 
             ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
             int minutes = ViewModel.GetCatalogCooldownMinutes();
