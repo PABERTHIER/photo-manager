@@ -43,6 +43,7 @@ namespace JPPhotoManager.UI.Windows
                 viewModel.Product = aboutInformation.Product;
                 viewModel.Version = aboutInformation.Version;
                 DataContext = viewModel;
+                ViewModel.CalculateGlobaleAssetsCounter(application);
             }
             catch (Exception ex)
             {

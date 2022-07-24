@@ -30,6 +30,7 @@ namespace JPPhotoManager.UI.ViewModels
         private string currentFolder;
         private Asset[] cataloguedAssets;
         private ObservableCollection<Asset> observableAssets;
+        private string globaleAssetsCounter;
         private Asset[] selectedAssets;
         private string appTitle;
         private string statusMessage;
@@ -48,6 +49,7 @@ namespace JPPhotoManager.UI.ViewModels
         {
             CurrentFolder = Application.GetInitialFolder();
             SortCriteria = initialSortCriteria;
+            // Compute GlobaleAssetrsCounter her instead
         }
 
         public AppModeEnum AppMode
@@ -142,6 +144,16 @@ namespace JPPhotoManager.UI.ViewModels
                 observableAssets = value;
                 NotifyPropertyChanged(nameof(ObservableAssets));
                 UpdateAppTitle();
+            }
+        }
+
+        public string GlobaleAssetsCounter
+        {
+            get { return globaleAssetsCounter; }
+            private set
+            {
+                globaleAssetsCounter = value;
+                NotifyPropertyChanged(nameof(GlobaleAssetsCounter));
             }
         }
 
@@ -457,5 +469,12 @@ namespace JPPhotoManager.UI.ViewModels
         public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => Application.GetSubFolders(parentFolder, includeHidden);
 
         public BitmapImage LoadBitmapImage() => Application.LoadBitmapImage(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+
+        public void CalculateGlobaleAssetsCounter(IApplication application)
+        {
+            // rappeler la méthode quand import photos fini
+            var globaleAssetsCounter = application.GetAssetsCounter();
+            GlobaleAssetsCounter = $"Nombre total d'images: {globaleAssetsCounter}";
+        }
     }
 }

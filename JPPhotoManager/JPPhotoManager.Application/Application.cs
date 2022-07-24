@@ -57,6 +57,11 @@ namespace JPPhotoManager.Application
             return assetRepository.GetAssets(directory);
         }
 
+        public int GetAssetsCounter()
+        {
+            return assetRepository.AssetsCounter();
+        }
+
         public void LoadThumbnail(Asset asset)
         {
             asset.ImageData = assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);

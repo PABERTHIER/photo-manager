@@ -757,5 +757,10 @@ namespace JPPhotoManager.Infrastructure
                 hasChanges = true;
             }
         }
+
+        public int AssetsCounter()
+        {
+            return assets.Count();
+        }
     }
 }
