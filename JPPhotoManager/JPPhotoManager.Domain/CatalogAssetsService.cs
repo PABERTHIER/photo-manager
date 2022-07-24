@@ -246,6 +246,12 @@ namespace JPPhotoManager.Domain
                 }
 
                 Asset newAsset = CreateAsset(directory, fileName);
+                
+                if (newAsset == null)
+                {
+                    continue;
+                }
+
                 newAsset.ImageData = LoadThumbnail(directory, fileName, newAsset.ThumbnailPixelWidth, newAsset.ThumbnailPixelHeight);
 
                 if (!folderHasThumbnails)
@@ -352,7 +358,7 @@ namespace JPPhotoManager.Domain
             return thumbnailImage;
         }
 
-        public Asset CreateAsset(string directoryName, string fileName)
+        public Asset? CreateAsset(string directoryName, string fileName)
         {
             Asset asset = null;
 
@@ -363,6 +369,12 @@ namespace JPPhotoManager.Domain
             {
                 string imagePath = Path.Combine(directoryName, fileName);
                 byte[] imageBytes = storageService.GetFileBytes(imagePath);
+
+                if (!storageService.GetIsValidGDIPlusImage(imageBytes))
+                {
+                    return asset;
+                }
+
                 ushort? exifOrientation = storageService.GetExifOrientation(imageBytes);
                 Rotation rotation = exifOrientation.HasValue ? storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
                 BitmapImage originalImage = storageService.LoadBitmapImage(imageBytes, rotation);

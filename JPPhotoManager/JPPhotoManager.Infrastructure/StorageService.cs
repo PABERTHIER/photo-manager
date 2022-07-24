@@ -200,5 +200,10 @@ namespace JPPhotoManager.Infrastructure
                 asset.FileModificationDateTime = info.LastWriteTime;
             }
         }
+
+        public bool GetIsValidGDIPlusImage(byte[] imageData)
+        {
+            return ExifHelper.IsValidGDIPlusImage(imageData);
+        }
     }
 }

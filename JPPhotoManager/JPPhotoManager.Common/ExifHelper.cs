@@ -12,7 +12,7 @@ namespace JPPhotoManager.Common
             using (MemoryStream stream = new(buffer))
             {
                 BitmapFrame bitmapFrame = BitmapFrame.Create(stream);
-                BitmapMetadata bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
+                BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
 
                 if (bitmapMetadata != null && bitmapMetadata.ContainsQuery("System.Photo.Orientation"))
                 {
@@ -64,6 +64,23 @@ namespace JPPhotoManager.Common
             }
 
             return rotation;
+        }
+
+        public static bool IsValidGDIPlusImage(byte[] imageData)
+        {
+            try
+            {
+                using (var ms = new MemoryStream(imageData))
+                {
+                    BitmapFrame bitmapFrame = BitmapFrame.Create(ms);
+                    BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

@@ -31,5 +31,6 @@ namespace JPPhotoManager.Domain.Interfaces
         bool CopyImage(string sourcePath, string destinationPath);
         bool MoveImage(string sourcePath, string destinationPath);
         void GetFileInformation(Asset asset);
+        bool GetIsValidGDIPlusImage(byte[] imageData);
     }
 }
