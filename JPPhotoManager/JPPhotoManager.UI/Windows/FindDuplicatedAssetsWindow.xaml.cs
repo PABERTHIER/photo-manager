@@ -68,17 +68,27 @@ namespace JPPhotoManager.UI.Windows
                 Asset asset = viewModel.Asset;
                 var currentRootFolderPath = asset.Folder.Path;
                 var duplicatedAssets = DuplicatedAssets;
+                var isFirstOne = false;
 
                 foreach (var duplicatedAssetList in duplicatedAssets)
                 {
+                    isFirstOne = !isFirstOne;
                     foreach (var duplicatedAsset in duplicatedAssetList)
                     {
-                        if (duplicatedAsset.Asset.Folder.Path == currentRootFolderPath)
+                        if (!isFirstOne && duplicatedAsset.Asset.Folder.Path == currentRootFolderPath)
                         {
                             ViewModel.DeleteAsset(duplicatedAsset);
+                            continue;
                         }
+
+                        if (isFirstOne)
+                        {
+                            isFirstOne = !isFirstOne;
+                        }                        
                     }
                 }
+
+                ViewModel.Refresh();
             }
             catch (Exception ex)
             {
