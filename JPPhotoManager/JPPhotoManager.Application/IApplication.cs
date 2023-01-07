@@ -17,7 +17,6 @@ namespace JPPhotoManager.Application
         List<List<Asset>> GetDuplicatedAssets();
         void DeleteAssets(Asset[] assets, bool deleteFiles);
         AboutInformation GetAboutInformation(Assembly assembly);
-        Folder[] GetDrives();
         Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
         string GetInitialFolder();
         int GetCatalogCooldownMinutes();
@@ -27,6 +26,5 @@ namespace JPPhotoManager.Application
         List<string> GetRecentTargetPaths();
         Folder[] GetRootCatalogFolders();
         bool IsAlreadyRunning();
-        Task<Release> CheckNewReleaseAsyc();
     }
 }

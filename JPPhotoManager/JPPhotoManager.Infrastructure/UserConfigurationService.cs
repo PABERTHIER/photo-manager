@@ -14,16 +14,10 @@ namespace JPPhotoManager.Infrastructure
         private const int SPI_SETDESKWALLPAPER = 20;
         private const int SPIF_UPDATEINIFILE = 0x01;
         private const int SPIF_SENDWININICHANGE = 0x02;
-        private const string INITIAL_DIRECTORY_KEY = "appsettings:InitialDirectory";
-        private const string ADDITIONAL_PHOTOS_DIRECTORIES_KEY = "appsettings:AdditionalPhotosDirectories";
-        private const string MY_PICTURES_VALUE = "{MyPictures}";
-        private const string APPLICATION_DATA_DIRECTORY_KEY = "appsettings:ApplicationDataDirectory";
-        private const string APPLICATION_DATA_VALUE = "{ApplicationData}";
         private const string CATALOG_BATCH_SIZE_KEY = "appsettings:CatalogBatchSize";
         private const string CATALOG_COOLDOWN_MINUTES = "appsettings:CatalogCooldownMinutes";
         private const string BACKUPS_TO_KEEP = "appsettings:BackupsToKeep";
         private const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:ThumbnailsDictionaryEntriesToKeep";
-        private const string APPLICATION_NAME = "JPPhotoManager";
         private const string REPOSITORY_OWNER = "appsettings:Repository:Owner";
         private const string REPOSITORY_NAME = "appsettings:Repository:Name";
 
@@ -39,13 +33,7 @@ namespace JPPhotoManager.Infrastructure
 
         public string GetPicturesDirectory()
         {
-            //return Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             return Constants.PathLocation;
-        }
-
-        public string GetOneDriveDirectory()
-        {
-            return Environment.GetEnvironmentVariable("OneDrive", EnvironmentVariableTarget.User);
         }
 
         public void SetAsWallpaper(Asset asset, WallpaperStyle style)
@@ -126,47 +114,11 @@ namespace JPPhotoManager.Infrastructure
 
         public string GetInitialFolder()
         {
-            //string result = configuration.GetValue<string>(INITIAL_DIRECTORY_KEY);
-
-            //if (string.IsNullOrEmpty(result))
-            //{
-            //    result = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            //}
-
-            // Pictures folder location
-            //result = result.Replace(MY_PICTURES_VALUE, Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
-
             return Constants.PathLocation;
-        }
-
-        public string[] AdditionalPhotosDirectories()
-        {
-            string[] result;
-            string additionalPicturesDirectoriesValue = configuration.GetValue<string>(ADDITIONAL_PHOTOS_DIRECTORIES_KEY);
-
-            if (string.IsNullOrWhiteSpace(additionalPicturesDirectoriesValue))
-                return Array.Empty<string>();
-
-            additionalPicturesDirectoriesValue = additionalPicturesDirectoriesValue.Replace(MY_PICTURES_VALUE, Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
-            result = additionalPicturesDirectoriesValue.Split(';');
-
-            return result;
         }
 
         public string GetApplicationDataFolder()
         {
-            //string result = configuration.GetValue<string>(APPLICATION_DATA_DIRECTORY_KEY);
-
-            //if (string.IsNullOrEmpty(result))
-            //{
-            //    result = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), APPLICATION_NAME);
-            //}
-
-            //result = result.Replace(APPLICATION_DATA_VALUE, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-
-            //return result;
-
-            // path location to the catalog files back up
             return Constants.PathBackUp;
         }
 
@@ -205,11 +157,8 @@ namespace JPPhotoManager.Infrastructure
             // TODO: Validate if some of the root folders are not valid or don't exist any longer.
             List<string> rootPaths = new()
             {
-                //GetOneDriveDirectory(),
                 GetPicturesDirectory()
             };
-
-            //rootPaths.AddRange(AdditionalPhotosDirectories());
 
             return rootPaths.ToArray();
         }

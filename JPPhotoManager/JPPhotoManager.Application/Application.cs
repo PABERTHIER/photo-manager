@@ -16,7 +16,6 @@ namespace JPPhotoManager.Application
         private readonly IStorageService storageService;
         private readonly IBatchRenameService batchRenameService;
         private readonly IProcessService processService;
-        private readonly INewReleaseNotificationService newReleaseNotificationService;
 
         public Application(
             ISyncAssetsService syncAssetsService,
@@ -27,8 +26,7 @@ namespace JPPhotoManager.Application
             IUserConfigurationService userConfigurationService,
             IStorageService storageService,
             IBatchRenameService batchRenameService,
-            IProcessService processService,
-            INewReleaseNotificationService newReleaseNotificationService)
+            IProcessService processService)
         {
             this.syncAssetsService = syncAssetsService;
             this.catalogAssetsService = catalogAssetsService;
@@ -39,7 +37,6 @@ namespace JPPhotoManager.Application
             this.storageService = storageService;
             this.batchRenameService = batchRenameService;
             this.processService = processService;
-            this.newReleaseNotificationService = newReleaseNotificationService;
         }
 
         public Asset[] GetAssets(string directory)
@@ -103,8 +100,6 @@ namespace JPPhotoManager.Application
 
         public AboutInformation GetAboutInformation(Assembly assembly) => userConfigurationService.GetAboutInformation(assembly);
 
-        public Folder[] GetDrives() => storageService.GetDrives();
-
         public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => assetRepository.GetSubFolders(parentFolder, includeHidden);
 
         public string GetInitialFolder() => userConfigurationService.GetInitialFolder();
@@ -138,9 +133,5 @@ namespace JPPhotoManager.Application
         }
 
         public bool IsAlreadyRunning() => processService.IsAlreadyRunning();
-
-        public async Task<Release> CheckNewReleaseAsyc() => await newReleaseNotificationService.CheckNewReleaseAsync();
-
-        public BatchRenameResult BatchRename(Asset[] sourceAssets, string batchFormat, bool overwriteExistingTargetFiles) => batchRenameService.BatchRename(sourceAssets, batchFormat, overwriteExistingTargetFiles);
     }
 }

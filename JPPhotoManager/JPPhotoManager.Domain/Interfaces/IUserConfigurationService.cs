@@ -5,7 +5,6 @@ namespace JPPhotoManager.Domain.Interfaces
     public interface IUserConfigurationService
     {
         string GetPicturesDirectory();
-        string GetOneDriveDirectory();
         void SetAsWallpaper(Asset asset, WallpaperStyle style);
         AboutInformation GetAboutInformation(Assembly assembly);
         string GetInitialFolder();

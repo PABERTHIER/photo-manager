@@ -424,8 +424,6 @@ namespace JPPhotoManager.UI.Windows
 
         private async Task DoBackgroundWork()
         {
-            //await CheckNewRelease(); // don't care if new release
-
             ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
             int minutes = ViewModel.GetCatalogCooldownMinutes();
 
@@ -440,43 +438,7 @@ namespace JPPhotoManager.UI.Windows
 
                 await catalogTask.ConfigureAwait(true);
                 await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
-            }
-        }
-
-        private async Task CheckNewRelease()
-        {
-            var latestRelease = await application.CheckNewReleaseAsyc().ConfigureAwait(true);
-
-            if (latestRelease != null && latestRelease.Success && latestRelease.IsNewRelease)
-            {
-                string newReleaseTitle = $"New Release {latestRelease.Name} available!";
-                string newReleaseMessage = $"There is a new release of the application: {latestRelease.Name}, " +
-                    $"published on {latestRelease.PublishedOn.Value.LocalDateTime.ToShortDateString()}! " +
-                    $"To download it please click here.";
-
-                new ToastContentBuilder()
-                    .AddArgument("action", "viewConversation")
-                    .AddArgument("conversationId", 10000)
-                    .AddArgument("releaseDownloadUrl", latestRelease.DownloadUrl)
-                    .AddText(newReleaseTitle)
-                    .AddText(newReleaseMessage)
-                    .Show();
-
-                // Listen to notification activation
-                ToastNotificationManagerCompat.OnActivated += toastArgs =>
-                {
-                    // Obtain the arguments from the notification
-                    ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
-                    string releaseDownloadUrl = args["releaseDownloadUrl"];
-
-                    if (!string.IsNullOrWhiteSpace(releaseDownloadUrl))
-                    {
-                        Process process = new();
-                        process.StartInfo.FileName = releaseDownloadUrl;
-                        process.StartInfo.UseShellExecute = true;
-                        process.Start();
-                    }
-                };
+                ViewModel.CalculateGlobaleAssetsCounter(application);
             }
         }
     }

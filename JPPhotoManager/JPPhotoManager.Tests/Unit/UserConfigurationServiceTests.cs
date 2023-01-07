@@ -77,7 +77,7 @@ namespace JPPhotoManager.Tests.Unit
         {
             UserConfigurationService userConfigurationService = new(configuration);
             string result = userConfigurationService.GetInitialFolder();
-            result.Should().Be(dataDirectory);
+            result.Should().Be(Constants.PathLocation);
         }
 
         [Fact]
