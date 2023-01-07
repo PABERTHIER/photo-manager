@@ -1,0 +1,36 @@
+﻿<Window x:Class="PhotoManager.UI.Windows.FolderNavigationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PhotoManager.UI.Controls"
+        mc:Ignorable="d"
+        KeyDown="Window_KeyDown"
+        Title="Select destination folder" Height="400" Width="500">
+    <Grid Background="#FF3C3C3C">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <local:FolderNavigationControl x:Name="folderTreeView" Grid.Column="0" Grid.Row="0" FolderSelected="FolderTreeView_FolderSelected" Margin="5"/>
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" Content="Selected path:" Foreground="#FFFFFFFF" Width="100" Margin="5"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" x:Name="selectedPathComboBox" HorizontalAlignment="Stretch" Margin="5" IsEditable="True" Text="{Binding TargetPath}" ItemsSource="{Binding RecentTargetPaths}" />
+        </Grid>
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Label Content="Confirm" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding CanConfirm}" MouseLeftButtonDown="Confirm_MouseLeftButtonDown" Width="100" Margin="5"/>
+            <Label Content="Cancel" Style="{StaticResource ButtonStyle}" MouseLeftButtonDown="Cancel_MouseLeftButtonDown" Width="100" Margin="5"/>
+        </StackPanel>
+    </Grid>
+</Window>

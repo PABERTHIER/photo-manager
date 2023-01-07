@@ -4,18 +4,17 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore JPPhotoManager/JPPhotoManager.sln
-    - name: Build
-      run: dotnet build --no-restore --configuration Release JPPhotoManager/JPPhotoManager.sln
-    - name: Test
-      run: dotnet test --no-build --configuration Release --verbosity normal JPPhotoManager/JPPhotoManager.Tests/JPPhotoManager.Tests.csproj
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore PhotoManager/PhotoManager.sln
+      - name: Build
+        run: dotnet build --no-restore --configuration Release PhotoManager/PhotoManager.sln
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity normal PhotoManager/PhotoManager.Tests/PhotoManager.Tests.csproj
