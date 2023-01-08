@@ -1,9 +1,8 @@
-﻿using PhotoManager.Domain;
-using PhotoManager.Domain.Interfaces;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Win32;
+using PhotoManager.Domain;
+using PhotoManager.Domain.Interfaces;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -18,22 +17,15 @@ namespace PhotoManager.Infrastructure
         private const string CATALOG_COOLDOWN_MINUTES = "appsettings:CatalogCooldownMinutes";
         private const string BACKUPS_TO_KEEP = "appsettings:BackupsToKeep";
         private const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:ThumbnailsDictionaryEntriesToKeep";
-        private const string REPOSITORY_OWNER = "appsettings:Repository:Owner";
-        private const string REPOSITORY_NAME = "appsettings:Repository:Name";
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
 
-        private readonly IConfigurationRoot configuration;
+        private readonly IConfigurationRoot _configuration;
 
         public UserConfigurationService(IConfigurationRoot configuration)
         {
-            this.configuration = configuration;
-        }
-
-        public string GetPicturesDirectory()
-        {
-            return Constants.PathLocation;
+            _configuration = configuration;
         }
 
         public void SetAsWallpaper(Asset asset, WallpaperStyle style)
@@ -96,51 +88,34 @@ namespace PhotoManager.Infrastructure
             return aboutInformation;
         }
 
-        private string GetProductVersion()
-        {
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(GetType().Assembly.Location);
-
-            return fileVersionInfo.ProductVersion;
-        }
-
-        public string GetInitialFolder()
+        public string GetPicturesDirectory()
         {
             return Constants.PathLocation;
         }
 
-        public string GetApplicationDataFolder()
+        public string GetApplicationBackUpFolder()
         {
             return Constants.PathBackUp;
         }
 
         public int GetCatalogBatchSize()
         {
-            return configuration.GetValue<int>(CATALOG_BATCH_SIZE_KEY);
+            return _configuration.GetValue<int>(CATALOG_BATCH_SIZE_KEY);
         }
 
         public int GetCatalogCooldownMinutes()
         {
-            return configuration.GetValue<int>(CATALOG_COOLDOWN_MINUTES);
+            return _configuration.GetValue<int>(CATALOG_COOLDOWN_MINUTES);
         }
 
         public int GetBackupsToKeep()
         {
-            return configuration.GetValue<int>(BACKUPS_TO_KEEP);
+            return _configuration.GetValue<int>(BACKUPS_TO_KEEP);
         }
 
         public int GetThumbnailsDictionaryEntriesToKeep()
         {
-            return configuration.GetValue<int>(THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
-        }
-
-        public string GetRepositoryOwner()
-        {
-            return configuration.GetValue<string>(REPOSITORY_OWNER);
-        }
-
-        public string GetRepositoryName()
-        {
-            return configuration.GetValue<string>(REPOSITORY_NAME);
+            return _configuration.GetValue<int>(THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
         }
 
         public string[] GetRootCatalogFolderPaths()
@@ -152,6 +127,13 @@ namespace PhotoManager.Infrastructure
             };
 
             return rootPaths.ToArray();
+        }
+
+        private string GetProductVersion()
+        {
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(GetType().Assembly.Location);
+
+            return fileVersionInfo.ProductVersion;
         }
     }
 }

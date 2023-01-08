@@ -3,6 +3,7 @@ using Autofac.Extras.Moq;
 using FluentAssertions;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
+using PhotoManager.Tests.Unit.Batch;
 using Moq;
 using Xunit;
 

@@ -36,8 +36,8 @@ namespace PhotoManager.UI.ViewModels
         private string statusMessage;
         private SortCriteriaEnum sortCriteria;
         private SortCriteriaEnum previousSortCriteria;
-        public bool SortAscending { get; private set; } = true;
 
+        public bool SortAscending { get; private set; } = true;
         public string Product { get; set; }
         public string Version { get; set; }
         public bool IsRefreshingFolders { get; set; }
@@ -49,7 +49,7 @@ namespace PhotoManager.UI.ViewModels
         {
             CurrentFolder = Application.GetInitialFolder();
             SortCriteria = initialSortCriteria;
-            // Compute GlobaleAssetrsCounter her instead
+            // TODO: Compute GlobaleAssetrsCounter her instead
         }
 
         public AppModeEnum AppMode
@@ -170,38 +170,42 @@ namespace PhotoManager.UI.ViewModels
 
         private void SortAssets()
         {
-            switch (SortCriteria)
+            if (cataloguedAssets != null)
             {
-                case SortCriteriaEnum.FileName:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets?.OrderBy(a => a.FileName).ToArray() :
-                        cataloguedAssets?.OrderByDescending(a => a.FileName).ToArray();
-                    break;
+                switch (SortCriteria)
+                {
+                    case SortCriteriaEnum.FileName:
+                        cataloguedAssets = SortAscending ?
+                            cataloguedAssets.OrderBy(a => a.FileName).ToArray() :
+                            cataloguedAssets.OrderByDescending(a => a.FileName).ToArray();
+                        break;
 
-                case SortCriteriaEnum.ThumbnailCreationDateTime:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets?.OrderBy(a => a.ThumbnailCreationDateTime).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets?.OrderByDescending(a => a.ThumbnailCreationDateTime).ThenByDescending(a => a.FileName).ToArray();
-                    break;
+                    case SortCriteriaEnum.ThumbnailCreationDateTime:
+                        cataloguedAssets = SortAscending ?
+                            cataloguedAssets.OrderBy(a => a.ThumbnailCreationDateTime).ThenBy(a => a.FileName).ToArray() :
+                            cataloguedAssets.OrderByDescending(a => a.ThumbnailCreationDateTime).ThenByDescending(a => a.FileName).ToArray();
+                        break;
 
-                case SortCriteriaEnum.FileCreationDateTime:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets?.OrderBy(a => a.FileCreationDateTime).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets?.OrderByDescending(a => a.FileCreationDateTime).ThenByDescending(a => a.FileName).ToArray();
-                    break;
+                    case SortCriteriaEnum.FileCreationDateTime:
+                        cataloguedAssets = SortAscending ?
+                            cataloguedAssets.OrderBy(a => a.FileCreationDateTime).ThenBy(a => a.FileName).ToArray() :
+                            cataloguedAssets.OrderByDescending(a => a.FileCreationDateTime).ThenByDescending(a => a.FileName).ToArray();
+                        break;
 
-                case SortCriteriaEnum.FileModificationDateTime:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets?.OrderBy(a => a.FileModificationDateTime).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets?.OrderByDescending(a => a.FileModificationDateTime).ThenByDescending(a => a.FileName).ToArray();
-                    break;
+                    case SortCriteriaEnum.FileModificationDateTime:
+                        cataloguedAssets = SortAscending ?
+                            cataloguedAssets.OrderBy(a => a.FileModificationDateTime).ThenBy(a => a.FileName).ToArray() :
+                            cataloguedAssets.OrderByDescending(a => a.FileModificationDateTime).ThenByDescending(a => a.FileName).ToArray();
+                        break;
 
-                case SortCriteriaEnum.FileSize:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets?.OrderBy(a => a.FileSize).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets?.OrderByDescending(a => a.FileSize).ThenByDescending(a => a.FileName).ToArray();
-                    break;
+                    case SortCriteriaEnum.FileSize:
+                        cataloguedAssets = SortAscending ?
+                            cataloguedAssets.OrderBy(a => a.FileSize).ThenBy(a => a.FileName).ToArray() :
+                            cataloguedAssets.OrderByDescending(a => a.FileSize).ThenByDescending(a => a.FileName).ToArray();
+                        break;
+                }
             }
+            
 
             ObservableAssets = cataloguedAssets != null ? new ObservableCollection<Asset>(cataloguedAssets) : null;
         }
@@ -472,7 +476,7 @@ namespace PhotoManager.UI.ViewModels
 
         public void CalculateGlobaleAssetsCounter(IApplication application)
         {
-            // rappeler la méthode quand import photos fini
+            // TODO: rappeler la méthode quand import photos fini
             var globaleAssetsCounter = application.GetAssetsCounter();
             GlobaleAssetsCounter = $"Nombre total d'images: {globaleAssetsCounter}";
         }

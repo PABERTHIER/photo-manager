@@ -2,6 +2,7 @@
 using FluentAssertions;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
+using PhotoManager.Tests.Unit.Batch;
 using System.Globalization;
 using Xunit;
 
@@ -301,14 +302,8 @@ namespace PhotoManager.Tests.Unit
             };
 
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IStorageService>()
-                .Setup(s => s.GetParentDirectory(@"C:\My Images\My Folder"))
-                .Returns(@"C:\My Images");
-            mock.Mock<IStorageService>()
-                .Setup(s => s.GetParentDirectory(@"C:\My Images"))
-                .Returns(@"C:\");
             var storageService = mock.Mock<IStorageService>().Object;
-            string targetPath = asset.ComputeTargetPath(batchFormat, ordinal, new CultureInfo("en-US"), storageService, false);
+            string targetPath = BatchHelper.ComputeTargetPath(asset, batchFormat, ordinal, new CultureInfo("en-US"), storageService, false);
             targetPath.Should().Be(expectedTargetPath);
         }
 
@@ -326,7 +321,7 @@ namespace PhotoManager.Tests.Unit
 
             using var mock = AutoMock.GetLoose();
             var storageService = mock.Mock<IStorageService>().Object;
-            string targetPath = asset.ComputeTargetPath($"{asset.FileName}_#.jpg", int.MaxValue, new CultureInfo("en-US"), storageService, false);
+            string targetPath = BatchHelper.ComputeTargetPath(asset, $"{asset.FileName}_#.jpg", int.MaxValue, new CultureInfo("en-US"), storageService, false);
             targetPath.Should().BeNullOrEmpty(targetPath);
         }
 
@@ -501,7 +496,7 @@ namespace PhotoManager.Tests.Unit
         [InlineData("D:\\OtherFolder\\Image_<##>.jpg", true)]
         public void IsValidBatchFormat_ReturnIsValid(string batchFormat, bool expectedIsValid)
         {
-            bool isValid = Asset.IsValidBatchFormat(batchFormat);
+            bool isValid = BatchHelper.IsValidBatchFormat(batchFormat);
             isValid.Should().Be(expectedIsValid);
         }
     }

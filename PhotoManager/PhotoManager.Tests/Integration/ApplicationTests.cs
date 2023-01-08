@@ -1,11 +1,11 @@
 ﻿using Autofac;
 using Autofac.Extras.Moq;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using Moq;
 using SimplePortableDatabase;
 using System.IO;
 using Xunit;
@@ -14,8 +14,8 @@ namespace PhotoManager.Tests.Integration
 {
     public class ApplicationTests
     {
-        private string dataDirectory;
-        private IConfigurationRoot configuration;
+        private readonly string dataDirectory;
+        private readonly IConfigurationRoot _configuration;
 
         public ApplicationTests()
         {
@@ -30,13 +30,13 @@ namespace PhotoManager.Tests.Integration
                 .MockGetValue("appsettings:BackupsToKeep", "2")
                 .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
 
-            configuration = configurationMock.Object;
+            _configuration = configurationMock.Object;
         }
 
         [Fact]
         public void GetDuplicatedAssets_WithDuplicates_ReturnArray()
         {
-            IUserConfigurationService userConfigurationService = new UserConfigurationService(configuration);
+            IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
 
             using var mock = AutoMock.GetLoose(
                 cfg =>
@@ -92,7 +92,7 @@ namespace PhotoManager.Tests.Integration
         [Fact]
         public void GetDuplicatedAssets_WithoutDuplicates_ReturnEmptyArray()
         {
-            IUserConfigurationService userConfigurationService = new UserConfigurationService(configuration);
+            IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
 
             using var mock = AutoMock.GetLoose(
                 cfg =>
@@ -131,7 +131,7 @@ namespace PhotoManager.Tests.Integration
         [Fact]
         public void GetDuplicatedAssets_WithInexistingDuplicatedAsset_ReturnEmptyArray()
         {
-            IUserConfigurationService userConfigurationService = new UserConfigurationService(configuration);
+            IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
 
             using var mock = AutoMock.GetLoose(
                 cfg =>
@@ -182,7 +182,7 @@ namespace PhotoManager.Tests.Integration
         [Fact]
         public void GetDuplicatedAssets_WithInexistingNotDuplicatedAsset_ReturnEmptyArray()
         {
-            IUserConfigurationService userConfigurationService = new UserConfigurationService(configuration);
+            IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
 
             using var mock = AutoMock.GetLoose(
                 cfg =>
@@ -228,7 +228,7 @@ namespace PhotoManager.Tests.Integration
         [Fact]
         public void AddAssets_ToNonExistingFolder_AddFolderToCatalog()
         {
-            IUserConfigurationService userConfigurationService = new UserConfigurationService(configuration);
+            IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
 
             using var mock = AutoMock.GetLoose(
                 cfg =>
@@ -263,7 +263,7 @@ namespace PhotoManager.Tests.Integration
         [Fact]
         public void GetAssets_WithThumbnailNotFound_ReturnArrayIncludingAssetWithNoThumbnail()
         {
-            IUserConfigurationService userConfigurationService = new UserConfigurationService(configuration);
+            IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
 
             using var mock = AutoMock.GetLoose(
                 cfg =>

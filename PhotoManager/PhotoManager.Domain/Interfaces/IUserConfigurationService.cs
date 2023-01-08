@@ -4,17 +4,14 @@ namespace PhotoManager.Domain.Interfaces
 {
     public interface IUserConfigurationService
     {
-        string GetPicturesDirectory();
         void SetAsWallpaper(Asset asset, WallpaperStyle style);
         AboutInformation GetAboutInformation(Assembly assembly);
-        string GetInitialFolder();
-        string GetApplicationDataFolder();
+        string GetPicturesDirectory();
+        string GetApplicationBackUpFolder();
         int GetCatalogBatchSize();
         int GetCatalogCooldownMinutes();
         int GetBackupsToKeep();
         int GetThumbnailsDictionaryEntriesToKeep();
         string[] GetRootCatalogFolderPaths();
-        string GetRepositoryOwner();
-        string GetRepositoryName();
     }
 }

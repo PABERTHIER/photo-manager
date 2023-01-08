@@ -76,24 +76,8 @@ namespace PhotoManager.Tests.Unit
         public void GetInitialFolderConfiguredTest()
         {
             UserConfigurationService userConfigurationService = new(configuration);
-            string result = userConfigurationService.GetInitialFolder();
+            string result = userConfigurationService.GetPicturesDirectory();
             result.Should().Be(Constants.PathLocation);
-        }
-
-        [Fact]
-        public void GetInitialFolderNotConfiguredTest()
-        {
-            Mock<IConfigurationRoot> configurationMock = new();
-            configurationMock
-                .MockGetValue("appsettings:InitialDirectory", "")
-                .MockGetValue("appsettings:ApplicationDataDirectory", dataDirectory)
-                .MockGetValue("appsettings:CatalogBatchSize", "100")
-                .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
-
-            UserConfigurationService userConfigurationService = new(configurationMock.Object);
-            string expected = userConfigurationService.GetPicturesDirectory();
-            string result = userConfigurationService.GetInitialFolder();
-            result.Should().Be(expected);
         }
 
         [Fact]
@@ -107,7 +91,7 @@ namespace PhotoManager.Tests.Unit
                 .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
 
             UserConfigurationService userConfigurationService = new(configurationMock.Object);
-            string result = userConfigurationService.GetApplicationDataFolder();
+            string result = userConfigurationService.GetApplicationBackUpFolder();
             result.Should().NotBeEmpty();
         }
 
@@ -122,7 +106,7 @@ namespace PhotoManager.Tests.Unit
                 .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
 
             UserConfigurationService userConfigurationService = new(configurationMock.Object);
-            string result = userConfigurationService.GetApplicationDataFolder();
+            string result = userConfigurationService.GetApplicationBackUpFolder();
             result.Should().NotBeEmpty();
         }
     }

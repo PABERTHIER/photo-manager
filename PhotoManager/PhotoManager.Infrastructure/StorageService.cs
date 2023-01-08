@@ -9,16 +9,11 @@ namespace PhotoManager.Infrastructure
 {
     public class StorageService : IStorageService
     {
-        private readonly IUserConfigurationService userConfigurationService;
+        private readonly IUserConfigurationService _userConfigurationService;
 
         public StorageService(IUserConfigurationService userConfigurationService)
         {
-            this.userConfigurationService = userConfigurationService;
-        }
-
-        public string GetParentDirectory(string directoryPath)
-        {
-            return new DirectoryInfo(directoryPath).Parent?.FullName;
+            _userConfigurationService = userConfigurationService;
         }
 
         public List<DirectoryInfo> GetSubDirectories(string directoryPath)
@@ -47,22 +42,12 @@ namespace PhotoManager.Infrastructure
 
         public string ResolveDataDirectory(double storageVersion)
         {
-            return Path.Combine(userConfigurationService.GetApplicationDataFolder(), "v" + storageVersion.ToString("0.0", new CultureInfo("en-US")));
+            return Path.Combine(_userConfigurationService.GetApplicationBackUpFolder(), "v" + storageVersion.ToString("0.0", new CultureInfo("en-US")));
         }
 
         public void CreateDirectory(string directory)
         {
             Directory.CreateDirectory(directory);
-        }
-
-        public T ReadObjectFromJsonFile<T>(string jsonFilePath)
-        {
-            return FileHelper.ReadObjectFromJsonFile<T>(jsonFilePath);
-        }
-
-        public void WriteObjectToJsonFile(object anObject, string jsonFilePath)
-        {
-            FileHelper.WriteObjectToJsonFile(anObject, jsonFilePath);
         }
 
         public void DeleteFile(string directory, string fileName)
@@ -86,24 +71,24 @@ namespace PhotoManager.Infrastructure
             return File.ReadAllBytes(filePath);
         }
 
+        public BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
+        {
+            return BitmapHelper.LoadBitmapImage(buffer, rotation, width, height);
+        }
+
         public BitmapImage LoadBitmapImage(byte[] buffer, int width, int height)
         {
             return BitmapHelper.LoadBitmapImage(buffer, width, height);
         }
 
-        public BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation, int width, int height)
+        public BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation)
         {
-            return BitmapHelper.LoadBitmapImage(buffer, rotation, width, height);
+            return BitmapHelper.LoadBitmapImage(buffer, rotation);
         }
 
         public BitmapImage LoadBitmapImage(string imagePath, Rotation rotation)
         {
             return BitmapHelper.LoadBitmapImage(imagePath, rotation);
-        }
-
-        public BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation)
-        {
-            return BitmapHelper.LoadBitmapImage(buffer, rotation);
         }
 
         public ushort? GetExifOrientation(byte[] buffer)
@@ -116,6 +101,32 @@ namespace PhotoManager.Infrastructure
             return ExifHelper.GetImageRotation(exifOrientation);
         }
 
+        // TODO: Remove it ?
+        //public bool HasSameContent(Asset assetA, Asset assetB)
+        //{
+        //    bool result;
+
+        //    byte[] assetABytes = File.ReadAllBytes(assetA.FullPath);
+        //    byte[] assetBBytes = File.ReadAllBytes(assetB.FullPath);
+
+        //    result = assetABytes.Length == assetBBytes.Length;
+
+        //    if (result)
+        //    {
+        //        for (int i = 0; i < assetABytes.Length; i++)
+        //        {
+        //            result = (assetABytes[i] == assetBBytes[i]);
+
+        //            if (!result)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
         public byte[] GetJpegBitmapImage(BitmapImage thumbnailImage)
         {
             return BitmapHelper.GetJpegBitmapImage(thumbnailImage);
@@ -124,37 +135,6 @@ namespace PhotoManager.Infrastructure
         public byte[] GetPngBitmapImage(BitmapImage thumbnailImage)
         {
             return BitmapHelper.GetPngBitmapImage(thumbnailImage);
-        }
-
-        public bool HasSameContent(Asset assetA, Asset assetB)
-        {
-            bool result;
-
-            byte[] assetABytes = File.ReadAllBytes(assetA.FullPath);
-            byte[] assetBBytes = File.ReadAllBytes(assetB.FullPath);
-
-            result = assetABytes.Length == assetBBytes.Length;
-
-            if (result)
-            {
-                for (int i = 0; i < assetABytes.Length; i++)
-                {
-                    result = (assetABytes[i] == assetBBytes[i]);
-
-                    if (!result)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        public Folder[] GetDrives()
-        {
-            string[] drives = Directory.GetLogicalDrives();
-            return drives.Select(d => new Folder { Path = d }).ToArray();
         }
 
         public bool FileExists(Asset asset, Folder folder)

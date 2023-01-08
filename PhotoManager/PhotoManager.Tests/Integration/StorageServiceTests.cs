@@ -7,29 +7,30 @@ using Moq;
 using System.IO;
 using System.Windows.Media.Imaging;
 using Xunit;
+using PhotoManager.Common;
 
 namespace PhotoManager.Tests.Integration
 {
     public class StorageServiceTests
     {
-        private string dataDirectory;
-        private IConfigurationRoot configuration;
+        private readonly string _dataDirectory;
+        private readonly IConfigurationRoot _configuration;
 
         public StorageServiceTests()
         {
-            dataDirectory = Path.GetDirectoryName(typeof(StorageServiceTests).Assembly.Location);
-            dataDirectory = Path.Combine(dataDirectory, "TestFiles");
+            _dataDirectory = Path.GetDirectoryName(typeof(StorageServiceTests).Assembly.Location);
+            _dataDirectory = Path.Combine(_dataDirectory, "TestFiles");
 
-            string hiddenFolderPath = Path.Combine(dataDirectory, "TestFolder", "TestHiddenSubFolder");
+            string hiddenFolderPath = Path.Combine(_dataDirectory, "TestFolder", "TestHiddenSubFolder");
             File.SetAttributes(hiddenFolderPath, File.GetAttributes(hiddenFolderPath) | FileAttributes.Hidden);
 
             Mock<IConfigurationRoot> configurationMock = new();
             configurationMock
-                .MockGetValue("appsettings:InitialDirectory", dataDirectory)
-                .MockGetValue("appsettings:ApplicationDataDirectory", dataDirectory)
+                .MockGetValue("appsettings:InitialDirectory", _dataDirectory)
+                .MockGetValue("appsettings:ApplicationDataDirectory", _dataDirectory)
                 .MockGetValue("appsettings:CatalogBatchSize", "100");
 
-            configuration = configurationMock.Object;
+            _configuration = configurationMock.Object;
         }
 
         [Theory]
@@ -55,8 +56,8 @@ namespace PhotoManager.Tests.Integration
         [Fact]
         public void GetFileNamesTest()
         {
-            IStorageService storageService = new StorageService(new UserConfigurationService(configuration));
-            string[] fileNames = storageService.GetFileNames(dataDirectory);
+            IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
+            string[] fileNames = storageService.GetFileNames(_dataDirectory);
 
             fileNames.Should().HaveCountGreaterOrEqualTo(2);
             fileNames.Should().Contain("Image 2.jpg");
@@ -66,16 +67,15 @@ namespace PhotoManager.Tests.Integration
         [Fact]
         public void GetDrivesTest()
         {
-            IStorageService storageService = new StorageService(new UserConfigurationService(configuration));
-            Folder[] drives = storageService.GetDrives();
+            Folder[] drives = GetDrives();
             drives.Should().NotBeEmpty();
         }
 
         [Fact]
         public void GetSubDirectoriesTest()
         {
-            IStorageService storageService = new StorageService(new UserConfigurationService(configuration));
-            string parentPath = Path.Combine(dataDirectory, "TestFolder");
+            IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
+            string parentPath = Path.Combine(_dataDirectory, "TestFolder");
             List<DirectoryInfo> directories = storageService.GetSubDirectories(parentPath);
 
             directories.Should().HaveCount(3);
@@ -87,8 +87,8 @@ namespace PhotoManager.Tests.Integration
         [Fact]
         public void GetRecursiveSubDirectoriesTest()
         {
-            IStorageService storageService = new StorageService(new UserConfigurationService(configuration));
-            string parentPath = Path.Combine(dataDirectory, "TestFolder");
+            IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
+            string parentPath = Path.Combine(_dataDirectory, "TestFolder");
             List<DirectoryInfo> directories = storageService.GetRecursiveSubDirectories(parentPath);
 
             directories.Should().HaveCount(4);
@@ -102,11 +102,10 @@ namespace PhotoManager.Tests.Integration
         public void WriteReadJsonTest()
         {
             List<string> writtenList = new() { "Value 1", "Value 2" };
-            string jsonPath = Path.Combine(dataDirectory, "test.json");
+            string jsonPath = Path.Combine(_dataDirectory, "test.json");
 
-            IStorageService storageService = new StorageService(new UserConfigurationService(configuration));
-            storageService.WriteObjectToJsonFile(writtenList, jsonPath);
-            List<string> readList = storageService.ReadObjectFromJsonFile<List<string>>(jsonPath);
+            WriteObjectToJsonFile(writtenList, jsonPath);
+            List<string> readList = ReadObjectFromJsonFile<List<string>>(jsonPath);
 
             readList.Should().HaveSameCount(writtenList);
             readList[0].Should().Be(writtenList[0]);
@@ -129,10 +128,26 @@ namespace PhotoManager.Tests.Integration
         [InlineData(ushort.MaxValue, Rotation.Rotate0)]
         public void GetImageRotationTest(ushort exifOrientation, Rotation expected)
         {
-            IStorageService storageService = new StorageService(new UserConfigurationService(configuration));
+            IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
             Rotation result = storageService.GetImageRotation(exifOrientation);
 
             result.Should().Be(expected);
+        }
+
+        private static T ReadObjectFromJsonFile<T>(string jsonFilePath)
+        {
+            return FileHelper.ReadObjectFromJsonFile<T>(jsonFilePath);
+        }
+
+        private static void WriteObjectToJsonFile(object anObject, string jsonFilePath)
+        {
+            FileHelper.WriteObjectToJsonFile(anObject, jsonFilePath);
+        }
+
+        private static Folder[] GetDrives()
+        {
+            string[] drives = Directory.GetLogicalDrives();
+            return drives.Select(d => new Folder { Path = d }).ToArray();
         }
     }
 }

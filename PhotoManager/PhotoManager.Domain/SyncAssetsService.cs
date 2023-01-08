@@ -98,21 +98,13 @@ namespace PhotoManager.Domain
                             callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"Deleted '{destinationPath}'" });
                         }
                     }
-                    
-                    switch (result.SyncedImages)
+
+                    result.Message = result.SyncedImages switch
                     {
-                        case 0:
-                            result.Message = $"No images synced from '{sourceDirectory}' to '{destinationDirectory}'.";
-                            break;
-
-                        case 1:
-                            result.Message = $"{result.SyncedImages} image synced from '{sourceDirectory}' to '{destinationDirectory}'.";
-                            break;
-
-                        default:
-                            result.Message = $"{result.SyncedImages} images synced from '{sourceDirectory}' to '{destinationDirectory}'.";
-                            break;
-                    }
+                        0 => $"No images synced from '{sourceDirectory}' to '{destinationDirectory}'.",
+                        1 => $"{result.SyncedImages} image synced from '{sourceDirectory}' to '{destinationDirectory}'.",
+                        _ => $"{result.SyncedImages} images synced from '{sourceDirectory}' to '{destinationDirectory}'.",
+                    };
 
                     resultList.Add(result);
 

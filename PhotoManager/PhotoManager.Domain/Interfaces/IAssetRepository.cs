@@ -6,6 +6,7 @@ namespace PhotoManager.Domain.Interfaces
     {
         Asset[] GetAssets(string directory);
         void AddAsset(Asset asset, byte[] thumbnailData);
+        void AddVideoAsset(VideoAsset videoAsset, byte[] thumbnailData);
         Folder AddFolder(string path);
         bool FolderExists(string path);
         Folder[] GetFolders();

@@ -1,4 +1,5 @@
 ﻿using PhotoManager.Domain.Interfaces;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -17,6 +18,14 @@ namespace PhotoManager.Infrastructure
             }
 
             return hashBuilder.ToString();
+        }
+
+        public string CalculateVideoHash(string filePath)
+        {
+            using FileStream stream = File.OpenRead(filePath);
+            using SHA1Managed sha = new();
+            byte[] hash = sha.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
     }
 }

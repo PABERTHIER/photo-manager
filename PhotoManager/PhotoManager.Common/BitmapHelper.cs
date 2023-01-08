@@ -80,6 +80,7 @@ namespace PhotoManager.Common
             return image;
         }
 
+        // TODO: Doing it for other format and first frame for a video
         public static byte[] GetJpegBitmapImage(BitmapImage image)
         {
             return GetBitmapImage(image, new JpegBitmapEncoder());

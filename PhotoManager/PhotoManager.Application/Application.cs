@@ -7,14 +7,13 @@ namespace PhotoManager.Application
 {
     public class Application : IApplication
     {
-        private readonly IAssetRepository assetRepository;
-        private readonly ISyncAssetsService syncAssetsService;
-        private readonly ICatalogAssetsService catalogAssetsService;
-        private readonly IMoveAssetsService moveAssetsService;
-        private readonly IFindDuplicatedAssetsService findDuplicatedAssetsService;
-        private readonly IUserConfigurationService userConfigurationService;
-        private readonly IStorageService storageService;
-        private readonly IProcessService processService;
+        private readonly IAssetRepository _assetRepository;
+        private readonly ISyncAssetsService _syncAssetsService;
+        private readonly ICatalogAssetsService _catalogAssetsService;
+        private readonly IMoveAssetsService _moveAssetsService;
+        private readonly IFindDuplicatedAssetsService _findDuplicatedAssetsService;
+        private readonly IUserConfigurationService _userConfigurationService;
+        private readonly IStorageService _storageService;
 
         public Application(
             ISyncAssetsService syncAssetsService,
@@ -23,17 +22,15 @@ namespace PhotoManager.Application
             IFindDuplicatedAssetsService findDuplicatedAssetsService,
             IAssetRepository assetRepository,
             IUserConfigurationService userConfigurationService,
-            IStorageService storageService,
-            IProcessService processService)
+            IStorageService storageService)
         {
-            this.syncAssetsService = syncAssetsService;
-            this.catalogAssetsService = catalogAssetsService;
-            this.moveAssetsService = moveAssetsService;
-            this.findDuplicatedAssetsService = findDuplicatedAssetsService;
-            this.assetRepository = assetRepository;
-            this.userConfigurationService = userConfigurationService;
-            this.storageService = storageService;
-            this.processService = processService;
+            _syncAssetsService = syncAssetsService;
+            _catalogAssetsService = catalogAssetsService;
+            _moveAssetsService = moveAssetsService;
+            _findDuplicatedAssetsService = findDuplicatedAssetsService;
+            _assetRepository = assetRepository;
+            _userConfigurationService = userConfigurationService;
+            _storageService = storageService;
         }
 
         public Asset[] GetAssets(string directory)
@@ -43,46 +40,46 @@ namespace PhotoManager.Application
                 throw new ArgumentException("Directory cannot be null or empty.", directory);
             }
 
-            if (!assetRepository.FolderExists(directory))
+            if (!_assetRepository.FolderExists(directory))
             {
-                assetRepository.AddFolder(directory);
+                _assetRepository.AddFolder(directory);
             }
 
-            return assetRepository.GetAssets(directory);
+            return _assetRepository.GetAssets(directory);
         }
 
         public int GetAssetsCounter()
         {
-            return assetRepository.AssetsCounter();
+            return _assetRepository.AssetsCounter();
         }
 
         public void LoadThumbnail(Asset asset)
         {
-            asset.ImageData = assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
+            asset.ImageData = _assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
         }
 
         public SyncAssetsConfiguration GetSyncAssetsConfiguration()
         {
-            return assetRepository.GetSyncAssetsConfiguration();
+            return _assetRepository.GetSyncAssetsConfiguration();
         }
 
         public void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration)
         {
             syncConfiguration.Validate();
             syncConfiguration.Normalize();
-            assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
-            assetRepository.SaveCatalog(null);
+            _assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
+            _assetRepository.SaveCatalog(null);
         }
 
-        public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) => await syncAssetsService.ExecuteAsync(callback);
+        public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) => await _syncAssetsService.ExecuteAsync(callback);
 
-        public async Task CatalogAssetsAsync(CatalogChangeCallback callback) => await catalogAssetsService.CatalogAssetsAsync(callback);
+        public async Task CatalogAssetsAsync(CatalogChangeCallback callback) => await _catalogAssetsService.CatalogAssetsAsync(callback);
 
         public void SetAsWallpaper(Asset asset, WallpaperStyle style)
         {
             if (asset != null)
             {
-                userConfigurationService.SetAsWallpaper(asset, style);
+                _userConfigurationService.SetAsWallpaper(asset, style);
             }
         }
 
@@ -91,44 +88,42 @@ namespace PhotoManager.Application
         /// </summary>
         /// <returns>A list of duplicated sets of assets (corresponding to the same image),
         /// where each item is a list of duplicated assets.</returns>
-        public List<List<Asset>> GetDuplicatedAssets() => findDuplicatedAssetsService.GetDuplicatedAssets();
+        public List<List<Asset>> GetDuplicatedAssets() => _findDuplicatedAssetsService.GetDuplicatedAssets();
 
-        public void DeleteAssets(Asset[] assets, bool deleteFiles) => moveAssetsService.DeleteAssets(assets, deleteFiles);
+        public void DeleteAssets(Asset[] assets, bool deleteFiles) => _moveAssetsService.DeleteAssets(assets, deleteFiles);
 
-        public AboutInformation GetAboutInformation(Assembly assembly) => userConfigurationService.GetAboutInformation(assembly);
+        public AboutInformation GetAboutInformation(Assembly assembly) => _userConfigurationService.GetAboutInformation(assembly);
 
-        public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => assetRepository.GetSubFolders(parentFolder, includeHidden);
+        public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => _assetRepository.GetSubFolders(parentFolder, includeHidden);
 
-        public string GetInitialFolder() => userConfigurationService.GetInitialFolder();
+        public string GetInitialFolder() => _userConfigurationService.GetPicturesDirectory();
 
-        public int GetCatalogCooldownMinutes() => userConfigurationService.GetCatalogCooldownMinutes();
+        public int GetCatalogCooldownMinutes() => _userConfigurationService.GetCatalogCooldownMinutes();
 
-        public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
+        public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => _moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
 
-        public BitmapImage LoadBitmapImage(string imagePath, Rotation rotation) => storageService.LoadBitmapImage(imagePath, rotation);
+        public BitmapImage LoadBitmapImage(string imagePath, Rotation rotation) => _storageService.LoadBitmapImage(imagePath, rotation);
 
-        public bool FileExists(string fullPath) => storageService.FileExists(fullPath);
+        public bool FileExists(string fullPath) => _storageService.FileExists(fullPath);
 
-        public List<string> GetRecentTargetPaths() => assetRepository.GetRecentTargetPaths();
+        public List<string> GetRecentTargetPaths() => _assetRepository.GetRecentTargetPaths();
 
         public Folder[] GetRootCatalogFolders()
         {
-            string[] paths = userConfigurationService.GetRootCatalogFolderPaths();
+            string[] paths = _userConfigurationService.GetRootCatalogFolderPaths();
             Folder[] folders = new Folder[paths.Length];
 
             for (int i = 0; i < paths.Length; i++)
             {
-                folders[i] = assetRepository.GetFolderByPath(paths[i]);
+                folders[i] = _assetRepository.GetFolderByPath(paths[i]);
 
                 if (folders[i] == null)
                 {
-                    folders[i] = assetRepository.AddFolder(paths[i]);
+                    folders[i] = _assetRepository.AddFolder(paths[i]);
                 }
             }
 
             return folders;
         }
-
-        public bool IsAlreadyRunning() => processService.IsAlreadyRunning();
     }
 }

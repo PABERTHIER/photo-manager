@@ -1,12 +1,12 @@
-﻿using PhotoManager.Domain;
+﻿using log4net;
+using log4net.Config;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.Windows;
-using log4net;
-using log4net.Config;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using SimplePortableDatabase;
 using System;
 using System.IO;
@@ -22,7 +22,7 @@ namespace PhotoManager.UI
     public partial class App : System.Windows.Application
     {
         private readonly ServiceProvider serviceProvider;
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
         // TODO: Add a global exception handler.
 
         public App()
@@ -32,17 +32,24 @@ namespace PhotoManager.UI
 
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
-            serviceProvider = serviceCollection.BuildServiceProvider();
+            serviceProvider = serviceCollection.BuildServiceProvider() ?? new ServiceCollection().BuildServiceProvider();
         }
 
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             try
             {
-                if (!serviceProvider.GetService<Application.IApplication>().IsAlreadyRunning())
+                if (!serviceProvider.GetService<IProcessService>()?.IsAlreadyRunning() ?? false)
                 {
                     var mainWindow = serviceProvider.GetService<MainWindow>();
-                    mainWindow.Show();
+                    if (mainWindow != null)
+                    {
+                        mainWindow.Show();
+                    }
+                    else
+                    {
+                        Shutdown();
+                    }
                 }
                 else
                 {
@@ -57,7 +64,7 @@ namespace PhotoManager.UI
             }
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(IServiceCollection services)
         {
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
@@ -70,7 +77,6 @@ namespace PhotoManager.UI
             services.AddSingleton<IProcessService, ProcessService>();
             services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
             services.AddSingleton<IStorageService, StorageService>();
-            services.AddSingleton<IBatchRenameService, BatchRenameService>();
             services.AddSingleton<IAssetRepository, AssetRepository>();
             services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
             services.AddSingleton<ICatalogAssetsService, CatalogAssetsService>();

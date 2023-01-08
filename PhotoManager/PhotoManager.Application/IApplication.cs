@@ -25,6 +25,5 @@ namespace PhotoManager.Application
         bool FileExists(string fullPath);
         List<string> GetRecentTargetPaths();
         Folder[] GetRootCatalogFolders();
-        bool IsAlreadyRunning();
     }
 }
