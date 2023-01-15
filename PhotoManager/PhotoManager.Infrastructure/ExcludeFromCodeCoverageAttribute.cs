@@ -1,6 +1,5 @@
-﻿namespace PhotoManager.Infrastructure
+﻿namespace PhotoManager.Infrastructure;
+
+public class ExcludeFromCodeCoverageAttribute : Attribute
 {
-    public class ExcludeFromCodeCoverageAttribute : Attribute
-    {
-    }
 }

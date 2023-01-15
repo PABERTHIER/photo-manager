@@ -1,58 +1,57 @@
-﻿namespace PhotoManager.Domain
+﻿namespace PhotoManager.Domain;
+
+public class Folder
 {
-    public class Folder
+    public string FolderId { get; set; }
+    public string Path { get; set; }
+    public string ThumbnailsFilename => FolderId + ".bin";
+
+    public string Name
     {
-        public string FolderId { get; set; }
-        public string Path { get; set; }
-        public string ThumbnailsFilename => FolderId + ".bin";
-
-        public string Name
+        get
         {
-            get
-            {
-                string[] pathParts = Path.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
-                string result = pathParts[pathParts.Length - 1];
+            string[] pathParts = Path.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            string result = pathParts[pathParts.Length - 1];
 
-                return result;
-            }
+            return result;
         }
+    }
 
-        public Folder? Parent
+    public Folder? Parent
+    {
+        get
         {
-            get
-            {
-                string? parentPath = GetParentPath();
-                return parentPath != null ? new Folder { Path = parentPath } : null;
-            }
+            string? parentPath = GetParentPath();
+            return parentPath != null ? new Folder { Path = parentPath } : null;
         }
+    }
 
-        private string? GetParentPath()
-        {
-            string[] thisPathDirectories = Path.Split(System.IO.Path.DirectorySeparatorChar);
-            thisPathDirectories = thisPathDirectories.SkipLast(1).ToArray();
-            return thisPathDirectories.Length > 0 ? System.IO.Path.Combine(thisPathDirectories) : null;
-        }
+    private string? GetParentPath()
+    {
+        string[] thisPathDirectories = Path.Split(System.IO.Path.DirectorySeparatorChar);
+        thisPathDirectories = thisPathDirectories.SkipLast(1).ToArray();
+        return thisPathDirectories.Length > 0 ? System.IO.Path.Combine(thisPathDirectories) : null;
+    }
 
-        public bool IsParentOf(Folder otherFolder)
-        {
-            return !string.IsNullOrWhiteSpace(Path)
-                && !string.IsNullOrWhiteSpace(otherFolder?.Parent?.Path)
-                && string.Compare(Path, otherFolder?.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
-        }
+    public bool IsParentOf(Folder otherFolder)
+    {
+        return !string.IsNullOrWhiteSpace(Path)
+            && !string.IsNullOrWhiteSpace(otherFolder?.Parent?.Path)
+            && string.Compare(Path, otherFolder?.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
+    }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is Folder folder && folder.Path == Path;
-        }
+    public override bool Equals(object? obj)
+    {
+        return obj is Folder folder && folder.Path == Path;
+    }
 
-        public override int GetHashCode()
-        {
-            return Path != null ? Path.GetHashCode() : base.GetHashCode();
-        }
+    public override int GetHashCode()
+    {
+        return Path != null ? Path.GetHashCode() : base.GetHashCode();
+    }
 
-        public override string ToString()
-        {
-            return Path;
-        }
+    public override string ToString()
+    {
+        return Path;
     }
 }

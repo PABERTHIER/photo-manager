@@ -1,68 +1,67 @@
 ﻿using PhotoManager.Domain.Interfaces;
 
-namespace PhotoManager.Domain
+namespace PhotoManager.Domain;
+
+public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
 {
-    public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
+    private readonly IAssetRepository _assetRepository;
+    private readonly IStorageService _storageService;
+
+    public FindDuplicatedAssetsService(
+        IAssetRepository assetRepository,
+        IStorageService storageService)
     {
-        private readonly IAssetRepository _assetRepository;
-        private readonly IStorageService _storageService;
+        _assetRepository = assetRepository;
+        _storageService = storageService;
+    }
 
-        public FindDuplicatedAssetsService(
-            IAssetRepository assetRepository,
-            IStorageService storageService)
+    /// <summary>
+    /// Detects duplicated assets in the catalog.
+    /// </summary>
+    /// <returns>A list of duplicated sets of assets (corresponding to the same image),
+    /// where each item is a list of duplicated assets.</returns>
+    public List<List<Asset>> GetDuplicatedAssets()
+    {
+        List<List<Asset>> result = new();
+        List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
+        var assetGroups = assets.GroupBy(a => a.Hash);
+        assetGroups = assetGroups.Where(g => g.Count() > 1);
+
+        foreach (var group in assetGroups)
         {
-            _assetRepository = assetRepository;
-            _storageService = storageService;
+            result.Add(group.ToList());
         }
 
-        /// <summary>
-        /// Detects duplicated assets in the catalog.
-        /// </summary>
-        /// <returns>A list of duplicated sets of assets (corresponding to the same image),
-        /// where each item is a list of duplicated assets.</returns>
-        public List<List<Asset>> GetDuplicatedAssets()
+        // Removes stale assets, whose files no longer exists.
+        foreach (List<Asset> duplicatedSet in result)
         {
-            List<List<Asset>> result = new();
-            List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
-            var assetGroups = assets.GroupBy(a => a.Hash);
-            assetGroups = assetGroups.Where(g => g.Count() > 1);
+            List<Asset> assetsToRemove = new();
 
-            foreach (var group in assetGroups)
+            for (int i = 0; i < duplicatedSet.Count; i++)
             {
-                result.Add(group.ToList());
-            }
-
-            // Removes stale assets, whose files no longer exists.
-            foreach (List<Asset> duplicatedSet in result)
-            {
-                List<Asset> assetsToRemove = new();
-
-                for (int i = 0; i < duplicatedSet.Count; i++)
+                if (!_storageService.FileExists(duplicatedSet[i].FullPath))
                 {
-                    if (!_storageService.FileExists(duplicatedSet[i].FullPath))
-                    {
-                        assetsToRemove.Add(duplicatedSet[i]);
-                    }
-                }
-
-                foreach (Asset asset in assetsToRemove)
-                {
-                    duplicatedSet.Remove(asset);
+                    assetsToRemove.Add(duplicatedSet[i]);
                 }
             }
 
-            result = result.Where(r => r.Count > 1).ToList();
-
-            // Loads the file information for each asset.
-            foreach (List<Asset> duplicatedSet in result)
+            foreach (Asset asset in assetsToRemove)
             {
-                foreach (Asset asset in duplicatedSet)
-                {
-                    _storageService.GetFileInformation(asset);
-                }
+                duplicatedSet.Remove(asset);
             }
-
-            return result;
         }
+
+        result = result.Where(r => r.Count > 1).ToList();
+
+        // Loads the file information for each asset.
+        foreach (List<Asset> duplicatedSet in result)
+        {
+            foreach (Asset asset in duplicatedSet)
+            {
+                _storageService.GetFileInformation(asset);
+            }
+        }
+
+        return result;
     }
 }

@@ -1,56 +1,55 @@
 ﻿using PhotoManager.Common;
 using PhotoManager.Domain.Interfaces;
 
-namespace PhotoManager.Domain
+namespace PhotoManager.Domain;
+
+public class DirectoryComparer : IDirectoryComparer
 {
-    public class DirectoryComparer : IDirectoryComparer
+    private readonly IStorageService _storageService;
+
+    public DirectoryComparer(IStorageService storageService)
     {
-        private readonly IStorageService _storageService;
+        _storageService = storageService;
+    }
 
-        public DirectoryComparer(IStorageService storageService)
+    public string[] GetNewFileNames(string[] fileNames, List<Asset> cataloguedAssets)
+    {
+        return GetNewFileNamesList(fileNames, cataloguedAssets.Select(ca => ca.FileName).ToArray());
+    }
+
+    public string[] GetNewFileNames(string[] sourceFileNames, string[] destinationFileNames)
+    {
+        return GetNewFileNamesList(sourceFileNames, destinationFileNames);
+    }     
+
+    public string[] GetUpdatedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
+    {
+        foreach (Asset asset in cataloguedAssets)
         {
-            _storageService = storageService;
+            _storageService.GetFileInformation(asset);
         }
 
-        public string[] GetNewFileNames(string[] fileNames, List<Asset> cataloguedAssets)
-        {
-            return GetNewFileNamesList(fileNames, cataloguedAssets.Select(ca => ca.FileName).ToArray());
-        }
+        return cataloguedAssets
+            .Where(ca => ca.FileCreationDateTime > ca.ThumbnailCreationDateTime ||
+                ca.FileModificationDateTime > ca.ThumbnailCreationDateTime)
+            .Select(ca => ca.FileName)
+            .ToArray();
+    }
 
-        public string[] GetNewFileNames(string[] sourceFileNames, string[] destinationFileNames)
-        {
-            return GetNewFileNamesList(sourceFileNames, destinationFileNames);
-        }     
+    public string[] GetDeletedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
+    {
+        return cataloguedAssets.Select(ca => ca.FileName).Except(fileNames).ToArray();
+    }
 
-        public string[] GetUpdatedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
-        {
-            foreach (Asset asset in cataloguedAssets)
-            {
-                _storageService.GetFileInformation(asset);
-            }
+    public string[] GetDeletedFileNames(string[] fileNames, string[] destinationFileNames)
+    {
+        return destinationFileNames.Except(fileNames).ToArray();
+    }
 
-            return cataloguedAssets
-                .Where(ca => ca.FileCreationDateTime > ca.ThumbnailCreationDateTime ||
-                    ca.FileModificationDateTime > ca.ThumbnailCreationDateTime)
-                .Select(ca => ca.FileName)
-                .ToArray();
-        }
-
-        public string[] GetDeletedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
-        {
-            return cataloguedAssets.Select(ca => ca.FileName).Except(fileNames).ToArray();
-        }
-
-        public string[] GetDeletedFileNames(string[] fileNames, string[] destinationFileNames)
-        {
-            return destinationFileNames.Except(fileNames).ToArray();
-        }
-
-        private static string[] GetNewFileNamesList(string[] fileNames, string[] destinationFileNames)
-        {
-            return fileNames.Except(destinationFileNames)
-                            .Where(ImageHelper.IsImageFile)
-                            .ToArray();
-        }
+    private static string[] GetNewFileNamesList(string[] fileNames, string[] destinationFileNames)
+    {
+        return fileNames.Except(destinationFileNames)
+                        .Where(ImageHelper.IsImageFile)
+                        .ToArray();
     }
 }

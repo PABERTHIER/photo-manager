@@ -1,8 +1,7 @@
-﻿namespace PhotoManager.Domain.Interfaces
+﻿namespace PhotoManager.Domain.Interfaces;
+
+public interface IAssetHashCalculatorService
 {
-    public interface IAssetHashCalculatorService
-    {
-        string CalculateHash(byte[] imageBytes);
-        string CalculateVideoHash(string filePath);
-    }
+    string CalculateHash(byte[] imageBytes);
+    string CalculateVideoHash(string filePath);
 }

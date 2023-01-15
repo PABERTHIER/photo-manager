@@ -1,30 +1,29 @@
 ﻿using PhotoManager.Application;
 using System.ComponentModel;
 
-namespace PhotoManager.UI.ViewModels
+namespace PhotoManager.UI.ViewModels;
+
+public abstract class BaseViewModel : INotifyPropertyChanged
 {
-    public abstract class BaseViewModel : INotifyPropertyChanged
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    /// <summary>
+    /// Gets or sets the application object.
+    /// This property is declared as protected so the views
+    /// always use the view model as a facade to the application object.
+    /// </summary>
+    protected IApplication Application { get; private set; }
+
+    protected BaseViewModel(IApplication application)
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        Application = application;
+    }
 
-        /// <summary>
-        /// Gets or sets the application object.
-        /// This property is declared as protected so the views
-        /// always use the view model as a facade to the application object.
-        /// </summary>
-        protected IApplication Application { get; private set; }
-
-        protected BaseViewModel(IApplication application)
+    protected void NotifyPropertyChanged(params string[] propertyNames)
+    {
+        foreach (string propertyName in propertyNames)
         {
-            Application = application;
-        }
-
-        protected void NotifyPropertyChanged(params string[] propertyNames)
-        {
-            foreach (string propertyName in propertyNames)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

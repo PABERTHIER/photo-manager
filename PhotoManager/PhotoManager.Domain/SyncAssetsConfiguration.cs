@@ -1,24 +1,23 @@
-﻿namespace PhotoManager.Domain
+﻿namespace PhotoManager.Domain;
+
+public class SyncAssetsConfiguration
 {
-    public class SyncAssetsConfiguration
+    public SyncAssetsConfiguration()
     {
-        public SyncAssetsConfiguration()
-        {
-            Definitions = new List<SyncAssetsDirectoriesDefinition>();
-        }
+        Definitions = new List<SyncAssetsDirectoriesDefinition>();
+    }
 
-        public List<SyncAssetsDirectoriesDefinition> Definitions { get; }
+    public List<SyncAssetsDirectoriesDefinition> Definitions { get; }
 
-        public void Validate()
-        {
-            var validDefinitions = Definitions.Where(d => d.IsValid()).ToList();
-            Definitions.Clear();
-            Definitions.AddRange(validDefinitions);
-        }
+    public void Validate()
+    {
+        var validDefinitions = Definitions.Where(d => d.IsValid()).ToList();
+        Definitions.Clear();
+        Definitions.AddRange(validDefinitions);
+    }
 
-        public void Normalize()
-        {
-            Definitions.ForEach(d => d.Normalize());
-        }
+    public void Normalize()
+    {
+        Definitions.ForEach(d => d.Normalize());
     }
 }

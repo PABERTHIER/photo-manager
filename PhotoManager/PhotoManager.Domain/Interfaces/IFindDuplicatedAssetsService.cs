@@ -1,7 +1,6 @@
-﻿namespace PhotoManager.Domain.Interfaces
+﻿namespace PhotoManager.Domain.Interfaces;
+
+public interface IFindDuplicatedAssetsService
 {
-    public interface IFindDuplicatedAssetsService
-    {
-        List<List<Asset>> GetDuplicatedAssets();
-    }
+    List<List<Asset>> GetDuplicatedAssets();
 }

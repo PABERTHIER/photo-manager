@@ -1,7 +1,6 @@
-﻿namespace PhotoManager.Domain.Interfaces
+﻿namespace PhotoManager.Domain.Interfaces;
+
+public interface ISyncAssetsService
 {
-    public interface ISyncAssetsService
-    {
-        Task<List<SyncAssetsResult>> ExecuteAsync(ProcessStatusChangedCallback callback);
-    }
+    Task<List<SyncAssetsResult>> ExecuteAsync(ProcessStatusChangedCallback callback);
 }

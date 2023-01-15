@@ -1,153 +1,152 @@
 ﻿using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using PhotoManager.Common;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
 using PhotoManager.Tests.Helpers;
-using Microsoft.Extensions.Configuration;
-using Moq;
 using System.IO;
 using System.Windows.Media.Imaging;
 using Xunit;
 
-namespace PhotoManager.Tests.Integration
+namespace PhotoManager.Tests.Integration;
+
+public class StorageServiceTests
 {
-    public class StorageServiceTests
+    private readonly string _dataDirectory;
+    private readonly IConfigurationRoot _configuration;
+
+    public StorageServiceTests()
     {
-        private readonly string _dataDirectory;
-        private readonly IConfigurationRoot _configuration;
+        _dataDirectory = Path.GetDirectoryName(typeof(StorageServiceTests).Assembly.Location);
+        _dataDirectory = Path.Combine(_dataDirectory, "TestFiles");
 
-        public StorageServiceTests()
-        {
-            _dataDirectory = Path.GetDirectoryName(typeof(StorageServiceTests).Assembly.Location);
-            _dataDirectory = Path.Combine(_dataDirectory, "TestFiles");
+        string hiddenFolderPath = Path.Combine(_dataDirectory, "TestFolder", "TestHiddenSubFolder");
+        File.SetAttributes(hiddenFolderPath, File.GetAttributes(hiddenFolderPath) | FileAttributes.Hidden);
 
-            string hiddenFolderPath = Path.Combine(_dataDirectory, "TestFolder", "TestHiddenSubFolder");
-            File.SetAttributes(hiddenFolderPath, File.GetAttributes(hiddenFolderPath) | FileAttributes.Hidden);
+        Mock<IConfigurationRoot> configurationMock = new();
+        configurationMock
+            .MockGetValue("appsettings:InitialDirectory", _dataDirectory)
+            .MockGetValue("appsettings:ApplicationDataDirectory", _dataDirectory)
+            .MockGetValue("appsettings:CatalogBatchSize", "100");
 
-            Mock<IConfigurationRoot> configurationMock = new();
-            configurationMock
-                .MockGetValue("appsettings:InitialDirectory", _dataDirectory)
-                .MockGetValue("appsettings:ApplicationDataDirectory", _dataDirectory)
-                .MockGetValue("appsettings:CatalogBatchSize", "100");
+        _configuration = configurationMock.Object;
+    }
 
-            _configuration = configurationMock.Object;
-        }
+    [Theory]
+    [InlineData(1.0, "v1.0")]
+    [InlineData(1.1, "v1.1")]
+    [InlineData(2.0, "v2.0")]
+    public void ResolveCatalogPathTest(double storageVersion, string storageVersionPath)
+    {
+        Mock<IConfigurationRoot> configurationMock = new();
+        configurationMock
+            .MockGetValue("appsettings:InitialDirectory", "{ApplicationData}\\PhotoManager")
+            .MockGetValue("appsettings:ApplicationDataDirectory", "{ApplicationData}\\PhotoManager")
+            .MockGetValue("appsettings:CatalogBatchSize", "100");
 
-        [Theory]
-        [InlineData(1.0, "v1.0")]
-        [InlineData(1.1, "v1.1")]
-        [InlineData(2.0, "v2.0")]
-        public void ResolveCatalogPathTest(double storageVersion, string storageVersionPath)
-        {
-            Mock<IConfigurationRoot> configurationMock = new();
-            configurationMock
-                .MockGetValue("appsettings:InitialDirectory", "{ApplicationData}\\PhotoManager")
-                .MockGetValue("appsettings:ApplicationDataDirectory", "{ApplicationData}\\PhotoManager")
-                .MockGetValue("appsettings:CatalogBatchSize", "100");
+        string expected = Path.Combine(Constants.PathBackUpTests, storageVersionPath);
 
-            string expected = Path.Combine(Constants.PathBackUpTests, storageVersionPath);
+        string result = StorageServiceHelper.ResolveDataDirectory(storageVersion);
 
-            string result = StorageServiceHelper.ResolveDataDirectory(storageVersion);
+        result.Should().Be(expected);
+    }
 
-            result.Should().Be(expected);
-        }
+    [Fact]
+    public void GetFileNamesTest()
+    {
+        IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
+        string[] fileNames = storageService.GetFileNames(_dataDirectory);
 
-        [Fact]
-        public void GetFileNamesTest()
-        {
-            IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
-            string[] fileNames = storageService.GetFileNames(_dataDirectory);
+        fileNames.Should().HaveCountGreaterOrEqualTo(2);
+        fileNames.Should().Contain("Image 2.jpg");
+        fileNames.Should().Contain("Image 1.jpg");
+    }
 
-            fileNames.Should().HaveCountGreaterOrEqualTo(2);
-            fileNames.Should().Contain("Image 2.jpg");
-            fileNames.Should().Contain("Image 1.jpg");
-        }
+    [Fact]
+    public void GetDrivesTest()
+    {
+        Folder[] drives = GetDrives();
+        drives.Should().NotBeEmpty();
+    }
 
-        [Fact]
-        public void GetDrivesTest()
-        {
-            Folder[] drives = GetDrives();
-            drives.Should().NotBeEmpty();
-        }
+    [Fact]
+    public void GetSubDirectoriesTest()
+    {
+        IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
+        string parentPath = Path.Combine(_dataDirectory, "TestFolder");
+        List<DirectoryInfo> directories = storageService.GetSubDirectories(parentPath);
 
-        [Fact]
-        public void GetSubDirectoriesTest()
-        {
-            IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
-            string parentPath = Path.Combine(_dataDirectory, "TestFolder");
-            List<DirectoryInfo> directories = storageService.GetSubDirectories(parentPath);
+        directories.Should().HaveCount(3);
+        directories[0].Name.Should().Be("TestHiddenSubFolder");
+        directories[1].Name.Should().Be("TestSubFolder1");
+        directories[2].Name.Should().Be("TestSubFolder2");
+    }
 
-            directories.Should().HaveCount(3);
-            directories[0].Name.Should().Be("TestHiddenSubFolder");
-            directories[1].Name.Should().Be("TestSubFolder1");
-            directories[2].Name.Should().Be("TestSubFolder2");
-        }
+    [Fact]
+    public void GetRecursiveSubDirectoriesTest()
+    {
+        IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
+        string parentPath = Path.Combine(_dataDirectory, "TestFolder");
+        List<DirectoryInfo> directories = storageService.GetRecursiveSubDirectories(parentPath);
 
-        [Fact]
-        public void GetRecursiveSubDirectoriesTest()
-        {
-            IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
-            string parentPath = Path.Combine(_dataDirectory, "TestFolder");
-            List<DirectoryInfo> directories = storageService.GetRecursiveSubDirectories(parentPath);
+        directories.Should().HaveCount(4);
+        directories[0].FullName.Should().EndWith("\\TestHiddenSubFolder");
+        directories[1].FullName.Should().EndWith("\\TestSubFolder1");
+        directories[2].FullName.Should().EndWith("\\TestSubFolder2");
+        directories[3].FullName.Should().EndWith("\\TestSubFolder2\\TestSubFolder3");
+    }
 
-            directories.Should().HaveCount(4);
-            directories[0].FullName.Should().EndWith("\\TestHiddenSubFolder");
-            directories[1].FullName.Should().EndWith("\\TestSubFolder1");
-            directories[2].FullName.Should().EndWith("\\TestSubFolder2");
-            directories[3].FullName.Should().EndWith("\\TestSubFolder2\\TestSubFolder3");
-        }
+    [Fact]
+    public void WriteReadJsonTest()
+    {
+        List<string> writtenList = new() { "Value 1", "Value 2" };
+        string jsonPath = Path.Combine(_dataDirectory, "test.json");
 
-        [Fact]
-        public void WriteReadJsonTest()
-        {
-            List<string> writtenList = new() { "Value 1", "Value 2" };
-            string jsonPath = Path.Combine(_dataDirectory, "test.json");
+        WriteObjectToJsonFile(writtenList, jsonPath);
+        List<string> readList = ReadObjectFromJsonFile<List<string>>(jsonPath);
 
-            WriteObjectToJsonFile(writtenList, jsonPath);
-            List<string> readList = ReadObjectFromJsonFile<List<string>>(jsonPath);
+        readList.Should().HaveSameCount(writtenList);
+        readList[0].Should().Be(writtenList[0]);
+        readList[1].Should().Be(writtenList[1]);
+    }
 
-            readList.Should().HaveSameCount(writtenList);
-            readList[0].Should().Be(writtenList[0]);
-            readList[1].Should().Be(writtenList[1]);
-        }
+    [Theory]
+    [InlineData(0, Rotation.Rotate0)]
+    [InlineData(1, Rotation.Rotate0)]
+    [InlineData(2, Rotation.Rotate0)]
+    [InlineData(3, Rotation.Rotate180)]
+    [InlineData(4, Rotation.Rotate180)]
+    [InlineData(5, Rotation.Rotate90)]
+    [InlineData(6, Rotation.Rotate90)]
+    [InlineData(7, Rotation.Rotate270)]
+    [InlineData(8, Rotation.Rotate270)]
+    [InlineData(9, Rotation.Rotate0)]
+    [InlineData(10, Rotation.Rotate0)]
+    [InlineData(ushort.MinValue, Rotation.Rotate0)]
+    [InlineData(ushort.MaxValue, Rotation.Rotate0)]
+    public void GetImageRotationTest(ushort exifOrientation, Rotation expected)
+    {
+        IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
+        Rotation result = storageService.GetImageRotation(exifOrientation);
 
-        [Theory]
-        [InlineData(0, Rotation.Rotate0)]
-        [InlineData(1, Rotation.Rotate0)]
-        [InlineData(2, Rotation.Rotate0)]
-        [InlineData(3, Rotation.Rotate180)]
-        [InlineData(4, Rotation.Rotate180)]
-        [InlineData(5, Rotation.Rotate90)]
-        [InlineData(6, Rotation.Rotate90)]
-        [InlineData(7, Rotation.Rotate270)]
-        [InlineData(8, Rotation.Rotate270)]
-        [InlineData(9, Rotation.Rotate0)]
-        [InlineData(10, Rotation.Rotate0)]
-        [InlineData(ushort.MinValue, Rotation.Rotate0)]
-        [InlineData(ushort.MaxValue, Rotation.Rotate0)]
-        public void GetImageRotationTest(ushort exifOrientation, Rotation expected)
-        {
-            IStorageService storageService = new StorageService(new UserConfigurationService(_configuration));
-            Rotation result = storageService.GetImageRotation(exifOrientation);
+        result.Should().Be(expected);
+    }
 
-            result.Should().Be(expected);
-        }
+    private static T ReadObjectFromJsonFile<T>(string jsonFilePath)
+    {
+        return FileHelper.ReadObjectFromJsonFile<T>(jsonFilePath);
+    }
 
-        private static T ReadObjectFromJsonFile<T>(string jsonFilePath)
-        {
-            return FileHelper.ReadObjectFromJsonFile<T>(jsonFilePath);
-        }
+    private static void WriteObjectToJsonFile(object anObject, string jsonFilePath)
+    {
+        FileHelper.WriteObjectToJsonFile(anObject, jsonFilePath);
+    }
 
-        private static void WriteObjectToJsonFile(object anObject, string jsonFilePath)
-        {
-            FileHelper.WriteObjectToJsonFile(anObject, jsonFilePath);
-        }
-
-        private static Folder[] GetDrives()
-        {
-            string[] drives = Directory.GetLogicalDrives();
-            return drives.Select(d => new Folder { Path = d }).ToArray();
-        }
+    private static Folder[] GetDrives()
+    {
+        string[] drives = Directory.GetLogicalDrives();
+        return drives.Select(d => new Folder { Path = d }).ToArray();
     }
 }

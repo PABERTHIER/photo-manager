@@ -13,79 +13,78 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 
-namespace PhotoManager.UI
+namespace PhotoManager.UI;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+[ExcludeFromCodeCoverage]
+public partial class App : System.Windows.Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public partial class App : System.Windows.Application
+    private readonly ServiceProvider serviceProvider;
+    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    // TODO: Add a global exception handler.
+
+    public App()
     {
-        private readonly ServiceProvider serviceProvider;
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-        // TODO: Add a global exception handler.
+        var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+        XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-        public App()
+        var serviceCollection = new ServiceCollection();
+        ConfigureServices(serviceCollection);
+        serviceProvider = serviceCollection.BuildServiceProvider() ?? new ServiceCollection().BuildServiceProvider();
+    }
+
+    private void App_OnStartup(object sender, StartupEventArgs e)
+    {
+        try
         {
-            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
-
-            var serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
-            serviceProvider = serviceCollection.BuildServiceProvider() ?? new ServiceCollection().BuildServiceProvider();
-        }
-
-        private void App_OnStartup(object sender, StartupEventArgs e)
-        {
-            try
+            if (!serviceProvider.GetService<IProcessService>()?.IsAlreadyRunning() ?? false)
             {
-                if (!serviceProvider.GetService<IProcessService>()?.IsAlreadyRunning() ?? false)
+                var mainWindow = serviceProvider.GetService<MainWindow>();
+                if (mainWindow != null)
                 {
-                    var mainWindow = serviceProvider.GetService<MainWindow>();
-                    if (mainWindow != null)
-                    {
-                        mainWindow.Show();
-                    }
-                    else
-                    {
-                        Shutdown();
-                    }
+                    mainWindow.Show();
                 }
                 else
                 {
                     Shutdown();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                log.Error(ex);
-                MessageBox.Show("The application failed to initialize.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                throw;
+                Shutdown();
             }
         }
-
-        private static void ConfigureServices(IServiceCollection services)
+        catch (Exception ex)
         {
-            IConfigurationBuilder builder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-            IConfigurationRoot configuration = builder.Build();
-
-            services.AddSingleton(configuration);
-            services.AddSimplePortableDatabaseServices();
-            services.AddSingleton<IDirectoryComparer, DirectoryComparer>();
-            services.AddSingleton<IProcessService, ProcessService>();
-            services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
-            services.AddSingleton<IStorageService, StorageService>();
-            services.AddSingleton<IAssetRepository, AssetRepository>();
-            services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
-            services.AddSingleton<ICatalogAssetsService, CatalogAssetsService>();
-            services.AddSingleton<IMoveAssetsService, MoveAssetsService>();
-            services.AddSingleton<IFindDuplicatedAssetsService, FindDuplicatedAssetsService>();
-            services.AddSingleton<ISyncAssetsService, SyncAssetsService>();
-            services.AddSingleton<Application.IApplication, Application.Application>();
-            services.AddSingleton<MainWindow>();
-            services.AddSingleton<ApplicationViewModel>();
+            log.Error(ex);
+            MessageBox.Show("The application failed to initialize.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            throw;
         }
+    }
+
+    private static void ConfigureServices(IServiceCollection services)
+    {
+        IConfigurationBuilder builder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+        IConfigurationRoot configuration = builder.Build();
+
+        services.AddSingleton(configuration);
+        services.AddSimplePortableDatabaseServices();
+        services.AddSingleton<IDirectoryComparer, DirectoryComparer>();
+        services.AddSingleton<IProcessService, ProcessService>();
+        services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
+        services.AddSingleton<IStorageService, StorageService>();
+        services.AddSingleton<IAssetRepository, AssetRepository>();
+        services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
+        services.AddSingleton<ICatalogAssetsService, CatalogAssetsService>();
+        services.AddSingleton<IMoveAssetsService, MoveAssetsService>();
+        services.AddSingleton<IFindDuplicatedAssetsService, FindDuplicatedAssetsService>();
+        services.AddSingleton<ISyncAssetsService, SyncAssetsService>();
+        services.AddSingleton<Application.IApplication, Application.Application>();
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<ApplicationViewModel>();
     }
 }

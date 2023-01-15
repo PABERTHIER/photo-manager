@@ -1,38 +1,37 @@
-﻿using PhotoManager.Domain;
+﻿using log4net;
+using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
-using log4net;
 using System;
 using System.Reflection;
 using System.Windows;
 
-namespace PhotoManager.UI.Windows
+namespace PhotoManager.UI.Windows;
+
+/// <summary>
+/// Interaction logic for AboutWindow.xaml
+/// </summary>
+[ExcludeFromCodeCoverage]
+public partial class AboutWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for AboutWindow.xaml
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public partial class AboutWindow : Window
+    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+    public AboutWindow(AboutInformation aboutInformation)
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        public AboutWindow(AboutInformation aboutInformation)
+        try
         {
-            try
-            {
-                InitializeComponent();
+            InitializeComponent();
 
-                DataContext = aboutInformation;
-                Title = $"About {aboutInformation.Product} {aboutInformation.Version}";
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
+            DataContext = aboutInformation;
+            Title = $"About {aboutInformation.Product} {aboutInformation.Version}";
         }
-
-        private void ConfirmButton_MouseLeftButtonDown(object sender, RoutedEventArgs e)
+        catch (Exception ex)
         {
-            Close();
+            log.Error(ex);
         }
+    }
+
+    private void ConfirmButton_MouseLeftButtonDown(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }

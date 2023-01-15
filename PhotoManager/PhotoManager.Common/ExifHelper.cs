@@ -1,86 +1,65 @@
 using System.IO;
 using System.Windows.Media.Imaging;
 
-namespace PhotoManager.Common
+namespace PhotoManager.Common;
+
+public static class ExifHelper
 {
-    public static class ExifHelper
+    public static ushort? GetExifOrientation(byte[] buffer)
     {
-        public static ushort? GetExifOrientation(byte[] buffer)
-        {
-            ushort? result = null;
+        ushort? result = null;
 
-            using (MemoryStream stream = new(buffer))
+        using (MemoryStream stream = new(buffer))
+        {
+            BitmapFrame bitmapFrame = BitmapFrame.Create(stream);
+            BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
+
+            if (bitmapMetadata != null && bitmapMetadata.ContainsQuery("System.Photo.Orientation"))
             {
-                BitmapFrame bitmapFrame = BitmapFrame.Create(stream);
+                object value = bitmapMetadata.GetQuery("System.Photo.Orientation");
+
+                if (value != null)
+                {
+                    result = (ushort)value;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static Rotation GetImageRotation(ushort exifOrientation)
+    {
+        Rotation rotation = exifOrientation switch
+        {
+            1 => Rotation.Rotate0,
+            2 => Rotation.Rotate0, // FlipX
+            3 => Rotation.Rotate180,
+            4 => Rotation.Rotate180, // FlipX
+            5 => Rotation.Rotate90, // FlipX
+            6 => Rotation.Rotate90,
+            7 => Rotation.Rotate270, // FlipX
+            8 => Rotation.Rotate270,
+            _ => Rotation.Rotate0,
+        };
+
+        return rotation;
+    }
+
+    public static bool IsValidGDIPlusImage(byte[] imageData)
+    {
+        try
+        {
+            using (var ms = new MemoryStream(imageData))
+            {
+                BitmapFrame bitmapFrame = BitmapFrame.Create(ms);
                 BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
-
-                if (bitmapMetadata != null && bitmapMetadata.ContainsQuery("System.Photo.Orientation"))
-                {
-                    object value = bitmapMetadata.GetQuery("System.Photo.Orientation");
-
-                    if (value != null)
-                    {
-                        result = (ushort)value;
-                    }
-                }
             }
-
-            return result;
+            return true;
         }
-
-        public static Rotation GetImageRotation(ushort exifOrientation)
+        catch (Exception)
         {
-            Rotation rotation = Rotation.Rotate0;
-
-            switch (exifOrientation)
-            {
-                case 1:
-                    rotation = Rotation.Rotate0;
-                    break;
-                case 2:
-                    rotation = Rotation.Rotate0; // FlipX
-                    break;
-                case 3:
-                    rotation = Rotation.Rotate180;
-                    break;
-                case 4:
-                    rotation = Rotation.Rotate180; // FlipX
-                    break;
-                case 5:
-                    rotation = Rotation.Rotate90; // FlipX
-                    break;
-                case 6:
-                    rotation = Rotation.Rotate90;
-                    break;
-                case 7:
-                    rotation = Rotation.Rotate270; // FlipX
-                    break;
-                case 8:
-                    rotation = Rotation.Rotate270;
-                    break;
-                default:
-                    rotation = Rotation.Rotate0;
-                    break;
-            }
-
-            return rotation;
-        }
-
-        public static bool IsValidGDIPlusImage(byte[] imageData)
-        {
-            try
-            {
-                using (var ms = new MemoryStream(imageData))
-                {
-                    BitmapFrame bitmapFrame = BitmapFrame.Create(ms);
-                    BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
-                }
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

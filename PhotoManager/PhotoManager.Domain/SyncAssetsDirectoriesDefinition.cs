@@ -1,46 +1,45 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace PhotoManager.Domain
+namespace PhotoManager.Domain;
+
+public class SyncAssetsDirectoriesDefinition
 {
-    public class SyncAssetsDirectoriesDefinition
+    private const string LOCAL_PATH_PATTERN = "^([A-Za-z])(:)(\\[A-Za-z0-9]*)*";
+    private const string REMOTE_PATH_PATTERN = "^(\\\\)(\\[A-Za-z0-9]*)*";
+
+    public string SourceDirectory { get; set; }
+    public string DestinationDirectory { get; set; }
+    public bool IncludeSubFolders { get; set; }
+    public bool DeleteAssetsNotInSource { get; set; }
+
+    internal bool IsValid()
     {
-        private const string LOCAL_PATH_PATTERN = "^([A-Za-z])(:)(\\[A-Za-z0-9]*)*";
-        private const string REMOTE_PATH_PATTERN = "^(\\\\)(\\[A-Za-z0-9]*)*";
+        return (IsValidLocalPath(SourceDirectory) || IsValidRemotePath(SourceDirectory))
+            && (IsValidLocalPath(DestinationDirectory) || IsValidRemotePath(DestinationDirectory));
+    }
 
-        public string SourceDirectory { get; set; }
-        public string DestinationDirectory { get; set; }
-        public bool IncludeSubFolders { get; set; }
-        public bool DeleteAssetsNotInSource { get; set; }
+    private bool IsValidLocalPath(string directory)
+    {
+        Regex regex = new(LOCAL_PATH_PATTERN);
+        return regex.IsMatch(directory);
+    }
 
-        internal bool IsValid()
-        {
-            return (IsValidLocalPath(SourceDirectory) || IsValidRemotePath(SourceDirectory))
-                && (IsValidLocalPath(DestinationDirectory) || IsValidRemotePath(DestinationDirectory));
-        }
+    private bool IsValidRemotePath(string directory)
+    {
+        Regex regex = new(REMOTE_PATH_PATTERN);
+        return regex.IsMatch(directory);
+    }
 
-        private bool IsValidLocalPath(string directory)
-        {
-            Regex regex = new(LOCAL_PATH_PATTERN);
-            return regex.IsMatch(directory);
-        }
+    internal void Normalize()
+    {
+        bool isRemote = IsValidRemotePath(SourceDirectory);
+        string[] parts = SourceDirectory.Split('\\', StringSplitOptions.RemoveEmptyEntries);
+        SourceDirectory = string.Join('\\', parts);
+        SourceDirectory = isRemote ? @"\\" + SourceDirectory : SourceDirectory;
 
-        private bool IsValidRemotePath(string directory)
-        {
-            Regex regex = new(REMOTE_PATH_PATTERN);
-            return regex.IsMatch(directory);
-        }
-
-        internal void Normalize()
-        {
-            bool isRemote = IsValidRemotePath(SourceDirectory);
-            string[] parts = SourceDirectory.Split('\\', StringSplitOptions.RemoveEmptyEntries);
-            SourceDirectory = string.Join('\\', parts);
-            SourceDirectory = isRemote ? @"\\" + SourceDirectory : SourceDirectory;
-
-            isRemote = IsValidRemotePath(DestinationDirectory);
-            parts = DestinationDirectory.Split('\\', StringSplitOptions.RemoveEmptyEntries);
-            DestinationDirectory = string.Join('\\', parts);
-            DestinationDirectory = isRemote ? @"\\" + DestinationDirectory : DestinationDirectory;
-        }
+        isRemote = IsValidRemotePath(DestinationDirectory);
+        parts = DestinationDirectory.Split('\\', StringSplitOptions.RemoveEmptyEntries);
+        DestinationDirectory = string.Join('\\', parts);
+        DestinationDirectory = isRemote ? @"\\" + DestinationDirectory : DestinationDirectory;
     }
 }

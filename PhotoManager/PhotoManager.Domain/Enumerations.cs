@@ -1,45 +1,44 @@
-﻿namespace PhotoManager.Domain
+﻿namespace PhotoManager.Domain;
+
+public enum AppModeEnum
 {
-    public enum AppModeEnum
-    {
-        Thumbnails,
-        Viewer
-    }
+    Thumbnails,
+    Viewer
+}
 
-    public enum ReasonEnum
-    {
-        AssetCreated,
-        AssetUpdated,
-        AssetDeleted,
-        FolderCreated,
-        FolderDeleted
-    }
+public enum ReasonEnum
+{
+    AssetCreated,
+    AssetUpdated,
+    AssetDeleted,
+    FolderCreated,
+    FolderDeleted
+}
 
-    public enum WallpaperStyle
-    {
-        Center,
-        Fill,
-        Fit,
-        Span,
-        Stretch,
-        Tile
-    }
+public enum WallpaperStyle
+{
+    Center,
+    Fill,
+    Fit,
+    Span,
+    Stretch,
+    Tile
+}
 
-    public enum ProcessStepEnum
-    {
-        ViewDescription,
-        Configure,
-        Run,
-        ViewResults
-    }
+public enum ProcessStepEnum
+{
+    ViewDescription,
+    Configure,
+    Run,
+    ViewResults
+}
 
-    public enum SortCriteriaEnum
-    {
-        Undefined,
-        FileName,
-        FileSize,
-        FileCreationDateTime,
-        FileModificationDateTime,
-        ThumbnailCreationDateTime
-    }
+public enum SortCriteriaEnum
+{
+    Undefined,
+    FileName,
+    FileSize,
+    FileCreationDateTime,
+    FileModificationDateTime,
+    ThumbnailCreationDateTime
 }

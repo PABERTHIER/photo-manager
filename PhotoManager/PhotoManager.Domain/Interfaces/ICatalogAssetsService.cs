@@ -1,9 +1,8 @@
-﻿namespace PhotoManager.Domain.Interfaces
+﻿namespace PhotoManager.Domain.Interfaces;
+
+public interface ICatalogAssetsService
 {
-    public interface ICatalogAssetsService
-    {
-        Task CatalogAssetsAsync(CatalogChangeCallback callback);
-        Asset CreateAsset(string directoryName, string fileName);
-        VideoAsset CreateVideoAsset(string directoryName, string fileName);
-    }
+    Task CatalogAssetsAsync(CatalogChangeCallback callback);
+    Asset CreateAsset(string directoryName, string fileName);
+    VideoAsset CreateVideoAsset(string directoryName, string fileName);
 }

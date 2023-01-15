@@ -6,134 +6,133 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace PhotoManager.Infrastructure
+namespace PhotoManager.Infrastructure;
+
+public class UserConfigurationService : IUserConfigurationService
 {
-    public class UserConfigurationService : IUserConfigurationService
+    private const int SPI_SETDESKWALLPAPER = 20;
+    private const int SPIF_UPDATEINIFILE = 0x01;
+    private const int SPIF_SENDWININICHANGE = 0x02;
+    private const string CATALOG_BATCH_SIZE_KEY = "appsettings:CatalogBatchSize";
+    private const string CATALOG_COOLDOWN_MINUTES = "appsettings:CatalogCooldownMinutes";
+    private const string BACKUPS_TO_KEEP = "appsettings:BackupsToKeep";
+    private const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:ThumbnailsDictionaryEntriesToKeep";
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+
+    private readonly IConfigurationRoot _configuration;
+
+    public UserConfigurationService(IConfigurationRoot configuration)
     {
-        private const int SPI_SETDESKWALLPAPER = 20;
-        private const int SPIF_UPDATEINIFILE = 0x01;
-        private const int SPIF_SENDWININICHANGE = 0x02;
-        private const string CATALOG_BATCH_SIZE_KEY = "appsettings:CatalogBatchSize";
-        private const string CATALOG_COOLDOWN_MINUTES = "appsettings:CatalogCooldownMinutes";
-        private const string BACKUPS_TO_KEEP = "appsettings:BackupsToKeep";
-        private const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:ThumbnailsDictionaryEntriesToKeep";
+        _configuration = configuration;
+    }
 
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+    public void SetAsWallpaper(Asset asset, WallpaperStyle style)
+    {
+        RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
 
-        private readonly IConfigurationRoot _configuration;
-
-        public UserConfigurationService(IConfigurationRoot configuration)
+        switch (style)
         {
-            _configuration = configuration;
+            case WallpaperStyle.Fill:
+                key.SetValue(@"WallpaperStyle", "10");
+                key.SetValue(@"TileWallpaper", "0");
+                break;
+
+            case WallpaperStyle.Fit:
+                key.SetValue(@"WallpaperStyle", "6");
+                key.SetValue(@"TileWallpaper", "0");
+                break;
+
+            case WallpaperStyle.Stretch:
+                key.SetValue(@"WallpaperStyle", "2");
+                key.SetValue(@"TileWallpaper", "0");
+                break;
+
+            case WallpaperStyle.Tile:
+                key.SetValue(@"WallpaperStyle", "0");
+                key.SetValue(@"TileWallpaper", "1");
+                break;
+
+            case WallpaperStyle.Center:
+                key.SetValue(@"WallpaperStyle", "0");
+                key.SetValue(@"TileWallpaper", "0");
+                break;
+
+            case WallpaperStyle.Span:
+                key.SetValue(@"WallpaperStyle", "22");
+                key.SetValue(@"TileWallpaper", "0");
+                break;
         }
 
-        public void SetAsWallpaper(Asset asset, WallpaperStyle style)
+        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, asset.FullPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+    }
+
+    public AboutInformation GetAboutInformation(Assembly assembly)
+    {
+        string? product = null;
+        string version = "v" + GetProductVersion();
+        var attrs = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute));
+
+        if (attrs.SingleOrDefault() is AssemblyProductAttribute assemblyProduct)
         {
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
-
-            switch (style)
-            {
-                case WallpaperStyle.Fill:
-                    key.SetValue(@"WallpaperStyle", "10");
-                    key.SetValue(@"TileWallpaper", "0");
-                    break;
-
-                case WallpaperStyle.Fit:
-                    key.SetValue(@"WallpaperStyle", "6");
-                    key.SetValue(@"TileWallpaper", "0");
-                    break;
-
-                case WallpaperStyle.Stretch:
-                    key.SetValue(@"WallpaperStyle", "2");
-                    key.SetValue(@"TileWallpaper", "0");
-                    break;
-
-                case WallpaperStyle.Tile:
-                    key.SetValue(@"WallpaperStyle", "0");
-                    key.SetValue(@"TileWallpaper", "1");
-                    break;
-
-                case WallpaperStyle.Center:
-                    key.SetValue(@"WallpaperStyle", "0");
-                    key.SetValue(@"TileWallpaper", "0");
-                    break;
-
-                case WallpaperStyle.Span:
-                    key.SetValue(@"WallpaperStyle", "22");
-                    key.SetValue(@"TileWallpaper", "0");
-                    break;
-            }
-
-            SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, asset.FullPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+            product = assemblyProduct.Product;
         }
 
-        public AboutInformation GetAboutInformation(Assembly assembly)
+        AboutInformation aboutInformation = new()
         {
-            string? product = null;
-            string version = "v" + GetProductVersion();
-            var attrs = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute));
+            Product = product ?? "",
+            Version = version
+        };
 
-            if (attrs.SingleOrDefault() is AssemblyProductAttribute assemblyProduct)
-            {
-                product = assemblyProduct.Product;
-            }
+        return aboutInformation;
+    }
 
-            AboutInformation aboutInformation = new()
-            {
-                Product = product ?? "",
-                Version = version
-            };
+    public string GetPicturesDirectory()
+    {
+        return Constants.PathLocation;
+    }
 
-            return aboutInformation;
-        }
+    public string GetApplicationBackUpFolder()
+    {
+        return Constants.PathBackUp;
+    }
 
-        public string GetPicturesDirectory()
+    public int GetCatalogBatchSize()
+    {
+        return _configuration.GetValue<int>(CATALOG_BATCH_SIZE_KEY);
+    }
+
+    public int GetCatalogCooldownMinutes()
+    {
+        return _configuration.GetValue<int>(CATALOG_COOLDOWN_MINUTES);
+    }
+
+    public int GetBackupsToKeep()
+    {
+        return _configuration.GetValue<int>(BACKUPS_TO_KEEP);
+    }
+
+    public int GetThumbnailsDictionaryEntriesToKeep()
+    {
+        return _configuration.GetValue<int>(THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
+    }
+
+    public string[] GetRootCatalogFolderPaths()
+    {
+        // TODO: Validate if some of the root folders are not valid or don't exist any longer.
+        List<string> rootPaths = new()
         {
-            return Constants.PathLocation;
-        }
+            GetPicturesDirectory()
+        };
 
-        public string GetApplicationBackUpFolder()
-        {
-            return Constants.PathBackUp;
-        }
+        return rootPaths.ToArray();
+    }
 
-        public int GetCatalogBatchSize()
-        {
-            return _configuration.GetValue<int>(CATALOG_BATCH_SIZE_KEY);
-        }
+    private string GetProductVersion()
+    {
+        FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(GetType().Assembly.Location);
 
-        public int GetCatalogCooldownMinutes()
-        {
-            return _configuration.GetValue<int>(CATALOG_COOLDOWN_MINUTES);
-        }
-
-        public int GetBackupsToKeep()
-        {
-            return _configuration.GetValue<int>(BACKUPS_TO_KEEP);
-        }
-
-        public int GetThumbnailsDictionaryEntriesToKeep()
-        {
-            return _configuration.GetValue<int>(THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
-        }
-
-        public string[] GetRootCatalogFolderPaths()
-        {
-            // TODO: Validate if some of the root folders are not valid or don't exist any longer.
-            List<string> rootPaths = new()
-            {
-                GetPicturesDirectory()
-            };
-
-            return rootPaths.ToArray();
-        }
-
-        private string GetProductVersion()
-        {
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(GetType().Assembly.Location);
-
-            return fileVersionInfo.ProductVersion;
-        }
+        return fileVersionInfo.ProductVersion;
     }
 }

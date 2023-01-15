@@ -4,500 +4,499 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Media.Imaging;
 
-namespace PhotoManager.Domain
+namespace PhotoManager.Domain;
+
+public class CatalogAssetsService : ICatalogAssetsService
 {
-    public class CatalogAssetsService : ICatalogAssetsService
+    private readonly IAssetRepository _assetRepository;
+    private readonly IAssetHashCalculatorService _assetHashCalculatorService;
+    private readonly IStorageService _storageService;
+    private readonly IUserConfigurationService _userConfigurationService;
+    private readonly IDirectoryComparer _directoryComparer;
+
+    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+    private string currentFolderPath;
+
+    public CatalogAssetsService(
+        IAssetRepository assetRepository,
+        IAssetHashCalculatorService assetHashCalculatorService,
+        IStorageService storageService,
+        IUserConfigurationService userConfigurationService,
+        IDirectoryComparer directoryComparer)
     {
-        private readonly IAssetRepository _assetRepository;
-        private readonly IAssetHashCalculatorService _assetHashCalculatorService;
-        private readonly IStorageService _storageService;
-        private readonly IUserConfigurationService _userConfigurationService;
-        private readonly IDirectoryComparer _directoryComparer;
+        _assetRepository = assetRepository;
+        _assetHashCalculatorService = assetHashCalculatorService;
+        _storageService = storageService;
+        _userConfigurationService = userConfigurationService;
+        _directoryComparer = directoryComparer;
+    }
 
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        private string currentFolderPath;
-
-        public CatalogAssetsService(
-            IAssetRepository assetRepository,
-            IAssetHashCalculatorService assetHashCalculatorService,
-            IStorageService storageService,
-            IUserConfigurationService userConfigurationService,
-            IDirectoryComparer directoryComparer)
+    public async Task CatalogAssetsAsync(CatalogChangeCallback callback)
+    {
+        await Task.Run(() =>
         {
-            _assetRepository = assetRepository;
-            _assetHashCalculatorService = assetHashCalculatorService;
-            _storageService = storageService;
-            _userConfigurationService = userConfigurationService;
-            _directoryComparer = directoryComparer;
-        }
+            int cataloguedAssetsBatchCount = 0;
+            List<string> visitedFolders = new();
 
-        public async Task CatalogAssetsAsync(CatalogChangeCallback callback)
-        {
-            await Task.Run(() =>
+            try
             {
-                int cataloguedAssetsBatchCount = 0;
-                List<string> visitedFolders = new();
-
-                try
+                if (!_assetRepository.BackupExists())
                 {
-                    if (!_assetRepository.BackupExists())
-                    {
-                        callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = "Creating catalog backup..." });
-                        _assetRepository.WriteBackup();
-                        callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = string.Empty });
-                    }
-
-                    Folder[] foldersToCatalog = GetFoldersToCatalog();
-
-                    // TODO: Since the root folders to catalog are combined in the same list
-                    // with the catalogued sub-folders, the catalog process should keep a list
-                    // of the already visited folders so they don't get catalogued twice
-                    // in the same execution.
-
-                    foreach (Folder folder in foldersToCatalog)
-                    {
-                        cataloguedAssetsBatchCount = CatalogAssets(folder.Path, callback, cataloguedAssetsBatchCount, visitedFolders);
-                    }
-
+                    callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = "Creating catalog backup..." });
+                    _assetRepository.WriteBackup();
                     callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = string.Empty });
                 }
-                catch (OperationCanceledException)
+
+                Folder[] foldersToCatalog = GetFoldersToCatalog();
+
+                // TODO: Since the root folders to catalog are combined in the same list
+                // with the catalogued sub-folders, the catalog process should keep a list
+                // of the already visited folders so they don't get catalogued twice
+                // in the same execution.
+
+                foreach (Folder folder in foldersToCatalog)
                 {
-                    // If the catalog background process is cancelled,
-                    // there is a risk that it happens while saving the catalog files.
-                    // This could result in the files being damaged.
-                    // Therefore the application saves the files before the task is completly shut down.
-                    Folder currentFolder = _assetRepository.GetFolderByPath(currentFolderPath);
-                    _assetRepository.SaveCatalog(currentFolder);
-                    throw;
+                    cataloguedAssetsBatchCount = CatalogAssets(folder.Path, callback, cataloguedAssetsBatchCount, visitedFolders);
                 }
-                catch (Exception ex)
-                {
-                    log.Error(ex);
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Exception = ex });
-                }
-                finally
-                {
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Message = string.Empty });
-                }
+
+                callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = string.Empty });
+            }
+            catch (OperationCanceledException)
+            {
+                // If the catalog background process is cancelled,
+                // there is a risk that it happens while saving the catalog files.
+                // This could result in the files being damaged.
+                // Therefore the application saves the files before the task is completly shut down.
+                Folder currentFolder = _assetRepository.GetFolderByPath(currentFolderPath);
+                _assetRepository.SaveCatalog(currentFolder);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                callback?.Invoke(new CatalogChangeCallbackEventArgs { Exception = ex });
+            }
+            finally
+            {
+                callback?.Invoke(new CatalogChangeCallbackEventArgs { Message = string.Empty });
+            }
+        });
+    }
+
+    public Asset? CreateAsset(string directoryName, string fileName)
+    {
+        Asset asset = null;
+
+        const double MAX_WIDTH = 200;
+        const double MAX_HEIGHT = 150;
+
+        if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
+        {
+            string imagePath = Path.Combine(directoryName, fileName);
+            byte[] imageBytes = _storageService.GetFileBytes(imagePath);
+
+            if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
+            {
+                return asset;
+            }
+
+            ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
+            Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
+            BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
+
+            double originalDecodeWidth = originalImage.PixelWidth;
+            double originalDecodeHeight = originalImage.PixelHeight;
+            double thumbnailDecodeWidth;
+            double thumbnailDecodeHeight;
+            double percentage;
+
+            // If the original image is landscape
+            if (originalDecodeWidth > originalDecodeHeight)
+            {
+                thumbnailDecodeWidth = MAX_WIDTH;
+                percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
+                thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
+            }
+            else // If the original image is portrait
+            {
+                thumbnailDecodeHeight = MAX_HEIGHT;
+                percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
+                thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
+            }
+
+            BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
+                rotation,
+                Convert.ToInt32(thumbnailDecodeWidth),
+                Convert.ToInt32(thumbnailDecodeHeight));
+            bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
+            byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
+            Folder folder = _assetRepository.GetFolderByPath(directoryName);
+
+            asset = new Asset
+            {
+                FileName = Path.GetFileName(imagePath),
+                FolderId = folder.FolderId,
+                Folder = folder,
+                FileSize = new FileInfo(imagePath).Length,
+                PixelWidth = Convert.ToInt32(originalDecodeWidth),
+                PixelHeight = Convert.ToInt32(originalDecodeHeight),
+                ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
+                ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
+                ImageRotation = rotation,
+                ThumbnailCreationDateTime = DateTime.Now,
+                Hash = _assetHashCalculatorService.CalculateHash(imageBytes)
+            };
+
+            _assetRepository.AddAsset(asset, thumbnailBuffer);
+        }
+
+        return asset;
+    }
+
+    public VideoAsset? CreateVideoAsset(string directoryName, string fileName)
+    {
+        VideoAsset videoAsset = null;
+
+        const double MAX_WIDTH = 200;
+        const double MAX_HEIGHT = 150;
+
+        if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
+        {
+            string videoPath = Path.Combine(directoryName, fileName);
+            byte[] imageBytes = _storageService.GetFileBytes(videoPath);
+
+            if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
+            {
+                return videoAsset;
+            }
+
+            ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
+            Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
+            BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
+
+            double originalDecodeWidth = originalImage.PixelWidth;
+            double originalDecodeHeight = originalImage.PixelHeight;
+            double thumbnailDecodeWidth;
+            double thumbnailDecodeHeight;
+            double percentage;
+
+            // If the original image is landscape
+            if (originalDecodeWidth > originalDecodeHeight)
+            {
+                thumbnailDecodeWidth = MAX_WIDTH;
+                percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
+                thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
+            }
+            else // If the original image is portrait
+            {
+                thumbnailDecodeHeight = MAX_HEIGHT;
+                percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
+                thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
+            }
+
+            BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
+                rotation,
+                Convert.ToInt32(thumbnailDecodeWidth),
+                Convert.ToInt32(thumbnailDecodeHeight));
+            bool isPng = videoPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
+            byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
+            Folder folder = _assetRepository.GetFolderByPath(directoryName);
+
+            videoAsset = new VideoAsset
+            {
+                FileName = Path.GetFileName(videoPath),
+                FolderId = folder.FolderId,
+                Folder = folder,
+                FileSize = new FileInfo(videoPath).Length,
+                PixelWidth = Convert.ToInt32(originalDecodeWidth),
+                PixelHeight = Convert.ToInt32(originalDecodeHeight),
+                ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
+                ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
+                ImageRotation = rotation,
+                ThumbnailCreationDateTime = DateTime.Now,
+                Hash = _assetHashCalculatorService.CalculateVideoHash(videoPath)
+            };
+
+            _assetRepository.AddVideoAsset(videoAsset, thumbnailBuffer);
+        }
+
+        return videoAsset;
+    }
+
+    #region private
+    private Folder[] GetFoldersToCatalog()
+    {
+        string[] rootPaths = _userConfigurationService.GetRootCatalogFolderPaths();
+
+        foreach (string root in rootPaths)
+        {
+            if (!_assetRepository.FolderExists(root))
+            {
+                _assetRepository.AddFolder(root);
+            }
+        }
+
+        return _assetRepository.GetFolders();
+    }
+
+    private int CatalogAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, List<string> visitedFolders)
+    {
+        if (!visitedFolders.Contains(directory))
+        {
+            currentFolderPath = directory;
+            int batchSize = _userConfigurationService.GetCatalogBatchSize();
+
+            if (_storageService.FolderExists(directory))
+            {
+                cataloguedAssetsBatchCount = CatalogExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize, visitedFolders);
+            }
+            else if (!string.IsNullOrEmpty(directory) && !_storageService.FolderExists(directory))
+            {
+                cataloguedAssetsBatchCount = CatalogNonExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize);
+            }
+
+            visitedFolders.Add(directory);
+        }
+
+        return cataloguedAssetsBatchCount;
+    }
+
+    private int CatalogExistingFolder(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, List<string> visitedFolders)
+    {
+        Folder folder;
+
+        if (cataloguedAssetsBatchCount >= batchSize)
+        {
+            return cataloguedAssetsBatchCount;
+        }
+
+        if (!_assetRepository.FolderExists(directory))
+        {
+            folder = _assetRepository.AddFolder(directory);
+
+            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            {
+                Folder = folder,
+                Message = $"Folder {directory} added to catalog",
+                Reason = ReasonEnum.FolderCreated
             });
         }
 
-        public Asset? CreateAsset(string directoryName, string fileName)
+        callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = "Inspecting folder " + directory });
+        string[] fileNames = _storageService.GetFileNames(directory);
+        folder = _assetRepository.GetFolderByPath(directory);
+        List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
+        bool folderHasThumbnails = _assetRepository.FolderHasThumbnails(folder);
+
+        if (!folderHasThumbnails)
         {
-            Asset asset = null;
-
-            const double MAX_WIDTH = 200;
-            const double MAX_HEIGHT = 150;
-
-            if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
+            foreach (var asset in cataloguedAssets)
             {
-                string imagePath = Path.Combine(directoryName, fileName);
-                byte[] imageBytes = _storageService.GetFileBytes(imagePath);
-
-                if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
-                {
-                    return asset;
-                }
-
-                ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
-                Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
-                BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
-
-                double originalDecodeWidth = originalImage.PixelWidth;
-                double originalDecodeHeight = originalImage.PixelHeight;
-                double thumbnailDecodeWidth;
-                double thumbnailDecodeHeight;
-                double percentage;
-
-                // If the original image is landscape
-                if (originalDecodeWidth > originalDecodeHeight)
-                {
-                    thumbnailDecodeWidth = MAX_WIDTH;
-                    percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
-                    thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
-                }
-                else // If the original image is portrait
-                {
-                    thumbnailDecodeHeight = MAX_HEIGHT;
-                    percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
-                    thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
-                }
-
-                BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
-                    rotation,
-                    Convert.ToInt32(thumbnailDecodeWidth),
-                    Convert.ToInt32(thumbnailDecodeHeight));
-                bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
-                byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
-                Folder folder = _assetRepository.GetFolderByPath(directoryName);
-
-                asset = new Asset
-                {
-                    FileName = Path.GetFileName(imagePath),
-                    FolderId = folder.FolderId,
-                    Folder = folder,
-                    FileSize = new FileInfo(imagePath).Length,
-                    PixelWidth = Convert.ToInt32(originalDecodeWidth),
-                    PixelHeight = Convert.ToInt32(originalDecodeHeight),
-                    ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
-                    ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
-                    ImageRotation = rotation,
-                    ThumbnailCreationDateTime = DateTime.Now,
-                    Hash = _assetHashCalculatorService.CalculateHash(imageBytes)
-                };
-
-                _assetRepository.AddAsset(asset, thumbnailBuffer);
+                asset.ImageData = LoadThumbnail(directory, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
             }
-
-            return asset;
         }
 
-        public VideoAsset? CreateVideoAsset(string directoryName, string fileName)
+        cataloguedAssetsBatchCount = CatalogNewAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, cataloguedAssets, folderHasThumbnails);
+        cataloguedAssetsBatchCount = CatalogUpdatedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, cataloguedAssets, folderHasThumbnails);
+        cataloguedAssetsBatchCount = CatalogDeletedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, folder, cataloguedAssets);
+
+        if (_assetRepository.HasChanges() || !folderHasThumbnails)
         {
-            VideoAsset videoAsset = null;
-
-            const double MAX_WIDTH = 200;
-            const double MAX_HEIGHT = 150;
-
-            if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
-            {
-                string videoPath = Path.Combine(directoryName, fileName);
-                byte[] imageBytes = _storageService.GetFileBytes(videoPath);
-
-                if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
-                {
-                    return videoAsset;
-                }
-
-                ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
-                Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
-                BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
-
-                double originalDecodeWidth = originalImage.PixelWidth;
-                double originalDecodeHeight = originalImage.PixelHeight;
-                double thumbnailDecodeWidth;
-                double thumbnailDecodeHeight;
-                double percentage;
-
-                // If the original image is landscape
-                if (originalDecodeWidth > originalDecodeHeight)
-                {
-                    thumbnailDecodeWidth = MAX_WIDTH;
-                    percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
-                    thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
-                }
-                else // If the original image is portrait
-                {
-                    thumbnailDecodeHeight = MAX_HEIGHT;
-                    percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
-                    thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
-                }
-
-                BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
-                    rotation,
-                    Convert.ToInt32(thumbnailDecodeWidth),
-                    Convert.ToInt32(thumbnailDecodeHeight));
-                bool isPng = videoPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
-                byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
-                Folder folder = _assetRepository.GetFolderByPath(directoryName);
-
-                videoAsset = new VideoAsset
-                {
-                    FileName = Path.GetFileName(videoPath),
-                    FolderId = folder.FolderId,
-                    Folder = folder,
-                    FileSize = new FileInfo(videoPath).Length,
-                    PixelWidth = Convert.ToInt32(originalDecodeWidth),
-                    PixelHeight = Convert.ToInt32(originalDecodeHeight),
-                    ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
-                    ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
-                    ImageRotation = rotation,
-                    ThumbnailCreationDateTime = DateTime.Now,
-                    Hash = _assetHashCalculatorService.CalculateVideoHash(videoPath)
-                };
-
-                _assetRepository.AddVideoAsset(videoAsset, thumbnailBuffer);
-            }
-
-            return videoAsset;
+            _assetRepository.SaveCatalog(folder);
         }
 
-        #region private
-        private Folder[] GetFoldersToCatalog()
+        if (cataloguedAssetsBatchCount < batchSize)
         {
-            string[] rootPaths = _userConfigurationService.GetRootCatalogFolderPaths();
+            var subdirectories = new DirectoryInfo(directory).EnumerateDirectories();
 
-            foreach (string root in rootPaths)
+            foreach (var subdir in subdirectories)
             {
-                if (!_assetRepository.FolderExists(root))
-                {
-                    _assetRepository.AddFolder(root);
-                }
+                cataloguedAssetsBatchCount = CatalogAssets(subdir.FullName, callback, cataloguedAssetsBatchCount, visitedFolders);
             }
-
-            return _assetRepository.GetFolders();
         }
 
-        private int CatalogAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, List<string> visitedFolders)
+        return cataloguedAssetsBatchCount;
+    }
+
+    private int CatalogNonExistingFolder(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize)
+    {
+        if (cataloguedAssetsBatchCount >= batchSize)
         {
-            if (!visitedFolders.Contains(directory))
-            {
-                currentFolderPath = directory;
-                int batchSize = _userConfigurationService.GetCatalogBatchSize();
-
-                if (_storageService.FolderExists(directory))
-                {
-                    cataloguedAssetsBatchCount = CatalogExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize, visitedFolders);
-                }
-                else if (!string.IsNullOrEmpty(directory) && !_storageService.FolderExists(directory))
-                {
-                    cataloguedAssetsBatchCount = CatalogNonExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize);
-                }
-
-                visitedFolders.Add(directory);
-            }
-
             return cataloguedAssetsBatchCount;
         }
 
-        private int CatalogExistingFolder(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, List<string> visitedFolders)
-        {
-            Folder folder;
+        // If the folder doesn't exist anymore, the corresponding entry in the catalog and the thumbnails file are both deleted.
+        // TODO: This should be tested in a new test method, in which the non existent folder is explicitly added to the catalog.
+        Folder folder = _assetRepository.GetFolderByPath(directory);
 
-            if (cataloguedAssetsBatchCount >= batchSize)
+        if (folder != null)
+        {
+            List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
+
+            foreach (var asset in cataloguedAssets)
             {
-                return cataloguedAssetsBatchCount;
+                if (cataloguedAssetsBatchCount >= batchSize)
+                {
+                    break;
+                }
+
+                _assetRepository.DeleteAsset(directory, asset.FileName);
+                cataloguedAssetsBatchCount++;
+
+                callback?.Invoke(new CatalogChangeCallbackEventArgs
+                {
+                    Asset = asset,
+                    Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog",
+                    Reason = ReasonEnum.AssetDeleted
+                });
             }
 
-            if (!_assetRepository.FolderExists(directory))
+            cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
+
+            if (cataloguedAssets.Count == 0)
             {
-                folder = _assetRepository.AddFolder(directory);
+                _assetRepository.DeleteFolder(folder);
 
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
                     Folder = folder,
-                    Message = $"Folder {directory} added to catalog",
-                    Reason = ReasonEnum.FolderCreated
+                    Message = "Folder " + directory + " deleted from catalog",
+                    Reason = ReasonEnum.FolderDeleted
                 });
             }
 
-            callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = "Inspecting folder " + directory });
-            string[] fileNames = _storageService.GetFileNames(directory);
-            folder = _assetRepository.GetFolderByPath(directory);
-            List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
-            bool folderHasThumbnails = _assetRepository.FolderHasThumbnails(folder);
-
-            if (!folderHasThumbnails)
-            {
-                foreach (var asset in cataloguedAssets)
-                {
-                    asset.ImageData = LoadThumbnail(directory, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
-                }
-            }
-
-            cataloguedAssetsBatchCount = CatalogNewAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, cataloguedAssets, folderHasThumbnails);
-            cataloguedAssetsBatchCount = CatalogUpdatedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, cataloguedAssets, folderHasThumbnails);
-            cataloguedAssetsBatchCount = CatalogDeletedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, folder, cataloguedAssets);
-
-            if (_assetRepository.HasChanges() || !folderHasThumbnails)
+            if (_assetRepository.HasChanges())
             {
                 _assetRepository.SaveCatalog(folder);
             }
-
-            if (cataloguedAssetsBatchCount < batchSize)
-            {
-                var subdirectories = new DirectoryInfo(directory).EnumerateDirectories();
-
-                foreach (var subdir in subdirectories)
-                {
-                    cataloguedAssetsBatchCount = CatalogAssets(subdir.FullName, callback, cataloguedAssetsBatchCount, visitedFolders);
-                }
-            }
-
-            return cataloguedAssetsBatchCount;
         }
 
-        private int CatalogNonExistingFolder(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize)
+        return cataloguedAssetsBatchCount;
+    }
+
+    private int CatalogNewAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails)
+    {
+        string[] newFileNames = _directoryComparer.GetNewFileNames(fileNames, cataloguedAssets);
+
+        foreach (var fileName in newFileNames)
         {
             if (cataloguedAssetsBatchCount >= batchSize)
             {
-                return cataloguedAssetsBatchCount;
+                break;
             }
 
-            // If the folder doesn't exist anymore, the corresponding entry in the catalog and the thumbnails file are both deleted.
-            // TODO: This should be tested in a new test method, in which the non existent folder is explicitly added to the catalog.
-            Folder folder = _assetRepository.GetFolderByPath(directory);
-
-            if (folder != null)
+            Asset newAsset = CreateAsset(directory, fileName);
+            
+            if (newAsset == null)
             {
-                List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
-
-                foreach (var asset in cataloguedAssets)
-                {
-                    if (cataloguedAssetsBatchCount >= batchSize)
-                    {
-                        break;
-                    }
-
-                    _assetRepository.DeleteAsset(directory, asset.FileName);
-                    cataloguedAssetsBatchCount++;
-
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs
-                    {
-                        Asset = asset,
-                        Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog",
-                        Reason = ReasonEnum.AssetDeleted
-                    });
-                }
-
-                cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
-
-                if (cataloguedAssets.Count == 0)
-                {
-                    _assetRepository.DeleteFolder(folder);
-
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs
-                    {
-                        Folder = folder,
-                        Message = "Folder " + directory + " deleted from catalog",
-                        Reason = ReasonEnum.FolderDeleted
-                    });
-                }
-
-                if (_assetRepository.HasChanges())
-                {
-                    _assetRepository.SaveCatalog(folder);
-                }
+                continue;
             }
 
-            return cataloguedAssetsBatchCount;
+            newAsset.ImageData = LoadThumbnail(directory, fileName, newAsset.ThumbnailPixelWidth, newAsset.ThumbnailPixelHeight);
+
+            if (!folderHasThumbnails)
+            {
+                cataloguedAssets.Add(newAsset);
+            }
+
+            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            {
+                Asset = newAsset,
+                CataloguedAssets = cataloguedAssets,
+                Message = $"Image {Path.Combine(directory, fileName)} added to catalog",
+                Reason = ReasonEnum.AssetCreated
+            });
+
+            cataloguedAssetsBatchCount++;
         }
 
-        private int CatalogNewAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails)
+        return cataloguedAssetsBatchCount;
+    }
+
+    private int CatalogUpdatedAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails)
+    {
+        string[] updatedFileNames = _directoryComparer.GetUpdatedFileNames(fileNames, cataloguedAssets);
+        Folder folder = _assetRepository.GetFolderByPath(directory);
+
+        foreach (var fileName in updatedFileNames)
         {
-            string[] newFileNames = _directoryComparer.GetNewFileNames(fileNames, cataloguedAssets);
-
-            foreach (var fileName in newFileNames)
+            if (cataloguedAssetsBatchCount >= batchSize)
             {
-                if (cataloguedAssetsBatchCount >= batchSize)
-                {
-                    break;
-                }
+                break;
+            }
 
-                Asset newAsset = CreateAsset(directory, fileName);
-                
-                if (newAsset == null)
-                {
-                    continue;
-                }
+            _assetRepository.DeleteAsset(directory, fileName);
+            string fullPath = Path.Combine(directory, fileName);
 
-                newAsset.ImageData = LoadThumbnail(directory, fileName, newAsset.ThumbnailPixelWidth, newAsset.ThumbnailPixelHeight);
+            if (_storageService.FileExists(fullPath))
+            {
+                Asset updatedAsset = CreateAsset(directory, fileName);
+                updatedAsset.ImageData = LoadThumbnail(directory, fileName, updatedAsset.ThumbnailPixelWidth, updatedAsset.ThumbnailPixelHeight);
 
                 if (!folderHasThumbnails)
                 {
-                    cataloguedAssets.Add(newAsset);
+                    cataloguedAssets.Add(updatedAsset);
                 }
 
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
-                    Asset = newAsset,
+                    Asset = updatedAsset,
                     CataloguedAssets = cataloguedAssets,
-                    Message = $"Image {Path.Combine(directory, fileName)} added to catalog",
-                    Reason = ReasonEnum.AssetCreated
+                    Message = $"Image {fullPath} updated in catalog",
+                    Reason = ReasonEnum.AssetUpdated
                 });
 
                 cataloguedAssetsBatchCount++;
             }
-
-            return cataloguedAssetsBatchCount;
         }
 
-        private int CatalogUpdatedAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails)
-        {
-            string[] updatedFileNames = _directoryComparer.GetUpdatedFileNames(fileNames, cataloguedAssets);
-            Folder folder = _assetRepository.GetFolderByPath(directory);
-
-            foreach (var fileName in updatedFileNames)
-            {
-                if (cataloguedAssetsBatchCount >= batchSize)
-                {
-                    break;
-                }
-
-                _assetRepository.DeleteAsset(directory, fileName);
-                string fullPath = Path.Combine(directory, fileName);
-
-                if (_storageService.FileExists(fullPath))
-                {
-                    Asset updatedAsset = CreateAsset(directory, fileName);
-                    updatedAsset.ImageData = LoadThumbnail(directory, fileName, updatedAsset.ThumbnailPixelWidth, updatedAsset.ThumbnailPixelHeight);
-
-                    if (!folderHasThumbnails)
-                    {
-                        cataloguedAssets.Add(updatedAsset);
-                    }
-
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs
-                    {
-                        Asset = updatedAsset,
-                        CataloguedAssets = cataloguedAssets,
-                        Message = $"Image {fullPath} updated in catalog",
-                        Reason = ReasonEnum.AssetUpdated
-                    });
-
-                    cataloguedAssetsBatchCount++;
-                }
-            }
-
-            return cataloguedAssetsBatchCount;
-        }
-
-        private int CatalogDeletedAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, Folder folder, List<Asset> cataloguedAssets)
-        {
-            string[] deletedFileNames = _directoryComparer.GetDeletedFileNames(fileNames, cataloguedAssets);
-
-            foreach (var fileName in deletedFileNames)
-            {
-                if (cataloguedAssetsBatchCount >= batchSize)
-                {
-                    break;
-                }
-
-                Asset deletedAsset = new()
-                {
-                    FileName = fileName,
-                    FolderId = folder.FolderId,
-                    Folder = folder
-                };
-
-                _assetRepository.DeleteAsset(directory, fileName);
-
-                callback?.Invoke(new CatalogChangeCallbackEventArgs
-                {
-                    Asset = deletedAsset,
-                    Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog",
-                    Reason = ReasonEnum.AssetDeleted
-                });
-
-                cataloguedAssetsBatchCount++;
-            }
-
-            return cataloguedAssetsBatchCount;
-        }
-
-        private BitmapImage LoadThumbnail(string directoryName, string fileName, int width, int height)
-        {
-            BitmapImage thumbnailImage = null;
-
-            if (_assetRepository.ContainsThumbnail(directoryName, fileName))
-            {
-                thumbnailImage = _assetRepository.LoadThumbnail(directoryName, fileName, width, height);
-            }
-
-            return thumbnailImage;
-        }
-        #endregion
+        return cataloguedAssetsBatchCount;
     }
+
+    private int CatalogDeletedAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, Folder folder, List<Asset> cataloguedAssets)
+    {
+        string[] deletedFileNames = _directoryComparer.GetDeletedFileNames(fileNames, cataloguedAssets);
+
+        foreach (var fileName in deletedFileNames)
+        {
+            if (cataloguedAssetsBatchCount >= batchSize)
+            {
+                break;
+            }
+
+            Asset deletedAsset = new()
+            {
+                FileName = fileName,
+                FolderId = folder.FolderId,
+                Folder = folder
+            };
+
+            _assetRepository.DeleteAsset(directory, fileName);
+
+            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            {
+                Asset = deletedAsset,
+                Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog",
+                Reason = ReasonEnum.AssetDeleted
+            });
+
+            cataloguedAssetsBatchCount++;
+        }
+
+        return cataloguedAssetsBatchCount;
+    }
+
+    private BitmapImage LoadThumbnail(string directoryName, string fileName, int width, int height)
+    {
+        BitmapImage thumbnailImage = null;
+
+        if (_assetRepository.ContainsThumbnail(directoryName, fileName))
+        {
+            thumbnailImage = _assetRepository.LoadThumbnail(directoryName, fileName, width, height);
+        }
+
+        return thumbnailImage;
+    }
+    #endregion
 }

@@ -1,8 +1,7 @@
-﻿namespace PhotoManager.Domain.Interfaces
+﻿namespace PhotoManager.Domain.Interfaces;
+
+public interface IMoveAssetsService
 {
-    public interface IMoveAssetsService
-    {
-        bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFile);
-        void DeleteAssets(Asset[] assets, bool deleteFile, bool saveCatalog = true);
-    }
+    bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFile);
+    void DeleteAssets(Asset[] assets, bool deleteFile, bool saveCatalog = true);
 }

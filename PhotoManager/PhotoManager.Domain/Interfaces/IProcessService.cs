@@ -1,7 +1,6 @@
-﻿namespace PhotoManager.Domain.Interfaces
+﻿namespace PhotoManager.Domain.Interfaces;
+
+public interface IProcessService
 {
-    public interface IProcessService
-    {
-        bool IsAlreadyRunning();
-    }
+    bool IsAlreadyRunning();
 }

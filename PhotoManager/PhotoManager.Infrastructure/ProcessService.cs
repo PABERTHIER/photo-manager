@@ -1,29 +1,28 @@
 ﻿using PhotoManager.Domain.Interfaces;
 using System.Diagnostics;
 
-namespace PhotoManager.Infrastructure
+namespace PhotoManager.Infrastructure;
+
+public class ProcessService : IProcessService
 {
-    public class ProcessService : IProcessService
+    public bool IsAlreadyRunning()
     {
-        public bool IsAlreadyRunning()
+        bool result = false;
+
+        int currentProcessId = Environment.ProcessId;
+        Process currentProcess = Process.GetProcessById(currentProcessId);
+        Process[] processes = Process.GetProcessesByName(currentProcess.ProcessName);
+
+        foreach (Process process in processes)
         {
-            bool result = false;
+            result = process.Id != currentProcessId;
 
-            int currentProcessId = Environment.ProcessId;
-            Process currentProcess = Process.GetProcessById(currentProcessId);
-            Process[] processes = Process.GetProcessesByName(currentProcess.ProcessName);
-
-            foreach (Process process in processes)
+            if (result)
             {
-                result = process.Id != currentProcessId;
-
-                if (result)
-                {
-                    break;
-                }
+                break;
             }
-
-            return result;
         }
+
+        return result;
     }
 }

@@ -12,99 +12,98 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace PhotoManager.UI.Controls
+namespace PhotoManager.UI.Controls;
+
+/// <summary>
+/// Interaction logic for ThumbnailsUserControl.xaml
+/// </summary>
+[ExcludeFromCodeCoverage]
+public partial class ThumbnailsUserControl : UserControl
 {
-    /// <summary>
-    /// Interaction logic for ThumbnailsUserControl.xaml
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public partial class ThumbnailsUserControl : UserControl
+    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    public event ThumbnailSelectedEventHandler ThumbnailSelected;
+
+    public ThumbnailsUserControl()
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public event ThumbnailSelectedEventHandler ThumbnailSelected;
-
-        public ThumbnailsUserControl()
+        try
         {
-            try
-            {
-                InitializeComponent();
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
+            InitializeComponent();
         }
-
-        private ApplicationViewModel ViewModel
+        catch (Exception ex)
         {
-            get { return (ApplicationViewModel)DataContext; }
+            log.Error(ex);
         }
+    }
 
-        public async void GoToFolder(IApplication assetApp, string selectedImagePath)
+    private ApplicationViewModel ViewModel
+    {
+        get { return (ApplicationViewModel)DataContext; }
+    }
+
+    public async void GoToFolder(IApplication assetApp, string selectedImagePath)
+    {
+        try
         {
-            try
+            if (!ViewModel.IsRefreshingFolders)
             {
-                if (!ViewModel.IsRefreshingFolders)
+                ViewModel.CurrentFolder = selectedImagePath;
+                Asset[] assets = await GetAssets(assetApp, ViewModel.CurrentFolder).ConfigureAwait(true);
+                ViewModel.SetAssets(assets);
+
+                if (thumbnailsListView.Items.Count > 0)
                 {
-                    ViewModel.CurrentFolder = selectedImagePath;
-                    Asset[] assets = await GetAssets(assetApp, ViewModel.CurrentFolder).ConfigureAwait(true);
-                    ViewModel.SetAssets(assets);
-
-                    if (thumbnailsListView.Items.Count > 0)
-                    {
-                        ViewModel.ViewerPosition = 0;
-                        thumbnailsListView.ScrollIntoView(thumbnailsListView.Items[0]);
-                    }
+                    ViewModel.ViewerPosition = 0;
+                    thumbnailsListView.ScrollIntoView(thumbnailsListView.Items[0]);
                 }
             }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
         }
-
-        private static Task<Asset[]> GetAssets(IApplication assetApp, string folder)
+        catch (Exception ex)
         {
-            return Task.Run(() => assetApp.GetAssets(folder));
+            log.Error(ex);
         }
+    }
 
-        private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
-                Asset asset = (Asset)((FrameworkElement)sender).DataContext;
-                ViewModel?.GoToAsset(asset);
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
-        }
+    private static Task<Asset[]> GetAssets(IApplication assetApp, string folder)
+    {
+        return Task.Run(() => assetApp.GetAssets(folder));
+    }
 
-        private void ContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        try
         {
-            try
-            {
-                Asset asset = (Asset)((FrameworkElement)sender).DataContext;
-                ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs() { Asset = asset });
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
+            Asset asset = (Asset)((FrameworkElement)sender).DataContext;
+            ViewModel?.GoToAsset(asset);
         }
+        catch (Exception ex)
+        {
+            log.Error(ex);
+        }
+    }
 
-        public void ShowImage()
+    private void ContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        try
         {
-            if (thumbnailsListView.Items.Count > 0 && thumbnailsListView.SelectedItem != null)
-            {
-                thumbnailsListView.ScrollIntoView(thumbnailsListView.SelectedItem);
-            }
+            Asset asset = (Asset)((FrameworkElement)sender).DataContext;
+            ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs() { Asset = asset });
         }
+        catch (Exception ex)
+        {
+            log.Error(ex);
+        }
+    }
 
-        private void ThumbnailsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    public void ShowImage()
+    {
+        if (thumbnailsListView.Items.Count > 0 && thumbnailsListView.SelectedItem != null)
         {
-            ViewModel.SelectedAssets = thumbnailsListView.SelectedItems.Cast<Asset>().ToArray();
+            thumbnailsListView.ScrollIntoView(thumbnailsListView.SelectedItem);
         }
+    }
+
+    private void ThumbnailsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ViewModel.SelectedAssets = thumbnailsListView.SelectedItems.Cast<Asset>().ToArray();
     }
 }

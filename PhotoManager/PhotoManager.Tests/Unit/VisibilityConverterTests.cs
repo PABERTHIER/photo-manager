@@ -4,37 +4,35 @@ using System.Globalization;
 using System.Windows;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit
-{
-    class NamedObject
-    {
+namespace PhotoManager.Tests.Unit;
 
+class NamedObject
+{
+}
+
+public class VisibilityConverterTests
+{
+    [Fact]
+    public void GetVisibilityVisibleTest()
+    {
+        VisibilityConverter converter = new();
+        Visibility result = (Visibility)converter.Convert("A string", typeof(object), null, new CultureInfo("en-US"));
+        result.Should().Be(Visibility.Visible);
     }
 
-    public class VisibilityConverterTests
+    [Fact]
+    public void GetVisibilityHiddenTest()
     {
-        [Fact]
-        public void GetVisibilityVisibleTest()
-        {
-            VisibilityConverter converter = new();
-            Visibility result = (Visibility)converter.Convert("A string", typeof(object), null, new CultureInfo("en-US"));
-            result.Should().Be(Visibility.Visible);
-        }
+        VisibilityConverter converter = new();
+        Visibility result = (Visibility)converter.Convert(new NamedObject(), typeof(object), null, new CultureInfo("en-US"));
+        result.Should().Be(Visibility.Hidden);
+    }
 
-        [Fact]
-        public void GetVisibilityHiddenTest()
-        {
-            VisibilityConverter converter = new();
-            Visibility result = (Visibility)converter.Convert(new NamedObject(), typeof(object), null, new CultureInfo("en-US"));
-            result.Should().Be(Visibility.Hidden);
-        }
-
-        [Fact]
-        public void ConvertBackTest()
-        {
-            VisibilityConverter converter = new();
-            Func<object> function = () => converter.ConvertBack(Visibility.Visible, typeof(object), null, new CultureInfo("en-US"));
-            function.Should().Throw<NotImplementedException>();
-        }
+    [Fact]
+    public void ConvertBackTest()
+    {
+        VisibilityConverter converter = new();
+        Func<object> function = () => converter.ConvertBack(Visibility.Visible, typeof(object), null, new CultureInfo("en-US"));
+        function.Should().Throw<NotImplementedException>();
     }
 }
