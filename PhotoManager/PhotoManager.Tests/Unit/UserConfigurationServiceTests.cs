@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
-using PhotoManager.Domain;
-using PhotoManager.Infrastructure;
-using PhotoManager.UI;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using PhotoManager.Domain;
+using PhotoManager.Infrastructure;
+using PhotoManager.Tests.Helpers;
+using PhotoManager.UI;
 using System.IO;
 using Xunit;
 
@@ -90,8 +91,7 @@ namespace PhotoManager.Tests.Unit
                 .MockGetValue("appsettings:CatalogBatchSize", "100")
                 .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
 
-            UserConfigurationService userConfigurationService = new(configurationMock.Object);
-            string result = userConfigurationService.GetApplicationBackUpFolder();
+            string result = UserConfigurationHelper.GetApplicationBackUpTestsFolder();
             result.Should().NotBeEmpty();
         }
 
@@ -105,8 +105,7 @@ namespace PhotoManager.Tests.Unit
                 .MockGetValue("appsettings:CatalogBatchSize", "100")
                 .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
 
-            UserConfigurationService userConfigurationService = new(configurationMock.Object);
-            string result = userConfigurationService.GetApplicationBackUpFolder();
+            string result = UserConfigurationHelper.GetApplicationBackUpTestsFolder();
             result.Should().NotBeEmpty();
         }
     }

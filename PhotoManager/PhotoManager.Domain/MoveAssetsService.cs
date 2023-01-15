@@ -101,20 +101,6 @@ namespace PhotoManager.Domain
             return result;
         }
 
-        // TODO: Extend automated tests to evaluate recent target paths.
-        private void AddTargetPathToRecent(Folder destinationFolder)
-        {
-            List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
-
-            if (recentTargetPaths.Contains(destinationFolder.Path))
-                recentTargetPaths.Remove(destinationFolder.Path);
-
-            recentTargetPaths.Insert(0, destinationFolder.Path);
-
-            recentTargetPaths = recentTargetPaths.Take(RECENT_TARGET_PATHS_MAX_COUNT).ToList();
-            _assetRepository.SaveRecentTargetPaths(recentTargetPaths);
-        }
-
         public void DeleteAssets(Asset[] assets, bool deleteFiles, bool saveCatalog = true)
         {
             #region Parameters validation
@@ -158,6 +144,20 @@ namespace PhotoManager.Domain
             {
                 _assetRepository.SaveCatalog(assets.FirstOrDefault()?.Folder);
             }
+        }
+
+        // TODO: Extend automated tests to evaluate recent target paths.
+        private void AddTargetPathToRecent(Folder destinationFolder)
+        {
+            List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
+
+            if (recentTargetPaths.Contains(destinationFolder.Path))
+                recentTargetPaths.Remove(destinationFolder.Path);
+
+            recentTargetPaths.Insert(0, destinationFolder.Path);
+
+            recentTargetPaths = recentTargetPaths.Take(RECENT_TARGET_PATHS_MAX_COUNT).ToList();
+            _assetRepository.SaveRecentTargetPaths(recentTargetPaths);
         }
     }
 }

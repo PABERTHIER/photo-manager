@@ -1,11 +1,9 @@
-﻿using PhotoManager.Application;
+﻿using log4net;
+using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
-using log4net;
-using Microsoft.Toolkit.Uwp.Notifications;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -29,7 +27,7 @@ namespace PhotoManager.UI.Windows
     public partial class MainWindow : Window
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private readonly IApplication application;
+        private readonly IApplication _application;
         Task catalogTask;
 
         public MainWindow(ApplicationViewModel viewModel, IApplication application)
@@ -38,7 +36,7 @@ namespace PhotoManager.UI.Windows
             {
                 InitializeComponent();
 
-                this.application = application;
+                _application = application;
                 var aboutInformation = application.GetAboutInformation(GetType().Assembly);
                 viewModel.Product = aboutInformation.Product;
                 viewModel.Version = aboutInformation.Version;
@@ -61,7 +59,7 @@ namespace PhotoManager.UI.Windows
             try
             {
                 ViewModel?.ChangeAppMode(AppModeEnum.Thumbnails);
-                thumbnailsUserControl.GoToFolder(application, ViewModel?.CurrentFolder);
+                thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolder);
                 folderTreeView.SelectedPath = ViewModel?.CurrentFolder;
                 await DoBackgroundWork();
             }
@@ -167,7 +165,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                thumbnailsUserControl.GoToFolder(application, folderTreeView.SelectedPath);
+                thumbnailsUserControl.GoToFolder(_application, folderTreeView.SelectedPath);
             }
             catch (Exception ex)
             {
@@ -179,7 +177,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Center);
+                _application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Center);
             }
             catch (Exception ex)
             {
@@ -191,7 +189,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Fill);
+                _application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Fill);
             }
             catch (Exception ex)
             {
@@ -203,7 +201,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Fit);
+                _application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Fit);
             }
             catch (Exception ex)
             {
@@ -215,7 +213,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Span);
+                _application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Span);
             }
             catch (Exception ex)
             {
@@ -227,7 +225,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Stretch);
+                _application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Stretch);
             }
             catch (Exception ex)
             {
@@ -239,7 +237,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Tile);
+                _application.SetAsWallpaper(ViewModel?.CurrentAsset, WallpaperStyle.Tile);
             }
             catch (Exception ex)
             {
@@ -251,11 +249,11 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                var duplicates = application.GetDuplicatedAssets();
+                var duplicates = _application.GetDuplicatedAssets();
 
                 if (duplicates.Count > 0)
                 {
-                    FindDuplicatedAssetsViewModel viewModel = new(application);
+                    FindDuplicatedAssetsViewModel viewModel = new(_application);
                     viewModel.SetDuplicates(duplicates);
                     DuplicatedAssetsWindow duplicatedAssetsWindow = new(viewModel);
                     duplicatedAssetsWindow.ShowDialog();
@@ -275,7 +273,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                SyncAssetsViewModel viewModel = new(application);
+                SyncAssetsViewModel viewModel = new(_application);
                 SyncAssetsWindow syncAssetsWindow = new(viewModel);
                 syncAssetsWindow.ShowDialog();
             }
@@ -289,7 +287,7 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                var about = application.GetAboutInformation(GetType().Assembly);
+                var about = _application.GetAboutInformation(GetType().Assembly);
                 AboutWindow duplicatedAssetsWindow = new(about);
                 duplicatedAssetsWindow.ShowDialog();
             }
@@ -319,10 +317,10 @@ namespace PhotoManager.UI.Windows
                 {
                     FolderNavigationWindow folderNavigationWindow = new(
                         new FolderNavigationViewModel(
-                            application,
+                            _application,
                             assets.First().Folder,
                             ViewModel.LastSelectedFolder,
-                            application.GetRecentTargetPaths()));
+                            _application.GetRecentTargetPaths()));
 
                     folderNavigationWindow.Closed += (sender, e) =>
                     {
@@ -330,7 +328,7 @@ namespace PhotoManager.UI.Windows
                         {
                             bool result = true;
 
-                            result = application.MoveAssets(assets,
+                            result = _application.MoveAssets(assets,
                                 folderNavigationWindow.ViewModel.SelectedFolder,
                                 preserveOriginalFiles);
 
@@ -371,7 +369,7 @@ namespace PhotoManager.UI.Windows
 
                 if (assets != null)
                 {
-                    application.DeleteAssets(assets, deleteFiles: true);
+                    _application.DeleteAssets(assets, deleteFiles: true);
                     ViewModel.RemoveAssets(assets);
                     ShowImage();
                 }
@@ -438,7 +436,7 @@ namespace PhotoManager.UI.Windows
 
                 await catalogTask.ConfigureAwait(true);
                 await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
-                ViewModel.CalculateGlobaleAssetsCounter(application);
+                ViewModel.CalculateGlobaleAssetsCounter(_application);
             }
         }
     }

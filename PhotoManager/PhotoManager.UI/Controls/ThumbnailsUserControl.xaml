@@ -42,7 +42,7 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  HorizontalContentAlignment="Stretch"
                  SelectionMode="Extended"
-                 SelectionChanged="thumbnailsListView_SelectionChanged">
+                 SelectionChanged="ThumbnailsListView_SelectionChanged">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Vertical"/>

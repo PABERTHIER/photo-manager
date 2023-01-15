@@ -39,10 +39,7 @@ namespace PhotoManager.UI.ViewModels
 
         public void MoveUpDefinition(SyncAssetsDirectoriesDefinition definition)
         {
-            if (Definitions != null)
-            {
-                Definitions.MoveUp(definition);
-            }
+            Definitions?.MoveUp(definition);
         }
 
         public void MoveDownDefinition(SyncAssetsDirectoriesDefinition definition)

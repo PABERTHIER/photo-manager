@@ -25,8 +25,8 @@ namespace PhotoManager.Infrastructure
         private List<Asset> assets;
         private List<VideoAsset> videoAssets;
         private List<Folder> folders;
-        private SyncAssetsConfiguration syncAssetsConfiguration;
-        private List<string> recentTargetPaths;
+        private SyncAssetsConfiguration _syncAssetsConfiguration;
+        private List<string> _recentTargetPaths;
         protected Dictionary<string, Dictionary<string, byte[]>> Thumbnails { get; private set; }
         private readonly Queue<string> recentThumbnailsQueue;
         private bool hasChanges;
@@ -224,8 +224,8 @@ namespace PhotoManager.Infrastructure
                 {
                     WriteAssets(assets);
                     WriteFolders(folders);
-                    WriteSyncDefinitions(syncAssetsConfiguration.Definitions);
-                    WriteRecentTargetPaths(recentTargetPaths);
+                    WriteSyncDefinitions(_syncAssetsConfiguration.Definitions);
+                    WriteRecentTargetPaths(_recentTargetPaths);
                 }
 
                 hasChanges = false;
@@ -376,7 +376,7 @@ namespace PhotoManager.Infrastructure
                     RemoveOldThumbnailsDictionaryEntries(folder);
                 }
 
-                result = Thumbnails[directoryName].ContainsKey(fileName);
+                result = !string.IsNullOrEmpty(fileName) && Thumbnails[directoryName].ContainsKey(fileName);
             }
 
             return result;
@@ -423,7 +423,7 @@ namespace PhotoManager.Infrastructure
 
             lock (syncLock)
             {
-                result = syncAssetsConfiguration;
+                result = _syncAssetsConfiguration;
             }
 
             return result;
@@ -433,7 +433,7 @@ namespace PhotoManager.Infrastructure
         {
             lock (syncLock)
             {
-                this.syncAssetsConfiguration = syncAssetsConfiguration;
+                _syncAssetsConfiguration = syncAssetsConfiguration;
                 hasChanges = true;
             }
         }
@@ -444,7 +444,7 @@ namespace PhotoManager.Infrastructure
 
             lock (syncLock)
             {
-                result = recentTargetPaths;
+                result = _recentTargetPaths;
             }
 
             return result;
@@ -454,7 +454,7 @@ namespace PhotoManager.Infrastructure
         {
             lock (syncLock)
             {
-                this.recentTargetPaths = recentTargetPaths;
+                _recentTargetPaths = recentTargetPaths;
                 hasChanges = true;
             }
         }
@@ -541,10 +541,10 @@ namespace PhotoManager.Infrastructure
         {
             assets = ReadAssets();
             folders = ReadFolders();
-            syncAssetsConfiguration = new SyncAssetsConfiguration();
-            syncAssetsConfiguration.Definitions.AddRange(ReadSyncDefinitions());
+            _syncAssetsConfiguration = new SyncAssetsConfiguration();
+            _syncAssetsConfiguration.Definitions.AddRange(ReadSyncDefinitions());
             assets.ForEach(a => a.Folder = GetFolderById(a.FolderId));
-            recentTargetPaths = ReadRecentTargetPaths();
+            _recentTargetPaths = ReadRecentTargetPaths();
         }
 
         private List<Folder> ReadFolders()
@@ -750,7 +750,7 @@ namespace PhotoManager.Infrastructure
             if (recentThumbnailsQueue.Count > entriesToKeep)
             {
                 string pathToRemove = recentThumbnailsQueue.Dequeue();
-                this.Thumbnails.Remove(pathToRemove);
+                Thumbnails.Remove(pathToRemove);
             }
         }
 

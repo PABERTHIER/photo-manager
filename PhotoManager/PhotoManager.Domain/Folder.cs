@@ -35,9 +35,9 @@
 
         public bool IsParentOf(Folder otherFolder)
         {
-            return !string.IsNullOrWhiteSpace(this.Path)
+            return !string.IsNullOrWhiteSpace(Path)
                 && !string.IsNullOrWhiteSpace(otherFolder?.Parent?.Path)
-                && string.Compare(this.Path, otherFolder?.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
+                && string.Compare(Path, otherFolder?.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
         }
 
         public override bool Equals(object? obj)

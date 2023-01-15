@@ -84,6 +84,147 @@ namespace PhotoManager.Domain
             });
         }
 
+        public Asset? CreateAsset(string directoryName, string fileName)
+        {
+            Asset asset = null;
+
+            const double MAX_WIDTH = 200;
+            const double MAX_HEIGHT = 150;
+
+            if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
+            {
+                string imagePath = Path.Combine(directoryName, fileName);
+                byte[] imageBytes = _storageService.GetFileBytes(imagePath);
+
+                if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
+                {
+                    return asset;
+                }
+
+                ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
+                Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
+                BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
+
+                double originalDecodeWidth = originalImage.PixelWidth;
+                double originalDecodeHeight = originalImage.PixelHeight;
+                double thumbnailDecodeWidth;
+                double thumbnailDecodeHeight;
+                double percentage;
+
+                // If the original image is landscape
+                if (originalDecodeWidth > originalDecodeHeight)
+                {
+                    thumbnailDecodeWidth = MAX_WIDTH;
+                    percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
+                    thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
+                }
+                else // If the original image is portrait
+                {
+                    thumbnailDecodeHeight = MAX_HEIGHT;
+                    percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
+                    thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
+                }
+
+                BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
+                    rotation,
+                    Convert.ToInt32(thumbnailDecodeWidth),
+                    Convert.ToInt32(thumbnailDecodeHeight));
+                bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
+                byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
+                Folder folder = _assetRepository.GetFolderByPath(directoryName);
+
+                asset = new Asset
+                {
+                    FileName = Path.GetFileName(imagePath),
+                    FolderId = folder.FolderId,
+                    Folder = folder,
+                    FileSize = new FileInfo(imagePath).Length,
+                    PixelWidth = Convert.ToInt32(originalDecodeWidth),
+                    PixelHeight = Convert.ToInt32(originalDecodeHeight),
+                    ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
+                    ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
+                    ImageRotation = rotation,
+                    ThumbnailCreationDateTime = DateTime.Now,
+                    Hash = _assetHashCalculatorService.CalculateHash(imageBytes)
+                };
+
+                _assetRepository.AddAsset(asset, thumbnailBuffer);
+            }
+
+            return asset;
+        }
+
+        public VideoAsset? CreateVideoAsset(string directoryName, string fileName)
+        {
+            VideoAsset videoAsset = null;
+
+            const double MAX_WIDTH = 200;
+            const double MAX_HEIGHT = 150;
+
+            if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
+            {
+                string videoPath = Path.Combine(directoryName, fileName);
+                byte[] imageBytes = _storageService.GetFileBytes(videoPath);
+
+                if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
+                {
+                    return videoAsset;
+                }
+
+                ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
+                Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
+                BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
+
+                double originalDecodeWidth = originalImage.PixelWidth;
+                double originalDecodeHeight = originalImage.PixelHeight;
+                double thumbnailDecodeWidth;
+                double thumbnailDecodeHeight;
+                double percentage;
+
+                // If the original image is landscape
+                if (originalDecodeWidth > originalDecodeHeight)
+                {
+                    thumbnailDecodeWidth = MAX_WIDTH;
+                    percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
+                    thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
+                }
+                else // If the original image is portrait
+                {
+                    thumbnailDecodeHeight = MAX_HEIGHT;
+                    percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
+                    thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
+                }
+
+                BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
+                    rotation,
+                    Convert.ToInt32(thumbnailDecodeWidth),
+                    Convert.ToInt32(thumbnailDecodeHeight));
+                bool isPng = videoPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
+                byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
+                Folder folder = _assetRepository.GetFolderByPath(directoryName);
+
+                videoAsset = new VideoAsset
+                {
+                    FileName = Path.GetFileName(videoPath),
+                    FolderId = folder.FolderId,
+                    Folder = folder,
+                    FileSize = new FileInfo(videoPath).Length,
+                    PixelWidth = Convert.ToInt32(originalDecodeWidth),
+                    PixelHeight = Convert.ToInt32(originalDecodeHeight),
+                    ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
+                    ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
+                    ImageRotation = rotation,
+                    ThumbnailCreationDateTime = DateTime.Now,
+                    Hash = _assetHashCalculatorService.CalculateVideoHash(videoPath)
+                };
+
+                _assetRepository.AddVideoAsset(videoAsset, thumbnailBuffer);
+            }
+
+            return videoAsset;
+        }
+
+        #region private
         private Folder[] GetFoldersToCatalog()
         {
             string[] rootPaths = _userConfigurationService.GetRootCatalogFolderPaths();
@@ -357,145 +498,6 @@ namespace PhotoManager.Domain
 
             return thumbnailImage;
         }
-
-        public Asset? CreateAsset(string directoryName, string fileName)
-        {
-            Asset asset = null;
-
-            const double MAX_WIDTH = 200;
-            const double MAX_HEIGHT = 150;
-
-            if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
-            {
-                string imagePath = Path.Combine(directoryName, fileName);
-                byte[] imageBytes = _storageService.GetFileBytes(imagePath);
-
-                if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
-                {
-                    return asset;
-                }
-
-                ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
-                Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
-                BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
-
-                double originalDecodeWidth = originalImage.PixelWidth;
-                double originalDecodeHeight = originalImage.PixelHeight;
-                double thumbnailDecodeWidth;
-                double thumbnailDecodeHeight;
-                double percentage;
-
-                // If the original image is landscape
-                if (originalDecodeWidth > originalDecodeHeight)
-                {
-                    thumbnailDecodeWidth = MAX_WIDTH;
-                    percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
-                    thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
-                }
-                else // If the original image is portrait
-                {
-                    thumbnailDecodeHeight = MAX_HEIGHT;
-                    percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
-                    thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
-                }
-
-                BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
-                    rotation,
-                    Convert.ToInt32(thumbnailDecodeWidth),
-                    Convert.ToInt32(thumbnailDecodeHeight));
-                bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
-                byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
-                Folder folder = _assetRepository.GetFolderByPath(directoryName);
-
-                asset = new Asset
-                {
-                    FileName = Path.GetFileName(imagePath),
-                    FolderId = folder.FolderId,
-                    Folder = folder,
-                    FileSize = new FileInfo(imagePath).Length,
-                    PixelWidth = Convert.ToInt32(originalDecodeWidth),
-                    PixelHeight = Convert.ToInt32(originalDecodeHeight),
-                    ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
-                    ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
-                    ImageRotation = rotation,
-                    ThumbnailCreationDateTime = DateTime.Now,
-                    Hash = _assetHashCalculatorService.CalculateHash(imageBytes)
-                };
-
-                _assetRepository.AddAsset(asset, thumbnailBuffer);
-            }
-
-            return asset;
-        }
-
-        public VideoAsset? CreateVideoAsset(string directoryName, string fileName)
-        {
-            VideoAsset videoAsset = null;
-
-            const double MAX_WIDTH = 200;
-            const double MAX_HEIGHT = 150;
-
-            if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
-            {
-                string videoPath = Path.Combine(directoryName, fileName);
-                byte[] imageBytes = _storageService.GetFileBytes(videoPath);
-
-                if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
-                {
-                    return videoAsset;
-                }
-
-                ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
-                Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
-                BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
-
-                double originalDecodeWidth = originalImage.PixelWidth;
-                double originalDecodeHeight = originalImage.PixelHeight;
-                double thumbnailDecodeWidth;
-                double thumbnailDecodeHeight;
-                double percentage;
-
-                // If the original image is landscape
-                if (originalDecodeWidth > originalDecodeHeight)
-                {
-                    thumbnailDecodeWidth = MAX_WIDTH;
-                    percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
-                    thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
-                }
-                else // If the original image is portrait
-                {
-                    thumbnailDecodeHeight = MAX_HEIGHT;
-                    percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
-                    thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
-                }
-
-                BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
-                    rotation,
-                    Convert.ToInt32(thumbnailDecodeWidth),
-                    Convert.ToInt32(thumbnailDecodeHeight));
-                bool isPng = videoPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
-                byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
-                Folder folder = _assetRepository.GetFolderByPath(directoryName);
-
-                videoAsset = new VideoAsset
-                {
-                    FileName = Path.GetFileName(videoPath),
-                    FolderId = folder.FolderId,
-                    Folder = folder,
-                    FileSize = new FileInfo(videoPath).Length,
-                    PixelWidth = Convert.ToInt32(originalDecodeWidth),
-                    PixelHeight = Convert.ToInt32(originalDecodeHeight),
-                    ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
-                    ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
-                    ImageRotation = rotation,
-                    ThumbnailCreationDateTime = DateTime.Now,
-                    Hash = _assetHashCalculatorService.CalculateVideoHash(videoPath)
-                };
-
-                _assetRepository.AddVideoAsset(videoAsset, thumbnailBuffer);
-            }
-
-            return videoAsset;
-        }
+        #endregion
     }
 }

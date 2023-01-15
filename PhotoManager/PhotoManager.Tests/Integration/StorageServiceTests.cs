@@ -1,13 +1,14 @@
 ﻿using FluentAssertions;
+using PhotoManager.Common;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
+using PhotoManager.Tests.Helpers;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.IO;
 using System.Windows.Media.Imaging;
 using Xunit;
-using PhotoManager.Common;
 
 namespace PhotoManager.Tests.Integration
 {
@@ -45,10 +46,9 @@ namespace PhotoManager.Tests.Integration
                 .MockGetValue("appsettings:ApplicationDataDirectory", "{ApplicationData}\\PhotoManager")
                 .MockGetValue("appsettings:CatalogBatchSize", "100");
 
-            string expected = Path.Combine(Constants.PathBackUp, storageVersionPath);
+            string expected = Path.Combine(Constants.PathBackUpTests, storageVersionPath);
 
-            IStorageService storageService = new StorageService(new UserConfigurationService(configurationMock.Object));
-            string result = storageService.ResolveDataDirectory(storageVersion);
+            string result = StorageServiceHelper.ResolveDataDirectory(storageVersion);
 
             result.Should().Be(expected);
         }

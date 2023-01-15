@@ -1,9 +1,9 @@
-﻿using PhotoManager.Application;
+﻿using log4net;
+using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.Windows;
-using log4net;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -63,7 +63,7 @@ namespace PhotoManager.UI.Controls
             }
         }
 
-        private Task<Asset[]> GetAssets(IApplication assetApp, string folder)
+        private static Task<Asset[]> GetAssets(IApplication assetApp, string folder)
         {
             return Task.Run(() => assetApp.GetAssets(folder));
         }
@@ -102,7 +102,7 @@ namespace PhotoManager.UI.Controls
             }
         }
 
-        private void thumbnailsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ThumbnailsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ViewModel.SelectedAssets = thumbnailsListView.SelectedItems.Cast<Asset>().ToArray();
         }

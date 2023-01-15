@@ -1,11 +1,11 @@
 ﻿using Autofac;
 using Autofac.Extras.Moq;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using Moq;
 using SimplePortableDatabase;
 using System.IO;
 using Xunit;
@@ -14,10 +14,10 @@ namespace PhotoManager.Tests.Integration
 {
     public class CatalogMoveAssetsServiceTests
     {
-        private string dataDirectory;
-        private string imageDestinationDirectory;
-        private string nonCataloguedImageDestinationDirectory;
-        private IConfigurationRoot configuration;
+        private static string dataDirectory;
+        private static string imageDestinationDirectory;
+        private static string nonCataloguedImageDestinationDirectory;
+        private static IConfigurationRoot configuration;
 
         public CatalogMoveAssetsServiceTests()
         {
@@ -818,15 +818,15 @@ namespace PhotoManager.Tests.Integration
             string sourceImagePath = Path.Combine(dataDirectory, "Image 5.jpg");
             File.Exists(sourceImagePath).Should().BeTrue();
 
-            Asset asset = catalogAssetsService.CreateAsset(dataDirectory, "Image 5.jpg");
+            Asset? asset = catalogAssetsService.CreateAsset(dataDirectory, "Image 5.jpg");
             repository.SaveCatalog(sourceFolder);
 
-            Assert.True(repository.ContainsThumbnail(sourceFolder.Path, asset.FileName));
+            Assert.True(repository.ContainsThumbnail(sourceFolder.Path, asset?.FileName));
 
             moveAssetsService.MoveAssets(new Asset[] { asset }, sourceFolder, preserveOriginalFile: true).Should().BeFalse();
 
             File.Exists(sourceImagePath).Should().BeTrue();
-            repository.ContainsThumbnail(sourceFolder.Path, asset.FileName).Should().BeTrue();
+            repository.ContainsThumbnail(sourceFolder.Path, asset?.FileName).Should().BeTrue();
         }
 
         [Fact]

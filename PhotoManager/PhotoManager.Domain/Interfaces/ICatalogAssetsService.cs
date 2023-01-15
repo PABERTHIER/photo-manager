@@ -4,5 +4,6 @@
     {
         Task CatalogAssetsAsync(CatalogChangeCallback callback);
         Asset CreateAsset(string directoryName, string fileName);
+        VideoAsset CreateVideoAsset(string directoryName, string fileName);
     }
 }
