@@ -73,7 +73,7 @@ public class Application : IApplication
 
     public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) => await _syncAssetsService.ExecuteAsync(callback);
 
-    public async Task CatalogAssetsAsync(CatalogChangeCallback callback) => await _catalogAssetsService.CatalogAssetsAsync(callback);
+    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null) => await _catalogAssetsService.CatalogAssetsAsync(callback, token);
 
     public void SetAsWallpaper(Asset asset, WallpaperStyle style)
     {

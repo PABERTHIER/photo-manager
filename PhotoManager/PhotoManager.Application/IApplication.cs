@@ -12,7 +12,7 @@ public interface IApplication
     SyncAssetsConfiguration GetSyncAssetsConfiguration();
     void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration);
     Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback);
-    Task CatalogAssetsAsync(CatalogChangeCallback callback);
+    Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null);
     void SetAsWallpaper(Asset asset, WallpaperStyle style);
     List<List<Asset>> GetDuplicatedAssets();
     void DeleteAssets(Asset[] assets, bool deleteFiles);

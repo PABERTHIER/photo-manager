@@ -28,6 +28,7 @@ public partial class MainWindow : Window
 {
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     private readonly IApplication _application;
+    private readonly CancellationTokenSource _cts;
     Task catalogTask;
 
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
@@ -35,6 +36,7 @@ public partial class MainWindow : Window
         try
         {
             InitializeComponent();
+            _cts = new CancellationTokenSource();
 
             _application = application;
             var aboutInformation = application.GetAboutInformation(GetType().Assembly);
@@ -415,9 +417,16 @@ public partial class MainWindow : Window
         ViewModel.SortAssetsByCriteria(SortCriteriaEnum.ThumbnailCreationDateTime);
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        e.Cancel = catalogTask != null && !catalogTask.IsCompleted;
+        var taskCancellation = Task.Run(() =>
+        {
+            _cts.Cancel();
+        });
+
+        await taskCancellation.ConfigureAwait(true);
+        await catalogTask.ConfigureAwait(true);
+        //e.Cancel = catalogTask != null && !catalogTask.IsCompleted; // Now that all tasks are canceled, the window can be closed properly
     }
 
     private async Task DoBackgroundWork()
@@ -427,12 +436,19 @@ public partial class MainWindow : Window
 
         while (true)
         {
-            catalogTask = ViewModel.CatalogAssets(
+            try
+            {
+                catalogTask = ViewModel.CatalogAssets(
                 async (e) =>
                 {
                     // The InvokeAsync method is used to avoid freezing the application when the task is cancelled.
                     await Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e));
-                });
+                }, _cts.Token);
+            }
+            catch (OperationCanceledException ex)
+            {
+                log.Error(ex);
+            }
 
             await catalogTask.ConfigureAwait(true);
             ViewModel.CalculateGlobaleAssetsCounter(_application);

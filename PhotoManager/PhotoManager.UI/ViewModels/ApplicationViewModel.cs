@@ -464,7 +464,7 @@ public class ApplicationViewModel : BaseViewModel
         return result;
     }
 
-    public async Task CatalogAssets(CatalogChangeCallback callback) => await Application.CatalogAssetsAsync(callback);
+    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) => await Application.CatalogAssetsAsync(callback, token);
 
     public int GetCatalogCooldownMinutes() => Application.GetCatalogCooldownMinutes();
 
