@@ -435,8 +435,8 @@ public partial class MainWindow : Window
                 });
 
             await catalogTask.ConfigureAwait(true);
-            await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
             ViewModel.CalculateGlobaleAssetsCounter(_application);
+            await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
         }
     }
 }
