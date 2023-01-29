@@ -476,7 +476,6 @@ public class ApplicationViewModel : BaseViewModel
 
     public void CalculateGlobaleAssetsCounter(IApplication application)
     {
-        // TODO: rappeler la méthode quand import photos fini
         var globaleAssetsCounter = application.GetAssetsCounter();
         GlobaleAssetsCounter = $"Nombre total d'images: {globaleAssetsCounter}";
     }
