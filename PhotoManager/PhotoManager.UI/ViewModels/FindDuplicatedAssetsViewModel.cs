@@ -139,8 +139,14 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
     public void DeleteAsset(DuplicatedAssetViewModel assetViewModel)
     {
         Application.DeleteAssets(new Asset[] { assetViewModel.Asset }, deleteFiles: true);
+
         assetViewModel.Visible = Visibility.Collapsed;
-        NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
+
+        if (assetViewModel.ParentViewModel.Count() <= 2) // We want to navigate only when we are deleting the last duplicate
+        {
+            NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
+        }
+        
         // TODO: THE COUNTER DISPLAYED AT THE TOP OF THE SCREEN SHOULD BE UPDATED AS WELL BASED ON THE TOTAL OF DUPLICATED SETS WITH AT LEAST 2 VISIBLE ASSETS.
     }
 
