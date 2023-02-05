@@ -4,6 +4,7 @@ using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -65,29 +66,20 @@ public partial class DuplicatedAssetsWindow : Window
         try
         {
             DuplicatedAssetViewModel viewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
-            Asset asset = viewModel.Asset;
-            var currentRootFolderPath = asset.Folder.Path;
-            var duplicatedAssets = DuplicatedAssets;
-            var isFirstOne = false;
+            DeleteAllDuplicatedAssetsByHash(DuplicatedAssets, viewModel.Asset);
+            ViewModel.Refresh();
+        }
+        catch (Exception ex)
+        {
+            log.Error(ex);
+        }
+    }
 
-            foreach (var duplicatedAssetList in duplicatedAssets)
-            {
-                isFirstOne = !isFirstOne;
-                foreach (var duplicatedAsset in duplicatedAssetList)
-                {
-                    if (!isFirstOne && duplicatedAsset.Asset.Folder.Path == currentRootFolderPath)
-                    {
-                        ViewModel.DeleteAsset(duplicatedAsset);
-                        continue;
-                    }
-
-                    if (isFirstOne)
-                    {
-                        isFirstOne = !isFirstOne;
-                    }                        
-                }
-            }
-
+    private void DeleteEveryDuplicatesLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        try
+        {
+            DeleteEveryDuplicatedAssets(DuplicatedAssets);
             ViewModel.Refresh();
         }
         catch (Exception ex)
@@ -105,6 +97,55 @@ public partial class DuplicatedAssetsWindow : Window
         catch (Exception ex)
         {
             log.Error(ex);
+        }
+    }
+
+    private void DeleteAllDuplicatedAssetsByHash(List<DuplicatedSetViewModel> duplicatedAssets, Asset currentAsset)
+    {
+        if (duplicatedAssets == null || currentAsset == null)
+        {
+            log.Error("duplicatedAssets or currentAsset is null");
+            return;
+        }
+
+        var currentRootFolderPath = currentAsset.Folder.Path;
+        var duplicatedAssetByHashList = duplicatedAssets.Where(x => x.Any(y => y.Asset.Hash == currentAsset.Hash));
+        var duplicatedAssetByHash = duplicatedAssetByHashList.FirstOrDefault();
+
+        var assetSelected = duplicatedAssetByHash?.FirstOrDefault(x => x?.Asset.Folder.Path == currentRootFolderPath && x?.Asset.FileName == currentAsset.FileName);
+
+        if (assetSelected == null)
+        {
+            log.Error("firstAsset is null");
+            return;
+        }
+
+        var assetsToDelete = duplicatedAssetByHash?.Where(x => x != null && x != assetSelected).ToList() ?? new List<DuplicatedAssetViewModel>();
+
+        foreach (var assetToDelete in assetsToDelete)
+        {
+            ViewModel.DeleteAsset(assetToDelete);
+        }
+    }
+
+    private void DeleteEveryDuplicatedAssets(List<DuplicatedSetViewModel> duplicatedAssets)
+    {
+        if (duplicatedAssets == null)
+        {
+            log.Error("duplicatedAssets is null");
+            return;
+        }
+
+        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == Constants.PathLocationToExemptTheFolder).ToList();
+
+        var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != Constants.PathLocationToExemptTheFolder).ToList();
+
+        foreach (var assetToDelete in duplicatedAssetsFiltered)
+        {
+            if (exemptedAssets.Any(x => x.Asset.Hash == assetToDelete.Asset.Hash))
+            {
+                ViewModel.DeleteAsset(assetToDelete);
+            }
         }
     }
 }

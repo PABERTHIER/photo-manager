@@ -1,4 +1,5 @@
-﻿using PhotoManager.Domain.Interfaces;
+﻿using log4net;
+using PhotoManager.Domain.Interfaces;
 using System.IO;
 
 namespace PhotoManager.Domain;

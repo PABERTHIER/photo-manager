@@ -24,8 +24,8 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
     {
         List<List<Asset>> result = new();
         List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
-        var assetGroups = assets.GroupBy(a => a.Hash);
-        assetGroups = assetGroups.Where(g => g.Count() > 1);
+        var assetGroups = assets.GroupBy(a => a.Hash).ToList();
+        assetGroups = assetGroups.Where(g => g.Count() > 1).ToList();
 
         foreach (var group in assetGroups)
         {
