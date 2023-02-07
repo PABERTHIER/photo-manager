@@ -7,6 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="#FF3C3C3C">
     <UserControl.Resources>
+        <c:FileNameConverter x:Key="FileNameConverter" />
         <c:FileSizeConverter x:Key="FileSizeConverter" />
         <c:PixelSizeConverter x:Key="PixelSizeConverter" />
         <DataTemplate x:Key="ThumbnailDataTemplate">
@@ -21,12 +22,13 @@
                         <ColumnDefinition Width="250"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <!-- Displaying the pictures -->
                     <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Center" Source="{ Binding ImageData }" Width="200" Height="150" Margin="0 0 20 0">
                         <Image.Effect>
                             <DropShadowEffect/>
                         </Image.Effect>
                     </Image>
-                    <Label Grid.Row="0" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding FileName }" VerticalContentAlignment="Center"/>
+                    <Label Grid.Row="0" Grid.Column="1" Foreground="#FFFFFFFF" Content="{Binding FileName, Converter={StaticResource FileNameConverter}}" VerticalContentAlignment="Center"/>
                     <Label Grid.Row="1" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding Converter={StaticResource PixelSizeConverter}}" VerticalContentAlignment="Center"/>
                     <Label Grid.Row="2" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding FileSize, Converter={StaticResource FileSizeConverter}}" VerticalContentAlignment="Center"/>
                 </Grid>
