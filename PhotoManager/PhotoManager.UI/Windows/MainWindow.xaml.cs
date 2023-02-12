@@ -31,11 +31,14 @@ public partial class MainWindow : Window
     private readonly CancellationTokenSource _cts;
     Task catalogTask;
 
+    public static MainWindow Current { get; private set; }
+
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
     {
         try
         {
             InitializeComponent();
+            Current = this;
             _cts = new CancellationTokenSource();
 
             _application = application;
@@ -163,7 +166,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void FolderTreeView_FolderSelected(object sender, System.EventArgs e)
+    private void FolderTreeView_FolderSelected(object sender, EventArgs e)
     {
         try
         {
@@ -257,7 +260,10 @@ public partial class MainWindow : Window
             {
                 FindDuplicatedAssetsViewModel viewModel = new(_application);
                 viewModel.SetDuplicates(duplicates);
-                DuplicatedAssetsWindow duplicatedAssetsWindow = new(viewModel);
+                DuplicatedAssetsWindow duplicatedAssetsWindow = new(viewModel) // DuplicatedAssetsWindow is FindDuplicatedAssetsWindow.xaml
+                {
+                    MainWindowInstance = Current
+                };
                 duplicatedAssetsWindow.ShowDialog();
             }
             else
@@ -380,6 +386,27 @@ public partial class MainWindow : Window
         {
             log.Error(ex);
         }
+    }
+
+    public void DeleteDuplicateAssets(Asset[] assets )
+    {
+        try
+        {
+            if (assets != null)
+            {
+                _application.DeleteAssets(assets, deleteFiles: true);
+                ViewModel.RemoveAssets(assets);
+            }
+        }
+        catch (Exception ex)
+        {
+            log.Error(ex);
+        }
+    }
+
+    public void RefreshAssetsCounter()
+    {
+        ViewModel.CalculateGlobaleAssetsCounter(_application);
     }
 
     private void DeleteAssets_Click(object sender, RoutedEventArgs e)

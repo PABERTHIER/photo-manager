@@ -38,6 +38,8 @@ public partial class DuplicatedAssetsWindow : Window
         get { return (FindDuplicatedAssetsViewModel)DataContext; }
     }
 
+    public MainWindow MainWindowInstance { get; set; }
+
     private List<DuplicatedSetViewModel> DuplicatedAssets
     {
         get { return ViewModel.GetAllDuplicatedAssets(); }
@@ -49,10 +51,10 @@ public partial class DuplicatedAssetsWindow : Window
         {
             DuplicatedAssetViewModel viewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
             Asset asset = viewModel.Asset;
-            ViewModel.DeleteAsset(viewModel);
+            ViewModel.DeleteAsset(viewModel, MainWindowInstance);
+            ViewModel.Refresh();
 
             Console.WriteLine("Delete " + asset.FullPath);
-            // TODO: IF THE USER IS VIEWING THE FOLDER IN WHICH THE DUPLICATE WAS STORED, THE THUMBNAILS LIST WON'T REFRESH
         }
         catch (Exception ex)
         {
@@ -99,6 +101,11 @@ public partial class DuplicatedAssetsWindow : Window
         }
     }
 
+    private void FindDuplicatesAssetsWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        MainWindowInstance.RefreshAssetsCounter();
+    }
+
     private void DeleteAllDuplicatedAssetsByHash(List<DuplicatedSetViewModel> duplicatedAssets, Asset currentAsset)
     {
         if (duplicatedAssets == null || currentAsset == null)
@@ -121,10 +128,7 @@ public partial class DuplicatedAssetsWindow : Window
 
         var assetsToDelete = duplicatedAssetByHash?.Where(x => x != null && x != assetSelected).ToList() ?? new List<DuplicatedAssetViewModel>();
 
-        foreach (var assetToDelete in assetsToDelete)
-        {
-            ViewModel.DeleteAsset(assetToDelete);
-        }
+        ViewModel.DeleteAssets(assetsToDelete, MainWindowInstance);
     }
 
     private void DeleteEveryDuplicatedAssets(List<DuplicatedSetViewModel> duplicatedAssets)
@@ -139,12 +143,12 @@ public partial class DuplicatedAssetsWindow : Window
 
         var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != Constants.PathLocationToExemptTheFolder).ToList();
 
-        foreach (var assetToDelete in duplicatedAssetsFiltered)
-        {
-            if (exemptedAssets.Any(x => x.Asset.Hash == assetToDelete.Asset.Hash))
-            {
-                ViewModel.DeleteAsset(assetToDelete);
-            }
-        }
+        var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
+            x => x.Asset.Hash,
+            y => y.Asset.Hash,
+            (x, y) => x)
+            .ToList();
+
+        ViewModel.DeleteAssets(assetsToDelete, MainWindowInstance);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
+using PhotoManager.UI.Windows;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -136,18 +137,25 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
         SetDuplicates(duplicates);
     }
 
-    public void DeleteAsset(DuplicatedAssetViewModel assetViewModel)
+    public void DeleteAsset(DuplicatedAssetViewModel assetViewModel, MainWindow mainWindowInstance)
     {
-        Application.DeleteAssets(new Asset[] { assetViewModel.Asset }, deleteFiles: true);
+        mainWindowInstance.DeleteDuplicateAssets(new Asset[] { assetViewModel.Asset });
 
         assetViewModel.Visible = Visibility.Collapsed;
 
-        if (assetViewModel.ParentViewModel.Count() <= 2) // We want to navigate only when we are deleting the last duplicate
+        if (assetViewModel.ParentViewModel.Where(x => x.Visible == Visibility.Visible).Count() <= 1) // We want to navigate only when we are deleting the last duplicate
         {
             NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
         }
-        
-        // TODO: THE COUNTER DISPLAYED AT THE TOP OF THE SCREEN SHOULD BE UPDATED AS WELL BASED ON THE TOTAL OF DUPLICATED SETS WITH AT LEAST 2 VISIBLE ASSETS.
+    }
+
+    public void DeleteAssets(List<DuplicatedAssetViewModel> assetViewModelList, MainWindow mainWindowInstance)
+    {
+        mainWindowInstance.DeleteDuplicateAssets(assetViewModelList.Select(x => x.Asset).ToArray());
+
+        assetViewModelList.ForEach(x => x.Visible = Visibility.Collapsed);
+
+        NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
     }
 
     private void NavigateToNextVisibleSet(int currentIndex)

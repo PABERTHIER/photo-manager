@@ -10,7 +10,8 @@
         WindowStyle="SingleBorderWindow"
         Height="450"
         Width="800"
-        Background="#FF3C3C3C">
+        Background="#FF3C3C3C"
+        Closing="FindDuplicatesAssetsWindow_Closing">
     <Window.Resources>
         <c:FileSizeConverter x:Key="FileSizeConverter" />
         <c:PixelSizeConverter x:Key="PixelSizeConverter" />
@@ -24,12 +25,12 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0" Foreground="#FFFFFFFF" Content="{Binding DuplicatedAssetSetsCollection.Count}" ContentStringFormat="Duplicated sets: {0}"/>
         <Label Grid.Row="0" Grid.Column="1" x:Name="refreshLabel" Padding="5" MouseLeftButtonDown="RefreshLabel_MouseLeftButtonDown" Content="Refresh" Style="{StaticResource ButtonStyle}" />
-        <Label Grid.Row="0" Grid.Column="2" x:Name="deleteEveryLabel" Padding="5" MouseLeftButtonDown="DeleteEveryDuplicatesLabel_MouseLeftButtonDown" Content="Delete Every Duplicates" Style="{StaticResource ButtonStyle}" />
+        <Label Grid.Row="0" Grid.Column="2" x:Name="deleteEveryLabel" Padding="5" MouseLeftButtonDown="DeleteEveryDuplicatesLabel_MouseLeftButtonDown" Content="Delete Every Duplicates Linked To Exempt Folder" Style="{StaticResource ButtonStyle}" />
         <DataGrid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" ItemsSource="{Binding DuplicatedAssetSetsCollection}" SelectedIndex="{Binding DuplicatedAssetSetsPosition}" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserAddRows="False" SelectionMode="Single" SelectionUnit="FullRow" Margin="10 0 10 0" Background="#FF3C3C3C">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
@@ -71,7 +72,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Label x:Name="deleteAllLabel" DockPanel.Dock="Right" Padding="5" MouseLeftButtonDown="DeleteAllLabel_MouseLeftButtonDown" Content="DeleteAll" Style="{StaticResource ButtonStyle}" />
+                                <Label x:Name="deleteAllLabel" DockPanel.Dock="Right" Padding="5" MouseLeftButtonDown="DeleteAllLabel_MouseLeftButtonDown" Content="DeleteAllButThis" Style="{StaticResource ButtonStyle}" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

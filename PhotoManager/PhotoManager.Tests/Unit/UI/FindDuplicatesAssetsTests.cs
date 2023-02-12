@@ -238,22 +238,19 @@ public class FindDuplicatesAssetsTests
             _duplicatedAssetViewModel3
         };
 
-        var duplicatedAssetViewModelList = new List<DuplicatedAssetViewModel>();
         var isContainingDuplicatesFromExemptFolder = false;
         var duplicatedAssetsFiltered = _duplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != pathLocationToExemptTheFolder).ToList();
 
-        foreach (var assetToDelete in duplicatedAssetsFiltered)
-        {
-            if (exemptedAssets.Any(x => x.Asset.Hash == assetToDelete.Asset.Hash))
-            {
-                duplicatedAssetViewModelList.Add(assetToDelete);
-            }
-        }
+        var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
+            x => x.Asset.Hash,
+            y => y.Asset.Hash,
+            (x, y) => x)
+            .ToList();
 
-        isContainingDuplicatesFromExemptFolder = duplicatedAssetViewModelList.Any(x => x.Asset.Folder.Path == pathLocationToExemptTheFolder);
+        isContainingDuplicatesFromExemptFolder = assetsToDelete.Any(x => x.Asset.Folder.Path == pathLocationToExemptTheFolder);
         isContainingDuplicatesFromExemptFolder.Should().BeFalse();
-        duplicatedAssetViewModelList.Should().Contain(_duplicatedAssetViewModel2);
-        duplicatedAssetViewModelList.Should().Contain(_duplicatedAssetViewModel4);
+        assetsToDelete.Should().Contain(_duplicatedAssetViewModel2);
+        assetsToDelete.Should().Contain(_duplicatedAssetViewModel4);
     }
 
     [Fact]
@@ -266,21 +263,18 @@ public class FindDuplicatesAssetsTests
             _duplicatedAssetViewModel3
         };
 
-        var duplicatedAssetViewModelList = new List<DuplicatedAssetViewModel>();
         var isContainingDuplicatesFromExemptFolder = false;
         var duplicatedAssetsFiltered = _duplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != pathLocationToExemptTheFolder).ToList();
 
-        foreach (var assetToDelete in duplicatedAssetsFiltered)
-        {
-            if (exemptedAssets.Any(x => x.Asset.Hash == assetToDelete.Asset.Hash))
-            {
-                duplicatedAssetViewModelList.Add(assetToDelete);
-            }
-        }
+        var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
+            x => x.Asset.Hash,
+            y => y.Asset.Hash,
+            (x, y) => x)
+            .ToList();
 
-        isContainingDuplicatesFromExemptFolder = duplicatedAssetViewModelList.Any(x => x.Asset.Folder.Path == pathLocationToExemptTheFolder);
+        isContainingDuplicatesFromExemptFolder = assetsToDelete.Any(x => x.Asset.Folder.Path == pathLocationToExemptTheFolder);
         isContainingDuplicatesFromExemptFolder.Should().BeFalse();
-        duplicatedAssetViewModelList.Should().NotContain(_duplicatedAssetViewModel5);
-        duplicatedAssetViewModelList.Should().NotContain(_duplicatedAssetViewModel6);
+        assetsToDelete.Should().NotContain(_duplicatedAssetViewModel5);
+        assetsToDelete.Should().NotContain(_duplicatedAssetViewModel6);
     }
 }
