@@ -190,7 +190,7 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
         }
         else
         {
-            // TODO: SHOULD DISPLAY A MESSAGE.
+            MessageBox.Show("All duplicates have been deleted. \nGood Job ;)", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
@@ -221,9 +221,7 @@ public class DuplicatedAssetViewModel : BaseViewModel
         {
             visible = value;
             NotifyPropertyChanged(nameof(Visible));
-
-            if (ParentViewModel != null)
-                ParentViewModel.NotifyAssetChanged(this);
+            ParentViewModel?.NotifyAssetChanged(this);
         }
     }
 
