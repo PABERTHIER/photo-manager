@@ -2,17 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
-	<ImplicitUsings>enable</ImplicitUsings>
+	  <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-	<AssemblyVersion>1.0.0.0</AssemblyVersion>
-	<FileVersion>1.0.0.0</FileVersion>
-	<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	<DebugType>none</DebugType>
-	<DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhotoManager.Constants\PhotoManager.Constants.csproj" />
+  </ItemGroup>
 	
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Win32;
+using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using System.Diagnostics;
@@ -90,12 +91,12 @@ public class UserConfigurationService : IUserConfigurationService
 
     public string GetPicturesDirectory()
     {
-        return Constants.PathLocation;
+        return Path.PathLocation;
     }
 
     public string GetApplicationBackUpFolder()
     {
-        return Constants.PathBackUp;
+        return Path.PathBackUp;
     }
 
     public int GetCatalogBatchSize()

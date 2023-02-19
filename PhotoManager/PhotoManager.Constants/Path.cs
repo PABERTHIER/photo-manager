@@ -1,6 +1,6 @@
-﻿namespace PhotoManager.Infrastructure;
+﻿namespace PhotoManager.Constants;
 
-public static class Constants
+public static class Path
 {
     //public const string PathLocation = "D:\\Out\\Photos";
     //public const string PathBackUp = "D:\\Workspace\\PhotoManager\\BackUp";

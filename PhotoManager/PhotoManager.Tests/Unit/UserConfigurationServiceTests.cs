@@ -7,6 +7,7 @@ using PhotoManager.Tests.Helpers;
 using PhotoManager.UI;
 using System.IO;
 using Xunit;
+using ConstantsPath = PhotoManager.Constants.Path;
 
 namespace PhotoManager.Tests.Unit;
 
@@ -78,7 +79,7 @@ public class UserConfigurationServiceTests
     {
         UserConfigurationService userConfigurationService = new(configuration);
         string result = userConfigurationService.GetPicturesDirectory();
-        result.Should().Be(Constants.PathLocation);
+        result.Should().Be(ConstantsPath.PathLocation);
     }
 
     [Fact]

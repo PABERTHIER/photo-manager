@@ -9,6 +9,7 @@ using PhotoManager.Tests.Helpers;
 using System.IO;
 using System.Windows.Media.Imaging;
 using Xunit;
+using ConstantsPath = PhotoManager.Constants.Path;
 
 namespace PhotoManager.Tests.Integration;
 
@@ -46,7 +47,7 @@ public class StorageServiceTests
             .MockGetValue("appsettings:ApplicationDataDirectory", "{ApplicationData}\\PhotoManager")
             .MockGetValue("appsettings:CatalogBatchSize", "100");
 
-        string expected = Path.Combine(Constants.PathBackUpTests, storageVersionPath);
+        string expected = Path.Combine(ConstantsPath.PathBackUpTests, storageVersionPath);
 
         string result = StorageServiceHelper.ResolveDataDirectory(storageVersion);
 

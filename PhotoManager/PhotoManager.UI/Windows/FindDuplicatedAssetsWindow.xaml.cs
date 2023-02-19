@@ -1,4 +1,5 @@
 ﻿using log4net;
+using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
@@ -139,9 +140,9 @@ public partial class DuplicatedAssetsWindow : Window
             return;
         }
 
-        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == Constants.PathLocationToExemptTheFolder).ToList();
+        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == Path.PathLocationToExemptTheFolder).ToList();
 
-        var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != Constants.PathLocationToExemptTheFolder).ToList();
+        var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != Path.PathLocationToExemptTheFolder).ToList();
 
         var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
             x => x.Asset.Hash,
