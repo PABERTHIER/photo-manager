@@ -1,4 +1,5 @@
 ﻿using log4net;
+using PhotoManager.Constants;
 using PhotoManager.Domain.Interfaces;
 using System.IO;
 using System.Reflection;
@@ -88,9 +89,6 @@ public class CatalogAssetsService : ICatalogAssetsService
     {
         Asset asset = null;
 
-        const double MAX_WIDTH = 200;
-        const double MAX_HEIGHT = 150;
-
         if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
         {
             string imagePath = Path.Combine(directoryName, fileName);
@@ -114,14 +112,14 @@ public class CatalogAssetsService : ICatalogAssetsService
             // If the original image is landscape
             if (originalDecodeWidth > originalDecodeHeight)
             {
-                thumbnailDecodeWidth = MAX_WIDTH;
-                percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
+                thumbnailDecodeWidth = AssetConstants.MaxWidth;
+                percentage = (AssetConstants.MaxWidth * 100d / originalDecodeWidth);
                 thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
             }
             else // If the original image is portrait
             {
-                thumbnailDecodeHeight = MAX_HEIGHT;
-                percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
+                thumbnailDecodeHeight = AssetConstants.MaxHeight;
+                percentage = (AssetConstants.MaxHeight * 100d / originalDecodeHeight);
                 thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
             }
 
@@ -158,9 +156,6 @@ public class CatalogAssetsService : ICatalogAssetsService
     {
         VideoAsset videoAsset = null;
 
-        const double MAX_WIDTH = 200;
-        const double MAX_HEIGHT = 150;
-
         if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
         {
             string videoPath = Path.Combine(directoryName, fileName);
@@ -184,14 +179,14 @@ public class CatalogAssetsService : ICatalogAssetsService
             // If the original image is landscape
             if (originalDecodeWidth > originalDecodeHeight)
             {
-                thumbnailDecodeWidth = MAX_WIDTH;
-                percentage = (MAX_WIDTH * 100d / originalDecodeWidth);
+                thumbnailDecodeWidth = AssetConstants.MaxWidth;
+                percentage = (AssetConstants.MaxWidth * 100d / originalDecodeWidth);
                 thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
             }
             else // If the original image is portrait
             {
-                thumbnailDecodeHeight = MAX_HEIGHT;
-                percentage = (MAX_HEIGHT * 100d / originalDecodeHeight);
+                thumbnailDecodeHeight = AssetConstants.MaxHeight;
+                percentage = (AssetConstants.MaxHeight * 100d / originalDecodeHeight);
                 thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
             }
 

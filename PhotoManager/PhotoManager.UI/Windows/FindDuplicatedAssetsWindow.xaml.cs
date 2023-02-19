@@ -140,9 +140,9 @@ public partial class DuplicatedAssetsWindow : Window
             return;
         }
 
-        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == Path.PathLocationToExemptTheFolder).ToList();
+        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == PathConstants.PathLocationToExemptTheFolder).ToList();
 
-        var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != Path.PathLocationToExemptTheFolder).ToList();
+        var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != PathConstants.PathLocationToExemptTheFolder).ToList();
 
         var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
             x => x.Asset.Hash,

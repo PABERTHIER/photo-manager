@@ -1,13 +1,13 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.Tests.Helpers;
 using PhotoManager.UI;
 using System.IO;
 using Xunit;
-using ConstantsPath = PhotoManager.Constants.Path;
 
 namespace PhotoManager.Tests.Unit;
 
@@ -79,7 +79,7 @@ public class UserConfigurationServiceTests
     {
         UserConfigurationService userConfigurationService = new(configuration);
         string result = userConfigurationService.GetPicturesDirectory();
-        result.Should().Be(ConstantsPath.PathLocation);
+        result.Should().Be(PathConstants.PathLocation);
     }
 
     [Fact]

@@ -6,6 +6,6 @@ public class UserConfigurationHelper
 {
     public static string GetApplicationBackUpTestsFolder()
     {
-        return Path.PathBackUpTests;
+        return PathConstants.PathBackUpTests;
     }
 }

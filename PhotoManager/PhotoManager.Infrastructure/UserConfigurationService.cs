@@ -91,12 +91,12 @@ public class UserConfigurationService : IUserConfigurationService
 
     public string GetPicturesDirectory()
     {
-        return Path.PathLocation;
+        return PathConstants.PathLocation;
     }
 
     public string GetApplicationBackUpFolder()
     {
-        return Path.PathBackUp;
+        return PathConstants.PathBackUp;
     }
 
     public int GetCatalogBatchSize()
