@@ -10,6 +10,7 @@
         <c:FileNameConverter x:Key="FileNameConverter" />
         <c:FileSizeConverter x:Key="FileSizeConverter" />
         <c:PixelSizeConverter x:Key="PixelSizeConverter" />
+        <c:TernaryConverter x:Key="TernaryConverter" />
         <DataTemplate x:Key="ThumbnailDataTemplate">
             <ContentControl MouseDown="ContentControl_MouseDown" MouseDoubleClick="ContentControl_MouseDoubleClick" Margin="10">
                 <Grid>
@@ -19,6 +20,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="250"/>
                         <ColumnDefinition Width="250"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
@@ -31,6 +33,25 @@
                     <Label Grid.Row="0" Grid.Column="1" Foreground="#FFFFFFFF" Content="{Binding FileName, Converter={StaticResource FileNameConverter}}" VerticalContentAlignment="Center"/>
                     <Label Grid.Row="1" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding Converter={StaticResource PixelSizeConverter}}" VerticalContentAlignment="Center"/>
                     <Label Grid.Row="2" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding FileSize, Converter={StaticResource FileSizeConverter}}" VerticalContentAlignment="Center"/>
+
+                    <Label Grid.Row="0" Grid.Column="2" Foreground="#FFFFFFFF" VerticalContentAlignment="Center">
+                        <Label.Content>
+                            <MultiBinding Converter="{StaticResource TernaryConverter}">
+                                <Binding Path="IsAssetCorrupted"/>
+                                <Binding Path="AssetCorruptedMessage"/>
+                            </MultiBinding>
+                        </Label.Content>
+                    </Label>
+
+                    <Label  Grid.Row="1" Grid.Column="2" Foreground="#FFFFFFFF" VerticalContentAlignment="Center">
+                        <Label.Content>
+                            <MultiBinding Converter="{StaticResource TernaryConverter}">
+                                <Binding Path="IsAssetRotated"/>
+                                <Binding Path="AssetRotatedMessage"/>
+                            </MultiBinding>
+                        </Label.Content>
+                    </Label>
+
                 </Grid>
             </ContentControl>
         </DataTemplate>

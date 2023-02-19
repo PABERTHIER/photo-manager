@@ -99,9 +99,23 @@ public class CatalogAssetsService : ICatalogAssetsService
                 return asset;
             }
 
-            ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
-            Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
-            BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
+            ushort exifOrientation = _storageService.GetExifOrientation(imageBytes);
+            Rotation rotation = _storageService.GetImageRotation(exifOrientation);
+
+            bool assetCorrupted = false;
+            bool assetRotated =  false;
+
+            if (exifOrientation == AssetConstants.OrientationCorruptedImage)
+            {
+                assetCorrupted = true;
+            }
+
+            if (rotation != Rotation.Rotate0)
+            {
+                assetRotated = true;
+            }
+
+            BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, Rotation.Rotate0); // before was rotation
 
             double originalDecodeWidth = originalImage.PixelWidth;
             double originalDecodeHeight = originalImage.PixelHeight;
@@ -124,12 +138,14 @@ public class CatalogAssetsService : ICatalogAssetsService
             }
 
             BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
-                rotation,
+                Rotation.Rotate0, // before was rotation
                 Convert.ToInt32(thumbnailDecodeWidth),
                 Convert.ToInt32(thumbnailDecodeHeight));
             bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
             byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
             Folder folder = _assetRepository.GetFolderByPath(directoryName);
+
+            var imageHash = _assetHashCalculatorService.CalculatePHash(imagePath);
 
             asset = new Asset
             {
@@ -143,7 +159,11 @@ public class CatalogAssetsService : ICatalogAssetsService
                 ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
                 ImageRotation = rotation,
                 ThumbnailCreationDateTime = DateTime.Now,
-                Hash = _assetHashCalculatorService.CalculateHash(imageBytes)
+                Hash = imageHash ?? _assetHashCalculatorService.CalculateHash(imageBytes), // TODO: performances are decreased with CalculatePHash by 6 times
+                IsAssetCorrupted = assetCorrupted,
+                AssetCorruptedMessage = assetCorrupted ? AssetConstants.AssetCorruptedMessage : null,
+                IsAssetRotated = assetRotated,
+                AssetRotatedMessage = assetRotated ? AssetConstants.AssetRotatedMessage : null,
             };
 
             _assetRepository.AddAsset(asset, thumbnailBuffer);
@@ -152,6 +172,7 @@ public class CatalogAssetsService : ICatalogAssetsService
         return asset;
     }
 
+    // TODO: Do it for video by keeping first frame and save it as asset ou video object ?
     public VideoAsset? CreateVideoAsset(string directoryName, string fileName)
     {
         VideoAsset videoAsset = null;
@@ -166,8 +187,8 @@ public class CatalogAssetsService : ICatalogAssetsService
                 return videoAsset;
             }
 
-            ushort? exifOrientation = _storageService.GetExifOrientation(imageBytes);
-            Rotation rotation = exifOrientation.HasValue ? _storageService.GetImageRotation(exifOrientation.Value) : Rotation.Rotate0;
+            ushort exifOrientation = _storageService.GetExifOrientation(imageBytes);
+            Rotation rotation = _storageService.GetImageRotation(exifOrientation);
             BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
 
             double originalDecodeWidth = originalImage.PixelWidth;

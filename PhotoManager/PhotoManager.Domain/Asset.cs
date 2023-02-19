@@ -20,6 +20,10 @@ public class Asset
     public string FullPath => Folder != null ? Path.Combine(Folder.Path, FileName) : FileName;
     public DateTime FileCreationDateTime { get; set; }
     public DateTime FileModificationDateTime { get; set; }
+    public bool IsAssetCorrupted { get; set; }
+    public string? AssetCorruptedMessage { get; set; }
+    public bool IsAssetRotated { get; set; }
+    public string? AssetRotatedMessage { get; set; }
 
     // Keep this code for UT only, whereas, one UT will fail...
     public override bool Equals(object? obj)

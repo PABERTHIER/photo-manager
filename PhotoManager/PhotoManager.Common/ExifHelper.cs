@@ -1,31 +1,50 @@
+using log4net;
+using PhotoManager.Constants;
 using System.IO;
+using System.Reflection;
 using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Common;
 
 public static class ExifHelper
 {
-    public static ushort? GetExifOrientation(byte[] buffer)
-    {
-        ushort? result = null;
 
+    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+    public static ushort GetExifOrientation(byte[] buffer)
+    {
         using (MemoryStream stream = new(buffer))
         {
             BitmapFrame bitmapFrame = BitmapFrame.Create(stream);
             BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
 
-            if (bitmapMetadata != null && bitmapMetadata.ContainsQuery("System.Photo.Orientation"))
+            if (bitmapMetadata != null)
             {
-                object value = bitmapMetadata.GetQuery("System.Photo.Orientation");
-
-                if (value != null)
+                try
                 {
-                    result = (ushort)value;
+                    var orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
+
+                    if (orientation == null)
+                    {
+                        return (ushort)Rotation.Rotate0;
+                    }
+
+                    return (ushort)orientation;
+                }
+                catch (Exception e)
+                {
+                    if (e is NotSupportedException && e.InnerException?.HResult == -2003292351)
+                    {
+                        Console.WriteLine("The image is corrupted");
+                        return AssetConstants.OrientationCorruptedImage;
+                    }
+
+                    log.Error(e);
                 }
             }
-        }
 
-        return result;
+            return AssetConstants.OrientationCorruptedImage;
+        }
     }
 
     public static Rotation GetImageRotation(ushort exifOrientation)

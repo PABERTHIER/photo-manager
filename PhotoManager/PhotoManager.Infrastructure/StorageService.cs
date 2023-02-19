@@ -91,7 +91,7 @@ public class StorageService : IStorageService
         return BitmapHelper.LoadBitmapImage(imagePath, rotation);
     }
 
-    public ushort? GetExifOrientation(byte[] buffer)
+    public ushort GetExifOrientation(byte[] buffer)
     {
         return ExifHelper.GetExifOrientation(buffer);
     }
@@ -100,32 +100,6 @@ public class StorageService : IStorageService
     {
         return ExifHelper.GetImageRotation(exifOrientation);
     }
-
-    // TODO: Remove it ?
-    //public bool HasSameContent(Asset assetA, Asset assetB)
-    //{
-    //    bool result;
-
-    //    byte[] assetABytes = File.ReadAllBytes(assetA.FullPath);
-    //    byte[] assetBBytes = File.ReadAllBytes(assetB.FullPath);
-
-    //    result = assetABytes.Length == assetBBytes.Length;
-
-    //    if (result)
-    //    {
-    //        for (int i = 0; i < assetABytes.Length; i++)
-    //        {
-    //            result = (assetABytes[i] == assetBBytes[i]);
-
-    //            if (!result)
-    //            {
-    //                break;
-    //            }
-    //        }
-    //    }
-
-    //    return result;
-    //}
 
     public byte[] GetJpegBitmapImage(BitmapImage thumbnailImage)
     {
