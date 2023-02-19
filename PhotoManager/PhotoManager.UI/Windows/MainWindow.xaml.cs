@@ -4,6 +4,7 @@ using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -458,6 +459,9 @@ public partial class MainWindow : Window
 
     private async Task DoBackgroundWork()
     {
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+
         ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
         int minutes = ViewModel.GetCatalogCooldownMinutes();
 
@@ -478,7 +482,9 @@ public partial class MainWindow : Window
             }
 
             await catalogTask.ConfigureAwait(true);
-            ViewModel.CalculateGlobaleAssetsCounter(_application);
+            ViewModel?.CalculateGlobaleAssetsCounter(_application);
+            stopwatch.Stop();
+            ViewModel?.SetExecutionTime(stopwatch.Elapsed);
             await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
         }
     }

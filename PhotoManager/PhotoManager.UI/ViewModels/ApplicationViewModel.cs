@@ -31,6 +31,7 @@ public class ApplicationViewModel : BaseViewModel
     private Asset[] cataloguedAssets;
     private ObservableCollection<Asset> observableAssets;
     private string globaleAssetsCounter;
+    private string executionTime;
     private Asset[] selectedAssets;
     private string appTitle;
     private string statusMessage;
@@ -154,6 +155,16 @@ public class ApplicationViewModel : BaseViewModel
         {
             globaleAssetsCounter = value;
             NotifyPropertyChanged(nameof(GlobaleAssetsCounter));
+        }
+    }
+
+    public string ExecutionTime
+    {
+        get { return executionTime; }
+        private set
+        {
+            executionTime = value;
+            NotifyPropertyChanged(nameof(ExecutionTime));
         }
     }
 
@@ -477,6 +488,11 @@ public class ApplicationViewModel : BaseViewModel
     public void CalculateGlobaleAssetsCounter(IApplication application)
     {
         var globaleAssetsCounter = application.GetAssetsCounter();
-        GlobaleAssetsCounter = $"Nombre total d'images: {globaleAssetsCounter}";
+        GlobaleAssetsCounter = $"Total number of assets: {globaleAssetsCounter}";
+    }
+
+    public void SetExecutionTime(TimeSpan executionTime)
+    {
+        ExecutionTime = $"Execution time: {executionTime}";
     }
 }
