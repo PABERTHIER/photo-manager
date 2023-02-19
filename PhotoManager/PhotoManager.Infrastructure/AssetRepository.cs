@@ -511,7 +511,11 @@ public class AssetRepository : IAssetRepository
                 new ColumnProperties { ColumnName = "ThumbnailPixelWidth" },
                 new ColumnProperties { ColumnName = "ThumbnailPixelHeight" },
                 new ColumnProperties { ColumnName = "ThumbnailCreationDateTime" },
-                new ColumnProperties { ColumnName = "Hash" }
+                new ColumnProperties { ColumnName = "Hash" },
+                new ColumnProperties { ColumnName = "AssetCorruptedMessage" },
+                new ColumnProperties { ColumnName = "IsAssetCorrupted" },
+                new ColumnProperties { ColumnName = "AssetRotatedMessage" },
+                new ColumnProperties { ColumnName = "IsAssetRotated" }
             }
         });
 
@@ -591,7 +595,11 @@ public class AssetRepository : IAssetRepository
                     ThumbnailPixelWidth = int.Parse(f[6]),
                     ThumbnailPixelHeight = int.Parse(f[7]),
                     ThumbnailCreationDateTime = DateTime.Parse(f[8]),
-                    Hash = f[9]
+                    Hash = f[9],
+                    AssetCorruptedMessage = f[10],
+                    IsAssetCorrupted = bool.Parse(f[11]),
+                    AssetRotatedMessage = f[12],
+                    IsAssetRotated = bool.Parse(f[13])
                 });
         }
         catch (ArgumentException ex)
@@ -685,6 +693,10 @@ public class AssetRepository : IAssetRepository
                 7 => a.ThumbnailPixelHeight,
                 8 => a.ThumbnailCreationDateTime,
                 9 => a.Hash,
+                10 => a.AssetCorruptedMessage,
+                11 => a.IsAssetCorrupted,
+                12 => a.AssetRotatedMessage,
+                13 => a.IsAssetRotated,
                 _ => throw new ArgumentOutOfRangeException(nameof(i))
             };
         });
