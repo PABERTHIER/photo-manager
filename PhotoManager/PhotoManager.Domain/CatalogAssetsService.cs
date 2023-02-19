@@ -145,8 +145,6 @@ public class CatalogAssetsService : ICatalogAssetsService
             byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
             Folder folder = _assetRepository.GetFolderByPath(directoryName);
 
-            var imageHash = _assetHashCalculatorService.CalculatePHash(imagePath);
-
             asset = new Asset
             {
                 FileName = Path.GetFileName(imagePath),
@@ -159,7 +157,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
                 ImageRotation = rotation,
                 ThumbnailCreationDateTime = DateTime.Now,
-                Hash = imageHash ?? _assetHashCalculatorService.CalculateHash(imageBytes), // TODO: performances are decreased with CalculatePHash by 6 times
+                Hash = _assetHashCalculatorService.CalculateHash(imageBytes, imagePath),
                 IsAssetCorrupted = assetCorrupted,
                 AssetCorruptedMessage = assetCorrupted ? AssetConstants.AssetCorruptedMessage : null,
                 IsAssetRotated = assetRotated,
