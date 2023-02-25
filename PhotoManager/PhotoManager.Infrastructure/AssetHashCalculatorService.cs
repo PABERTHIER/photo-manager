@@ -19,7 +19,7 @@ public class AssetHashCalculatorService : IAssetHashCalculatorService
         return CalculateHash(imageBytes);
     }
 
-    // TODO: Take the first frame to call then the CalculatePHash method ?
+    // TODO: Take the first frame to call then the CalculateHash method ?
     public string CalculateVideoHash(string filePath)
     {
         using FileStream stream = File.OpenRead(filePath);

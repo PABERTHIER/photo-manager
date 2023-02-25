@@ -244,7 +244,7 @@ public class AssetRepository : IAssetRepository
 
     public void WriteBackup()
     {
-        if (_database.WriteBackup(DateTime.Now.Date))
+        if (_database.WriteBackup(DateTime.Now.Date)) // TODO: System.IO.IOException: 'The process cannot access the file X because it is being used by another process.'
         {
             _database.DeleteOldBackups(_userConfigurationService.GetBackupsToKeep());
         }

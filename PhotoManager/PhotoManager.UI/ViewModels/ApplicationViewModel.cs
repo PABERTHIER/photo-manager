@@ -50,7 +50,6 @@ public class ApplicationViewModel : BaseViewModel
     {
         CurrentFolder = Application.GetInitialFolder();
         SortCriteria = initialSortCriteria;
-        // TODO: Compute GlobaleAssetrsCounter her instead
     }
 
     public AppModeEnum AppMode
