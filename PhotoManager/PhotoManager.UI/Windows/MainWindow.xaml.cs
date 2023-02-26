@@ -47,7 +47,7 @@ public partial class MainWindow : Window
             viewModel.Product = aboutInformation.Product;
             viewModel.Version = aboutInformation.Version;
             DataContext = viewModel;
-            ViewModel.CalculateGlobaleAssetsCounter(application);
+            viewModel.CalculateTotalFilesNumber();
         }
         catch (Exception ex)
         {
@@ -407,7 +407,7 @@ public partial class MainWindow : Window
 
     public void RefreshAssetsCounter()
     {
-        ViewModel.CalculateGlobaleAssetsCounter(_application);
+        ViewModel.CalculateGlobaleAssetsCounter();
     }
 
     private void DeleteAssets_Click(object sender, RoutedEventArgs e)
@@ -482,7 +482,7 @@ public partial class MainWindow : Window
             }
 
             await catalogTask.ConfigureAwait(true);
-            ViewModel?.CalculateGlobaleAssetsCounter(_application);
+            ViewModel?.CalculateGlobaleAssetsCounter();
             stopwatch.Stop();
             ViewModel?.SetExecutionTime(stopwatch.Elapsed);
             await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);

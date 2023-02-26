@@ -459,7 +459,7 @@ public class AssetRepository : IAssetRepository
         }
     }
 
-    public int AssetsCounter()
+    public int GetAssetsCounter()
     {
         return assets.Count;
     }

@@ -28,5 +28,5 @@ public interface IAssetRepository
     void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfiguration);
     List<string> GetRecentTargetPaths();
     void SaveRecentTargetPaths(List<string> recentTargetPaths);
-    int AssetsCounter();
+    int GetAssetsCounter();
 }

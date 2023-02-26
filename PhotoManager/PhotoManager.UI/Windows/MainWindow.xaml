@@ -53,8 +53,9 @@
             <local:FolderNavigationControl x:Name="folderTreeView" Grid.Column="0" Grid.Row="0" FolderSelected="FolderTreeView_FolderSelected" Visibility="{Binding ThumbnailsVisible}"/>
             <local:ViewerUserControl x:Name="viewerUserControl" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="2" ThumbnailSelected="ViewerUserControl_ThumbnailSelected" Visibility="{Binding ViewerVisible}"/>
             <local:ThumbnailsUserControl x:Name="thumbnailsUserControl" Grid.Column="1" Grid.Row="0" ThumbnailSelected="ThumbnailsUserControl_ThumbnailSelected" Visibility="{Binding ThumbnailsVisible}"/>
-            <Label x:Name="statusLabel" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding StatusMessage}" Visibility="{Binding ThumbnailsVisible}"/>
-            <Label x:Name="globaleAssetsCounter" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding GlobaleAssetsCounter}" Visibility="{Binding ThumbnailsVisible}"/>
+            <Label x:Name="globaleAssetsCounter" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding GlobaleAssetsCounter}" Visibility="{Binding ThumbnailsVisible}"/>
+            <Label x:Name="totalFilesNumber" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding TotalFilesNumber}" Visibility="{Binding ThumbnailsVisible}"/>
+            <Label x:Name="statusLabel" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding StatusMessage}" Visibility="{Binding ThumbnailsVisible}" HorizontalContentAlignment="Left"/>
             <Label x:Name="executionTime" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding ExecutionTime}" Visibility="{Binding ThumbnailsVisible}" HorizontalContentAlignment="Right"/>
         </Grid>
     </DockPanel>

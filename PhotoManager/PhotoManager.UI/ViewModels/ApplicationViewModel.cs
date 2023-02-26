@@ -32,6 +32,7 @@ public class ApplicationViewModel : BaseViewModel
     private ObservableCollection<Asset> observableAssets;
     private string globaleAssetsCounter;
     private string executionTime;
+    private string totalFilesNumber;
     private Asset[] selectedAssets;
     private string appTitle;
     private string statusMessage;
@@ -164,6 +165,16 @@ public class ApplicationViewModel : BaseViewModel
         {
             executionTime = value;
             NotifyPropertyChanged(nameof(ExecutionTime));
+        }
+    }
+
+    public string TotalFilesNumber
+    {
+        get { return totalFilesNumber; }
+        private set
+        {
+            totalFilesNumber = value;
+            NotifyPropertyChanged(nameof(TotalFilesNumber));
         }
     }
 
@@ -484,14 +495,20 @@ public class ApplicationViewModel : BaseViewModel
 
     public BitmapImage LoadBitmapImage() => Application.LoadBitmapImage(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
 
-    public void CalculateGlobaleAssetsCounter(IApplication application)
+    public void CalculateGlobaleAssetsCounter()
     {
-        var globaleAssetsCounter = application.GetAssetsCounter();
+        var globaleAssetsCounter = Application.GetAssetsCounter();
         GlobaleAssetsCounter = $"Total number of assets: {globaleAssetsCounter}";
     }
 
     public void SetExecutionTime(TimeSpan executionTime)
     {
         ExecutionTime = $"Execution time: {executionTime}";
+    }
+
+    public void CalculateTotalFilesNumber()
+    {
+        var totalFilesNumber = Application.GetTotalFilesNumber();
+        TotalFilesNumber = $"{totalFilesNumber} files found";
     }
 }

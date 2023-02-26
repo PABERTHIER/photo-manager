@@ -50,7 +50,12 @@ public class Application : IApplication
 
     public int GetAssetsCounter()
     {
-        return _assetRepository.AssetsCounter();
+        return _assetRepository.GetAssetsCounter();
+    }
+
+    public int GetTotalFilesNumber()
+    {
+        return _catalogAssetsService.GetTotalFilesNumber();
     }
 
     public void LoadThumbnail(Asset asset)

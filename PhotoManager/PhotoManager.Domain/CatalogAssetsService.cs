@@ -17,6 +17,8 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+    private string[] filesName;
+    private Folder[] foldersToCatalog;
     private string currentFolderPath;
 
     public CatalogAssetsService(
@@ -48,8 +50,6 @@ public class CatalogAssetsService : ICatalogAssetsService
                     _assetRepository.WriteBackup();
                     callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = string.Empty });
                 }
-
-                Folder[] foldersToCatalog = GetFoldersToCatalog();
 
                 // TODO: Since the root folders to catalog are combined in the same list
                 // with the catalogued sub-folders, the catalog process should keep a list
@@ -238,6 +238,13 @@ public class CatalogAssetsService : ICatalogAssetsService
         return videoAsset;
     }
 
+    public int GetTotalFilesNumber()
+    {
+        foldersToCatalog = GetFoldersToCatalog();
+        filesName = foldersToCatalog.SelectMany(x => _storageService.GetFileNames(x.Path)).ToArray();
+        return filesName.Length;
+    }
+
     #region private
     private Folder[] GetFoldersToCatalog()
     {
@@ -298,7 +305,6 @@ public class CatalogAssetsService : ICatalogAssetsService
         }
 
         callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = "Inspecting folder " + directory });
-        string[] fileNames = _storageService.GetFileNames(directory);
         folder = _assetRepository.GetFolderByPath(directory);
         List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
         bool folderHasThumbnails = _assetRepository.FolderHasThumbnails(folder);
@@ -311,9 +317,9 @@ public class CatalogAssetsService : ICatalogAssetsService
             }
         }
 
-        cataloguedAssetsBatchCount = CatalogNewAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, cataloguedAssets, folderHasThumbnails, token);
-        cataloguedAssetsBatchCount = CatalogUpdatedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, cataloguedAssets, folderHasThumbnails, token);
-        cataloguedAssetsBatchCount = CatalogDeletedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, fileNames, folder, cataloguedAssets, token);
+        cataloguedAssetsBatchCount = CatalogNewAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, filesName, cataloguedAssets, folderHasThumbnails, token);
+        cataloguedAssetsBatchCount = CatalogUpdatedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, filesName, cataloguedAssets, folderHasThumbnails, token);
+        cataloguedAssetsBatchCount = CatalogDeletedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, filesName, folder, cataloguedAssets, token);
 
         if (_assetRepository.HasChanges() || !folderHasThumbnails)
         {
