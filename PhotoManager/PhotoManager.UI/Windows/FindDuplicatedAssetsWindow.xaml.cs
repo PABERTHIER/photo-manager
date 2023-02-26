@@ -77,6 +77,18 @@ public partial class DuplicatedAssetsWindow : Window
         }
     }
 
+    private void RefreshLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        try
+        {
+            ViewModel.Refresh();
+        }
+        catch (Exception ex)
+        {
+            log.Error(ex);
+        }
+    }
+
     private void DeleteEveryDuplicatesLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         try
@@ -90,11 +102,12 @@ public partial class DuplicatedAssetsWindow : Window
         }
     }
 
-    private void RefreshLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void CopyToClipboard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         try
         {
-            ViewModel.Refresh();
+            var assetPath = ViewModel.CurrentDuplicatedAsset.Asset.FullPath;
+            Clipboard.SetText(assetPath);
         }
         catch (Exception ex)
         {
