@@ -81,6 +81,7 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <!-- Displaying the pictures in thumbnails mode, at the bottom of the page, duplicatedAssets page -->
         <Image Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Source="{ Binding CurrentDuplicatedAsset.Asset.ImageData }" Width="200" Height="150">
             <Image.Effect>
                 <DropShadowEffect/>

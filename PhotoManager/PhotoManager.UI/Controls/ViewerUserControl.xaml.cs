@@ -1,4 +1,5 @@
 ﻿using log4net;
+using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.Windows;
@@ -72,6 +73,11 @@ public partial class ViewerUserControl : UserControl
         {
             log.Error(ex);
         }
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        ViewModel?.ChangeAppMode(AppModeEnum.Thumbnails);
     }
 
     public void ShowImage()
