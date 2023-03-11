@@ -111,6 +111,11 @@ public class StorageService : IStorageService
         return BitmapHelper.GetPngBitmapImage(thumbnailImage);
     }
 
+    public byte[] GetGifBitmapImage(BitmapImage thumbnailImage)
+    {
+        return BitmapHelper.GetGifBitmapImage(thumbnailImage);
+    }
+
     public bool FileExists(Asset asset, Folder folder)
     {
         string fullPath = Path.Combine(folder.Path, asset.FileName);

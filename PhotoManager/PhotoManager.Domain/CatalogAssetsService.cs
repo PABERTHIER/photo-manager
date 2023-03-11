@@ -142,7 +142,9 @@ public class CatalogAssetsService : ICatalogAssetsService
                 Convert.ToInt32(thumbnailDecodeWidth),
                 Convert.ToInt32(thumbnailDecodeHeight));
             bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
-            byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
+            bool isGif = imagePath.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
+            byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) :
+                (isGif ? _storageService.GetGifBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage));
             Folder folder = _assetRepository.GetFolderByPath(directoryName);
 
             asset = new Asset
@@ -213,7 +215,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 rotation,
                 Convert.ToInt32(thumbnailDecodeWidth),
                 Convert.ToInt32(thumbnailDecodeHeight));
-            bool isPng = videoPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
+            bool isPng = videoPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase); // TODO: What will be the extension for the first frame ?
             byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
             Folder folder = _assetRepository.GetFolderByPath(directoryName);
 

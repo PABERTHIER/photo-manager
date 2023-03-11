@@ -91,6 +91,11 @@ public static class BitmapHelper
         return GetBitmapImage(image, new PngBitmapEncoder());
     }
 
+    public static byte[] GetGifBitmapImage(BitmapImage image)
+    {
+        return GetBitmapImage(image, new GifBitmapEncoder());
+    }
+
     private static byte[] GetBitmapImage(BitmapImage image, BitmapEncoder encoder)
     {
         byte[] imageBuffer;

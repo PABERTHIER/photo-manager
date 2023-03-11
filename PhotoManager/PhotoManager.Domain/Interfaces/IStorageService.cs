@@ -21,6 +21,7 @@ public interface IStorageService
     //bool HasSameContent(Asset assetA, Asset assetB);
     byte[] GetJpegBitmapImage(BitmapImage thumbnailImage);
     byte[] GetPngBitmapImage(BitmapImage thumbnailImage);
+    byte[] GetGifBitmapImage(BitmapImage thumbnailImage);
     bool FileExists(Asset asset, Folder folder);
     bool FileExists(string fullPath);
     bool FolderExists(string fullPath);

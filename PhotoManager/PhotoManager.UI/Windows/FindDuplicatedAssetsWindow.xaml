@@ -56,7 +56,7 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Path" Binding="{Binding Asset.FullPath}" Width="400"/>
+                <DataGridTextColumn Header="Path" Binding="{Binding Asset.FullPath}" Width="800"/>
                 <DataGridTextColumn Header="Image size" Binding="{ Binding Asset, Converter={StaticResource PixelSizeConverter}}" Width="100"/>
                 <DataGridTextColumn Header="File size" Binding="{ Binding Asset.FileSize, Converter={StaticResource FileSizeConverter}}" Width="60"/>
                 <DataGridTextColumn Header="File created" Binding="{ Binding Asset.FileCreationDateTime}" Width="150"/>
