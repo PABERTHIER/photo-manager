@@ -5,6 +5,7 @@ using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -102,12 +103,15 @@ public partial class DuplicatedAssetsWindow : Window
         }
     }
 
-    private void CopyToClipboard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void CopyToClipboard_OpenInFileExplorer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         try
         {
             var assetPath = ViewModel.CurrentDuplicatedAsset.Asset.FullPath;
             Clipboard.SetText(assetPath);
+
+            string args = $"/select, \"{assetPath}\"";
+            Process.Start("explorer.exe", args);
         }
         catch (Exception ex)
         {

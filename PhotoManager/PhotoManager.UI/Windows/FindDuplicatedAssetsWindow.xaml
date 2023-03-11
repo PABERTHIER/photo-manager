@@ -32,7 +32,7 @@
         <Label Grid.Row="0" Grid.Column="1" x:Name="refreshLabel" Padding="5" MouseLeftButtonDown="RefreshLabel_MouseLeftButtonDown" Content="Refresh" Style="{StaticResource ButtonStyle}" />
         <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
             <Label x:Name="deleteEveryLabel" Padding="5" MouseLeftButtonDown="DeleteEveryDuplicatesLabel_MouseLeftButtonDown" Content="Delete Every Duplicates Linked To Exempt Folder" Style="{StaticResource ButtonStyle}" />
-            <Label x:Name="copyToClipboard" Padding="5" MouseLeftButtonDown="CopyToClipboard_MouseLeftButtonDown" Content="Copy to Clipboard asset selected" Style="{StaticResource ButtonStyle}" />
+            <Label x:Name="copyToClipboardAndOpenInFileExploerer" Padding="5" MouseLeftButtonDown="CopyToClipboard_OpenInFileExplorer_MouseLeftButtonDown" Content="Open in File Explorer" Style="{StaticResource ButtonStyle}" />
         </StackPanel>
         <DataGrid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" ItemsSource="{Binding DuplicatedAssetSetsCollection}" SelectedIndex="{Binding DuplicatedAssetSetsPosition}" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserAddRows="False" SelectionMode="Single" SelectionUnit="FullRow" Margin="10 0 10 0" Background="#FF3C3C3C">
             <DataGrid.RowStyle>
@@ -56,8 +56,7 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Path" Binding="{Binding Asset.FullPath}" ClipboardContentBinding="{Binding Asset.FullPath}" Width="400"/>
-                <!-- CopyingCellClipboardContent="{CopyToClipbard_MouseLeftButtonDown}" -->
+                <DataGridTextColumn Header="Path" Binding="{Binding Asset.FullPath}" Width="400"/>
                 <DataGridTextColumn Header="Image size" Binding="{ Binding Asset, Converter={StaticResource PixelSizeConverter}}" Width="100"/>
                 <DataGridTextColumn Header="File size" Binding="{ Binding Asset.FileSize, Converter={StaticResource FileSizeConverter}}" Width="60"/>
                 <DataGridTextColumn Header="File created" Binding="{ Binding Asset.FileCreationDateTime}" Width="150"/>
