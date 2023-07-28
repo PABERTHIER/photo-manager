@@ -17,8 +17,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-    private string[] filesName;
-    private Folder[] foldersToCatalog;
+    private int totalFilesNumber;
     private string currentFolderPath;
 
     public CatalogAssetsService(
@@ -50,7 +49,8 @@ public class CatalogAssetsService : ICatalogAssetsService
                     _assetRepository.WriteBackup();
                     callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = string.Empty });
                 }
-
+                
+                Folder[] foldersToCatalog = GetFoldersToCatalog();
                 // TODO: Since the root folders to catalog are combined in the same list
                 // with the catalogued sub-folders, the catalog process should keep a list
                 // of the already visited folders so they don't get catalogued twice
@@ -242,9 +242,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     public int GetTotalFilesNumber()
     {
-        foldersToCatalog = GetFoldersToCatalog();
-        filesName = foldersToCatalog.SelectMany(x => _storageService.GetFileNames(x.Path)).ToArray();
-        return filesName.Length;
+        return totalFilesNumber;
     }
 
     #region private
@@ -307,6 +305,8 @@ public class CatalogAssetsService : ICatalogAssetsService
         }
 
         callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = "Inspecting folder " + directory });
+        string[] filesName = _storageService.GetFileNames(directory);
+        totalFilesNumber += filesName.Length; // To compute the total number of files in every folders
         folder = _assetRepository.GetFolderByPath(directory);
         List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
         bool folderHasThumbnails = _assetRepository.FolderHasThumbnails(folder);

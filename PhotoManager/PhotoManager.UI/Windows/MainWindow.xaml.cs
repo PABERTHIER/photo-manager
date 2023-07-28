@@ -47,7 +47,6 @@ public partial class MainWindow : Window
             viewModel.Product = aboutInformation.Product;
             viewModel.Version = aboutInformation.Version;
             DataContext = viewModel;
-            viewModel.CalculateTotalFilesNumber();
         }
         catch (Exception ex)
         {
@@ -485,6 +484,7 @@ public partial class MainWindow : Window
             ViewModel?.CalculateGlobaleAssetsCounter();
             stopwatch.Stop();
             ViewModel?.SetExecutionTime(stopwatch.Elapsed);
+            ViewModel?.CalculateTotalFilesNumber();
             await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
         }
     }
