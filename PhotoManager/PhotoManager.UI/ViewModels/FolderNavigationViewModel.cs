@@ -9,7 +9,7 @@ public class FolderNavigationViewModel : ApplicationViewModel
 {
     private string targetPath;
 
-    public FolderNavigationViewModel(IApplication assetApp, Folder sourceFolder, Folder lastSelectedFolder, List<string> recentTargetPaths) : base(assetApp)
+    public FolderNavigationViewModel(IApplication application, Folder sourceFolder, Folder lastSelectedFolder, List<string> recentTargetPaths) : base(application)
     {
         SourceFolder = sourceFolder;
         LastSelectedFolder = lastSelectedFolder;

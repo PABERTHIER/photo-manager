@@ -40,14 +40,14 @@ public partial class ThumbnailsUserControl : UserControl
         get { return (ApplicationViewModel)DataContext; }
     }
 
-    public async void GoToFolder(IApplication assetApp, string selectedImagePath)
+    public async void GoToFolder(IApplication application, string selectedImagePath)
     {
         try
         {
             if (!ViewModel.IsRefreshingFolders)
             {
                 ViewModel.CurrentFolder = selectedImagePath;
-                Asset[] assets = await GetAssets(assetApp, ViewModel.CurrentFolder).ConfigureAwait(true);
+                Asset[] assets = await GetAssets(application, ViewModel.CurrentFolder).ConfigureAwait(true);
                 ViewModel.SetAssets(assets);
 
                 if (thumbnailsListView.Items.Count > 0)
@@ -63,9 +63,9 @@ public partial class ThumbnailsUserControl : UserControl
         }
     }
 
-    private static Task<Asset[]> GetAssets(IApplication assetApp, string folder)
+    private static Task<Asset[]> GetAssets(IApplication application, string folder)
     {
-        return Task.Run(() => assetApp.GetAssets(folder));
+        return Task.Run(() => application.GetAssets(folder));
     }
 
     private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)

@@ -9,7 +9,7 @@ public class SyncAssetsViewModel : BaseProcessViewModel<SyncAssetsConfiguration,
 {
     private ObservableCollection<SyncAssetsDirectoriesDefinition>? definitions;
     
-    public SyncAssetsViewModel(IApplication assetApp) : base(assetApp)
+    public SyncAssetsViewModel(IApplication application) : base(application)
     {
     }
 

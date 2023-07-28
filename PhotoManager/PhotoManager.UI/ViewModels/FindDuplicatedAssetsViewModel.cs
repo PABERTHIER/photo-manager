@@ -16,7 +16,7 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
     private int _duplicatedAssetSetsPosition;
     private int _duplicatedAssetPosition;
 
-    public FindDuplicatedAssetsViewModel(IApplication assetApp) : base(assetApp)
+    public FindDuplicatedAssetsViewModel(IApplication application) : base(application)
     {
     }
 
@@ -200,7 +200,7 @@ public class DuplicatedAssetViewModel : BaseViewModel
     private Asset asset;
     private Visibility visible;
 
-    public DuplicatedAssetViewModel(IApplication assetApp) : base(assetApp)
+    public DuplicatedAssetViewModel(IApplication application) : base(application)
     {
     }
 

@@ -47,7 +47,7 @@ public class ApplicationViewModel : BaseViewModel
     public event FolderAddedEventHandler FolderAdded;
     public event FolderRemovedEventHandler FolderRemoved;
 
-    public ApplicationViewModel(IApplication assetApp, SortCriteriaEnum initialSortCriteria = SortCriteriaEnum.FileName) : base(assetApp)
+    public ApplicationViewModel(IApplication application, SortCriteriaEnum initialSortCriteria = SortCriteriaEnum.FileName) : base(application)
     {
         CurrentFolder = Application.GetInitialFolder();
         SortCriteria = initialSortCriteria;
