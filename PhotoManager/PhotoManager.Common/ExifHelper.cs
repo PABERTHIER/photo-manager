@@ -16,9 +16,8 @@ public static class ExifHelper
         using (MemoryStream stream = new(buffer))
         {
             BitmapFrame bitmapFrame = BitmapFrame.Create(stream);
-            BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
 
-            if (bitmapMetadata != null)
+            if (bitmapFrame.Metadata is BitmapMetadata bitmapMetadata)
             {
                 try
                 {
@@ -69,7 +68,7 @@ public static class ExifHelper
     {
         try
         {
-            using (var ms = new MemoryStream(imageData))
+            using (MemoryStream ms = new (imageData))
             {
                 BitmapFrame bitmapFrame = BitmapFrame.Create(ms);
                 BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;

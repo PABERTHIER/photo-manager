@@ -16,7 +16,7 @@ public class Asset
     public Rotation ImageRotation { get; set; }
     public DateTime ThumbnailCreationDateTime { get; set; }
     public string Hash { get; set; }
-    public BitmapImage ImageData { get; set; }
+    public BitmapImage? ImageData { get; set; }
     public string FullPath => Folder != null ? Path.Combine(Folder.Path, FileName) : FileName;
     public DateTime FileCreationDateTime { get; set; }
     public DateTime FileModificationDateTime { get; set; }
