@@ -5,6 +5,7 @@ namespace PhotoManager.Common;
 
 public static class BitmapHelper
 {
+    // From CatalogAssetsService for CreateAsset() to get the originalImage
     public static BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation)
     {
         BitmapImage image = new();
@@ -23,42 +24,7 @@ public static class BitmapHelper
         return image;
     }
 
-    public static BitmapImage LoadBitmapImage(string imagePath, Rotation rotation)
-    {
-        BitmapImage image = null;
-
-        if (File.Exists(imagePath))
-        {
-            image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            image.UriSource = new Uri(imagePath);
-            image.Rotation = rotation;
-            image.EndInit();
-            image.Freeze();
-        }
-
-        return image;
-    }
-
-    public static BitmapImage LoadBitmapImage(byte[] buffer, int width, int height)
-    {
-        // TODO: If the stream is disposed by a using block, the thumbnail is not shown. Find a way to dispose of the stream.
-        MemoryStream stream = new(buffer);
-        BitmapImage thumbnailImage = new();
-        thumbnailImage.BeginInit();
-        thumbnailImage.CacheOption = BitmapCacheOption.None;
-        thumbnailImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-        thumbnailImage.StreamSource = stream;
-        thumbnailImage.DecodePixelWidth = width;
-        thumbnailImage.DecodePixelHeight = height;
-        thumbnailImage.EndInit();
-        thumbnailImage.Freeze();
-
-        return thumbnailImage;
-    }
-
+    // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
     public static BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation, int width, int height)
     {
         BitmapImage image = null;
@@ -80,7 +46,44 @@ public static class BitmapHelper
         return image;
     }
 
-    // TODO: Doing it for other format and first frame for a video
+    // From ShowImage() in ViewerUserControl
+    public static BitmapImage LoadBitmapImage(string imagePath, Rotation rotation)
+    {
+        BitmapImage image = null;
+
+        if (File.Exists(imagePath))
+        {
+            image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+            image.UriSource = new Uri(imagePath);
+            image.Rotation = rotation;
+            image.EndInit();
+            image.Freeze();
+        }
+
+        return image;
+    }
+
+    // From AssetRepository
+    public static BitmapImage LoadBitmapImage(byte[] buffer, int width, int height)
+    {
+        // TODO: If the stream is disposed by a using block, the thumbnail is not shown. Find a way to dispose of the stream.
+        MemoryStream stream = new(buffer);
+        BitmapImage thumbnailImage = new();
+        thumbnailImage.BeginInit();
+        thumbnailImage.CacheOption = BitmapCacheOption.None;
+        thumbnailImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+        thumbnailImage.StreamSource = stream;
+        thumbnailImage.DecodePixelWidth = width;
+        thumbnailImage.DecodePixelHeight = height;
+        thumbnailImage.EndInit();
+        thumbnailImage.Freeze();
+
+        return thumbnailImage;
+    }
+
     public static byte[] GetJpegBitmapImage(BitmapImage image)
     {
         return GetBitmapImage(image, new JpegBitmapEncoder());

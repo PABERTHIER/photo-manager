@@ -20,7 +20,12 @@ public class DirectoryComparer : IDirectoryComparer
     public string[] GetNewFileNames(string[] sourceFileNames, string[] destinationFileNames)
     {
         return GetNewFileNamesList(sourceFileNames, destinationFileNames);
-    }     
+    }
+
+    public (string[], string[]) GetImageAndVideoNames(string[] fileNames)
+    {
+        return GetImageAndVideoNamesList(fileNames);
+    }
 
     public string[] GetUpdatedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
     {
@@ -49,7 +54,28 @@ public class DirectoryComparer : IDirectoryComparer
     private static string[] GetNewFileNamesList(string[] fileNames, string[] destinationFileNames)
     {
         return fileNames.Except(destinationFileNames)
-                        .Where(ImageHelper.IsImageFile)
+                        .Where(fileName => ImageHelper.IsImageFile(fileName) || VideoHelper.IsVideoFile(fileName))
                         .ToArray();
+    }
+
+    private static (string[], string[]) GetImageAndVideoNamesList(string[] fileNames)
+    {
+        var imageNames = new List<string>();
+        var videoNames = new List<string>();
+
+        foreach (var fileName in fileNames)
+        {
+            if (ImageHelper.IsImageFile(fileName))
+            {
+                imageNames.Add(fileName);
+            }
+
+            else if (VideoHelper.IsVideoFile(fileName))
+            {
+                videoNames.Add(fileName);
+            }
+        }
+
+        return (imageNames.ToArray(), videoNames.ToArray());
     }
 }

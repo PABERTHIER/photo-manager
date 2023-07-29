@@ -1,8 +1,6 @@
 ﻿using PhotoManager.Common;
 using PhotoManager.Constants;
 using PhotoManager.Domain.Interfaces;
-using System.IO;
-using System.Security.Cryptography;
 
 namespace PhotoManager.Infrastructure;
 
@@ -26,14 +24,5 @@ public class AssetHashCalculatorService : IAssetHashCalculatorService
         }
 
         return HashingHelper.CalculateHash(imageBytes);
-    }
-
-    // TODO: Take the first frame to call then the CalculateHash method ? + Use HashingHelper
-    public string CalculateVideoHash(string filePath)
-    {
-        using FileStream stream = File.OpenRead(filePath);
-        using SHA1Managed sha = new();
-        byte[] hash = sha.ComputeHash(stream);
-        return BitConverter.ToString(hash).Replace("-", string.Empty);
     }
 }

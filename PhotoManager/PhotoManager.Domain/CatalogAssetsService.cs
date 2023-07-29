@@ -1,4 +1,5 @@
 ﻿using log4net;
+using PhotoManager.Common;
 using PhotoManager.Constants;
 using PhotoManager.Domain.Interfaces;
 using System.IO;
@@ -85,13 +86,35 @@ public class CatalogAssetsService : ICatalogAssetsService
         });
     }
 
-    public Asset? CreateAsset(string directoryName, string fileName)
+    public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false)
     {
-        Asset asset = null;
+        Asset? asset = null;
+        string thumbnailPath = "";
+
+        if (isVideo)
+        {
+            thumbnailPath = VideoHelper.GetFirstFrame(directoryName, fileName); // Create an asset from the video file
+        }
 
         if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
         {
-            string imagePath = Path.Combine(directoryName, fileName);
+            string imagePath;
+
+            if (isVideo && !string.IsNullOrWhiteSpace(thumbnailPath))
+            {
+                imagePath = thumbnailPath;
+                DirectoryInfo directoryInfo = new (imagePath);
+
+                if (directoryName != directoryInfo.Parent?.FullName) // The video file is not in the same path than the asset created
+                {
+                    return asset; // The asset is null because the target is not the video but the asset created previously
+                }
+            }
+            else
+            {
+                imagePath = Path.Combine(directoryName, fileName);
+            }
+
             byte[] imageBytes = _storageService.GetFileBytes(imagePath);
 
             if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
@@ -170,74 +193,6 @@ public class CatalogAssetsService : ICatalogAssetsService
         }
 
         return asset;
-    }
-
-    // TODO: Do it for video by keeping first frame and save it as asset ou video object ?
-    public VideoAsset? CreateVideoAsset(string directoryName, string fileName)
-    {
-        VideoAsset videoAsset = null;
-
-        if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
-        {
-            string videoPath = Path.Combine(directoryName, fileName);
-            byte[] imageBytes = _storageService.GetFileBytes(videoPath);
-
-            if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
-            {
-                return videoAsset;
-            }
-
-            ushort exifOrientation = _storageService.GetExifOrientation(imageBytes);
-            Rotation rotation = _storageService.GetImageRotation(exifOrientation);
-            BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, rotation);
-
-            double originalDecodeWidth = originalImage.PixelWidth;
-            double originalDecodeHeight = originalImage.PixelHeight;
-            double thumbnailDecodeWidth;
-            double thumbnailDecodeHeight;
-            double percentage;
-
-            // If the original image is landscape
-            if (originalDecodeWidth > originalDecodeHeight)
-            {
-                thumbnailDecodeWidth = AssetConstants.MaxWidth;
-                percentage = (AssetConstants.MaxWidth * 100d / originalDecodeWidth);
-                thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
-            }
-            else // If the original image is portrait
-            {
-                thumbnailDecodeHeight = AssetConstants.MaxHeight;
-                percentage = (AssetConstants.MaxHeight * 100d / originalDecodeHeight);
-                thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
-            }
-
-            BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
-                rotation,
-                Convert.ToInt32(thumbnailDecodeWidth),
-                Convert.ToInt32(thumbnailDecodeHeight));
-            bool isPng = videoPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase); // TODO: What will be the extension for the first frame ?
-            byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage);
-            Folder folder = _assetRepository.GetFolderByPath(directoryName);
-
-            videoAsset = new VideoAsset
-            {
-                FileName = Path.GetFileName(videoPath),
-                FolderId = folder.FolderId,
-                Folder = folder,
-                FileSize = new FileInfo(videoPath).Length,
-                PixelWidth = Convert.ToInt32(originalDecodeWidth),
-                PixelHeight = Convert.ToInt32(originalDecodeHeight),
-                ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
-                ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
-                ImageRotation = rotation,
-                ThumbnailCreationDateTime = DateTime.Now,
-                Hash = _assetHashCalculatorService.CalculateVideoHash(videoPath)
-            };
-
-            _assetRepository.AddVideoAsset(videoAsset, thumbnailBuffer);
-        }
-
-        return videoAsset;
     }
 
     public int GetTotalFilesNumber()
@@ -399,24 +354,41 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private int CatalogNewAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
     {
-        string[] newFileNames = _directoryComparer.GetNewFileNames(fileNames, cataloguedAssets);
+        string[] imageNames;
+        string[] videoNames;
 
-        foreach (var fileName in newFileNames)
+        (imageNames, videoNames) = _directoryComparer.GetImageAndVideoNames(fileNames);
+
+        string[] newImageFileNames = _directoryComparer.GetNewFileNames(imageNames, cataloguedAssets);
+        string[] newVideoFileNames = _directoryComparer.GetNewFileNames(videoNames, cataloguedAssets);
+
+        cataloguedAssetsBatchCount += CreateAssets(newImageFileNames, false, directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
+
+        if (AssetConstants.AnalyseVideos)
         {
+            cataloguedAssetsBatchCount += CreateAssets(newVideoFileNames, true, directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
+        }
 
+        return cataloguedAssetsBatchCount;
+    }
+
+    private int CreateAssets(string[] fileNames, bool isAssetVideo, string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
+    {
+        foreach (var fileName in fileNames)
+        {
             if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
             {
                 break;
             }
 
-            Asset newAsset = CreateAsset(directory, fileName);
-            
+            Asset? newAsset = CreateAsset(directory, fileName, isAssetVideo);
+
             if (newAsset == null)
             {
                 continue;
             }
 
-            newAsset.ImageData = LoadThumbnail(directory, fileName, newAsset.ThumbnailPixelWidth, newAsset.ThumbnailPixelHeight);
+            newAsset.ImageData = LoadThumbnail(directory, newAsset.FileName, newAsset.ThumbnailPixelWidth, newAsset.ThumbnailPixelHeight);
 
             if (!folderHasThumbnails)
             {
@@ -427,7 +399,7 @@ public class CatalogAssetsService : ICatalogAssetsService
             {
                 Asset = newAsset,
                 CataloguedAssets = cataloguedAssets,
-                Message = $"Image {Path.Combine(directory, fileName)} added to catalog",
+                Message = $"Image {Path.Combine(directory, newAsset.FileName)} added to catalog",
                 Reason = ReasonEnum.AssetCreated
             });
 
@@ -454,7 +426,13 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             if (_storageService.FileExists(fullPath))
             {
-                Asset updatedAsset = CreateAsset(directory, fileName);
+                Asset? updatedAsset = CreateAsset(directory, fileName);
+
+                if (updatedAsset == null)
+                {
+                    continue;
+                }
+
                 updatedAsset.ImageData = LoadThumbnail(directory, fileName, updatedAsset.ThumbnailPixelWidth, updatedAsset.ThumbnailPixelHeight);
 
                 if (!folderHasThumbnails)
@@ -510,9 +488,9 @@ public class CatalogAssetsService : ICatalogAssetsService
         return cataloguedAssetsBatchCount;
     }
 
-    private BitmapImage LoadThumbnail(string directoryName, string fileName, int width, int height)
+    private BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height)
     {
-        BitmapImage thumbnailImage = null;
+        BitmapImage? thumbnailImage = null;
 
         if (_assetRepository.ContainsThumbnail(directoryName, fileName))
         {

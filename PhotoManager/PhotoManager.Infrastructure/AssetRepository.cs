@@ -23,7 +23,6 @@ public class AssetRepository : IAssetRepository
     private readonly IUserConfigurationService _userConfigurationService;
 
     private List<Asset> assets;
-    private List<VideoAsset> videoAssets;
     private List<Folder> folders;
     private SyncAssetsConfiguration _syncAssetsConfiguration;
     private List<string> _recentTargetPaths;
@@ -129,30 +128,7 @@ public class AssetRepository : IAssetRepository
         }
     }
 
-    public void AddVideoAsset(VideoAsset videoAsset, byte[] thumbnailData)
-    {
-        lock (syncLock)
-        {
-            Folder folder = GetFolderById(videoAsset.FolderId);
-
-            if (folder == null)
-            {
-                AddFolder(videoAsset.Folder.Path);
-            }
-
-            if (!Thumbnails.ContainsKey(videoAsset.Folder.Path))
-            {
-                Thumbnails[videoAsset.Folder.Path] = GetThumbnails(videoAsset.Folder, out bool isNewFile);
-                RemoveOldThumbnailsDictionaryEntries(videoAsset.Folder);
-            }
-
-            Thumbnails[videoAsset.Folder.Path][videoAsset.FileName] = thumbnailData;
-            videoAssets.Add(videoAsset);
-            hasChanges = true;
-        }
-    }
-
-    public Folder AddFolder(string path)
+    public Folder AddFolder(string path) // play this before anything else to register every folders
     {
         Folder folder;
 
