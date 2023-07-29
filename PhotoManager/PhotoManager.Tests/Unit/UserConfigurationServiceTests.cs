@@ -92,7 +92,7 @@ public class UserConfigurationServiceTests
             .MockGetValue("appsettings:CatalogBatchSize", "100")
             .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
 
-        string result = UserConfigurationHelper.GetApplicationBackUpTestsFolder();
+        string result = UserConfigurationHelper.GetApplicationBackupTestsFolder();
         result.Should().NotBeEmpty();
     }
 
@@ -106,7 +106,7 @@ public class UserConfigurationServiceTests
             .MockGetValue("appsettings:CatalogBatchSize", "100")
             .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
 
-        string result = UserConfigurationHelper.GetApplicationBackUpTestsFolder();
+        string result = UserConfigurationHelper.GetApplicationBackupTestsFolder();
         result.Should().NotBeEmpty();
     }
 }

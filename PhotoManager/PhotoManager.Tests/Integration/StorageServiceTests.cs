@@ -47,7 +47,7 @@ public class StorageServiceTests
             .MockGetValue("appsettings:ApplicationDataDirectory", "{ApplicationData}\\PhotoManager")
             .MockGetValue("appsettings:CatalogBatchSize", "100");
 
-        string expected = Path.Combine(PathConstants.PathBackUpTests, storageVersionPath);
+        string expected = Path.Combine(PathConstants.PathBackupTests, storageVersionPath);
 
         string result = StorageServiceHelper.ResolveDataDirectory(storageVersion);
 

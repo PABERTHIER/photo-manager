@@ -8,6 +8,6 @@ public class StorageServiceHelper
 {
     public static string ResolveDataDirectory(double storageVersion)
     {
-        return Path.Combine(PathConstants.PathBackUpTests, "v" + storageVersion.ToString("0.0", new CultureInfo("en-US")));
+        return Path.Combine(PathConstants.PathBackupTests, "v" + storageVersion.ToString("0.0", new CultureInfo("en-US")));
     }
 }

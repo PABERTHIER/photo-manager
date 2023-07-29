@@ -42,7 +42,7 @@ public class StorageService : IStorageService
 
     public string ResolveDataDirectory(double storageVersion)
     {
-        return Path.Combine(_userConfigurationService.GetApplicationBackUpFolder(), "v" + storageVersion.ToString("0.0", new CultureInfo("en-US")));
+        return Path.Combine(_userConfigurationService.GetApplicationBackupFolder(), "v" + storageVersion.ToString("0.0", new CultureInfo("en-US")));
     }
 
     public void CreateDirectory(string directory)

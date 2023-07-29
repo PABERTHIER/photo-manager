@@ -94,9 +94,9 @@ public class UserConfigurationService : IUserConfigurationService
         return PathConstants.PathLocation;
     }
 
-    public string GetApplicationBackUpFolder()
+    public string GetApplicationBackupFolder()
     {
-        return PathConstants.PathBackUp;
+        return PathConstants.PathBackup;
     }
 
     public int GetCatalogBatchSize()

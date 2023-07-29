@@ -7,7 +7,7 @@ public interface IUserConfigurationService
     void SetAsWallpaper(Asset asset, WallpaperStyle style);
     AboutInformation GetAboutInformation(Assembly assembly);
     string GetPicturesDirectory();
-    string GetApplicationBackUpFolder();
+    string GetApplicationBackupFolder();
     int GetCatalogBatchSize();
     int GetCatalogCooldownMinutes();
     int GetBackupsToKeep();

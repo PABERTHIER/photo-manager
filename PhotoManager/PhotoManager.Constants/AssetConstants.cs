@@ -3,9 +3,11 @@
 public static class AssetConstants
 {
     public const bool UsingMD5Hash = false; // Enable it to Hash in MD5
+    // Performances are decreased with PHash by 6 times (for ex: 0.17s for 140 pictures with SHA512 and 1.11s with PHash)
     public const bool UsingPHash = false; // Enable it to detect duplicates between rotated assets (improve detection) PHash = Perceptual Hash
     public const bool UsingDHash = false; // Enable it to Hash in DHash (Difference Hash)
-    public const bool DetectThumbnails = false;
+    public const bool DetectThumbnails = false; // Enable it to detect duplicates between a thumbnail and the original
+    public const bool AnalyseVideos = false; // Enable it to extract thumbnail from each videos
     public const ushort OrientationCorruptedImage = 10000;
     public const double MaxWidth = 200;
     public const double MaxHeight = 150;

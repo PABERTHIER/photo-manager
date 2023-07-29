@@ -60,7 +60,7 @@ public class CatalogMoveAssetsServiceTests
                 cfg.RegisterType<AssetRepository>().As<IAssetRepository>().SingleInstance();
                 cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
             });
-        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
+        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(1000);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetThumbnailsDictionaryEntriesToKeep()).Returns(5);
@@ -111,7 +111,7 @@ public class CatalogMoveAssetsServiceTests
             });
         int batchSize = 5;
 
-        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
+        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(batchSize);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetThumbnailsDictionaryEntriesToKeep()).Returns(5);
@@ -168,7 +168,7 @@ public class CatalogMoveAssetsServiceTests
                 cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
             }))
         {
-            mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(appDataFolder);
+            mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(appDataFolder);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(batchSize);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetThumbnailsDictionaryEntriesToKeep()).Returns(5);
@@ -204,7 +204,7 @@ public class CatalogMoveAssetsServiceTests
                 cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
             }))
         {
-            mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(appDataFolder);
+            mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(appDataFolder);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(batchSize);
 
@@ -244,7 +244,7 @@ public class CatalogMoveAssetsServiceTests
                 cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
             }))
         {
-            mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(appDataFolder);
+            mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(appDataFolder);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(batchSize);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetThumbnailsDictionaryEntriesToKeep()).Returns(5);
@@ -280,7 +280,7 @@ public class CatalogMoveAssetsServiceTests
         {
             batchSize = 5;
 
-            mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(appDataFolder);
+            mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(appDataFolder);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
             mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(batchSize);
 
@@ -312,7 +312,7 @@ public class CatalogMoveAssetsServiceTests
                 cfg.RegisterType<AssetRepository>().As<IAssetRepository>().SingleInstance();
                 cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
             });
-        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
+        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(Path.Combine(dataDirectory, "NonExistent"));
 
         var repository = mock.Container.Resolve<IAssetRepository>();
@@ -969,7 +969,7 @@ public class CatalogMoveAssetsServiceTests
                 cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
                 cfg.RegisterType<MoveAssetsService>().As<IMoveAssetsService>().SingleInstance();
             });
-        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(appDataFolder);
+        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(appDataFolder);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(1000);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetRootCatalogFolderPaths()).Returns(new string[] { dataDirectory });
@@ -1011,7 +1011,7 @@ public class CatalogMoveAssetsServiceTests
                 cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
                 cfg.RegisterType<MoveAssetsService>().As<IMoveAssetsService>().SingleInstance();
             });
-        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackUpFolder()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
+        mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolder()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(1000);
         mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetRootCatalogFolderPaths()).Returns(new string[] { dataDirectory });
