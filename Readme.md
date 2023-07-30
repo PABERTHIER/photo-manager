@@ -80,6 +80,7 @@ There are many switches, enable or disable it as you wish:
 - `UsingDHash = false;`: Enable it to Hash in DHash (Difference Hash).
 - `DetectThumbnails = false;`: Enable it to detect duplicates between a thumbnail and the original.
 - `AnalyseVideos = false;`: Enable it to extract thumbnail from each videos.
+- `SyncAssetsEveryXMinutes = false;`: Enable it to sync your assets every X minutes (CATALOG_COOLDOWN_MINUTES).
 
 ## Path settings
 

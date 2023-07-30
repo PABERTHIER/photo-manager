@@ -1,5 +1,6 @@
 ﻿using log4net;
 using PhotoManager.Application;
+using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
@@ -462,30 +463,42 @@ public partial class MainWindow : Window
         stopwatch.Start();
 
         ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
-        int minutes = ViewModel.GetCatalogCooldownMinutes();
 
-        while (true)
+        // Disabling infinite loop to prevent reduced perfs
+        if (AssetConstants.SyncAssetsEveryXMinutes)
         {
-            try
-            {
-                catalogTask = ViewModel.CatalogAssets(
-                async (e) =>
-                {
-                    // The InvokeAsync method is used to avoid freezing the application when the task is cancelled.
-                    await Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e));
-                }, _cts.Token);
-            }
-            catch (OperationCanceledException ex)
-            {
-                log.Error(ex);
-            }
+            int minutes = ViewModel.GetCatalogCooldownMinutes();
 
-            await catalogTask.ConfigureAwait(true);
-            ViewModel?.CalculateGlobaleAssetsCounter();
-            stopwatch.Stop();
-            ViewModel?.SetExecutionTime(stopwatch.Elapsed);
-            ViewModel?.CalculateTotalFilesNumber();
-            await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
+            while (true)
+            {
+                await Initialization(stopwatch);
+                await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
+            }
         }
+
+        await Initialization(stopwatch);
+    }
+
+    private async Task Initialization(Stopwatch stopwatch)
+    {
+        try
+        {
+            catalogTask = ViewModel.CatalogAssets(
+            async (e) =>
+            {
+                // The InvokeAsync method is used to avoid freezing the application when the task is cancelled.
+                await Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e));
+            }, _cts.Token);
+        }
+        catch (OperationCanceledException ex)
+        {
+            log.Error(ex);
+        }
+
+        await catalogTask.ConfigureAwait(true);
+        ViewModel?.CalculateGlobaleAssetsCounter();
+        stopwatch.Stop();
+        ViewModel?.SetExecutionTime(stopwatch.Elapsed);
+        ViewModel?.CalculateTotalFilesNumber();
     }
 }
