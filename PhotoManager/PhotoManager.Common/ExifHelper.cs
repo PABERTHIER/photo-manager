@@ -1,3 +1,4 @@
+using ImageMagick;
 using log4net;
 using PhotoManager.Constants;
 using System.IO;
@@ -46,6 +47,31 @@ public static class ExifHelper
         }
     }
 
+    public static ushort GetHeicExifOrientation(byte[] buffer)
+    {
+        try
+        {
+            using (MemoryStream stream = new(buffer))
+            {
+                using (MagickImage image = new(stream))
+                {
+                    var orientation = image.GetAttribute("exif:Orientation");
+                    if (orientation != null && ushort.TryParse(orientation, out ushort orientationValue))
+                    {
+                        return orientationValue;
+                    }
+                }
+            }
+        }
+        catch (MagickException)
+        {
+            // Image is not valid or unsupported format
+            Console.WriteLine("The image is corrupted or in an unsupported format");
+        }
+
+        return AssetConstants.OrientationCorruptedImage;
+    }
+
     public static Rotation GetImageRotation(ushort exifOrientation)
     {
         Rotation rotation = exifOrientation switch
@@ -77,6 +103,27 @@ public static class ExifHelper
         }
         catch (Exception)
         {
+            return false;
+        }
+    }
+
+    public static bool IsValidHeic(byte[] imageData)
+    {
+        try
+        {
+            using (MemoryStream ms = new(imageData))
+            {
+                using (MagickImage image = new(ms))
+                {
+                    // Image is valid
+                }
+            }
+
+            return true;
+        }
+        catch (MagickException)
+        {
+            // Image is not valid or unsupported format
             return false;
         }
     }

@@ -18,6 +18,8 @@ public class ImageHelperTests
     [InlineData(".PnG", true)]
     [InlineData(".gif", true)]
     [InlineData(".GIF", true)]
+    [InlineData(".heic", true)]
+    [InlineData(".HEIC", true)]
     [InlineData(".dng", true)]
     [InlineData(".DNG", true)]
     [InlineData(".bmp", true)]

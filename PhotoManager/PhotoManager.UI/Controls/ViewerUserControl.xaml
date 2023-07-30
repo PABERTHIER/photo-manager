@@ -23,6 +23,7 @@
                 <BlurEffect Radius="100"/>
             </Image.Effect>
         </Image>
+        <!-- ContentControl_MouseDoubleClick will open the image in thumbnail mode in the MainWindow -->
         <ContentControl Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" MouseDoubleClick="ContentControl_MouseDoubleClick">
             <Image x:Name="image" RenderOptions.BitmapScalingMode="HighQuality" RenderOptions.EdgeMode="Aliased">
                 <Image.Effect>

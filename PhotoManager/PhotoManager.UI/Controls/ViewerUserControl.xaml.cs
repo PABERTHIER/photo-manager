@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace PhotoManager.UI.Controls;
 
@@ -80,11 +81,22 @@ public partial class ViewerUserControl : UserControl
         ViewModel?.ChangeAppMode(AppModeEnum.Thumbnails);
     }
 
+    // Triggered when double clicked on the thumbnail image from ThumbnailsUserControl to pass into fullscreen mode
     public void ShowImage()
     {
         if (ViewModel.ViewerPosition >= 0)
         {
-            var source = ViewModel.LoadBitmapImage();
+            BitmapImage? source;
+            bool isHeic = ViewModel.CurrentAsset.FileName.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
+
+            if (isHeic)
+            {
+                source = ViewModel.LoadBitmapHeicImage();
+            }
+            else
+            {
+                source = ViewModel.LoadBitmapImage();
+            }
 
             if (source != null)
             {

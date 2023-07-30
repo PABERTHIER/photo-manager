@@ -12,6 +12,7 @@
         <c:PixelSizeConverter x:Key="PixelSizeConverter" />
         <c:TernaryConverter x:Key="TernaryConverter" />
         <DataTemplate x:Key="ThumbnailDataTemplate">
+            <!-- ContentControl_MouseDoubleClick will open the image in full screen mode in the ViewerUserControl -->
             <ContentControl MouseDown="ContentControl_MouseDown" MouseDoubleClick="ContentControl_MouseDoubleClick" Margin="10">
                 <Grid>
                     <Grid.RowDefinitions>

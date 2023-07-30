@@ -117,6 +117,13 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             byte[] imageBytes = _storageService.GetFileBytes(imagePath);
 
+            bool isHeic = imagePath.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
+
+            if (isHeic)
+            {
+                return CreateAssetFromHeic(imageBytes, imagePath, directoryName);
+            }
+
             if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
             {
                 return asset;
@@ -164,10 +171,12 @@ public class CatalogAssetsService : ICatalogAssetsService
                 Rotation.Rotate0, // before was rotation
                 Convert.ToInt32(thumbnailDecodeWidth),
                 Convert.ToInt32(thumbnailDecodeHeight));
+
             bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
             bool isGif = imagePath.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
             byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) :
                 (isGif ? _storageService.GetGifBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage));
+
             Folder folder = _assetRepository.GetFolderByPath(directoryName);
 
             asset = new Asset
@@ -407,6 +416,86 @@ public class CatalogAssetsService : ICatalogAssetsService
         }
 
         return cataloguedAssetsBatchCount;
+    }
+
+    private Asset? CreateAssetFromHeic(byte[] imageBytes, string imagePath, string directoryName)
+    {
+        Asset? asset = null;
+
+        if (!_storageService.GetIsValidHeic(imageBytes))
+        {
+            return asset;
+        }
+
+        ushort exifOrientation = _storageService.GetHeicExifOrientation(imageBytes);
+        Rotation rotation = _storageService.GetImageRotation(exifOrientation);
+
+        bool assetCorrupted = false;
+        bool assetRotated = false;
+
+        if (exifOrientation == AssetConstants.OrientationCorruptedImage)
+        {
+            assetCorrupted = true;
+        }
+
+        if (rotation != Rotation.Rotate0)
+        {
+            assetRotated = true;
+        }
+
+        BitmapImage originalImage = _storageService.LoadBitmapHeicImage(imageBytes, Rotation.Rotate0); // before was rotation
+
+        double originalDecodeWidth = originalImage.PixelWidth;
+        double originalDecodeHeight = originalImage.PixelHeight;
+        double thumbnailDecodeWidth;
+        double thumbnailDecodeHeight;
+        double percentage;
+
+        // If the original image is landscape
+        if (originalDecodeWidth > originalDecodeHeight)
+        {
+            thumbnailDecodeWidth = AssetConstants.MaxWidth;
+            percentage = (AssetConstants.MaxWidth * 100d / originalDecodeWidth);
+            thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
+        }
+        else // If the original image is portrait
+        {
+            thumbnailDecodeHeight = AssetConstants.MaxHeight;
+            percentage = (AssetConstants.MaxHeight * 100d / originalDecodeHeight);
+            thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
+        }
+
+        BitmapImage thumbnailImage = _storageService.LoadBitmapHeicImage(imageBytes,
+            Rotation.Rotate0, // before was rotation
+            Convert.ToInt32(thumbnailDecodeWidth),
+            Convert.ToInt32(thumbnailDecodeHeight));
+
+        byte[] thumbnailBuffer = _storageService.GetJpegBitmapImage(thumbnailImage);
+
+        Folder folder = _assetRepository.GetFolderByPath(directoryName);
+
+        asset = new Asset
+        {
+            FileName = Path.GetFileName(imagePath),
+            FolderId = folder.FolderId,
+            Folder = folder,
+            FileSize = new FileInfo(imagePath).Length,
+            PixelWidth = Convert.ToInt32(originalDecodeWidth),
+            PixelHeight = Convert.ToInt32(originalDecodeHeight),
+            ThumbnailPixelWidth = Convert.ToInt32(thumbnailDecodeWidth),
+            ThumbnailPixelHeight = Convert.ToInt32(thumbnailDecodeHeight),
+            ImageRotation = rotation,
+            ThumbnailCreationDateTime = DateTime.Now,
+            Hash = _assetHashCalculatorService.CalculateHash(imageBytes, imagePath),
+            IsAssetCorrupted = assetCorrupted,
+            AssetCorruptedMessage = assetCorrupted ? AssetConstants.AssetCorruptedMessage : null,
+            IsAssetRotated = assetRotated,
+            AssetRotatedMessage = assetRotated ? AssetConstants.AssetRotatedMessage : null,
+        };
+
+        _assetRepository.AddAsset(asset, thumbnailBuffer);
+
+        return asset;
     }
 
     private int CatalogUpdatedAssets(string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)

@@ -71,29 +71,56 @@ public class StorageService : IStorageService
         return File.ReadAllBytes(filePath);
     }
 
+    // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
     public BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
         return BitmapHelper.LoadBitmapImage(buffer, rotation, width, height);
     }
 
+    // From AssetRepository
     public BitmapImage LoadBitmapImage(byte[] buffer, int width, int height)
     {
         return BitmapHelper.LoadBitmapImage(buffer, width, height);
     }
 
+    // From CatalogAssetsService for CreateAsset() to get the originalImage
     public BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation)
     {
         return BitmapHelper.LoadBitmapImage(buffer, rotation);
     }
 
+    // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
     public BitmapImage LoadBitmapImage(string imagePath, Rotation rotation)
     {
         return BitmapHelper.LoadBitmapImage(imagePath, rotation);
     }
 
+    // From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC
+    public BitmapImage LoadBitmapHeicImage(byte[] imageBytes, Rotation rotation)
+    {
+        return BitmapHelper.LoadBitmapHeicImage(imageBytes, rotation);
+    }
+
+    // From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC
+    public BitmapImage LoadBitmapHeicImage(byte[] buffer, Rotation rotation, int width, int height)
+    {
+        return BitmapHelper.LoadBitmapHeicImage(buffer, rotation, width, height);
+    }
+
+    // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
+    public BitmapImage LoadBitmapHeicImage(string imagePath, Rotation rotation)
+    {
+        return BitmapHelper.LoadBitmapHeicImage(imagePath, rotation);
+    }
+
     public ushort GetExifOrientation(byte[] buffer)
     {
         return ExifHelper.GetExifOrientation(buffer);
+    }
+
+    public ushort GetHeicExifOrientation(byte[] buffer)
+    {
+        return ExifHelper.GetHeicExifOrientation(buffer);
     }
 
     public Rotation GetImageRotation(ushort exifOrientation)
@@ -163,5 +190,10 @@ public class StorageService : IStorageService
     public bool GetIsValidGDIPlusImage(byte[] imageData)
     {
         return ExifHelper.IsValidGDIPlusImage(imageData);
+    }
+
+    public bool GetIsValidHeic(byte[] imageData)
+    {
+        return ExifHelper.IsValidHeic(imageData);
     }
 }

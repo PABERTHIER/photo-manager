@@ -23,6 +23,7 @@ public interface IApplication
     int GetCatalogCooldownMinutes();
     bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles);
     BitmapImage LoadBitmapImage(string imagePath, Rotation rotation);
+    BitmapImage LoadBitmapHeicImage(string imagePath, Rotation rotation);
     bool FileExists(string fullPath);
     List<string> GetRecentTargetPaths();
     Folder[] GetRootCatalogFolders();

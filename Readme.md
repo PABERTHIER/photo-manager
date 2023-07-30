@@ -46,7 +46,7 @@ Open the solution file `PhotoManager/PhotoManager.sln` and run the `PhotoManager
 - .bmp - Windows bitmap
 - .dng - RAW Format
 - .gif - Graphics Interchange Format
-- .heic - Apple Format // WIP
+- .heic - Apple Format
 - .ico - Icon file
 - .jpeg, .jpg - Joint Photographic Experts Group
 - .png - Portable Network Graphics

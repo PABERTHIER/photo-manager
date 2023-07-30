@@ -16,7 +16,11 @@ public interface IStorageService
     BitmapImage LoadBitmapImage(byte[] buffer, int width, int height);
     BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation);
     BitmapImage LoadBitmapImage(string imagePath, Rotation rotation);
+    BitmapImage LoadBitmapHeicImage(byte[] buffer, Rotation rotation);
+    BitmapImage LoadBitmapHeicImage(byte[] buffer, Rotation rotation, int width, int height);
+    BitmapImage LoadBitmapHeicImage(string imagePath, Rotation rotation);
     ushort GetExifOrientation(byte[] buffer);
+    ushort GetHeicExifOrientation(byte[] buffer);
     Rotation GetImageRotation(ushort exifOrientation);
     //bool HasSameContent(Asset assetA, Asset assetB);
     byte[] GetJpegBitmapImage(BitmapImage thumbnailImage);
@@ -29,4 +33,5 @@ public interface IStorageService
     bool MoveImage(string sourcePath, string destinationPath);
     void GetFileInformation(Asset asset);
     bool GetIsValidGDIPlusImage(byte[] imageData);
+    bool GetIsValidHeic(byte[] imageData);
 }
