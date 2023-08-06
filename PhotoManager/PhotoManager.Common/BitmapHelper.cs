@@ -1,11 +1,15 @@
 ﻿using ImageMagick;
+using log4net;
 using System.IO;
+using System.Reflection;
 using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Common;
 
 public static class BitmapHelper
 {
+    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+
     // From CatalogAssetsService for CreateAsset() to get the originalImage
     public static BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation)
     {
@@ -82,8 +86,7 @@ public static class BitmapHelper
         }
         catch (MagickException)
         {
-            // Image is not valid or unsupported format
-            Console.WriteLine("The image is corrupted or in an unsupported format");
+            log.Error("The image is not valid or in an unsupported format");
         }
 
         return image;
@@ -127,8 +130,7 @@ public static class BitmapHelper
         }
         catch (MagickException)
         {
-            // Image is not valid or unsupported format
-            Console.WriteLine("The image is corrupted or in an unsupported format");
+            log.Error("The image is not valid or in an unsupported format");
         }
 
         return image;
