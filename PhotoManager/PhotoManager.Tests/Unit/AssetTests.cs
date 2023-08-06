@@ -330,6 +330,7 @@ public class AssetTests
     [InlineData("", false)]
     [InlineData(" ", false)]
     [InlineData("  ", false)]
+    [InlineData(".", false)]
     [InlineData(".jpg", false)]
     [InlineData("<#>.jpg", true)]
     [InlineData("<##>.jpg", true)]

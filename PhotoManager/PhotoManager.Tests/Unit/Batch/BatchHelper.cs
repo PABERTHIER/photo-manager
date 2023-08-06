@@ -32,22 +32,12 @@ public static class BatchHelper
         if (isValid)
         {
             batchFormat = batchFormat.Trim();
-
-            // If the batch format is just an extension,
-            // return the current filename.
-            if (batchFormat == ".")
-            {
-                batchFormat = asset.FileName;
-            }
-            else
-            {
-                (batchFormat, bool includesOrdinal) = ReplaceSupportedTagsWithValues(asset, batchFormat, ordinal, provider);
-                (Folder? folder, batchFormat) = ResolveTargetFolder(asset, batchFormat);
-                batchFormat = folder != null ? Path.Combine(folder.Path, batchFormat) : string.Empty;
-                batchFormat = !overwriteExistingTargetFiles ?
-                    ComputeUniqueTargetPath(folder, batchFormat, includesOrdinal, storageService) :
-                    batchFormat;
-            }
+            (batchFormat, bool includesOrdinal) = ReplaceSupportedTagsWithValues(asset, batchFormat, ordinal, provider);
+            (Folder? folder, batchFormat) = ResolveTargetFolder(asset, batchFormat);
+            batchFormat = folder != null ? Path.Combine(folder.Path, batchFormat) : string.Empty;
+            batchFormat = !overwriteExistingTargetFiles ?
+                ComputeUniqueTargetPath(folder, batchFormat, includesOrdinal, storageService) :
+                batchFormat;
         }
         else
         {
