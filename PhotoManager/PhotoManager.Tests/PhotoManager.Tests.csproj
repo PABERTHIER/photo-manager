@@ -15,6 +15,9 @@
   <ItemGroup>
     <None Remove="TestFiles\Homer.gif" />
     <None Remove="TestFiles\Image 1.jpg" />
+    <None Remove="TestFiles\Image 1_90_deg.jpg" />
+    <None Remove="TestFiles\Image 1_180_deg.jpg" />
+    <None Remove="TestFiles\Image 1_270_deg.jpg" />
     <None Remove="TestFiles\Image 10 portrait.png" />
     <None Remove="TestFiles\Image 2 duplicated.jpg" />
     <None Remove="TestFiles\Image 2.jpg" />
@@ -40,6 +43,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\Image 1.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Image 1_90_deg.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Image 1_180_deg.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Image 1_270_deg.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\Image 10 portrait.png">

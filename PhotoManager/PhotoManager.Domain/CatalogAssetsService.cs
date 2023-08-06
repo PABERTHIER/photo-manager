@@ -129,7 +129,9 @@ public class CatalogAssetsService : ICatalogAssetsService
                 return asset;
             }
 
-            ushort exifOrientation = _storageService.GetExifOrientation(imageBytes);
+            bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
+            bool isGif = imagePath.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
+            ushort exifOrientation = (isPng || isGif ) ? AssetConstants.DefaultExifOrientation : _storageService.GetExifOrientation(imageBytes); // GetExifOrientation is not handled by Gif and PNG
             Rotation rotation = _storageService.GetImageRotation(exifOrientation);
 
             bool assetCorrupted = false;
@@ -172,8 +174,6 @@ public class CatalogAssetsService : ICatalogAssetsService
                 Convert.ToInt32(thumbnailDecodeWidth),
                 Convert.ToInt32(thumbnailDecodeHeight));
 
-            bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
-            bool isGif = imagePath.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
             byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) :
                 (isGif ? _storageService.GetGifBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage));
 

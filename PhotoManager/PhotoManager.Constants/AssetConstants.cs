@@ -9,6 +9,7 @@ public static class AssetConstants
     public const bool DetectThumbnails = false; // Enable it to detect duplicates between a thumbnail and the original
     public const bool AnalyseVideos = false; // Enable it to extract thumbnail from each videos
     public const bool SyncAssetsEveryXMinutes = false; // Enable it to sync your assets every X minutes (CATALOG_COOLDOWN_MINUTES)
+    public const ushort DefaultExifOrientation = 1;
     public const ushort OrientationCorruptedImage = 10000;
     public const double MaxWidth = 200;
     public const double MaxHeight = 150;

@@ -1,9 +1,7 @@
-﻿using ImageMagick;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using PhotoManager.Common;
 using System.IO;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 
 namespace PhotoManager.Tests.Unit.Helpers;
 
