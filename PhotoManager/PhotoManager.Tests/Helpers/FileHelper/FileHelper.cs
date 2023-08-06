@@ -1,13 +1,13 @@
 ﻿using System.IO;
 using System.Text.Json;
 
-namespace PhotoManager.Common;
+namespace PhotoManager.Tests.Helpers.FileHelper;
 
 public static class FileHelper
 {
-    public static T ReadObjectFromJsonFile<T>(string jsonFilePath)
+    public static T? ReadObjectFromJsonFile<T>(string jsonFilePath)
     {
-        T result = default(T);
+        T? result = default;
         string json;
 
         if (File.Exists(jsonFilePath))

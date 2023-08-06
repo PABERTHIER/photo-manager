@@ -1,6 +1,6 @@
 ﻿using PhotoManager.Domain;
 
-namespace PhotoManager.Tests.Unit.Batch;
+namespace PhotoManager.Tests.Helpers.Batch;
 
 public class BatchRenameResult
 {

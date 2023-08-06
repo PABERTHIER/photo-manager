@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using PhotoManager.Common;
 using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
 using PhotoManager.Tests.Helpers;
+using PhotoManager.Tests.Helpers.FileHelper;
 using System.IO;
 using System.Windows.Media.Imaging;
 using Xunit;
@@ -20,8 +20,8 @@ public class StorageServiceTests
 
     public StorageServiceTests()
     {
-        _dataDirectory = Path.GetDirectoryName(typeof(StorageServiceTests).Assembly.Location);
-        _dataDirectory = Path.Combine(_dataDirectory, "TestFiles");
+        _dataDirectory = Path.GetDirectoryName(typeof(StorageServiceTests).Assembly.Location) ?? "";
+        _dataDirectory = Path.Combine(_dataDirectory!, "TestFiles");
 
         string hiddenFolderPath = Path.Combine(_dataDirectory, "TestFolder", "TestHiddenSubFolder");
         File.SetAttributes(hiddenFolderPath, File.GetAttributes(hiddenFolderPath) | FileAttributes.Hidden);
@@ -106,7 +106,7 @@ public class StorageServiceTests
         string jsonPath = Path.Combine(_dataDirectory, "test.json");
 
         WriteObjectToJsonFile(writtenList, jsonPath);
-        List<string> readList = ReadObjectFromJsonFile<List<string>>(jsonPath);
+        List<string> readList = ReadObjectFromJsonFile<List<string>>(jsonPath) ?? new List<string>();
 
         readList.Should().HaveSameCount(writtenList);
         readList[0].Should().Be(writtenList[0]);
@@ -135,7 +135,7 @@ public class StorageServiceTests
         result.Should().Be(expected);
     }
 
-    private static T ReadObjectFromJsonFile<T>(string jsonFilePath)
+    private static T? ReadObjectFromJsonFile<T>(string jsonFilePath)
     {
         return FileHelper.ReadObjectFromJsonFile<T>(jsonFilePath);
     }

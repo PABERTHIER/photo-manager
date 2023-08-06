@@ -2,7 +2,7 @@
 using FluentAssertions;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
-using PhotoManager.Tests.Unit.Batch;
+using PhotoManager.Tests.Helpers.Batch;
 using System.Globalization;
 using Xunit;
 

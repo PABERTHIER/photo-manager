@@ -3,7 +3,7 @@ using PhotoManager.Domain;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace PhotoManager.Tests.Unit.Batch;
+namespace PhotoManager.Tests.Helpers.Batch;
 
 public static class BatchHelper
 {
