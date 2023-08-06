@@ -7,7 +7,7 @@ namespace PhotoManager.Common;
 public static class BitmapHelper
 {
     // From CatalogAssetsService for CreateAsset() to get the originalImage
-    public static BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation)
+    public static BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation)
     {
         BitmapImage image = new();
 
@@ -26,9 +26,9 @@ public static class BitmapHelper
     }
 
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
-    public static BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation, int width, int height)
+    public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
-        BitmapImage image = null;
+        BitmapImage image = new();
 
         using (MemoryStream stream = new(buffer))
         {
@@ -48,7 +48,7 @@ public static class BitmapHelper
     }
 
     // From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC
-    public static BitmapImage LoadBitmapHeicImage(byte[] buffer, Rotation rotation)
+    public static BitmapImage LoadBitmapHeicOriginalImage(byte[] buffer, Rotation rotation)
     {
         BitmapImage image = new();
 
@@ -58,19 +58,7 @@ public static class BitmapHelper
             {
                 using (MagickImage magickImage = new (stream))
                 {
-                    // Apply rotation to the MagickImage
-                    if (rotation == Rotation.Rotate90)
-                    {
-                        magickImage.Rotate(90);
-                    }
-                    else if (rotation == Rotation.Rotate180)
-                    {
-                        magickImage.Rotate(180);
-                    }
-                    else if (rotation == Rotation.Rotate270)
-                    {
-                        magickImage.Rotate(270);
-                    }
+                    MagickImageApplyRotation(magickImage, rotation);
 
                     // Convert the MagickImage to a BitmapImage
                     using (MemoryStream bitmapStream = new ())
@@ -102,7 +90,7 @@ public static class BitmapHelper
     }
 
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC
-    public static BitmapImage LoadBitmapHeicImage(byte[] buffer, Rotation rotation, int width, int height)
+    public static BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
         BitmapImage image = new();
 
@@ -112,19 +100,7 @@ public static class BitmapHelper
             {
                 using (MagickImage magickImage = new(stream))
                 {
-                    // Apply rotation to the MagickImage
-                    if (rotation == Rotation.Rotate90)
-                    {
-                        magickImage.Rotate(90);
-                    }
-                    else if (rotation == Rotation.Rotate180)
-                    {
-                        magickImage.Rotate(180);
-                    }
-                    else if (rotation == Rotation.Rotate270)
-                    {
-                        magickImage.Rotate(270);
-                    }
+                    MagickImageApplyRotation(magickImage, rotation);
 
                     // Resize the MagickImage
                     magickImage.Resize(width, height);
@@ -159,9 +135,9 @@ public static class BitmapHelper
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
-    public static BitmapImage LoadBitmapImage(string imagePath, Rotation rotation)
+    public static BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation)
     {
-        BitmapImage image = null;
+        BitmapImage image = new();
 
         if (File.Exists(imagePath))
         {
@@ -179,28 +155,15 @@ public static class BitmapHelper
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
-    public static BitmapImage LoadBitmapHeicImage(string imagePath, Rotation rotation)
+    public static BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation)
     {
-        BitmapImage image = null;
+        BitmapImage image = new();
 
         if (File.Exists(imagePath))
         {
             using (MagickImage magickImage = new (imagePath))
             {
-                // Apply rotation to the MagickImage based on the Rotation value
-                switch (rotation)
-                {
-                    case Rotation.Rotate90:
-                        magickImage.Rotate(90);
-                        break;
-                    case Rotation.Rotate180:
-                        magickImage.Rotate(180);
-                        break;
-                    case Rotation.Rotate270:
-                        magickImage.Rotate(270);
-                        break;
-                        // case Rotation.Rotate0: No rotation needed for Rotate0
-                }
+                MagickImageApplyRotation(magickImage, rotation);
 
                 // Convert the MagickImage to a byte array (supported format: JPG)
                 byte[] imageData = magickImage.ToByteArray(MagickFormat.Jpg);
@@ -265,5 +228,24 @@ public static class BitmapHelper
         }
 
         return imageBuffer;
+    }
+
+    private static void MagickImageApplyRotation(MagickImage magickImage, Rotation rotation)
+    {
+        // Apply rotation to the MagickImage based on the Rotation value
+        switch (rotation)
+        {
+            // Apply rotation to the MagickImage
+            // Case Rotation.Rotate0: No rotation needed for Rotate0
+            case Rotation.Rotate90:
+                magickImage.Rotate(90);
+                break;
+            case Rotation.Rotate180:
+                magickImage.Rotate(180);
+                break;
+            case Rotation.Rotate270:
+                magickImage.Rotate(270);
+                break;
+        }
     }
 }

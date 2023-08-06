@@ -1,39 +1,39 @@
-﻿using FluentAssertions;
+﻿using NUnit.Framework;
 using PhotoManager.Common;
-using Xunit;
 
 namespace PhotoManager.Tests.Unit.Helpers;
 
+[TestFixture]
 public class ImageHelperTests
 {
-    [Theory]
-    [InlineData(".jpg", true)]
-    [InlineData(".JPG", true)]
-    [InlineData(".jpeg", true)]
-    [InlineData(".JPEG", true)]
-    [InlineData(".jfif", true)]
-    [InlineData(".JFIF", true)]
-    [InlineData(".png", true)]
-    [InlineData(".PNG", true)]
-    [InlineData(".PnG", true)]
-    [InlineData(".gif", true)]
-    [InlineData(".GIF", true)]
-    [InlineData(".heic", true)]
-    [InlineData(".HEIC", true)]
-    [InlineData(".dng", true)]
-    [InlineData(".DNG", true)]
-    [InlineData(".bmp", true)]
-    [InlineData(".BMP", true)]
-    [InlineData(".tiff", true)]
-    [InlineData(".TIFF", true)]
-    [InlineData(".tif", true)]
-    [InlineData(".TIF", true)]
-    [InlineData("png", false)]
-    [InlineData(".toto", false)]
-    [InlineData(".", false)]
+    [Test]
+    [TestCase(".jpg", true)]
+    [TestCase(".JPG", true)]
+    [TestCase(".jpeg", true)]
+    [TestCase(".JPEG", true)]
+    [TestCase(".jfif", true)]
+    [TestCase(".JFIF", true)]
+    [TestCase(".png", true)]
+    [TestCase(".PNG", true)]
+    [TestCase(".PnG", true)]
+    [TestCase(".gif", true)]
+    [TestCase(".GIF", true)]
+    [TestCase(".heic", true)]
+    [TestCase(".HEIC", true)]
+    [TestCase(".dng", true)]
+    [TestCase(".DNG", true)]
+    [TestCase(".bmp", true)]
+    [TestCase(".BMP", true)]
+    [TestCase(".tiff", true)]
+    [TestCase(".TIFF", true)]
+    [TestCase(".tif", true)]
+    [TestCase(".TIF", true)]
+    [TestCase("png", false)]
+    [TestCase(".toto", false)]
+    [TestCase(".", false)]
     public void Should_Detect_When_AssetIsImage(string fileExtension, bool expected)
     {
         var result = ImageHelper.IsImageFile(fileExtension);
-        result.Should().Be(expected);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

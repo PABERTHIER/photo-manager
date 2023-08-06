@@ -14,11 +14,11 @@ public interface IStorageService
     byte[] GetFileBytes(string filePath);
     BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height);
     BitmapImage LoadBitmapImage(byte[] buffer, int width, int height);
-    BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation);
-    BitmapImage LoadBitmapImage(string imagePath, Rotation rotation);
-    BitmapImage LoadBitmapHeicImage(byte[] buffer, Rotation rotation);
-    BitmapImage LoadBitmapHeicImage(byte[] buffer, Rotation rotation, int width, int height);
-    BitmapImage LoadBitmapHeicImage(string imagePath, Rotation rotation);
+    BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation);
+    BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation);
+    BitmapImage LoadBitmapHeicOriginalImage(byte[] buffer, Rotation rotation);
+    BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height);
+    BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation);
     ushort GetExifOrientation(byte[] buffer);
     ushort GetHeicExifOrientation(byte[] buffer);
     Rotation GetImageRotation(ushort exifOrientation);

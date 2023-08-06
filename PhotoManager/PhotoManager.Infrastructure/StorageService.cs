@@ -74,7 +74,7 @@ public class StorageService : IStorageService
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
     public BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
-        return BitmapHelper.LoadBitmapImage(buffer, rotation, width, height);
+        return BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height);
     }
 
     // From AssetRepository
@@ -84,33 +84,33 @@ public class StorageService : IStorageService
     }
 
     // From CatalogAssetsService for CreateAsset() to get the originalImage
-    public BitmapImage LoadBitmapImage(byte[] buffer, Rotation rotation)
+    public BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation)
     {
-        return BitmapHelper.LoadBitmapImage(buffer, rotation);
+        return BitmapHelper.LoadBitmapOriginalImage(buffer, rotation);
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode
-    public BitmapImage LoadBitmapImage(string imagePath, Rotation rotation)
+    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation)
     {
-        return BitmapHelper.LoadBitmapImage(imagePath, rotation);
+        return BitmapHelper.LoadBitmapImageFromPath(imagePath, rotation);
     }
 
     // From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC
-    public BitmapImage LoadBitmapHeicImage(byte[] imageBytes, Rotation rotation)
+    public BitmapImage LoadBitmapHeicOriginalImage(byte[] imageBytes, Rotation rotation)
     {
-        return BitmapHelper.LoadBitmapHeicImage(imageBytes, rotation);
+        return BitmapHelper.LoadBitmapHeicOriginalImage(imageBytes, rotation);
     }
 
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC
-    public BitmapImage LoadBitmapHeicImage(byte[] buffer, Rotation rotation, int width, int height)
+    public BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
-        return BitmapHelper.LoadBitmapHeicImage(buffer, rotation, width, height);
+        return BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
     }
 
     // From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic
-    public BitmapImage LoadBitmapHeicImage(string imagePath, Rotation rotation)
+    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation)
     {
-        return BitmapHelper.LoadBitmapHeicImage(imagePath, rotation);
+        return BitmapHelper.LoadBitmapHeicImageFromPath(imagePath, rotation);
     }
 
     public ushort GetExifOrientation(byte[] buffer)

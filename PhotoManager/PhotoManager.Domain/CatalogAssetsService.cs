@@ -145,7 +145,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 assetRotated = true;
             }
 
-            BitmapImage originalImage = _storageService.LoadBitmapImage(imageBytes, Rotation.Rotate0); // before was rotation
+            BitmapImage originalImage = _storageService.LoadBitmapOriginalImage(imageBytes, Rotation.Rotate0); // before was rotation
 
             double originalDecodeWidth = originalImage.PixelWidth;
             double originalDecodeHeight = originalImage.PixelHeight;
@@ -443,7 +443,7 @@ public class CatalogAssetsService : ICatalogAssetsService
             assetRotated = true;
         }
 
-        BitmapImage originalImage = _storageService.LoadBitmapHeicImage(imageBytes, Rotation.Rotate0); // before was rotation
+        BitmapImage originalImage = _storageService.LoadBitmapHeicOriginalImage(imageBytes, Rotation.Rotate0); // before was rotation
 
         double originalDecodeWidth = originalImage.PixelWidth;
         double originalDecodeHeight = originalImage.PixelHeight;
@@ -465,7 +465,7 @@ public class CatalogAssetsService : ICatalogAssetsService
             thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
         }
 
-        BitmapImage thumbnailImage = _storageService.LoadBitmapHeicImage(imageBytes,
+        BitmapImage thumbnailImage = _storageService.LoadBitmapHeicThumbnailImage(imageBytes,
             Rotation.Rotate0, // before was rotation
             Convert.ToInt32(thumbnailDecodeWidth),
             Convert.ToInt32(thumbnailDecodeHeight));

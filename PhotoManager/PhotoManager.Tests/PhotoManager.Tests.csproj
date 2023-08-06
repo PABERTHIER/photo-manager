@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="TestFiles\Homer.gif" />
     <None Remove="TestFiles\Image 1.jpg" />
     <None Remove="TestFiles\Image 10 portrait.png" />
     <None Remove="TestFiles\Image 2 duplicated.jpg" />
@@ -25,6 +26,7 @@
     <None Remove="TestFiles\Image 8.jpeg" />
     <None Remove="TestFiles\Image 9.png" />
     <None Remove="TestFiles\Image.pptx" />
+    <None Remove="TestFiles\Image_11.heic" />
     <None Remove="TestFiles\IMAGE_WITH_UPPERCASE_NAME.JPG" />
     <None Remove="TestFiles\TestFolder\EmptyFile.txt" />
     <None Remove="TestFiles\TestFolder\TestHiddenSubFolder\EmptyFile.txt" />
@@ -34,6 +36,9 @@
   </ItemGroup>
 
   <ItemGroup>
+  <Content Include="TestFiles\Homer.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestFiles\Image 1.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -68,6 +73,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\Image.pptx" />
+    <Content Include="TestFiles\Image_11.heic">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestFiles\IMAGE_WITH_UPPERCASE_NAME.JPG">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -92,6 +100,8 @@
     <PackageReference Include="Autofac.Extras.Moq" Version="6.1.0" />
     <PackageReference Include="FluentAssertions" Version="6.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="SimplePortableDatabase" Version="1.1.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
