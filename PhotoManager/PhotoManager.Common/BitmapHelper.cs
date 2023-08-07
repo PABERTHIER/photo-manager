@@ -191,17 +191,17 @@ public static class BitmapHelper
     {
         BitmapImage thumbnailImage = new();
 
-        // TODO: If the stream is disposed by a using block, the thumbnail is not shown. Find a way to dispose of the stream.
-        // When the using block for the MemoryStream is exited, the stream is disposed of, which lead to have a default bitmap at the end and to lose all the data.
-        MemoryStream stream = new(buffer);
-        thumbnailImage.BeginInit();
-        thumbnailImage.CacheOption = BitmapCacheOption.None;
-        thumbnailImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-        thumbnailImage.StreamSource = stream;
-        thumbnailImage.DecodePixelWidth = width;
-        thumbnailImage.DecodePixelHeight = height;
-        thumbnailImage.EndInit();
-        thumbnailImage.Freeze();
+        using (MemoryStream stream = new(buffer))
+        {
+            thumbnailImage.BeginInit();
+            thumbnailImage.CacheOption = BitmapCacheOption.OnLoad;
+            thumbnailImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+            thumbnailImage.StreamSource = stream;
+            thumbnailImage.DecodePixelWidth = width;
+            thumbnailImage.DecodePixelHeight = height;
+            thumbnailImage.EndInit();
+            thumbnailImage.Freeze();
+        }
 
         return thumbnailImage;
     }
