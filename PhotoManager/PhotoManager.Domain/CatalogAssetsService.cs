@@ -89,20 +89,20 @@ public class CatalogAssetsService : ICatalogAssetsService
     public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false)
     {
         Asset? asset = null;
-        string thumbnailPath = "";
+        string firstFrameVideoPath = "";
 
         if (isVideo)
         {
-            thumbnailPath = VideoHelper.GetFirstFrame(directoryName, fileName); // Create an asset from the video file
+            firstFrameVideoPath = VideoHelper.GetFirstFrame(directoryName, fileName, PathConstants.PathFirstFrameVideos); // Create an asset from the video file
         }
 
         if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
         {
             string imagePath;
 
-            if (isVideo && !string.IsNullOrWhiteSpace(thumbnailPath))
+            if (isVideo && !string.IsNullOrWhiteSpace(firstFrameVideoPath))
             {
-                imagePath = thumbnailPath;
+                imagePath = firstFrameVideoPath;
                 DirectoryInfo directoryInfo = new (imagePath);
 
                 if (directoryName != directoryInfo.Parent?.FullName) // The video file is not in the same path than the asset created

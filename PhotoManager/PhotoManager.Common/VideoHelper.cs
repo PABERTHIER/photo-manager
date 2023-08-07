@@ -1,11 +1,12 @@
 ﻿using PhotoManager.Constants;
-using System.Diagnostics;
 using System.IO;
 
 namespace PhotoManager.Common;
 
 public static class VideoHelper
 {
+    public static IProcessExecutor ProcessExecutor { get; set; } = new ProcessExecutor();
+
     //.3g2 - Mobile video
     //.3gp - Mobile video
     //.asf - Advanced Systems Format
@@ -44,10 +45,9 @@ public static class VideoHelper
         };
     }
 
-    public static string GetFirstFrame(string directoryName, string fileName)
+    public static string GetFirstFrame(string directoryName, string fileName, string destinationPath)
     {
         string videoPath = Path.Combine(directoryName, fileName);
-        string destinationPath = Path.Combine(PathConstants.PathLocation, "outputVideoThumbnails");
 
         // Create the output directory if it doesn't exist
         Directory.CreateDirectory(destinationPath);
@@ -56,60 +56,24 @@ public static class VideoHelper
         string ffmpegPath = PathConstants.FfmpegPath;
 
         // Set the output file name based on the input video file name
-        string thumbnailName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
-        string thumbnailPath = Path.Combine(destinationPath, thumbnailName);
+        string firstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
+        string firstFrameVideoPath = Path.Combine(destinationPath, firstFrameVideoName);
 
         try
         {
-            // Execute FFmpeg command to extract a thumbnail
-            string arguments = $"-i \"{videoPath}\" -ss 00:00:01 -vframes 1 \"{thumbnailPath}\"";
-            ExecuteFFmpegCommand(ffmpegPath, arguments);
+            // Execute FFmpeg command to extract the first frame
+            string arguments = $"-i \"{videoPath}\" -ss 00:00:01 -vframes 1 \"{firstFrameVideoPath}\"";
+            ProcessExecutor.ExecuteFFmpegCommand(ffmpegPath, arguments);
 
-            Console.WriteLine($"Thumbnail extracted successfully for: {videoPath}");
-            Console.WriteLine($"Thumbnail saved at: {thumbnailPath}");
+            Console.WriteLine($"Frist frame extracted successfully for: {videoPath}");
+            Console.WriteLine($"Frist frame saved at: {firstFrameVideoPath}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to extract thumbnail for: {videoPath}");
+            Console.WriteLine($"Failed to extract the first frame for: {videoPath}");
             Console.WriteLine($"Error: {ex.Message}");
         }
 
-        Console.WriteLine("Thumbnail extraction completed.");
-
-        return thumbnailPath;
-    }
-
-    private static void ExecuteFFmpegCommand(string ffmpegPath, string arguments)
-    {
-        using (Process process = new ())
-        {
-            process.StartInfo.FileName = ffmpegPath;
-            process.StartInfo.Arguments = arguments;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.CreateNoWindow = true;
-
-            // Event handler for output and error data
-            process.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
-            process.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
-
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-
-            // Wait for the process to exit with the specified timeout
-            bool processExited = process.WaitForExit(1000);
-
-            // If the process has not exited, it means it has timed out; terminate the process forcefully
-            if (!processExited)
-            {
-                process.Kill();
-                Console.WriteLine($"FFmpeg process terminated forcefully due to timeout.");
-            }
-
-            // Dispose the process
-            process.Dispose();
-        }
+        return firstFrameVideoPath;
     }
 }

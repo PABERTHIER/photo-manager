@@ -14,6 +14,8 @@
 
   <ItemGroup>
     <None Remove="TestFiles\Homer.gif" />
+    <None Remove="TestFiles\Homer.mp4" />
+    <None Remove="TestFiles\Homer1s.mp4" />
     <None Remove="TestFiles\Image 1.jpg" />
     <None Remove="TestFiles\Image 1_90_deg.jpg" />
     <None Remove="TestFiles\Image 1_180_deg.jpg" />
@@ -39,7 +41,13 @@
   </ItemGroup>
 
   <ItemGroup>
-  <Content Include="TestFiles\Homer.gif">
+    <Content Include="TestFiles\Homer.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Homer.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Homer1s.mp4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\Image 1.jpg">
@@ -115,6 +123,7 @@
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="SimplePortableDatabase" Version="1.1.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="19.2.51" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
