@@ -77,10 +77,18 @@ There are many switches, enable or disable it as you wish:
 
 - `UsingMD5Hash = false;`: Enable it to Hash in MD5.
 - `UsingPHash = false;`: Enable it to detect duplicates between rotated assets (improve detection) PHash = Perceptual Hash. Performances are decreased with PHash by 6 times (for ex: 0.17s for 140 pictures with SHA512 and 1.11s with PHash).
-- `UsingDHash = false;`: Enable it to Hash in DHash (Difference Hash).
+- `UsingDHash = false;`: Enable it to Hash in DHash (Difference Hash). This hashing method always returns "0" for Gif file.
 - `DetectThumbnails = false;`: Enable it to detect duplicates between a thumbnail and the original.
 - `AnalyseVideos = false;`: Enable it to extract thumbnail from each videos.
 - `SyncAssetsEveryXMinutes = false;`: Enable it to sync your assets every X minutes (CATALOG_COOLDOWN_MINUTES).
+
+About `DetectThumbnails`, you will need to activate the `UsingPHash` switch as well because:
+Between Original and Thumbnail:
+
+- PHash the hammingDistance is 36/210.
+- DHash the hammingDistance is 16/17.
+- MD5Hash the hammingDistance is 32/32.
+- SHA512 the hammingDistance is 118/128.
 
 ## Path settings
 

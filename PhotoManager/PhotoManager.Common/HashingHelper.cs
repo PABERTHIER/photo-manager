@@ -38,9 +38,14 @@ public static class HashingHelper
         return phash;
     }
 
+    // For Gif file it returns "0"
     public static string CalculateDHash(string filePath)
     {
-        var image = new Bitmap(filePath);
+        Bitmap? image;
+        bool isHeicFile = filePath?.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) ?? false;
+
+        image = isHeicFile ? BitmapHelper.LoadBitmapFromPath(filePath!) : new Bitmap(filePath!);
+
         var hash = 0UL;
         var mask = 1UL;
 
@@ -48,8 +53,8 @@ public static class HashingHelper
         {
             for (int x = 0; x < 7; x++)
             {
-                var leftPixel = image.GetPixel(x, y).GetBrightness();
-                var rightPixel = image.GetPixel(x + 1, y).GetBrightness();
+                var leftPixel = image?.GetPixel(x, y).GetBrightness();
+                var rightPixel = image?.GetPixel(x + 1, y).GetBrightness();
                 if (leftPixel < rightPixel)
                 {
                     hash |= mask;

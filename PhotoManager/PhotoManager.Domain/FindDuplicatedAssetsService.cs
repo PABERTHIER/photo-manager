@@ -72,7 +72,7 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
         return result;
     }
 
-    // Between Original and a Thumbnail:
+    // Between Original and Thumbnail:
     // PHash the hammingDistance is 36/210
     // DHash the hammingDistance is 16/17
     // MD5Hash the hammingDistance is 32/32

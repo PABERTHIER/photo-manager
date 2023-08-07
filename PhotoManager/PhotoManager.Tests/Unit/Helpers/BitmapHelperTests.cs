@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using PhotoManager.Common;
+using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
 
@@ -562,6 +563,42 @@ public class BitmapHelperTests
     }
 
     [Test]
+    [TestCase("Image 1.jpg", 1280, 720)]
+    [TestCase("Image 8.jpeg", 1280, 720)]
+    [TestCase("Image 10 portrait.png", 720, 1280)]
+    [TestCase("Homer.gif", 320, 320)]
+    [TestCase("Image_11.heic", 4032, 3024)]
+    public void LoadBitmapFromPath_ValidImagePath_ReturnsNonNullBitmap(string fileName, int expectedWidth, int expectedHeight)
+    {
+        var filePath = Path.Combine(dataDirectory!, fileName);
+        Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(filePath);
+
+        Assert.IsNotNull(bitmap);
+        Assert.AreEqual(bitmap!.Width, expectedWidth);
+        Assert.AreEqual(bitmap.Height, expectedHeight);
+    }
+
+    [Test]
+    public void LoadBitmapFromPath_InvalidImagePath_ReturnsNull()
+    {
+        var filePath = Path.Combine(dataDirectory!, "invalid_path.png");
+
+        Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(filePath!);
+
+        Assert.IsNull(bitmap);
+    }
+
+    [Test]
+    public void LoadBitmapFromPath_NullImagePath_ReturnsNull()
+    {
+        string? imagePath = null;
+
+        Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(imagePath!);
+
+        Assert.IsNull(bitmap);
+    }
+
+    [Test]
     [TestCase("Image 8.jpeg")]
     [TestCase("Image 1.jpg")]
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
@@ -612,9 +649,6 @@ public class BitmapHelperTests
         // File.WriteAllBytes("path/to/your/image_converted.gif", imageBuffer);
     }
 
-    // For example:
-    // - Test with an invalid image
-
     [Test]
     public void GetJpegBitmapImage_HeicValidImage_ReturnsJpegByteArray()
     {
@@ -664,6 +698,30 @@ public class BitmapHelperTests
         // Optionally, you can save the byte array to a file and verify that it's a valid GIF image.
         // For example:
         // File.WriteAllBytes("path/to/your/image_converted.gif", imageBuffer);
+    }
+
+    [Test]
+    public void GetJpegBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    {
+        BitmapImage image = new();
+
+        Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetJpegBitmapImage(image));
+    }
+
+    [Test]
+    public void GetPngBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    {
+        BitmapImage image = new();
+
+        Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetPngBitmapImage(image));
+    }
+
+    [Test]
+    public void GetGifBitmapImage_InvalidImage_ThrowsInvalidOperationException()
+    {
+        BitmapImage image = new();
+
+        Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetGifBitmapImage(image));
     }
 
     [Test]

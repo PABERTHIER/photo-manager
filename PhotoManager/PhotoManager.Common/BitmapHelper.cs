@@ -1,5 +1,6 @@
 ﻿using ImageMagick;
 using log4net;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Media.Imaging;
@@ -18,7 +19,7 @@ public static class BitmapHelper
         using (MemoryStream stream = new(buffer))
         {
             image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
             image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
             image.StreamSource = stream;
             image.Rotation = rotation;
@@ -38,7 +39,7 @@ public static class BitmapHelper
         {
             image = new BitmapImage();
             image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
             image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
             image.StreamSource = stream;
             image.Rotation = rotation;
@@ -72,7 +73,7 @@ public static class BitmapHelper
 
                         BitmapImage bitmapImage = new ();
                         bitmapImage.BeginInit();
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                         bitmapImage.StreamSource = bitmapStream;
                         bitmapImage.EndInit();
@@ -116,7 +117,7 @@ public static class BitmapHelper
 
                         BitmapImage bitmapImage = new();
                         bitmapImage.BeginInit();
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                         bitmapImage.StreamSource = bitmapStream;
                         bitmapImage.EndInit();
@@ -145,7 +146,7 @@ public static class BitmapHelper
         {
             image = new BitmapImage();
             image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
             image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
             image.UriSource = new Uri(imagePath);
             image.Rotation = rotation;
@@ -173,7 +174,7 @@ public static class BitmapHelper
                 // Create a BitmapImage from the byte array and set the rotation
                 image = new BitmapImage();
                 image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
                 image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                 image.StreamSource = new MemoryStream(imageData);
                 image.Rotation = rotation;
@@ -188,9 +189,11 @@ public static class BitmapHelper
     // From AssetRepository
     public static BitmapImage LoadBitmapImage(byte[] buffer, int width, int height)
     {
-        // TODO: If the stream is disposed by a using block, the thumbnail is not shown. Find a way to dispose of the stream.
-        MemoryStream stream = new(buffer);
         BitmapImage thumbnailImage = new();
+
+        // TODO: If the stream is disposed by a using block, the thumbnail is not shown. Find a way to dispose of the stream.
+        // When the using block for the MemoryStream is exited, the stream is disposed of, which lead to have a default bitmap at the end and to lose all the data.
+        MemoryStream stream = new(buffer);
         thumbnailImage.BeginInit();
         thumbnailImage.CacheOption = BitmapCacheOption.None;
         thumbnailImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
@@ -201,6 +204,32 @@ public static class BitmapHelper
         thumbnailImage.Freeze();
 
         return thumbnailImage;
+    }
+
+    public static Bitmap? LoadBitmapFromPath(string imagePath)
+    {
+        Bitmap? image = null;
+
+        if (File.Exists(imagePath))
+        {
+            using (MagickImage magickImage = new(imagePath))
+            {
+                // Convert the MagickImage to a byte array (supported format: JPG)
+                byte[] imageData = magickImage.ToByteArray(MagickFormat.Jpg);
+
+                using (MemoryStream stream = new(imageData))
+                {
+                    using (Bitmap bitmap = new(stream))
+                    {
+                        // Create a copy of the Bitmap
+                        // When the using block for the MemoryStream is exited, the stream is disposed of, which lead to have a default bitmap at the end and to lose all the data.
+                        image = new Bitmap(bitmap);
+                    }
+                }
+            }
+        }
+
+        return image;
     }
 
     public static byte[] GetJpegBitmapImage(BitmapImage image)
