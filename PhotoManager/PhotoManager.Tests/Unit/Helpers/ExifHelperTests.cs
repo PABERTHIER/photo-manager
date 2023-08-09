@@ -71,15 +71,20 @@ public class ExifHelperTests
     }
 
     [Test]
-    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue()
+    [TestCase("Image_11.heic", 0, 1)]
+    //[TestCase("Image_11_90.heic", 90, 8)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
+    //[TestCase("Image_11_180.heic", 180, 3)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
+    //[TestCase("Image_11_270.heic", 270, 6)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
+    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int degrees, int orientationExpected)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        var filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
+        //byte[] bufferRotated = GetHeicRotatedBuffer(buffer, degrees);
 
         ushort orientation = ExifHelper.GetHeicExifOrientation(buffer);
 
         Assert.IsNotNull(orientation);
-        Assert.That(orientation, Is.EqualTo(1));
+        Assert.That(orientation, Is.EqualTo(orientationExpected));
     }
 
     [Test]
@@ -181,4 +186,30 @@ public class ExifHelperTests
 
         Assert.Throws<ArgumentException>(() => ExifHelper.IsValidHeic(emptyHeicData));
     }
+
+    //private static byte[] GetHeicRotatedBuffer(byte[] buffer, int degrees)
+    //{
+    //    using (MemoryStream stream = new(buffer))
+    //    {
+    //        using (MagickImage image = new(stream))
+    //        {
+    //            image.Rotate(degrees);
+
+    //            // Convert the rotated image back to a byte array
+    //            //byte[] rotatedImageData = image.ToByteArray(MagickFormat.Heic);
+    //            //
+    //            //MemoryStream newStream = stream;
+    //            //stream.CopyTo(newStream);
+
+    //            //var readSettings = new MagickReadSettings() { Format = MagickFormat.Heic };
+    //            //newStream.Seek(0, SeekOrigin.Begin); //THIS IS NEEDED!!!
+    //            //var newImage = new MagickImage(newStream, readSettings);
+    //            //newImage.Rotate(degrees);
+    //            byte[] rotatedImageData = image.ToByteArray(MagickFormat.Heic);
+
+    //            // Return the rotated image data
+    //            return rotatedImageData;
+    //        }
+    //    }
+    //}
 }

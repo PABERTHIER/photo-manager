@@ -25,7 +25,7 @@ public class HashingHelperTests
     [TestCase("Image 8.jpeg", "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3")]
     [TestCase("Image 10 portrait.png", "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94")]
     [TestCase("Homer.gif", "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1")]
-    [TestCase("Image_11.heic", "fd9e74c84ede15c9f152b33d97b862d48fb0e87917250f1978eaaa3316bdda41e10803621899abc299fdc2d1e7e39eb7a15d15af0811ea509fc209b69d9519db")]
+    [TestCase("Image_11.heic", "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931")]
     public void CalculateHash_ValidImageBytes_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         var filePath = Path.Combine(dataDirectory!, fileName);
@@ -67,7 +67,7 @@ public class HashingHelperTests
     [TestCase("Image 8.jpeg", "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0")]
     [TestCase("Image 10 portrait.png", "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0")]
     [TestCase("Homer.gif", "af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225daf783881028a11d8ad696231b8ee326225d")]
-    [TestCase("Image_11.heic", "a9cf5849ff882a9874f08f0bf89ad161d8962ee062ee062ee062ee062ee062ee062ee0a9cf5849ff882a9874f08f0bf89ad161d8962ee062ee062ee062ee062ee062ee062ee0a9cf5849ff882a9874f08f0bf89ad161d89a9cf5849ff882a9874f08f0bf89ad161d89")]
+    [TestCase("Image_11.heic", "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056")]
     public void CalculatePHash_ValidImagePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         var filePath = Path.Combine(dataDirectory!, fileName);
@@ -127,7 +127,7 @@ public class HashingHelperTests
     }
 
     [Test]
-    [TestCase("Image_11.heic", "1125934266580992")]
+    [TestCase("Image_11.heic", "9077567998918656")]
     public void CalculateDHash_HeicImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         var filePath = Path.Combine(dataDirectory!, fileName);
@@ -163,7 +163,7 @@ public class HashingHelperTests
     [TestCase("Image 8.jpeg", "4194e88c247b5bbc7a1c6294cc795466")]
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
-    [TestCase("Image_11.heic", "38239c2b573c0c5221ef237025c49cda")]
+    [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
     public void CalculateMD5Hash_ValidFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         var filePath = Path.Combine(dataDirectory!, fileName);

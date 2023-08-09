@@ -567,7 +567,7 @@ public class BitmapHelperTests
     [TestCase("Image 8.jpeg", 1280, 720)]
     [TestCase("Image 10 portrait.png", 720, 1280)]
     [TestCase("Homer.gif", 320, 320)]
-    [TestCase("Image_11.heic", 4032, 3024)]
+    [TestCase("Image_11.heic", 3024, 4032)]
     public void LoadBitmapFromPath_ValidImagePath_ReturnsNonNullBitmap(string fileName, int expectedWidth, int expectedHeight)
     {
         var filePath = Path.Combine(dataDirectory!, fileName);

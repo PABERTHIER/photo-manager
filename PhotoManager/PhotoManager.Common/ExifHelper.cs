@@ -68,6 +68,8 @@ public static class ExifHelper
                 using (MagickImage image = new(stream))
                 {
                     var orientation = image.GetAttribute("exif:Orientation");
+                    //image.AutoOrient();
+                    //image.GetExifProfile();
                     if (orientation != null && ushort.TryParse(orientation, out ushort orientationValue))
                     {
                         return orientationValue;
