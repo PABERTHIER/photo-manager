@@ -33,20 +33,20 @@ public class HashingHelperTests
 
         string hash = HashingHelper.CalculateHash(imageBytes);
 
-        Assert.IsNotNull(hash);
+        Assert.False(string.IsNullOrWhiteSpace(hash));
         Assert.AreEqual(128, hash.Length); // SHA-512 generates a 128-character long hash in hexadecimal representation
         Assert.AreEqual(expectedHash, hash.ToLower());
     }
 
     [Test]
-    public void CalculateHash_EmptyImageBytes_ReturnsEmptyHash()
+    public void CalculateHash_EmptyImageBytes_ReturnsSameHash()
     {
         byte[] imageBytes = Array.Empty<byte>();
         var expectedHash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e";
 
         string hash = HashingHelper.CalculateHash(imageBytes);
 
-        Assert.IsNotNull(hash);
+        Assert.False(string.IsNullOrWhiteSpace(hash));
         Assert.AreEqual(128, hash.Length);
         Assert.AreEqual(expectedHash, hash.ToLower());
     }
@@ -74,7 +74,7 @@ public class HashingHelperTests
 
         string? phash = HashingHelper.CalculatePHash(filePath);
 
-        Assert.IsNotNull(phash);
+        Assert.False(string.IsNullOrWhiteSpace(phash));
         Assert.AreEqual(210, phash?.Length); // The PHash is a 210-character hexadecimal string
         Assert.AreEqual(expectedHash, phash?.ToLower());
     }
@@ -108,7 +108,7 @@ public class HashingHelperTests
 
         string dhash = HashingHelper.CalculateDHash(filePath);
 
-        Assert.IsNotNull(dhash);
+        Assert.False(string.IsNullOrWhiteSpace(dhash));
         Assert.AreEqual(17, dhash.Length); // The DHash is a 17-character number
         Assert.AreEqual(expectedHash, dhash);
     }
@@ -121,7 +121,7 @@ public class HashingHelperTests
 
         string dhash = HashingHelper.CalculateDHash(filePath);
 
-        Assert.IsNotNull(dhash);
+        Assert.False(string.IsNullOrWhiteSpace(dhash));
         Assert.AreEqual(1, dhash.Length);
         Assert.AreEqual(expectedHash, dhash);
     }
@@ -134,7 +134,7 @@ public class HashingHelperTests
 
         string dhash = HashingHelper.CalculateDHash(filePath);
 
-        Assert.IsNotNull(dhash);
+        Assert.False(string.IsNullOrWhiteSpace(dhash));
         Assert.AreEqual(16, dhash.Length); // The DHash is a 16-character number for heic file
         Assert.AreEqual(expectedHash, dhash);
     }
@@ -169,7 +169,7 @@ public class HashingHelperTests
         var filePath = Path.Combine(dataDirectory!, fileName);
         string md5Hash = HashingHelper.CalculateMD5Hash(filePath);
 
-        Assert.IsNotNull(md5Hash);
+        Assert.False(string.IsNullOrWhiteSpace(md5Hash));
         Assert.AreEqual(32, md5Hash.Length); // The MD5Hash is a 32-character hexadecimal string
         Assert.AreEqual(expectedHash, md5Hash);
     }
@@ -215,6 +215,7 @@ public class HashingHelperTests
         int distance = HashingHelper.CalculateHammingDistance(hash1, hash2);
 
         Assert.AreEqual(expectedDistance, distance);
+        Assert.GreaterOrEqual(expectedDistance, 0);
     }
 
     [Test]
