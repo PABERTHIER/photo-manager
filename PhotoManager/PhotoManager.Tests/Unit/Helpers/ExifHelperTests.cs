@@ -51,11 +51,11 @@ public class ExifHelperTests
     }
 
     [Test]
-    public void GetExifOrientation_CorruptedImageBuffer_ReturnsCorruptedOrientationValue()
+    public void GetExifOrientation_InvalidImageBuffer_ReturnsCorruptedOrientationValue()
     {
-        byte[] corruptedImageBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
+        byte[] invalidImageBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
 
-        ushort orientation = ExifHelper.GetExifOrientation(corruptedImageBuffer);
+        ushort orientation = ExifHelper.GetExifOrientation(invalidImageBuffer);
 
         Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
     }
@@ -66,6 +66,16 @@ public class ExifHelperTests
         byte[]? nullBuffer = null;
 
         ushort orientation = ExifHelper.GetExifOrientation(nullBuffer!);
+
+        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+    }
+
+    [Test]
+    public void GetExifOrientation_EmptyBuffer_ReturnsCorruptedOrientationValue()
+    {
+        byte[] emptyBuffer = Array.Empty<byte>();
+
+        ushort orientation = ExifHelper.GetExifOrientation(emptyBuffer);
 
         Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
     }
@@ -88,11 +98,11 @@ public class ExifHelperTests
     }
 
     [Test]
-    public void GetHeicExifOrientation_CorruptedImageBuffer_ReturnsCorruptedOrientationValue()
+    public void GetHeicExifOrientation_InvalidImageBuffer_ReturnsCorruptedOrientationValue()
     {
-        byte[] corruptedHeicBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
+        byte[] invalidHeicBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
 
-        ushort orientation = ExifHelper.GetHeicExifOrientation(corruptedHeicBuffer);
+        ushort orientation = ExifHelper.GetHeicExifOrientation(invalidHeicBuffer);
 
         Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
     }
@@ -106,6 +116,14 @@ public class ExifHelperTests
     }
 
     [Test]
+    public void GetHeicExifOrientation_EmptyBuffer_ThrowsArgumentException()
+    {
+        byte[] emptyBuffer = Array.Empty<byte>();
+
+        Assert.Throws<ArgumentException>(() => ExifHelper.GetHeicExifOrientation(emptyBuffer));
+    }
+
+    [Test]
     [TestCase((ushort)1, Rotation.Rotate0)]
     [TestCase((ushort)2, Rotation.Rotate0)]
     [TestCase((ushort)3, Rotation.Rotate180)]
@@ -116,6 +134,8 @@ public class ExifHelperTests
     [TestCase((ushort)8, Rotation.Rotate270)]
     [TestCase((ushort)9, Rotation.Rotate0)]
     [TestCase((ushort)10000, Rotation.Rotate0)]
+    [TestCase(ushort.MinValue, Rotation.Rotate0)]
+    [TestCase(ushort.MaxValue, Rotation.Rotate0)]
     public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation, Rotation expectedRotation)
     {
         Rotation rotation = ExifHelper.GetImageRotation(exifOrientation);
@@ -130,6 +150,14 @@ public class ExifHelperTests
         Rotation rotation = ExifHelper.GetImageRotation((ushort)exifOrientation);
 
         Assert.AreEqual(Rotation.Rotate0, rotation);
+    }
+
+    [Test]
+    public void GetImageRotation_NullExifOrientation_ThrowsInvalidOperationException()
+    {
+        ushort? exifOrientation = null;
+
+        Assert.Throws<InvalidOperationException>(() => ExifHelper.GetImageRotation((ushort)exifOrientation!));
     }
 
     [Test]
@@ -154,6 +182,16 @@ public class ExifHelperTests
         byte[] invalidImageData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidGDIPlusImage(invalidImageData);
+
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    public void IsValidGDIPlusImage_EmptyImageData_ReturnsFalse()
+    {
+        byte[] emptyHeicData = Array.Empty<byte>();
+
+        var result = ExifHelper.IsValidGDIPlusImage(emptyHeicData);
 
         Assert.IsFalse(result);
     }

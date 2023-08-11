@@ -145,6 +145,7 @@ public class CatalogAssetsService : ICatalogAssetsService
             if (rotation != Rotation.Rotate0)
             {
                 assetRotated = true;
+                //rotation = Rotation.Rotate0; ?
             }
 
             BitmapImage originalImage = _storageService.LoadBitmapOriginalImage(imageBytes, Rotation.Rotate0); // before was rotation
@@ -441,6 +442,7 @@ public class CatalogAssetsService : ICatalogAssetsService
         if (rotation != Rotation.Rotate0)
         {
             assetRotated = true;
+            //rotation = Rotation.Rotate0; ?
         }
 
         BitmapImage originalImage = _storageService.LoadBitmapHeicOriginalImage(imageBytes, Rotation.Rotate0); // before was rotation
