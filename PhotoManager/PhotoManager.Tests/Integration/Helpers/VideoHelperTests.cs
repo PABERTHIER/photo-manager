@@ -29,6 +29,7 @@ public class VideoHelperTests
         {
             string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
+            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);
 
             // Verify that the first frame file is created in the output directory
@@ -52,6 +53,7 @@ public class VideoHelperTests
 
         string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
+        Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
         Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);
 
         // Verify that the first frame file is created in the output directory

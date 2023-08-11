@@ -90,7 +90,7 @@ public class VideoHelperTests
         {
             var firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
-            Assert.NotNull(firstFrameVideoPath);
+            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsTrue(fileSystem.File.Exists(firstFrameVideoPath));
             // Get the captured console output
             var consoleOutput = stringWriter.ToString();
@@ -128,7 +128,7 @@ public class VideoHelperTests
 
         var firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
-        Assert.NotNull(firstFrameVideoPath);
+        Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
         Assert.IsFalse(File.Exists(firstFrameVideoPath));
         // Get the captured console output
         var consoleOutput = stringWriter.ToString();
@@ -158,7 +158,7 @@ public class VideoHelperTests
 
         var firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
-        Assert.NotNull(firstFrameVideoPath);
+        Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
         Assert.IsFalse(File.Exists(firstFrameVideoPath));
 
         // Get the captured console output
