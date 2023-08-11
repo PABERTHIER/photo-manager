@@ -69,7 +69,7 @@ public class AssetRepository : IAssetRepository
                         {
                             if (Thumbnails[folder.Path].ContainsKey(asset.FileName))
                             {
-                                asset.ImageData = _storageService.LoadBitmapImage(Thumbnails[folder.Path][asset.FileName], asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
+                                asset.ImageData = _storageService.LoadBitmapThumbnailImage(Thumbnails[folder.Path][asset.FileName], asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
                             }
                         }
 
@@ -373,7 +373,7 @@ public class AssetRepository : IAssetRepository
 
             if (Thumbnails[directoryName].ContainsKey(fileName))
             {
-                result = _storageService.LoadBitmapImage(Thumbnails[directoryName][fileName], width, height);
+                result = _storageService.LoadBitmapThumbnailImage(Thumbnails[directoryName][fileName], width, height);
             }
             else
             {

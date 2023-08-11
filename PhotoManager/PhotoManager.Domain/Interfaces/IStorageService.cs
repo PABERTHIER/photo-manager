@@ -13,7 +13,7 @@ public interface IStorageService
     string[] GetFileNames(string directory);
     byte[] GetFileBytes(string filePath);
     BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height);
-    BitmapImage LoadBitmapImage(byte[] buffer, int width, int height);
+    BitmapImage LoadBitmapThumbnailImage(byte[] buffer, int width, int height);
     BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation);
     BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation);
     BitmapImage LoadBitmapHeicOriginalImage(byte[] buffer, Rotation rotation);

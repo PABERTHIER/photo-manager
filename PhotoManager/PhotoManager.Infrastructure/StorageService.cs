@@ -78,9 +78,9 @@ public class StorageService : IStorageService
     }
 
     // From AssetRepository
-    public BitmapImage LoadBitmapImage(byte[] buffer, int width, int height)
+    public BitmapImage LoadBitmapThumbnailImage(byte[] buffer, int width, int height)
     {
-        return BitmapHelper.LoadBitmapImage(buffer, width, height);
+        return BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height);
     }
 
     // From CatalogAssetsService for CreateAsset() to get the originalImage

@@ -187,7 +187,7 @@ public static class BitmapHelper
     }
 
     // From AssetRepository
-    public static BitmapImage LoadBitmapImage(byte[] buffer, int width, int height)
+    public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, int width, int height)
     {
         BitmapImage thumbnailImage = new();
 
