@@ -15,21 +15,21 @@ public class FileSizeConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        long FileSize = System.Convert.ToInt64(value, culture);
+        long fileSize = System.Convert.ToInt64(value, culture);
         string result;
 
-        if (FileSize < ONE_KILOBYTE)
+        if (fileSize < ONE_KILOBYTE)
         {
-            result = FileSize + " bytes";
+            result = fileSize + " bytes";
         }
         else
         {
-            decimal bytes = FileSize;
+            decimal bytes = fileSize;
             decimal decimal_value;
             string unit;
 
-            bool sizeInKb = (FileSize >= ONE_KILOBYTE && FileSize < ONE_MEGABYTE && FileSize < ONE_GIGABYTE);
-            bool sizeInMb = (FileSize >= ONE_MEGABYTE && FileSize < ONE_GIGABYTE);
+            bool sizeInKb = (fileSize >= ONE_KILOBYTE && fileSize < ONE_MEGABYTE && fileSize < ONE_GIGABYTE);
+            bool sizeInMb = (fileSize >= ONE_MEGABYTE && fileSize < ONE_GIGABYTE);
 
             if (sizeInKb)
             {

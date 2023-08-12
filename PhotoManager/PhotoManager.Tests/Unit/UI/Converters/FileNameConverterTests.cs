@@ -23,7 +23,7 @@ public class FileNameConverterTests
         };
         object? parameter = null;
 
-        string result = (string)fileNameConverter.Convert(asset.FileName, typeof(Asset), parameter!, CultureInfo.InvariantCulture);
+        string result = (string)fileNameConverter.Convert(asset.FileName, typeof(string), parameter!, CultureInfo.InvariantCulture);
         Assert.AreEqual(expected, result);
     }
 
@@ -57,6 +57,6 @@ public class FileNameConverterTests
         FileNameConverter fileNameConverter = new();
         Type? targetType = null;
 
-        Assert.Throws<NotImplementedException>(() => fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType!, new CultureInfo("en-US")));
+        Assert.Throws<NotImplementedException>(() => fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType!, CultureInfo.InvariantCulture));
     }
 }
