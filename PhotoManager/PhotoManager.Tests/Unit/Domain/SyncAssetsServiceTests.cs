@@ -7,7 +7,7 @@ using PhotoManager.Domain.Interfaces;
 using System.IO;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.Infrastructure;
 
 public class SyncAssetsServiceTests
 {

@@ -2,7 +2,7 @@
 using PhotoManager.Common;
 using System.IO;
 
-namespace PhotoManager.Tests.Integration.Helpers;
+namespace PhotoManager.Tests.Integration.Common;
 
 [TestFixture]
 public class VideoHelperTests
@@ -12,7 +12,7 @@ public class VideoHelperTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var directoryName = Path.GetDirectoryName(typeof(ApplicationTests).Assembly.Location) ?? "";
+        var directoryName = Path.GetDirectoryName(typeof(VideoHelperTests).Assembly.Location) ?? "";
         dataDirectory = Path.Combine(directoryName, "TestFiles");
     }
 

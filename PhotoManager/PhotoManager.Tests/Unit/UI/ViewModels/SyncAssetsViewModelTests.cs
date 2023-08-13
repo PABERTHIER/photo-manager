@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.UI.ViewModels;
 
 public class SyncAssetsViewModelTests
 {

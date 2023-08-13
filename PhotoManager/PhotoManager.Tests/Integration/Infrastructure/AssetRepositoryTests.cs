@@ -10,7 +10,7 @@ using SimplePortableDatabase;
 using System.IO;
 using Xunit;
 
-namespace PhotoManager.Tests.Integration;
+namespace PhotoManager.Tests.Integration.Infrastructure;
 
 public class AssetRepositoryTests
 {

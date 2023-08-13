@@ -10,8 +10,9 @@ using SimplePortableDatabase;
 using System.IO;
 using Xunit;
 
-namespace PhotoManager.Tests.Integration;
+namespace PhotoManager.Tests.Integration.Domain;
 
+// TODO: Split into 2 files (CatalogAssetService and MoveAssetService ?)
 public class CatalogMoveAssetsServiceTests
 {
     private static string dataDirectory;

@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.UI.ViewModels;
 
 public class ApplicationViewModelTests
 {

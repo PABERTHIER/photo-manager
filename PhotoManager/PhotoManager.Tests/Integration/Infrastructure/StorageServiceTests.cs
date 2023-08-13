@@ -11,7 +11,7 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Xunit;
 
-namespace PhotoManager.Tests.Integration;
+namespace PhotoManager.Tests.Integration.Infrastructure;
 
 public class StorageServiceTests
 {

@@ -6,7 +6,7 @@ using PhotoManager.Tests.Helpers.Batch;
 using System.Globalization;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.Domain;
 
 public class AssetTests
 {

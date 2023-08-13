@@ -6,7 +6,7 @@ using PhotoManager.Domain.Interfaces;
 using System.IO;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.Application;
 
 public class ApplicationTests
 {
@@ -39,7 +39,7 @@ public class ApplicationTests
         using var mock = AutoMock.GetLoose();
         mock.Mock<IAssetRepository>().Setup(m => m.GetAssets(directory)).Returns(expectedResult);
 
-        var app = mock.Container.Resolve<Application.Application>();
+        var app = mock.Container.Resolve<PhotoManager.Application.Application>();
 
         Asset[] assets = app.GetAssets(directory);
         assets.Should().BeEquivalentTo(expectedResult);
@@ -54,7 +54,7 @@ public class ApplicationTests
     public void GetAssets_InvalidDirectory_Test(string directory)
     {
         using var mock = AutoMock.GetLoose();
-        var app = mock.Container.Resolve<Application.Application>();
+        var app = mock.Container.Resolve<PhotoManager.Application.Application>();
 
         Func<Asset[]> function = () => app.GetAssets(directory);
         function.Should().Throw<ArgumentException>();

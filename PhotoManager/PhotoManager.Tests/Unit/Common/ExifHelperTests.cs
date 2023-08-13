@@ -4,7 +4,7 @@ using PhotoManager.Constants;
 using System.IO;
 using System.Windows.Media.Imaging;
 
-namespace PhotoManager.Tests.Unit.Helpers;
+namespace PhotoManager.Tests.Unit.Common;
 
 [TestFixture]
 public class ExifHelperTests
@@ -14,7 +14,7 @@ public class ExifHelperTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var directoryName = Path.GetDirectoryName(typeof(ApplicationTests).Assembly.Location) ?? "";
+        var directoryName = Path.GetDirectoryName(typeof(ExifHelperTests).Assembly.Location) ?? "";
         dataDirectory = Path.Combine(directoryName, "TestFiles");
     }
 

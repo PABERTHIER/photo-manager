@@ -9,7 +9,7 @@ using PhotoManager.UI;
 using System.IO;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.Infrastructure;
 
 public class UserConfigurationServiceTests
 {

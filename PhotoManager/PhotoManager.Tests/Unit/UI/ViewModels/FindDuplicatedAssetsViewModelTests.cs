@@ -6,9 +6,9 @@ using PhotoManager.Domain;
 using PhotoManager.UI.ViewModels;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.UI.ViewModels;
 
-public class DuplicatedAssetsViewModelTests
+public class FindDuplicatedAssetsViewModelTests
 {
     [Fact]
     public void ViewModelTest()

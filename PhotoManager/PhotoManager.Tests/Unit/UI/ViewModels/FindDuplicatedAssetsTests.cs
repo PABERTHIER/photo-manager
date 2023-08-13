@@ -1,13 +1,15 @@
 ﻿using FluentAssertions;
 using PhotoManager.Application;
 using PhotoManager.Domain;
+using PhotoManager.UI.Tests.Unit;
 using PhotoManager.UI.ViewModels;
 using Xunit;
 
-namespace PhotoManager.UI.Tests.Unit;
+namespace PhotoManager.Tests.Unit.UI.ViewModels;
 
 [Collection("Test Collection")]
-public class FindDuplicatesAssetsTests
+// TODO: Testing from file FindDuplicatedAssetsViewModel (it should be split into 2 files FindDuplicatedAssetsViewModel and DuplicatedSetViewModel)
+public class FindDuplicatedAssetsTests
 {
     private readonly IApplication _application;
     private readonly TestFixture _fixture;
@@ -27,7 +29,7 @@ public class FindDuplicatesAssetsTests
 
     private const string pathLocationToExemptTheFolder = "D:\\Inexistent Folder1";
 
-    public FindDuplicatesAssetsTests(TestFixture fixture)
+    public FindDuplicatedAssetsTests(TestFixture fixture)
     {
         _fixture = fixture;
 

@@ -5,7 +5,7 @@ using PhotoManager.Constants;
 using System.IO;
 using System.IO.Abstractions;
 
-namespace PhotoManager.Tests.Unit.Helpers;
+namespace PhotoManager.Tests.Unit.Common;
 
 [TestFixture]
 public class VideoHelperTests
@@ -15,7 +15,7 @@ public class VideoHelperTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var directoryName = Path.GetDirectoryName(typeof(ApplicationTests).Assembly.Location) ?? "";
+        var directoryName = Path.GetDirectoryName(typeof(VideoHelperTests).Assembly.Location) ?? "";
         dataDirectory = Path.Combine(directoryName, "TestFiles");
     }
 

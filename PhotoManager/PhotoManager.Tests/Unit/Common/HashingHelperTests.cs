@@ -3,7 +3,7 @@ using NUnit.Framework;
 using PhotoManager.Common;
 using System.IO;
 
-namespace PhotoManager.Tests.Unit.Helpers;
+namespace PhotoManager.Tests.Unit.Common;
 
 [TestFixture]
 public class HashingHelperTests
@@ -13,7 +13,7 @@ public class HashingHelperTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var directoryName = Path.GetDirectoryName(typeof(ApplicationTests).Assembly.Location) ?? "";
+        var directoryName = Path.GetDirectoryName(typeof(HashingHelperTests).Assembly.Location) ?? "";
         dataDirectory = Path.Combine(directoryName, "TestFiles");
     }
 

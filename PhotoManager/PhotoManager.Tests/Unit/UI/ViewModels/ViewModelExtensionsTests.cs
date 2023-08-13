@@ -4,7 +4,7 @@ using PhotoManager.UI.ViewModels;
 using System.Collections.ObjectModel;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.UI.ViewModels;
 
 public class ViewModelExtensionsTests
 {

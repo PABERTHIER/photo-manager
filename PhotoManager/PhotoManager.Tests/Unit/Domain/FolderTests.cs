@@ -3,7 +3,7 @@ using PhotoManager.Domain;
 using System.IO;
 using Xunit;
 
-namespace PhotoManager.Tests.Unit;
+namespace PhotoManager.Tests.Unit.Domain;
 
 public class FolderTests
 {
