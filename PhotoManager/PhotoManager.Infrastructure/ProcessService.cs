@@ -5,17 +5,16 @@ namespace PhotoManager.Infrastructure;
 
 public class ProcessService : IProcessService
 {
-    public bool IsAlreadyRunning()
+    public bool IsAlreadyRunning(int processId)
     {
         bool result = false;
 
-        int currentProcessId = Environment.ProcessId;
-        Process currentProcess = Process.GetProcessById(currentProcessId);
-        Process[] processes = Process.GetProcessesByName(currentProcess.ProcessName);
+        Process currentProcess = GetProcessById(processId);
+        Process[] processes = GetProcessesByName(currentProcess.ProcessName);
 
         foreach (Process process in processes)
         {
-            result = process.Id != currentProcessId;
+            result = process.Id != processId;
 
             if (result)
             {
@@ -24,5 +23,15 @@ public class ProcessService : IProcessService
         }
 
         return result;
+    }
+
+    private Process GetProcessById(int processId)
+    {
+        return Process.GetProcessById(processId);
+    }
+
+    private Process[] GetProcessesByName(string processName)
+    {
+        return Process.GetProcessesByName(processName);
     }
 }

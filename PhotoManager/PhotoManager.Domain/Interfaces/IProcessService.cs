@@ -2,5 +2,5 @@
 
 public interface IProcessService
 {
-    bool IsAlreadyRunning();
+    bool IsAlreadyRunning(int processId);
 }

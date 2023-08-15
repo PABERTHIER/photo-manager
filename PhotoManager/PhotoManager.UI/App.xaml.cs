@@ -39,7 +39,7 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            if (!serviceProvider.GetService<IProcessService>()?.IsAlreadyRunning() ?? false)
+            if (!serviceProvider.GetService<IProcessService>()?.IsAlreadyRunning(Environment.ProcessId) ?? false)
             {
                 var mainWindow = serviceProvider.GetService<MainWindow>();
                 if (mainWindow != null)
