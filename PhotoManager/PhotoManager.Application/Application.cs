@@ -107,8 +107,8 @@ public class Application : IApplication
 
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => _moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
 
-    public BitmapImage LoadBitmapImage(string imagePath, Rotation rotation) => _storageService.LoadBitmapImageFromPath(imagePath, rotation);
-    public BitmapImage LoadBitmapHeicImage(string imagePath, Rotation rotation) => _storageService.LoadBitmapHeicImageFromPath(imagePath, rotation);
+    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) => _storageService.LoadBitmapImageFromPath(imagePath, rotation);
+    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) => _storageService.LoadBitmapHeicImageFromPath(imagePath, rotation);
 
     public bool FileExists(string fullPath) => _storageService.FileExists(fullPath);
 

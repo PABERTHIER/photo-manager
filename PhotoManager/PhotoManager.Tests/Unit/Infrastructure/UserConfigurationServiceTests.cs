@@ -83,7 +83,7 @@ public class UserConfigurationServiceTests
     }
 
     [Fact]
-    public void GetApplicationDataFolderConfiguredTest()
+    public void GetApplicationBackupFolder()
     {
         Mock<IConfigurationRoot> configurationMock = new();
         configurationMock
@@ -92,21 +92,21 @@ public class UserConfigurationServiceTests
             .MockGetValue("appsettings:CatalogBatchSize", "100")
             .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
 
-        string result = UserConfigurationHelper.GetApplicationBackupTestsFolder();
+        UserConfigurationService userConfigurationService = new(configurationMock.Object);
+        string result = userConfigurationService.GetApplicationBackupFolder();
+
         result.Should().NotBeEmpty();
     }
 
-    [Fact]
-    public void GetApplicationDataFolderNotConfiguredTest()
-    {
-        Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock
-            .MockGetValue("appsettings:InitialDirectory", dataDirectory)
-            .MockGetValue("appsettings:ApplicationDataDirectory", "")
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
+    //[Test]
+    //public void GetApplicationBackupFolder_ReturnsCorrectPath()
+    //{
+    //    string expectedPath = PathConstants.PathBackup;
 
-        string result = UserConfigurationHelper.GetApplicationBackupTestsFolder();
-        result.Should().NotBeEmpty();
-    }
+    //    IUserConfigurationService userConfigurationService = new UserConfigurationService();
+
+    //    string backupFolderPath = userConfigurationService.GetApplicationBackupFolder();
+
+    //    Assert.AreEqual(expectedPath, backupFolderPath);
+    //}
 }

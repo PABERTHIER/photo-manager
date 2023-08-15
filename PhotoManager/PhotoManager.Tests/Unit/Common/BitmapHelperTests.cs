@@ -199,7 +199,7 @@ public class BitmapHelperTests
     [TestCase(Rotation.Rotate180, 3024, 4032)]
     [TestCase(Rotation.Rotate270, 4032, 3024)]
     [TestCase(null, 3024, 4032)]
-    public void LoadBitmapHeicImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedPixelWidth, int expectedPixelHeight)
+    public void LoadBitmapHeicOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedPixelWidth, int expectedPixelHeight)
     {
         var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -219,7 +219,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
-    public void LoadBitmapHeicImage_NullBuffer_ThrowsArgumentNullException()
+    public void LoadBitmapHeicOriginalImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
         Rotation rotation = Rotation.Rotate90;
@@ -229,7 +229,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
-    public void LoadBitmapHeicImage_EmptyBuffer_ThrowsArgumentException()
+    public void LoadBitmapHeicOriginalImage_EmptyBuffer_ThrowsArgumentException()
     {
         byte[] buffer = Array.Empty<byte>();
         Rotation rotation = Rotation.Rotate90;
@@ -239,7 +239,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
-    public void LoadBitmapHeicImage_InvalidBuffer_ReturnsDefaultBitmapImage()
+    public void LoadBitmapHeicOriginalImage_InvalidBuffer_ReturnsDefaultBitmapImage()
     {
         byte[] buffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
         Rotation rotation = Rotation.Rotate90;
@@ -255,7 +255,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
-    public void LoadBitmapHeicImage_InvalidRotation_ReturnsPartialBitmapImage()
+    public void LoadBitmapHeicOriginalImage_InvalidRotation_ReturnsPartialBitmapImage()
     {
         var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -291,7 +291,7 @@ public class BitmapHelperTests
     [TestCase(null, 100, null)]
     [TestCase(null, null, 100)]
     [TestCase(null, null, null)]
-    public void LoadBitmapHeicImageThumbnail_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int width, int height)
+    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int width, int height)
     {
         var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -312,7 +312,7 @@ public class BitmapHelperTests
     [TestCase(-100, 100)]
     [TestCase(100, -100)]
     [TestCase(-100, -100)]
-    public void LoadBitmapHeicImageThumbnail_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height)
+    public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height)
     {
         var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -323,7 +323,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapHeicImageThumbnail_LargeWidthAndHeight_ReturnsDefaultBitmapImage()
+    public void LoadBitmapHeicThumbnailImage_LargeWidthAndHeight_ReturnsDefaultBitmapImage()
     {
         var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -340,7 +340,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapHeicImageThumbnail_NullBuffer_ThrowsArgumentNullException()
+    public void LoadBitmapHeicThumbnailImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
         Rotation rotation = Rotation.Rotate90;
@@ -350,7 +350,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapHeicImageThumbnail_EmptyBuffer_ThrowsArgumentException()
+    public void LoadBitmapHeicThumbnailImage_EmptyBuffer_ThrowsArgumentException()
     {
         byte[] buffer = Array.Empty<byte>();
         Rotation rotation = Rotation.Rotate90;
@@ -360,7 +360,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapHeicImageThumbnail_InvalidBuffer_ReturnsDefaultBitmapImage()
+    public void LoadBitmapHeicThumbnailImage_InvalidBuffer_ReturnsDefaultBitmapImage()
     {
         byte[] buffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
         Rotation rotation = Rotation.Rotate90;
@@ -376,7 +376,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapHeicImageThumbnail_InvalidRotation_ReturnsPartialBitmapImage()
+    public void LoadBitmapHeicThumbnailImage_InvalidRotation_ReturnsPartialBitmapImage()
     {
         var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -470,7 +470,7 @@ public class BitmapHelperTests
     [TestCase(Rotation.Rotate180)]
     [TestCase(Rotation.Rotate270)]
     [TestCase(null)]
-    public void LoadBitmapHeicImageViewerUserControl_ValidPathAndRotation_ReturnsBitmapImage(Rotation rotation)
+    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotation_ReturnsBitmapImage(Rotation rotation)
     {
         var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
 
@@ -487,7 +487,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    public void LoadBitmapHeicImageViewerUserControl_NullFilePath_ReturnsBitmapImage()
+    public void LoadBitmapHeicImageFromPathViewerUserControl_NullFilePath_ReturnsBitmapImage()
     {
         string? filePath = null;
         Rotation rotation = Rotation.Rotate90;
@@ -503,7 +503,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    public void LoadBitmapHeicImageViewerUserControl_FileNotExists_ReturnsDefaultBitmapImage()
+    public void LoadBitmapHeicImageFromPathViewerUserControl_FileNotExists_ReturnsDefaultBitmapImage()
     {
         var filePath = Path.Combine(dataDirectory!, "invalid_path.heic");
         Rotation rotation = Rotation.Rotate90;
@@ -519,7 +519,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    public void LoadBitmapHeicImageViewerUserControl_InvalidRotation_ReturnsPartialBitmapImage()
+    public void LoadBitmapHeicImageFromPathViewerUserControl_InvalidRotation_ReturnsPartialBitmapImage()
     {
         var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         Rotation rotation = (Rotation)999;

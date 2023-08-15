@@ -6,10 +6,12 @@ namespace PhotoManager.Tests.Helpers.Batch;
 public class BatchRenameService : IBatchRenameService
 {
     private readonly IStorageService _storageService;
+    private readonly IMoveAssetsService _moveAssetsService;
 
-    public BatchRenameService(IStorageService storageService)
+    public BatchRenameService(IStorageService storageService, IMoveAssetsService moveAssetsService)
     {
         _storageService = storageService;
+        _moveAssetsService = moveAssetsService;
     }
 
     public BatchRenameResult BatchRename(Asset[] sourceAssets, string batchFormat, bool overwriteExistingTargetFiles)
@@ -29,7 +31,7 @@ public class BatchRenameService : IBatchRenameService
                     overwriteExistingTargetFiles);
 
                 if (!string.IsNullOrEmpty(targetPath)
-                    && _storageService.MoveImage(sourceAssets[i].FullPath, targetPath))
+                    && _moveAssetsService.MoveImage(sourceAssets[i].FullPath, targetPath))
                 {
                     batchRenameResult.SourceAssets.Add(sourceAssets[i]);
                     batchRenameResult.TargetPaths.Add(targetPath);

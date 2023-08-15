@@ -72,7 +72,7 @@ public class MoveAssetsService : IMoveAssetsService
 
             if (_storageService.FileExists(sourcePath) && !_storageService.FileExists(destinationPath))
             {
-                result = _storageService.CopyImage(sourcePath, destinationPath);
+                result = CopyImage(sourcePath, destinationPath);
 
                 if (!result)
                 {
@@ -144,6 +144,24 @@ public class MoveAssetsService : IMoveAssetsService
         {
             _assetRepository.SaveCatalog(assets.FirstOrDefault()?.Folder);
         }
+    }
+
+    public bool CopyImage(string sourcePath, string destinationPath)
+    {
+        string destinationFolderPath = new FileInfo(destinationPath).Directory.FullName;
+        _storageService.CreateDirectory(destinationFolderPath);
+        File.Copy(sourcePath, destinationPath);
+
+        return _storageService.FileExists(sourcePath) && _storageService.FileExists(destinationPath);
+    }
+
+    public bool MoveImage(string sourcePath, string destinationPath)
+    {
+        string destinationFolderPath = new FileInfo(destinationPath).Directory.FullName;
+        _storageService.CreateDirectory(destinationFolderPath);
+        File.Move(sourcePath, destinationPath);
+
+        return !_storageService.FileExists(sourcePath) && _storageService.FileExists(destinationPath);
     }
 
     // TODO: Extend automated tests to evaluate recent target paths.

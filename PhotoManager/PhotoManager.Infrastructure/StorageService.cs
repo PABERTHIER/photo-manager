@@ -29,20 +29,9 @@ public class StorageService : IStorageService
         return result;
     }
 
-    private void GetRecursiveSubDirectories(string directoryPath, List<DirectoryInfo> result)
-    {
-        List<DirectoryInfo> subdirs = GetSubDirectories(directoryPath);
-        result.AddRange(subdirs);
-
-        foreach (var dir in subdirs)
-        {
-            GetRecursiveSubDirectories(dir.FullName, result);
-        }
-    }
-
     public string ResolveDataDirectory(double storageVersion)
     {
-        return Path.Combine(_userConfigurationService.GetApplicationBackupFolder(), "v" + storageVersion.ToString("0.0", new CultureInfo("en-US")));
+        return Path.Combine(_userConfigurationService.GetApplicationBackupFolder(), "v" + storageVersion.ToString("0.0", CultureInfo.InvariantCulture));
     }
 
     public void CreateDirectory(string directory)
@@ -146,7 +135,7 @@ public class StorageService : IStorageService
     public bool FileExists(Asset asset, Folder folder)
     {
         string fullPath = Path.Combine(folder.Path, asset.FileName);
-        return File.Exists(fullPath);
+        return FileExists(fullPath);
     }
 
     public bool FileExists(string fullPath)
@@ -159,24 +148,6 @@ public class StorageService : IStorageService
         return Directory.Exists(fullPath);
     }
 
-    public bool CopyImage(string sourcePath, string destinationPath)
-    {
-        string destinationFolderPath = new FileInfo(destinationPath).Directory.FullName;
-        CreateDirectory(destinationFolderPath);
-        File.Copy(sourcePath, destinationPath);
-
-        return FileExists(sourcePath) && FileExists(destinationPath);
-    }
-
-    public bool MoveImage(string sourcePath, string destinationPath)
-    {
-        string destinationFolderPath = new FileInfo(destinationPath).Directory.FullName;
-        CreateDirectory(destinationFolderPath);
-        File.Move(sourcePath, destinationPath);
-
-        return !FileExists(sourcePath) && FileExists(destinationPath);
-    }
-
     public void GetFileInformation(Asset asset)
     {
         if (FileExists(asset.FullPath))
@@ -187,13 +158,24 @@ public class StorageService : IStorageService
         }
     }
 
-    public bool GetIsValidGDIPlusImage(byte[] imageData)
+    public bool IsValidGDIPlusImage(byte[] imageData)
     {
         return ExifHelper.IsValidGDIPlusImage(imageData);
     }
 
-    public bool GetIsValidHeic(byte[] imageData)
+    public bool IsValidHeic(byte[] imageData)
     {
         return ExifHelper.IsValidHeic(imageData);
+    }
+
+    private void GetRecursiveSubDirectories(string directoryPath, List<DirectoryInfo> result)
+    {
+        List<DirectoryInfo> subdirs = GetSubDirectories(directoryPath);
+        result.AddRange(subdirs);
+
+        foreach (var dir in subdirs)
+        {
+            GetRecursiveSubDirectories(dir.FullName, result);
+        }
     }
 }

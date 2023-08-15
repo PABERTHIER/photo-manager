@@ -124,7 +124,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 return CreateAssetFromHeic(imageBytes, imagePath, directoryName);
             }
 
-            if (!_storageService.GetIsValidGDIPlusImage(imageBytes))
+            if (!_storageService.IsValidGDIPlusImage(imageBytes))
             {
                 return asset;
             }
@@ -423,7 +423,7 @@ public class CatalogAssetsService : ICatalogAssetsService
     {
         Asset? asset = null;
 
-        if (!_storageService.GetIsValidHeic(imageBytes))
+        if (!_storageService.IsValidHeic(imageBytes))
         {
             return asset;
         }

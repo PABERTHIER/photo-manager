@@ -13,5 +13,4 @@ public static class PathConstants
 
     // The backup must be upper than the location to prevent bugs like "Process is already used"
     public const string PathBackup = "D:\\Workspace\\PhotoManager\\Backup"; // The path to store your backup
-    public const string PathBackupTests = "D:\\Workspace\\PhotoManager\\BackupTests"; // The path to store your backup Tests
 }

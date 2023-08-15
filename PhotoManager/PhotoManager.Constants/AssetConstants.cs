@@ -15,4 +15,5 @@ public static class AssetConstants
     public const double MaxHeight = 150;
     public const string AssetCorruptedMessage = "The asset is corrupted";
     public const string AssetRotatedMessage = "The asset has been rotated";
+    public const double StorageVersion = 1.0;
 }

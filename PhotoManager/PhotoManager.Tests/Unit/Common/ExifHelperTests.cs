@@ -124,6 +124,7 @@ public class ExifHelperTests
     }
 
     [Test]
+    [TestCase((ushort)0, Rotation.Rotate0)]
     [TestCase((ushort)1, Rotation.Rotate0)]
     [TestCase((ushort)2, Rotation.Rotate0)]
     [TestCase((ushort)3, Rotation.Rotate180)]
@@ -133,6 +134,7 @@ public class ExifHelperTests
     [TestCase((ushort)7, Rotation.Rotate270)]
     [TestCase((ushort)8, Rotation.Rotate270)]
     [TestCase((ushort)9, Rotation.Rotate0)]
+    [TestCase((ushort)10, Rotation.Rotate0)]
     [TestCase((ushort)10000, Rotation.Rotate0)]
     [TestCase(ushort.MinValue, Rotation.Rotate0)]
     [TestCase(ushort.MaxValue, Rotation.Rotate0)]

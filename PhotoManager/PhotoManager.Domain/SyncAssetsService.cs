@@ -8,15 +8,18 @@ public class SyncAssetsService : ISyncAssetsService
     private readonly IAssetRepository _assetRepository;
     private readonly IStorageService _storageService;
     private readonly IDirectoryComparer _directoryComparer;
+    private readonly IMoveAssetsService _moveAssetsService;
 
     public SyncAssetsService(
         IAssetRepository assetRepository,
         IStorageService storageService,
-        IDirectoryComparer directoryComparer)
+        IDirectoryComparer directoryComparer,
+        IMoveAssetsService moveAssetsService)
     {
         _assetRepository = assetRepository;
         _storageService = storageService;
         _directoryComparer = directoryComparer;
+        _moveAssetsService = moveAssetsService;
     }
 
     public async Task<List<SyncAssetsResult>> ExecuteAsync(ProcessStatusChangedCallback callback)
@@ -77,7 +80,7 @@ public class SyncAssetsService : ISyncAssetsService
                     string sourcePath = Path.Combine(sourceDirectory, newImage);
                     string destinationPath = Path.Combine(destinationDirectory, newImage);
 
-                    if (_storageService.CopyImage(sourcePath, destinationPath))
+                    if (_moveAssetsService.CopyImage(sourcePath, destinationPath))
                     {
                         result.SyncedImages++;
                         callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"'{sourcePath}' => '{destinationPath}'" });

@@ -91,11 +91,11 @@ public partial class ViewerUserControl : UserControl
 
             if (isHeic)
             {
-                source = ViewModel.LoadBitmapHeicImage();
+                source = ViewModel.LoadBitmapHeicImageFromPath();
             }
             else
             {
-                source = ViewModel.LoadBitmapImage();
+                source = ViewModel.LoadBitmapImageFromPath();
             }
 
             if (source != null)

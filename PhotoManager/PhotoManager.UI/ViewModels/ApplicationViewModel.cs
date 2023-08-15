@@ -493,8 +493,8 @@ public class ApplicationViewModel : BaseViewModel
 
     public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => Application.GetSubFolders(parentFolder, includeHidden);
 
-    public BitmapImage LoadBitmapImage() => Application.LoadBitmapImage(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
-    public BitmapImage LoadBitmapHeicImage() => Application.LoadBitmapHeicImage(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+    public BitmapImage LoadBitmapImageFromPath() => Application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+    public BitmapImage LoadBitmapHeicImageFromPath() => Application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
 
     public void CalculateGlobaleAssetsCounter()
     {

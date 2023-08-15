@@ -43,7 +43,7 @@ public class BatchRenameServiceTests
     public void BatchRename_ReturnValidResult()
     {
         using var mock = AutoMock.GetLoose();
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Setup(s => s.MoveImage(It.IsAny<string>(), It.IsAny<string>()))
             .Returns(true);
         var service = mock.Container.Resolve<BatchRenameService>();
@@ -67,13 +67,13 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, "Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\My Folder\Image_01.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MySecondImage.jpg",
             @"C:\My Images\My Folder\Image_02.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyThirdImage.jpg",
             @"C:\My Images\My Folder\Image_03.jpg"), Times.Once);
     }
@@ -85,13 +85,13 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"<CreationDate>\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\My Folder\20211206\Image_01.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MySecondImage.jpg",
             @"C:\My Images\My Folder\20211206\Image_02.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyThirdImage.jpg",
             @"C:\My Images\My Folder\20211206\Image_03.jpg"), Times.Once);
     }
@@ -103,13 +103,13 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"<CreationDate>-<CreationTime>\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\My Folder\20211206-162515\Image_01.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MySecondImage.jpg",
             @"C:\My Images\My Folder\20211206-163015\Image_02.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyThirdImage.jpg",
             @"C:\My Images\My Folder\20211206-163515\Image_03.jpg"), Times.Once);
     }
@@ -121,13 +121,13 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\Image_01.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MySecondImage.jpg",
             @"C:\My Images\Image_02.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyThirdImage.jpg",
             @"C:\My Images\Image_03.jpg"), Times.Once);
     }
@@ -139,13 +139,13 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\..\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\Image_01.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MySecondImage.jpg",
             @"C:\Image_02.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyThirdImage.jpg",
             @"C:\Image_03.jpg"), Times.Once);
     }
@@ -157,7 +157,7 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\..\..\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
@@ -168,13 +168,13 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\<CreationDate>\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\20211206\Image_01.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MySecondImage.jpg",
             @"C:\My Images\20211206\Image_02.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyThirdImage.jpg",
             @"C:\My Images\20211206\Image_03.jpg"), Times.Once);
     }
@@ -186,13 +186,13 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"D:\OtherFolder\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"D:\OtherFolder\Image_01.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MySecondImage.jpg",
             @"D:\OtherFolder\Image_02.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyThirdImage.jpg",
             @"D:\OtherFolder\Image_03.jpg"), Times.Once);
     }
@@ -204,13 +204,13 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"\\OtherFolder\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"\\OtherFolder\Image_01.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MySecondImage.jpg",
             @"\\OtherFolder\Image_02.jpg"), Times.Once);
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyThirdImage.jpg",
             @"\\OtherFolder\Image_03.jpg"), Times.Once);
     }
@@ -240,7 +240,7 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\<CreationDate>\Image_<##>.jpg", true);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\20211206\Image_01.jpg"), Times.Once);
     }
@@ -268,7 +268,7 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\<CreationDate>\Image_<#>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\20211206\Image_6.jpg"), Times.Once);
     }
@@ -296,7 +296,7 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\<CreationDate>\Image_<##>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\20211206\Image_06.jpg"), Times.Once);
     }
@@ -324,7 +324,7 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\<CreationDate>\Image_<###>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\20211206\Image_006.jpg"), Times.Once);
     }
@@ -351,7 +351,7 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\<CreationDate>\Image_<###>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\20211206\Image_003.jpg"), Times.Once);
     }
@@ -374,7 +374,7 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\<CreationDate>\Image_<###>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\20211206\Image_001.jpg"), Times.Once);
     }
@@ -398,7 +398,7 @@ public class BatchRenameServiceTests
         var service = mock.Container.Resolve<BatchRenameService>();
         var renameResult = service.BatchRename(sourceAssets, @"..\Image_<CreationDate>.jpg", false);
 
-        mock.Mock<IStorageService>()
+        mock.Mock<IMoveAssetsService>()
             .Verify(s => s.MoveImage(@"C:\My Images\My Folder\MyFirstImage.jpg",
             @"C:\My Images\Image_20211206_1.jpg"), Times.Once);
     }

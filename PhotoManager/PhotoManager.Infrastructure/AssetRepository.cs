@@ -1,4 +1,5 @@
 using log4net;
+using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using SimplePortableDatabase;
@@ -11,10 +12,9 @@ namespace PhotoManager.Infrastructure;
 
 public class AssetRepository : IAssetRepository
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
-    private const double STORAGE_VERSION = 1.0;
-    private const string SEPARATOR = "|";
+    private const string Separator = "|";
 
     public bool IsInitialized { get; private set; }
     private string dataDirectory;
@@ -459,8 +459,8 @@ public class AssetRepository : IAssetRepository
 
     private void InitializeDatabase()
     {
-        dataDirectory = _storageService.ResolveDataDirectory(STORAGE_VERSION);
-        var separatorChar = SEPARATOR.ToCharArray().First();
+        dataDirectory = _storageService.ResolveDataDirectory(AssetConstants.StorageVersion);
+        var separatorChar = Separator.ToCharArray().First();
         _database.Initialize(dataDirectory, separatorChar);
 
         _database.SetDataTableProperties(new DataTableProperties

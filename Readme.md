@@ -98,7 +98,6 @@ To run the application, you will need to set some settings first, for the path:
 - `PathLocationToExemptTheFolder = "";`: The path where PhotoManager will protect your assets and if there are duplicates in others path, you will be able to delete all of them except the asset in this exempted path.
 - `FfmpegPath = "Path\\ffmpeg.exe";`: The path where your ffmpeg.exe is located (Needed to be installed first, used if you activate the switch `AnalyseVideos`).
 - `PathBackup = "";`: The path to store your backup (The backup must be upper than the location to prevent bugs like "Process is already used").
-- `PathBackupTests = "";`: The path to store your backup Tests (The backup must be upper than the location to prevent bugs like "Process is already used").
 - `PathFirstFrameVideos = "";`: The path to save the first frame for each video file (Used if you activate the switch `AnalyseVideos`), the path should be lower than `PathLocation` (Ex "`PathLocation`\\your_folder").
 
 ## Deletion modes
