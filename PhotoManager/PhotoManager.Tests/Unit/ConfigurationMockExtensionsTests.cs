@@ -1,19 +1,31 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace PhotoManager.Tests.Unit;
 
+[TestFixture]
 public class ConfigurationMockExtensionsTests
 {
-    [Fact]
+    [Test]
     public void ConfigurationMockTest()
     {
         Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock.MockGetValue("appsettings:CatalogBatchSize", "100");
+        configurationMock
+            .MockGetValue("appsettings:CatalogBatchSize", "100")
+            .MockGetValue("appsettings:CatalogCooldownMinutes", "2")
+            .MockGetValue("appsettings:BackupsToKeep", "2")
+            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5")
+            .MockGetValue("appsettings:Repository.Owner", "toto")
+            .MockGetValue("appsettings:Repository.Name", "photo-manager");
 
         IConfigurationRoot configuration = configurationMock.Object;
-        configuration.GetValue<string>("appsettings:CatalogBatchSize").Should().Be("100");
+
+        Assert.AreEqual("100", configuration.GetValue<string>("appsettings:CatalogBatchSize"));
+        Assert.AreEqual("2", configuration.GetValue<string>("appsettings:CatalogCooldownMinutes"));
+        Assert.AreEqual("2", configuration.GetValue<string>("appsettings:BackupsToKeep"));
+        Assert.AreEqual("5", configuration.GetValue<string>("appsettings:ThumbnailsDictionaryEntriesToKeep"));
+        Assert.AreEqual("toto", configuration.GetValue<string>("appsettings:Repository.Owner"));
+        Assert.AreEqual("photo-manager", configuration.GetValue<string>("appsettings:Repository.Name"));
     }
 }
