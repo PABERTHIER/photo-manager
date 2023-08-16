@@ -30,7 +30,7 @@ public class ProcessExecutor : IProcessExecutor
             if (!processExited)
             {
                 process.Kill();
-                Console.WriteLine($"FFmpeg process terminated forcefully due to timeout.");
+                Console.WriteLine("FFmpeg process terminated forcefully due to timeout.");
             }
 
             // Dispose the process

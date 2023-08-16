@@ -65,8 +65,8 @@ public static class VideoHelper
             string arguments = $"-i \"{videoPath}\" -ss 00:00:01 -vframes 1 \"{firstFrameVideoPath}\"";
             ProcessExecutor.ExecuteFFmpegCommand(ffmpegPath, arguments);
 
-            Console.WriteLine($"Frist frame extracted successfully for: {videoPath}");
-            Console.WriteLine($"Frist frame saved at: {firstFrameVideoPath}");
+            Console.WriteLine($"First frame extracted successfully for: {videoPath}");
+            Console.WriteLine($"First frame saved at: {firstFrameVideoPath}");
         }
         catch (Exception ex)
         {

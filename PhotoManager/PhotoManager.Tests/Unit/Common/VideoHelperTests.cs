@@ -96,7 +96,7 @@ public class VideoHelperTests
             var consoleOutput = stringWriter.ToString();
 
             // Assert that the expected error message was printed to the console
-            Assert.IsTrue(consoleOutput.Contains("Frist frame extracted successfully for:"));
+            Assert.IsTrue(consoleOutput.Contains("First frame extracted successfully for:"));
 
             // Verify that ExecuteFFmpegCommand was called with the correct arguments
             string ffmpegPath = PathConstants.FfmpegPath;
@@ -134,7 +134,7 @@ public class VideoHelperTests
         var consoleOutput = stringWriter.ToString();
 
         // Assert that the expected error message was printed to the console
-        Assert.IsTrue(consoleOutput.Contains("Frist frame extracted successfully for:"));
+        Assert.IsTrue(consoleOutput.Contains("First frame extracted successfully for:"));
     }
 
     [Test]
