@@ -1,112 +1,144 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Moq;
+using NUnit.Framework;
 using PhotoManager.Constants;
 using PhotoManager.Domain;
+using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
-using PhotoManager.Tests.Helpers;
 using PhotoManager.UI;
 using System.IO;
-using Xunit;
 
 namespace PhotoManager.Tests.Unit.Infrastructure;
 
+[TestFixture]
 public class UserConfigurationServiceTests
 {
-    private string dataDirectory;
-    private IConfigurationRoot configuration;
+    private string? dataDirectory;
+    private IUserConfigurationService? _userConfigurationService;
 
-    public UserConfigurationServiceTests()
+    [OneTimeSetUp]
+    public void OneTimeSetup()
     {
-        dataDirectory = Path.GetDirectoryName(typeof(UserConfigurationServiceTests).Assembly.Location);
-        dataDirectory = Path.Combine(dataDirectory, "TestFiles");
+        var directoryName = Path.GetDirectoryName(typeof(UserConfigurationServiceTests).Assembly.Location) ?? "";
+        dataDirectory = Path.Combine(directoryName, "TestFiles");
 
         Mock<IConfigurationRoot> configurationMock = new();
         configurationMock
-            .MockGetValue("appsettings:InitialDirectory", dataDirectory)
-            .MockGetValue("appsettings:ApplicationDataDirectory", dataDirectory)
+            .MockGetValue("appsettings:InitialDirectory", dataDirectory!)
+            .MockGetValue("appsettings:ApplicationDataDirectory", dataDirectory!)
             .MockGetValue("appsettings:CatalogBatchSize", "100")
             .MockGetValue("appsettings:CatalogCooldownMinutes", "5")
-            .MockGetValue("appsettings:BackupsToKeep", "2");
+            .MockGetValue("appsettings:BackupsToKeep", "2")
+            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
 
-        configuration = configurationMock.Object;
+        _userConfigurationService = new UserConfigurationService(configurationMock.Object);
     }
 
-    [Fact]
-    public void GetPicturesDirectoryTest()
+    [Test]
+    [TestCase(WallpaperStyle.Fill, "10", "0")]
+    [TestCase(WallpaperStyle.Fit, "6", "0")]
+    [TestCase(WallpaperStyle.Stretch, "2", "0")]
+    [TestCase(WallpaperStyle.Tile, "0", "1")]
+    [TestCase(WallpaperStyle.Center, "0", "0")]
+    [TestCase(WallpaperStyle.Span, "22", "0")]
+    public void SetAsWallpaper_ValidStyleAndTile_RegistersExpectedValues(WallpaperStyle style, string expectedStyleValue, string expectedTileValue)
     {
-        UserConfigurationService userConfigurationService = new(configuration);
-        string result = userConfigurationService.GetPicturesDirectory();
-        result.Should().NotBeEmpty();
+        Folder folder = new() { Path = dataDirectory! };
+        Asset asset = new() { Folder = folder, FileName = "NonExistentFile.jpg" }; // Not giving an existing file to prevent the wallpaper to be changed
+
+        // Set up a StringWriter to capture console output
+        var stringWriter = new StringWriter();
+        Console.SetOut(stringWriter);
+
+        _userConfigurationService!.SetAsWallpaper(asset, style);
+
+        // Get the captured console output
+        var consoleOutput = stringWriter.ToString();
+
+        // Assert that the expected error message was printed to the console
+        Assert.IsTrue(consoleOutput.Contains($"Wallpaper set for style {expectedStyleValue} and tile {expectedTileValue}"));
     }
 
-    [Fact]
-    public void GetAboutInformationTest()
+    [Test]
+    public void GetAboutInformation_WithValidAssembly_ReturnsAboutInformation()
     {
-        UserConfigurationService userConfigurationService = new(configuration);
-        AboutInformation result = userConfigurationService.GetAboutInformation(typeof(App).Assembly);
-        result.Product.Should().Be("PhotoManager");
-        result.Version.Should().NotBeEmpty();
-        result.Version.Should().StartWith("v");
+        AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(typeof(App).Assembly);
+
+        Assert.AreEqual("PhotoManager", aboutInformation.Product);
+        Assert.IsFalse(string.IsNullOrWhiteSpace(aboutInformation.Version));
+        Assert.That(aboutInformation.Version, Does.StartWith("v"));
+        Assert.AreEqual("v1.0.0", aboutInformation.Version);
     }
 
-    [Fact]
-    public void GetCatalogBatchSizeTest()
+    [Test]
+    public void GetAboutInformation_WithInvalidAssembly_ReturnsDefaultProduct()
     {
-        UserConfigurationService userConfigurationService = new(configuration);
-        int result = userConfigurationService.GetCatalogBatchSize();
-        result.Should().Be(100);
+        AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(typeof(int).Assembly);
+
+        Assert.AreNotEqual("PhotoManager", aboutInformation.Product);
+        Assert.AreEqual("v1.0.0", aboutInformation.Version);
     }
 
-    [Fact]
-    public void GetCatalogCooldownMinutesTest()
+    [Test]
+    public void GetPicturesDirectory_ValidPath_ReturnsPicturesDirectory()
     {
-        UserConfigurationService userConfigurationService = new(configuration);
-        int result = userConfigurationService.GetCatalogCooldownMinutes();
-        result.Should().Be(5);
+        string picturesDirectory = _userConfigurationService!.GetPicturesDirectory();
+
+        Assert.IsFalse(string.IsNullOrWhiteSpace(picturesDirectory));
+        Assert.AreEqual(PathConstants.PathLocation, picturesDirectory);
     }
 
-    [Fact]
-    public void GetBackupsToKeepTest()
+    [Test]
+    public void GetApplicationBackupFolder_ValidPath_ReturnsBackupFolderPath()
     {
-        UserConfigurationService userConfigurationService = new(configuration);
-        int result = userConfigurationService.GetBackupsToKeep();
-        result.Should().Be(2);
+        string backupFolderPath = _userConfigurationService!.GetApplicationBackupFolderPath();
+
+        Assert.AreEqual(PathConstants.PathBackup, backupFolderPath);
     }
 
-    [Fact]
-    public void GetInitialFolderConfiguredTest()
+    [Test]
+    public void GetCatalogBatchSize_CorrectSize_ReturnsBatchSize()
     {
-        UserConfigurationService userConfigurationService = new(configuration);
-        string result = userConfigurationService.GetPicturesDirectory();
-        result.Should().Be(PathConstants.PathLocation);
+        int batchSize = _userConfigurationService!.GetCatalogBatchSize();
+
+        Assert.IsNotNull(batchSize);
+        Assert.AreEqual(100, batchSize);
     }
 
-    [Fact]
-    public void GetApplicationBackupFolder()
+    [Test]
+    public void GetCatalogCooldownMinutes_CorrectValue_ReturnsCatalogCooldownMinutes()
     {
-        Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock
-            .MockGetValue("appsettings:InitialDirectory", dataDirectory)
-            .MockGetValue("appsettings:ApplicationDataDirectory", dataDirectory)
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "5");
+        int catalogCooldownMinutes = _userConfigurationService!.GetCatalogCooldownMinutes();
 
-        UserConfigurationService userConfigurationService = new(configurationMock.Object);
-        string result = userConfigurationService.GetApplicationBackupFolder();
-
-        result.Should().NotBeEmpty();
+        Assert.IsNotNull(catalogCooldownMinutes);
+        Assert.AreEqual(5, catalogCooldownMinutes);
     }
 
-    //[Test]
-    //public void GetApplicationBackupFolder_ReturnsCorrectPath()
-    //{
-    //    string expectedPath = PathConstants.PathBackup;
+    [Test]
+    public void GetBackupsToKeep_CorrectValue_ReturnsBackupsToKeep()
+    {
+        int backupsToKeep = _userConfigurationService!.GetBackupsToKeep();
 
-    //    IUserConfigurationService userConfigurationService = new UserConfigurationService();
+        Assert.IsNotNull(backupsToKeep);
+        Assert.AreEqual(2, backupsToKeep);
+    }
 
-    //    string backupFolderPath = userConfigurationService.GetApplicationBackupFolder();
+    [Test]
+    public void GetThumbnailsDictionaryEntriesToKeep_CorrectValue_ReturnsThumbnailsDictionaryEntriesToKeep()
+    {
+        int thumbnailsDictionaryEntriesToKeep = _userConfigurationService!.GetThumbnailsDictionaryEntriesToKeep();
 
-    //    Assert.AreEqual(expectedPath, backupFolderPath);
-    //}
+        Assert.IsNotNull(thumbnailsDictionaryEntriesToKeep);
+        Assert.AreEqual(5, thumbnailsDictionaryEntriesToKeep);
+    }
+
+    [Test]
+    public void GetRootCatalogFolderPaths_CorrectPath_ReturnsArrayOfPaths()
+    {
+        string[] paths = _userConfigurationService!.GetRootCatalogFolderPaths();
+
+        Assert.IsNotNull(paths);
+        Assert.AreEqual(1, paths.Length);
+        Assert.AreEqual(PathConstants.PathLocation, paths[0]);
+    }
 }

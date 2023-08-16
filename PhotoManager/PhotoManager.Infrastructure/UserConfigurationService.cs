@@ -4,6 +4,7 @@ using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -31,42 +32,51 @@ public class UserConfigurationService : IUserConfigurationService
 
     public void SetAsWallpaper(Asset asset, WallpaperStyle style)
     {
-        RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
+        RegistryKey? key = Registry.CurrentUser?.OpenSubKey(@"Control Panel\Desktop", true);
 
         switch (style)
         {
             case WallpaperStyle.Fill:
-                key.SetValue(@"WallpaperStyle", "10");
-                key.SetValue(@"TileWallpaper", "0");
+                key?.SetValue(@"WallpaperStyle", "10");
+                key?.SetValue(@"TileWallpaper", "0");
+                Console.WriteLine("Wallpaper set for style 10 and tile 0");
                 break;
 
             case WallpaperStyle.Fit:
-                key.SetValue(@"WallpaperStyle", "6");
-                key.SetValue(@"TileWallpaper", "0");
+                key?.SetValue(@"WallpaperStyle", "6");
+                key?.SetValue(@"TileWallpaper", "0");
+                Console.WriteLine("Wallpaper set for style 6 and tile 0");
                 break;
 
             case WallpaperStyle.Stretch:
-                key.SetValue(@"WallpaperStyle", "2");
-                key.SetValue(@"TileWallpaper", "0");
+                key?.SetValue(@"WallpaperStyle", "2");
+                key?.SetValue(@"TileWallpaper", "0");
+                Console.WriteLine("Wallpaper set for style 2 and tile 0");
                 break;
 
             case WallpaperStyle.Tile:
-                key.SetValue(@"WallpaperStyle", "0");
-                key.SetValue(@"TileWallpaper", "1");
+                key?.SetValue(@"WallpaperStyle", "0");
+                key?.SetValue(@"TileWallpaper", "1");
+                Console.WriteLine("Wallpaper set for style 0 and tile 1");
                 break;
 
             case WallpaperStyle.Center:
-                key.SetValue(@"WallpaperStyle", "0");
-                key.SetValue(@"TileWallpaper", "0");
+                key?.SetValue(@"WallpaperStyle", "0");
+                key?.SetValue(@"TileWallpaper", "0");
+                Console.WriteLine("Wallpaper set for style 0 and tile 0");
                 break;
 
             case WallpaperStyle.Span:
-                key.SetValue(@"WallpaperStyle", "22");
-                key.SetValue(@"TileWallpaper", "0");
+                key?.SetValue(@"WallpaperStyle", "22");
+                key?.SetValue(@"TileWallpaper", "0");
+                Console.WriteLine("Wallpaper set for style 22 and tile 0");
                 break;
         }
 
-        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, asset.FullPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+        if (File.Exists(asset.FullPath))
+        {
+            SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, asset.FullPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+        }
     }
 
     public AboutInformation GetAboutInformation(Assembly assembly)
@@ -94,7 +104,7 @@ public class UserConfigurationService : IUserConfigurationService
         return PathConstants.PathLocation;
     }
 
-    public string GetApplicationBackupFolder()
+    public string GetApplicationBackupFolderPath()
     {
         return PathConstants.PathBackup;
     }
@@ -121,7 +131,6 @@ public class UserConfigurationService : IUserConfigurationService
 
     public string[] GetRootCatalogFolderPaths()
     {
-        // TODO: Validate if some of the root folders are not valid or don't exist any longer.
         List<string> rootPaths = new()
         {
             GetPicturesDirectory()
@@ -130,7 +139,7 @@ public class UserConfigurationService : IUserConfigurationService
         return rootPaths.ToArray();
     }
 
-    private string GetProductVersion()
+    private string? GetProductVersion()
     {
         FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(GetType().Assembly.Location);
 
