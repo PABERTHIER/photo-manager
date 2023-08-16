@@ -24,8 +24,6 @@ public class ApplicationTests
 
         Mock<IConfigurationRoot> configurationMock = new();
         configurationMock
-            .MockGetValue("appsettings:InitialDirectory", dataDirectory)
-            .MockGetValue("appsettings:ApplicationDataDirectory", Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()))
             .MockGetValue("appsettings:CatalogBatchSize", "100")
             .MockGetValue("appsettings:BackupsToKeep", "2")
             .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");

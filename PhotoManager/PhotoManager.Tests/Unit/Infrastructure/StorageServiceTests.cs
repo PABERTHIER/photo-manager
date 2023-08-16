@@ -23,10 +23,7 @@ public class StorageServiceTests
         dataDirectory = Path.Combine(directoryName, "TestFiles");
 
         Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock
-            .MockGetValue("appsettings:InitialDirectory", dataDirectory!)
-            .MockGetValue("appsettings:ApplicationDataDirectory", dataDirectory!)
-            .MockGetValue("appsettings:CatalogBatchSize", "100");
+        configurationMock.MockGetValue("appsettings:CatalogBatchSize", "100");
 
         _storageService = new StorageService(new UserConfigurationService(configurationMock.Object));
     }
