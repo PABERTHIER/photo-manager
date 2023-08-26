@@ -44,9 +44,21 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             try
             {
+                // TODO: Called to soon, then it is empty, instead, should be called when the sync is done (like at the end of this method or in the finally)
                 if (!_assetRepository.BackupExists())
                 {
                     callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = "Creating catalog backup..." });
+                    // TODO: For the tests: check the content like this:
+                    //    ZipFile.ExtractToDirectory(filePath, "TestData_Backups_Test");
+
+                    //    var sourceDirectories = Directory.GetDirectories("TestData");
+                    //    var backupDirectories = Directory.GetDirectories("TestData_Backups_Test");
+
+                    //    sourceDirectories.Should().HaveSameCount(backupDirectories);
+                    //    sourceDirectories[0].Should().Be(@"TestData\Blobs");
+                    //    sourceDirectories[1].Should().Be(@"TestData\Tables");
+                    //    backupDirectories[0].Should().Be(@"TestData_Backups_Test\Blobs");
+                    //    backupDirectories[1].Should().Be(@"TestData_Backups_Test\Tables");
                     _assetRepository.WriteBackup();
                     callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = string.Empty });
                 }

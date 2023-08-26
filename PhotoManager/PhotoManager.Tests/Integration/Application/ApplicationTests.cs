@@ -6,7 +6,7 @@ using Moq;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
-using SimplePortableDatabase;
+using PhotoManager.Infrastructure.Database;
 using System.IO;
 using Xunit;
 
@@ -39,7 +39,7 @@ public class ApplicationTests
         using var mock = AutoMock.GetLoose(
             cfg =>
             {
-                cfg.RegisterSimplePortableDatabaseTypes();
+                cfg.RegisterDatabaseTypes();
                 cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
                 cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
                 cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
@@ -95,7 +95,7 @@ public class ApplicationTests
         using var mock = AutoMock.GetLoose(
             cfg =>
             {
-                cfg.RegisterSimplePortableDatabaseTypes();
+                cfg.RegisterDatabaseTypes();
                 cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
                 cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
                 cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
@@ -134,7 +134,7 @@ public class ApplicationTests
         using var mock = AutoMock.GetLoose(
             cfg =>
             {
-                cfg.RegisterSimplePortableDatabaseTypes();
+                cfg.RegisterDatabaseTypes();
                 cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
                 cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
                 cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
@@ -185,7 +185,7 @@ public class ApplicationTests
         using var mock = AutoMock.GetLoose(
             cfg =>
             {
-                cfg.RegisterSimplePortableDatabaseTypes();
+                cfg.RegisterDatabaseTypes();
                 cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
                 cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
                 cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
@@ -231,7 +231,7 @@ public class ApplicationTests
         using var mock = AutoMock.GetLoose(
             cfg =>
             {
-                cfg.RegisterSimplePortableDatabaseTypes();
+                cfg.RegisterDatabaseTypes();
                 cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
                 cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
                 cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
@@ -266,7 +266,7 @@ public class ApplicationTests
         using var mock = AutoMock.GetLoose(
             cfg =>
             {
-                cfg.RegisterSimplePortableDatabaseTypes();
+                cfg.RegisterDatabaseTypes();
                 cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
                 cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
                 cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();

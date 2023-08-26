@@ -2,7 +2,7 @@
 
 public class Folder
 {
-    public string FolderId { get; set; }
+    public string FolderId { get; set; } // Why not a Guid? ? -> update all tests that using a non Guid value
     public string Path { get; set; }
     public string ThumbnailsFilename => FolderId + ".bin";
 
@@ -17,6 +17,7 @@ public class Folder
         }
     }
 
+    // Only used here and BatchHelper which is not really used
     public Folder? Parent
     {
         get
@@ -26,6 +27,7 @@ public class Folder
         }
     }
 
+    // Can be marked as private method
     private string? GetParentPath()
     {
         string[] thisPathDirectories = Path.Split(System.IO.Path.DirectorySeparatorChar);
@@ -40,16 +42,19 @@ public class Folder
             && string.Compare(Path, otherFolder?.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
     }
 
+    // Usefull ?
     public override bool Equals(object? obj)
     {
         return obj is Folder folder && folder.Path == Path;
     }
 
+    // Only for UT
     public override int GetHashCode()
     {
         return Path != null ? Path.GetHashCode() : base.GetHashCode();
     }
 
+    // Only for UT
     public override string ToString()
     {
         return Path;

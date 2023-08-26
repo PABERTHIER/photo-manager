@@ -2,7 +2,7 @@ using log4net;
 using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
-using SimplePortableDatabase;
+using PhotoManager.Infrastructure.Database;
 using System.Data;
 using System.IO;
 using System.Reflection;
@@ -14,8 +14,6 @@ public class AssetRepository : IAssetRepository
 {
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
-    private const string Separator = "|";
-
     public bool IsInitialized { get; private set; }
     private string dataDirectory;
     private readonly IDatabase _database;
@@ -25,6 +23,7 @@ public class AssetRepository : IAssetRepository
     private List<Asset> assets;
     private List<Folder> folders;
     private SyncAssetsConfiguration _syncAssetsConfiguration;
+    // TODO: not sure working
     private List<string> _recentTargetPaths;
     protected Dictionary<string, Dictionary<string, byte[]>> Thumbnails { get; private set; }
     private readonly Queue<string> recentThumbnailsQueue;
@@ -67,7 +66,7 @@ public class AssetRepository : IAssetRepository
                     {
                         foreach (Asset asset in assetsList)
                         {
-                            if (Thumbnails[folder.Path].ContainsKey(asset.FileName))
+                            if (Thumbnails[folder.Path].ContainsKey(asset.FileName)) // TODO: Prefer the method IDictionary.TryGetValue(TKey, out TValue) to avoid double lookup
                             {
                                 asset.ImageData = _storageService.LoadBitmapThumbnailImage(Thumbnails[folder.Path][asset.FileName], asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
                             }
@@ -134,7 +133,7 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            string folderId = Guid.NewGuid().ToString();
+            string folderId = Guid.NewGuid().ToString(); // Why not a Guid? ?
 
             folder = new Folder
             {
@@ -388,8 +387,9 @@ public class AssetRepository : IAssetRepository
 
     public bool FolderHasThumbnails(Folder folder)
     {
+        // TODO: Use _database.FolderHasThumbnails(folder.ThumbnailsFilename); instead (check if dataDirectory is the same)
+        // TODO: Pass ResolveBlobFilePath in private when done (tests ok)
         string thumbnailsFilePath = _database.ResolveBlobFilePath(dataDirectory, folder.ThumbnailsFilename);
-        // TODO: Implement through the NuGet package.
         return File.Exists(thumbnailsFilePath);
     }
 
@@ -414,6 +414,7 @@ public class AssetRepository : IAssetRepository
         }
     }
 
+    // TODO: not sure working
     public List<string> GetRecentTargetPaths()
     {
         List<string> result = null;
@@ -426,6 +427,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
+    // TODO: not sure working
     public void SaveRecentTargetPaths(List<string> recentTargetPaths)
     {
         lock (syncLock)
@@ -459,8 +461,8 @@ public class AssetRepository : IAssetRepository
 
     private void InitializeDatabase()
     {
-        dataDirectory = _storageService.ResolveDataDirectory(AssetConstants.StorageVersion);
-        var separatorChar = Separator.ToCharArray().First();
+        dataDirectory = _storageService.ResolveDataDirectory(AssetConstants.StorageVersion); // TODO: dataDirectory should be mocked for the tests to prevent issues
+        var separatorChar = AssetConstants.Separator.ToCharArray().First();
         _database.Initialize(dataDirectory, separatorChar);
 
         _database.SetDataTableProperties(new DataTableProperties
@@ -669,9 +671,9 @@ public class AssetRepository : IAssetRepository
                 7 => a.ThumbnailPixelHeight,
                 8 => a.ThumbnailCreationDateTime,
                 9 => a.Hash,
-                10 => a.AssetCorruptedMessage,
+                10 => a.AssetCorruptedMessage!,
                 11 => a.IsAssetCorrupted,
-                12 => a.AssetRotatedMessage,
+                12 => a.AssetRotatedMessage!,
                 13 => a.IsAssetRotated,
                 _ => throw new ArgumentOutOfRangeException(nameof(i))
             };
@@ -705,9 +707,11 @@ public class AssetRepository : IAssetRepository
         });
     }
 
+    // TODO: Delete this method and call _database.DeleteThumbnails(folder.ThumbnailsFilename); in DeleteFolder
     private void DeleteThumbnails(Folder folder)
     {
-        // TODO: Implement through the NuGet package.
+        // TODO: Use _database.DeleteThumbnails(folder.ThumbnailsFilename); instead (check if dataDirectory is the same)
+        // TODO: Pass ResolveBlobFilePath in private when done (tests ok)
         string thumbnailsFilePath = _database.ResolveBlobFilePath(dataDirectory, folder.ThumbnailsFilename);
         File.Delete(thumbnailsFilePath);
     }
@@ -715,7 +719,8 @@ public class AssetRepository : IAssetRepository
     protected virtual Dictionary<string, byte[]> GetThumbnails(Folder folder, out bool isNewFile)
     {
         isNewFile = false;
-        Dictionary<string, byte[]> thumbnails = (Dictionary<string, byte[]>)_database.ReadBlob(folder.ThumbnailsFilename);
+        // TODO: Why not doing folder.Path combine to folder.ThumbnailsFilename ? and then removing the ResolveBlobFilePath (debug to check values)
+        Dictionary<string, byte[]>? thumbnails = _database.ReadBlob(folder.ThumbnailsFilename); // ReadBlob returns a dict with the key as the image name and the value the byte[] (image data)
 
         if (thumbnails == null)
         {
@@ -742,12 +747,13 @@ public class AssetRepository : IAssetRepository
         }
     }
 
+    // One Blob per folder
     private void SaveThumbnails(Dictionary<string, byte[]> thumbnails, string thumbnailsFileName)
     {
         _database.WriteBlob(thumbnails, thumbnailsFileName);
     }
 
-    private Folder GetFolderById(string folderId)
+    private Folder GetFolderById(string folderId) // Why not a Guid? ?
     {
         Folder result = null;
 
@@ -759,7 +765,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
-    private List<Asset> GetAssetsByFolderId(string folderId)
+    private List<Asset> GetAssetsByFolderId(string folderId)  // Why not a Guid? ?
     {
         List<Asset> result = null;
 
@@ -771,7 +777,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
-    private Asset GetAssetByFolderIdFileName(string folderId, string fileName)
+    private Asset GetAssetByFolderIdFileName(string folderId, string fileName) // Why not a Guid? ?
     {
         Asset result = null;
 

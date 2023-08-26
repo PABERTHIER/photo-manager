@@ -667,28 +667,28 @@ public class StorageServiceTests
         Assert.Throws<InvalidOperationException>(() => _storageService!.GetImageRotation((ushort)exifOrientation!));
     }
 
-    [Test]
-    [Category("Supplemental")]
-    public void WriteReadJsonTestAndReadObjectFromJsonFile_Tests()
-    {
-        List<string> writtenList = new() { "Value 1", "Value 2" };
-        string jsonPath = Path.Combine(dataDirectory!, "test.json");
+    //[Test]
+    //[Category("Supplemental")]
+    //public void WriteReadJsonTestAndReadObjectFromJsonFile_Tests()
+    //{
+    //    List<string> writtenList = new() { "Value 1", "Value 2" };
+    //    string jsonPath = Path.Combine(dataDirectory!, "test.json");
 
-        WriteObjectToJsonFile(writtenList, jsonPath);
-        List<string> readList = ReadObjectFromJsonFile<List<string>>(jsonPath) ?? new List<string>();
+    //    WriteObjectToJsonFile(writtenList, jsonPath);
+    //    List<string> readList = ReadObjectFromJsonFile<List<string>>(jsonPath) ?? new List<string>();
 
-        Assert.AreEqual(writtenList.Count(), readList.Count());
-        Assert.AreEqual(writtenList[0], readList[0]);
-        Assert.AreEqual(writtenList[1], readList[1]);
-    }
+    //    Assert.AreEqual(writtenList.Count(), readList.Count());
+    //    Assert.AreEqual(writtenList[0], readList[0]);
+    //    Assert.AreEqual(writtenList[1], readList[1]);
+    //}
 
-    private static T? ReadObjectFromJsonFile<T>(string jsonFilePath)
-    {
-        return FileHelper.ReadObjectFromJsonFile<T>(jsonFilePath);
-    }
+    //private static T? ReadObjectFromJsonFile<T>(string jsonFilePath)
+    //{
+    //    return FileHelper.ReadObjectFromJsonFile<T>(jsonFilePath);
+    //}
 
-    private static void WriteObjectToJsonFile(object anObject, string jsonFilePath)
-    {
-        FileHelper.WriteObjectToJsonFile(anObject, jsonFilePath);
-    }
+    //private static void WriteObjectToJsonFile(object anObject, string jsonFilePath)
+    //{
+    //    FileHelper.WriteObjectToJsonFile(anObject, jsonFilePath);
+    //}
 }

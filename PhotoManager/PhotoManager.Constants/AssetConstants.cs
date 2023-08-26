@@ -16,4 +16,5 @@ public static class AssetConstants
     public const string AssetCorruptedMessage = "The asset is corrupted";
     public const string AssetRotatedMessage = "The asset has been rotated";
     public const double StorageVersion = 1.0;
+    public const string Separator = "|";
 }

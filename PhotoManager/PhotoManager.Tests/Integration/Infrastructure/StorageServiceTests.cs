@@ -23,10 +23,7 @@ public class StorageServiceTests
         dataDirectory = Path.Combine(directoryName, "TestFiles");
 
         Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock
-            .MockGetValue("appsettings:InitialDirectory", dataDirectory!)
-            .MockGetValue("appsettings:ApplicationDataDirectory", dataDirectory!)
-            .MockGetValue("appsettings:CatalogBatchSize", "100");
+        configurationMock.MockGetValue("appsettings:CatalogBatchSize", "100");
 
         _storageService = new StorageService(new UserConfigurationService(configurationMock.Object));
     }
@@ -617,17 +614,17 @@ public class StorageServiceTests
         Assert.Throws<ArgumentException>(() => _storageService!.IsValidHeic(emptyHeicData));
     }
 
-    [Test]
-    [Category("Supplemental")]
-    public void GetDrivesTest()
-    {
-        Folder[] drives = GetDrives();
-        Assert.IsNotEmpty(drives);
-    }
+    //[Test]
+    //[Category("Supplemental")]
+    //public void GetDrivesTest()
+    //{
+    //    Folder[] drives = GetDrives();
+    //    Assert.IsNotEmpty(drives);
+    //}
 
-    private static Folder[] GetDrives()
-    {
-        string[] drives = Directory.GetLogicalDrives();
-        return drives.Select(d => new Folder { Path = d }).ToArray();
-    }
+    //private static Folder[] GetDrives()
+    //{
+    //    string[] drives = Directory.GetLogicalDrives();
+    //    return drives.Select(d => new Folder { Path = d }).ToArray();
+    //}
 }

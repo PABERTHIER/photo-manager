@@ -5,9 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Interfaces;
 using PhotoManager.Infrastructure;
+using PhotoManager.Infrastructure.Database.Storage;
+using PhotoManager.Infrastructure.Database;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.Windows;
-using SimplePortableDatabase;
 using System;
 using System.IO;
 using System.Reflection;
@@ -72,7 +73,11 @@ public partial class App : System.Windows.Application
         IConfigurationRoot configuration = builder.Build();
 
         services.AddSingleton(configuration);
-        services.AddSimplePortableDatabaseServices();
+        services.AddSingleton<IObjectListStorage, ObjectListStorage>();
+        //services.AddSingleton<IDataTableStorage, DataTableStorage>();
+        services.AddSingleton<IBlobStorage, BlobStorage>();
+        services.AddSingleton<IBackupStorage, BackupStorage>();
+        services.AddSingleton<IDatabase, Database>();
         services.AddSingleton<IDirectoryComparer, DirectoryComparer>();
         services.AddSingleton<IProcessService, ProcessService>();
         services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
@@ -87,4 +92,22 @@ public partial class App : System.Windows.Application
         services.AddSingleton<MainWindow>();
         services.AddSingleton<ApplicationViewModel>();
     }
+
+    // TODO: if needeed to test the regiters: here is the sample for database, need to be completed
+    //[TestMethod]
+    //public void AddDatabaseServices_AddsAllRequiredServices()
+    //{
+    //    // Arrange
+    //    var services = new ServiceCollection();
+
+    //    // Act
+    //    services.AddDatabaseServices();
+
+    //    // Assert
+    //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IObjectListStorage)));
+    //    // Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IDataTableStorage)));
+    //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IBlobStorage)));
+    //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IBackupStorage)));
+    //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IDatabase)));
+    //}
 }

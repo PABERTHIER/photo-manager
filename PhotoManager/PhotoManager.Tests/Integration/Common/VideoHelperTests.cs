@@ -39,6 +39,7 @@ public class VideoHelperTests
         {
             // Clean up: delete the first frame file
             File.Delete(expectedFirstFrameVideoPath);
+            Directory.Delete(destinationPath);
         }
     }
 
@@ -48,15 +49,22 @@ public class VideoHelperTests
         string fileName = "Homer1s.mp4"; // Video that has less than 1 second
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
 
-        string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
-        string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
+        try
+        {
+            string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
+            string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-        string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
-        Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
-        Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);
+            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
+            Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);
 
-        // Verify that the first frame file is created in the output directory
-        Assert.IsFalse(File.Exists(expectedFirstFrameVideoPath));
+            // Verify that the first frame file is created in the output directory
+            Assert.IsFalse(File.Exists(expectedFirstFrameVideoPath));
+        }
+        finally
+        {
+            Directory.Delete(destinationPath);
+        }
     }
 }
