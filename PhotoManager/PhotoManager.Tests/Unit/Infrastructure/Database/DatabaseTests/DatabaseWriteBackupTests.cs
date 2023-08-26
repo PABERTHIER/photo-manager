@@ -11,8 +11,7 @@ public class DatabaseWriteBackupTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        string directoryName = Path.GetDirectoryName(typeof(DatabaseWriteBackupTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [SetUp]

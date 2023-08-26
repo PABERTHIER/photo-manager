@@ -8,8 +8,7 @@ public class VideoHelperTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var directoryName = Path.GetDirectoryName(typeof(VideoHelperTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [Test]

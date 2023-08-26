@@ -8,8 +8,7 @@ public class AssetHashCalculatorServiceTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var directoryName = Path.GetDirectoryName(typeof(AssetHashCalculatorServiceTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     // The cases for imageBytes null, empty or invalid and filePath null or invalid are already handled in the HashingHelperTests

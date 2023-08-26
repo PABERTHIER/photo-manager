@@ -12,8 +12,7 @@ public class UserConfigurationServiceTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var directoryName = Path.GetDirectoryName(typeof(UserConfigurationServiceTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationMock = new();
         configurationMock

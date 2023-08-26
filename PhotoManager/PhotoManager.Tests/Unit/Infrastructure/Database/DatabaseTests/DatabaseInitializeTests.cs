@@ -11,8 +11,7 @@ public class DatabaseInitializeTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        string directoryName = Path.GetDirectoryName(typeof(DatabaseInitializeTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [SetUp]

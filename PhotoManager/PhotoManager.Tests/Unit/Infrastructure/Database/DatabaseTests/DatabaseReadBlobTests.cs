@@ -12,8 +12,7 @@ public class DatabaseReadBlobTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        string directoryName = Path.GetDirectoryName(typeof(DatabaseReadBlobTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [SetUp]

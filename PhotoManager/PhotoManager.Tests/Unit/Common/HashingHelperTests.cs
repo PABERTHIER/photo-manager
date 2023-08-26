@@ -10,8 +10,7 @@ public class HashingHelperTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        var directoryName = Path.GetDirectoryName(typeof(HashingHelperTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [Test]

@@ -9,8 +9,7 @@ public class BlobStorageTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        string directoryName = Path.GetDirectoryName(typeof(BlobStorageTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [SetUp]

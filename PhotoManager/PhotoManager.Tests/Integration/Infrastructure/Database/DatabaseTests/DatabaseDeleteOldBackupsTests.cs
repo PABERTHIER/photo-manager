@@ -11,8 +11,7 @@ public class DatabaseDeleteOldBackupsTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        string directoryName = Path.GetDirectoryName(typeof(DatabaseDeleteOldBackupsTests).Assembly.Location) ?? "";
-        dataDirectory = Path.Combine(directoryName, "TestFiles");
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [SetUp]
