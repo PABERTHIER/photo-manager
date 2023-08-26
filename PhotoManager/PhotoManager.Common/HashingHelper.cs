@@ -1,6 +1,4 @@
 ﻿using ImageMagick;
-using System.Drawing;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 

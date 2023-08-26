@@ -1,9 +1,6 @@
 using ImageMagick;
 using log4net;
-using PhotoManager.Constants;
-using System.IO;
 using System.Reflection;
-using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Common;
 

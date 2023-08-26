@@ -1,7 +1,4 @@
-﻿using PhotoManager.Constants;
-using System.IO;
-
-namespace PhotoManager.Common;
+﻿namespace PhotoManager.Common;
 
 public static class VideoHelper
 {
