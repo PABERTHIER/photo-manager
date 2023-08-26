@@ -57,7 +57,18 @@ public class ObjectListStorageTests
         Assert.IsInstanceOf<List<Folder>>(result);
         Assert.IsNotEmpty(result);
         Assert.AreEqual(3, result.Count);
-        Assert.IsNotNull(result.FirstOrDefault(x => x.FolderId == "f1f00403-0554-4201-9b6b-11a6b4cea3a9"));
+
+        Folder? folder1 = result.FirstOrDefault(x => x.FolderId == "f1f00403-0554-4201-9b6b-11a6b4cea3a9");
+        Assert.IsNotNull(folder1);
+        Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test", folder1!.Path);
+
+        Folder? folder2 = result.FirstOrDefault(x => x.FolderId == "2c107211-1a1c-4e73-8e8b-35d18ca8ef85");
+        Assert.IsNotNull(folder2);
+        Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame", folder2!.Path);
+
+        Folder? folder3 = result.FirstOrDefault(x => x.FolderId == "18033543-defb-4d37-837b-d8063eda3a25");
+        Assert.IsNotNull(folder3);
+        Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test\\toto", folder3!.Path);
     }
 
     [Test]
@@ -112,11 +123,26 @@ public class ObjectListStorageTests
         Assert.IsInstanceOf<List<Asset>>(result);
         Assert.IsNotEmpty(result);
         Assert.AreEqual(11, result.Count);
-        Assert.IsNotNull(result.FirstOrDefault(x => x.FileName == "533.JPG"));
+
+        Asset? asset = result.FirstOrDefault(x => x.Hash == "ee43714d8b96d7ed3308d18afcb701444198c783fbe4103ce44e95aaf99c2095ae70e6e2035a7a438d1598fadaf5fe8cb0d541378387d20e91f26819fcc64b82");
+        Assert.IsNotNull(asset);
+        Assert.AreEqual("533.JPG", asset!.FileName);
+        Assert.AreEqual("f1f00403-0554-4201-9b6b-11a6b4cea3a9", asset!.FolderId);
+        Assert.AreEqual(2986996, asset!.FileSize);
+        Assert.AreEqual(Rotation.Rotate270, asset!.ImageRotation);
+        Assert.AreEqual(3072, asset!.PixelWidth);
+        Assert.AreEqual(4080, asset!.PixelHeight);
+        Assert.AreEqual(113, asset!.ThumbnailPixelWidth);
+        Assert.AreEqual(150, asset!.ThumbnailPixelHeight);
+        Assert.AreEqual(new DateTime(2023, 8, 25, 12, 01, 21), asset!.ThumbnailCreationDateTime);
+        Assert.AreEqual(string.Empty, asset!.AssetCorruptedMessage);
+        Assert.AreEqual(false, asset!.IsAssetCorrupted);
+        Assert.AreEqual("The asset has been rotated", asset!.AssetRotatedMessage);
+        Assert.AreEqual(true, asset!.IsAssetRotated);
     }
 
     [Test]
-    public void ReadObjectList_ImportType_ReturnsEmptyList()
+    public void ReadObjectList_ImportType_ReturnsNotEmptyList()
     {
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\import.db");
         DataTableProperties dataTableProperties = new()
@@ -145,11 +171,24 @@ public class ObjectListStorageTests
             new Diagnostics());
 
         Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
-        Assert.IsEmpty(result);
+        Assert.IsNotEmpty(result);
+        Assert.AreEqual(2, result.Count);
+
+        SyncAssetsDirectoriesDefinition? firstImport = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Toto\\Screenshots");
+        Assert.IsNotNull(firstImport);
+        Assert.AreEqual("C:\\Images\\Toto", firstImport!.DestinationDirectory);
+        Assert.AreEqual(false, firstImport.IncludeSubFolders);
+        Assert.AreEqual(false, firstImport.DeleteAssetsNotInSource);
+
+        SyncAssetsDirectoriesDefinition? secondImport = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Tutu\\Screenshots");
+        Assert.IsNotNull(secondImport);
+        Assert.AreEqual("C:\\Images\\Tutu", secondImport!.DestinationDirectory);
+        Assert.AreEqual(false, secondImport.IncludeSubFolders);
+        Assert.AreEqual(false, secondImport.DeleteAssetsNotInSource);
     }
 
     [Test]
-    public void ReadObjectList_RecentTargetPathsType_ReturnsEmptyList()
+    public void ReadObjectList_RecentTargetPathsType_ReturnsNotList()
     {
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\recenttargetpaths.db");
         DataTableProperties dataTableProperties = new()
@@ -164,6 +203,42 @@ public class ObjectListStorageTests
 
         var result = _objectListStorage!.ReadObjectList(dataFilePath, f => f[0], new Diagnostics());
 
+        Assert.IsNotEmpty(result);
+        Assert.AreEqual(2, result.Count);
+        Assert.IsTrue(result.Any(x => x == "D:\\Workspace\\PhotoManager\\Toto"));
+        Assert.IsTrue(result.Any(x => x == "D:\\Workspace\\PhotoManager\\Tutu"));
+    }
+
+    [Test]
+    public void ReadObjectList_ImportTypeEmpty_ReturnsEmptyList()
+    {
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\import_empty.db");
+        DataTableProperties dataTableProperties = new()
+        {
+            TableName = "Import",
+            ColumnProperties = new ColumnProperties[]
+            {
+                new ColumnProperties { ColumnName = "SourceDirectory" },
+                new ColumnProperties { ColumnName = "DestinationDirectory" },
+                new ColumnProperties { ColumnName = "IncludeSubFolders" },
+                new ColumnProperties { ColumnName = "DeleteAssetsNotInSource" }
+            }
+        };
+        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+
+        var result = _objectListStorage!.ReadObjectList(
+            dataFilePath,
+            f =>
+                new SyncAssetsDirectoriesDefinition
+                {
+                    SourceDirectory = f[0],
+                    DestinationDirectory = f[1],
+                    IncludeSubFolders = bool.Parse(f[2]),
+                    DeleteAssetsNotInSource = f.Length > 3 && bool.Parse(f[3])
+                },
+            new Diagnostics());
+
+        Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
         Assert.IsEmpty(result);
     }
 

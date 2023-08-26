@@ -41,6 +41,7 @@
     <None Remove="TestFiles\TestBackup\v1.0\Tables\asset.db" />
     <None Remove="TestFiles\TestBackup\v1.0\Tables\folder.db" />
     <None Remove="TestFiles\TestBackup\v1.0\Tables\import.db" />
+    <None Remove="TestFiles\TestBackup\v1.0\Tables\import_empty.db" />
     <None Remove="TestFiles\TestBackup\v1.0\Tables\recenttargetpaths.db" />
     <None Remove="TestFiles\TestBackup\v1.0_Backups\20230819.zip" />
     <None Remove="TestFiles\TestFolder\EmptyFile.txt" />
@@ -131,6 +132,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\TestBackup\v1.0\Tables\import.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\TestBackup\v1.0\Tables\import_empty.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\TestBackup\v1.0\Tables\recenttargetpaths.db">

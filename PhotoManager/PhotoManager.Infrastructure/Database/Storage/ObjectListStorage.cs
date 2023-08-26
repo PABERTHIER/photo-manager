@@ -34,11 +34,6 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
 
         using (StringReader reader = new(csv))
         {
-            if (reader == null)
-            {
-                return list;
-            }
-
             string? line = reader.ReadLine();
 
             if (line == null)
