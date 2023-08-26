@@ -1,7 +1,4 @@
-﻿using PhotoManager.Common;
-using PhotoManager.Domain.Interfaces;
-
-namespace PhotoManager.Domain;
+﻿namespace PhotoManager.Domain;
 
 public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
 {

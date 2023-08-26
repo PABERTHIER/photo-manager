@@ -1,7 +1,4 @@
-﻿using PhotoManager.Domain.Interfaces;
-using System.IO;
-
-namespace PhotoManager.Domain;
+﻿namespace PhotoManager.Domain;
 
 public class SyncAssetsService : ISyncAssetsService
 {

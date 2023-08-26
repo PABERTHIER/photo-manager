@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Windows.Media.Imaging;
-
-namespace PhotoManager.Domain;
+﻿namespace PhotoManager.Domain;
 
 public class Asset
 {

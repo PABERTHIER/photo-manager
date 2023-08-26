@@ -1,6 +1,4 @@
-﻿using System.Windows.Media.Imaging;
-
-namespace PhotoManager.Domain.Interfaces;
+﻿namespace PhotoManager.Domain.Interfaces;
 
 public interface IAssetRepository
 {
