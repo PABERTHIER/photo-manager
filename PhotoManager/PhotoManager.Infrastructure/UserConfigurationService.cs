@@ -1,10 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Win32;
-using PhotoManager.Constants;
-using PhotoManager.Domain;
-using PhotoManager.Domain.Interfaces;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 

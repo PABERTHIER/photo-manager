@@ -1,5 +1,4 @@
-﻿using PhotoManager.Domain.Interfaces;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace PhotoManager.Infrastructure;
 

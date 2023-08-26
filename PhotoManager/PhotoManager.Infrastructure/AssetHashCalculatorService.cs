@@ -1,8 +1,4 @@
-﻿using PhotoManager.Common;
-using PhotoManager.Constants;
-using PhotoManager.Domain.Interfaces;
-
-namespace PhotoManager.Infrastructure;
+﻿namespace PhotoManager.Infrastructure;
 
 public class AssetHashCalculatorService : IAssetHashCalculatorService
 {

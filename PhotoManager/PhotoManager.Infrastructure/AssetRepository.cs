@@ -1,12 +1,6 @@
 using log4net;
-using PhotoManager.Constants;
-using PhotoManager.Domain;
-using PhotoManager.Domain.Interfaces;
-using PhotoManager.Infrastructure.Database;
 using System.Data;
-using System.IO;
 using System.Reflection;
-using System.Windows.Media.Imaging;
 
 namespace PhotoManager.Infrastructure;
 

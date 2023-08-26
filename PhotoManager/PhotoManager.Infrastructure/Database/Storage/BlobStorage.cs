@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace PhotoManager.Infrastructure.Database.Storage;
+﻿namespace PhotoManager.Infrastructure.Database.Storage;
 
 public class BlobStorage : IBlobStorage
 {

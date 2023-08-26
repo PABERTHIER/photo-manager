@@ -1,9 +1,4 @@
-﻿using PhotoManager.Common;
-using PhotoManager.Domain;
-using PhotoManager.Domain.Interfaces;
-using System.Globalization;
-using System.IO;
-using System.Windows.Media.Imaging;
+﻿using System.Globalization;
 
 namespace PhotoManager.Infrastructure;
 
