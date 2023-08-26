@@ -1,6 +1,4 @@
 ﻿using Autofac;
-using PhotoManager.Infrastructure.Database.Storage;
-using PhotoManager.Infrastructure.Database;
 
 namespace PhotoManager.Tests;
 

@@ -1,6 +1,4 @@
-﻿using PhotoManager.Domain;
-
-namespace PhotoManager.Tests.Helpers.Batch;
+﻿namespace PhotoManager.Tests.Helpers.Batch;
 
 public interface IBatchRenameService
 {

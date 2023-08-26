@@ -1,10 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Common;
-using PhotoManager.Constants;
-using System.IO;
-using System.Windows.Media.Imaging;
-
-namespace PhotoManager.Tests.Unit.Common;
+﻿namespace PhotoManager.Tests.Unit.Common;
 
 [TestFixture]
 public class ExifHelperTests

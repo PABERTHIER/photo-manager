@@ -1,7 +1,4 @@
 ﻿using Autofac;
-using NUnit.Framework;
-using PhotoManager.Infrastructure.Database;
-using PhotoManager.Infrastructure.Database.Storage;
 
 namespace PhotoManager.Tests;
 

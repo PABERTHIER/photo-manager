@@ -1,9 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Constants;
-using PhotoManager.Infrastructure.Database.Storage;
-using System.IO;
-
-namespace PhotoManager.Tests.Integration.Infrastructure.Database.DatabaseTests;
+﻿namespace PhotoManager.Tests.Integration.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseDeleteOldBackupsTests

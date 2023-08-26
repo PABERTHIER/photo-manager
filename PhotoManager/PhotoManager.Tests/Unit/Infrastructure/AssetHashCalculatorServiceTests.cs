@@ -1,8 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Infrastructure;
-using System.IO;
-
-namespace PhotoManager.Tests.Unit.Infrastructure;
+﻿namespace PhotoManager.Tests.Unit.Infrastructure;
 
 [TestFixture]
 public class AssetHashCalculatorServiceTests

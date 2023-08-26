@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.UI.Converters;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 
 namespace PhotoManager.Tests.Unit.UI.Converters;

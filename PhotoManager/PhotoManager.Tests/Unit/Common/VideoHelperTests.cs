@@ -1,9 +1,4 @@
-﻿using Moq;
-using NUnit.Framework;
-using PhotoManager.Common;
-using PhotoManager.Constants;
-using System.IO;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 
 namespace PhotoManager.Tests.Unit.Common;
 

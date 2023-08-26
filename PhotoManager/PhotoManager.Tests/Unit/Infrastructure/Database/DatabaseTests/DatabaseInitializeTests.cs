@@ -1,10 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Constants;
-using PhotoManager.Infrastructure.Database;
-using PhotoManager.Infrastructure.Database.Storage;
-using System.IO;
-
-namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseInitializeTests

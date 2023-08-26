@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Moq;
-using NUnit.Framework;
 
 namespace PhotoManager.Tests.Unit;
 

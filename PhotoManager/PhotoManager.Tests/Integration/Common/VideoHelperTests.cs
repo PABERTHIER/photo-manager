@@ -1,8 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Common;
-using System.IO;
-
-namespace PhotoManager.Tests.Integration.Common;
+﻿namespace PhotoManager.Tests.Integration.Common;
 
 [TestFixture]
 public class VideoHelperTests

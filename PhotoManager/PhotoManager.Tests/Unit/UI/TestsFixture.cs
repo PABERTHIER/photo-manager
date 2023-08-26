@@ -1,7 +1,4 @@
-﻿using PhotoManager.Domain;
-using System;
-
-namespace PhotoManager.UI.Tests.Unit;
+﻿namespace PhotoManager.UI.Tests.Unit;
 
 public class TestFixture : IDisposable
 {

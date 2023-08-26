@@ -1,8 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Infrastructure.Database.Storage;
-using System.IO;
-
-namespace PhotoManager.Tests.Unit.Infrastructure.Database.Storage;
+﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.Storage;
 
 [TestFixture]
 public class BackupStorageTests

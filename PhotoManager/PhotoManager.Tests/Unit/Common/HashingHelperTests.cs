@@ -1,7 +1,4 @@
 ﻿using ImageMagick;
-using NUnit.Framework;
-using PhotoManager.Common;
-using System.IO;
 
 namespace PhotoManager.Tests.Unit.Common;
 

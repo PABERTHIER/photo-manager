@@ -1,7 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Common;
-
-namespace PhotoManager.Tests.Unit.Common;
+﻿namespace PhotoManager.Tests.Unit.Common;
 
 [TestFixture]
 public class ImageHelperTests

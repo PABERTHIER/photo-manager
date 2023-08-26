@@ -1,12 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Moq;
-using NUnit.Framework;
-using PhotoManager.Constants;
-using PhotoManager.Domain;
-using PhotoManager.Domain.Interfaces;
-using PhotoManager.Infrastructure;
 using PhotoManager.UI;
-using System.IO;
 
 namespace PhotoManager.Tests.Unit.Infrastructure;
 

@@ -1,10 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Common;
-using System.Drawing;
-using System.IO;
-using System.Windows.Media.Imaging;
-
-namespace PhotoManager.Tests.Unit.Common;
+﻿namespace PhotoManager.Tests.Unit.Common;
 
 [TestFixture]
 public class BitmapHelperTests

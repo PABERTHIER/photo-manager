@@ -1,7 +1,4 @@
-﻿using PhotoManager.Infrastructure.Database.Storage;
-using PhotoManager.Infrastructure.Database;
-
-namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 public class TestableDatabase : PhotoManager.Infrastructure.Database.Database
 {

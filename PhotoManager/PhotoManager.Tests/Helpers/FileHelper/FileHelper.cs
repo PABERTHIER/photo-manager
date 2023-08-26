@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Text.Json;
-
-namespace PhotoManager.Tests.Helpers.FileHelper;
+﻿namespace PhotoManager.Tests.Helpers.FileHelper;
 
 public static class FileHelper
 {

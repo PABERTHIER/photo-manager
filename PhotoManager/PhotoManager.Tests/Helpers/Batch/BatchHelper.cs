@@ -1,7 +1,4 @@
-﻿using PhotoManager.Domain.Interfaces;
-using PhotoManager.Domain;
-using System.IO;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace PhotoManager.Tests.Helpers.Batch;
 
@@ -67,7 +64,7 @@ public static class BatchHelper
         var remainingBatchFormat = batchFormat;
 
         // Identifies if the complete tags have supported expressions.
-        foreach (Match match in matches.Cast<Match>())
+        foreach (System.Text.RegularExpressions.Match match in matches.Cast<System.Text.RegularExpressions.Match>())
         {
             string tag = match.Value[1..^1];
             isValid = isValid

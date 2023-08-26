@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-using PhotoManager.Infrastructure;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace PhotoManager.Tests.Unit.Infrastructure;
 
