@@ -464,6 +464,7 @@ public partial class MainWindow : Window
 
         ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
 
+#pragma warning disable CS0162 // Unreachable code detected
         // Disabling infinite loop to prevent reduced perfs
         if (AssetConstants.SyncAssetsEveryXMinutes)
         {
@@ -477,6 +478,7 @@ public partial class MainWindow : Window
         }
 
         await Initialization(stopwatch);
+#pragma warning restore CS0162 // Unreachable code detected
     }
 
     private async Task Initialization(Stopwatch stopwatch)

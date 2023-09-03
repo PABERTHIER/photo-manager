@@ -23,7 +23,7 @@ public class BlobStorageTests
     [TestCase("f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin", 7, "1336.JPG")]
     public void ReadFromBinaryFile_FileExists_ReturnsDeserializedObject(string blobFileName, int countExpected, string keyContained)
     {
-        string blobFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Blobs", blobFileName);
+        string blobFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0", AssetConstants.Blobs, blobFileName);
 
         var deserializedObject = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 

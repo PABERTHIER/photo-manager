@@ -35,8 +35,8 @@ public class DatabaseInitializeTests
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
             Assert.AreEqual(directoryPath, _testableDatabase!.DataDirectory);
-            Assert.AreEqual(Path.Combine(directoryPath, "Tables"), tablesDirectory);
-            Assert.AreEqual(Path.Combine(directoryPath, "Blobs"), blobsDirectory);
+            Assert.AreEqual(Path.Combine(directoryPath, AssetConstants.Tables), tablesDirectory);
+            Assert.AreEqual(Path.Combine(directoryPath, AssetConstants.Blobs), blobsDirectory);
             Assert.AreEqual(directoryPath + "_Backups", backupsDirectory);
             Assert.AreEqual(pipeSeparator, _testableDatabase!.Separator);
             Assert.IsNotNull(dataTablePropertiesDictionary);

@@ -120,9 +120,9 @@ This feature is only here to let you to identify if you got some videos duplicat
 
 - [.NET 7.0](https://dotnet.microsoft.com/)
 - [Windows Presentation Foundation](https://docs.microsoft.com/en-us/dotnet/framework/wpf/)
-- [xUnit](https://xunit.net/)
+- [NUnit](https://nunit.org/)
 - [Moq framework for .NET](https://github.com/moq/moq4)
-- [Fluent Assertions](https://fluentassertions.com/)
+- [MagickImage](https://github.com/dlemstra/Magick.NET)
 - [log4net](https://logging.apache.org/log4net/)
 - [coverlet](https://github.com/coverlet-coverage/coverlet)
 - [ReportGenerator](https://github.com/danielpalme/ReportGenerator)

@@ -67,7 +67,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -100,7 +100,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -122,7 +122,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -166,7 +166,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -209,7 +209,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -274,7 +274,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -341,7 +341,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -365,7 +365,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -389,7 +389,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {

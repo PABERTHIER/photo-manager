@@ -59,6 +59,7 @@ public class DatabaseWriteBackupTests
             bool backupCreated1 = _database!.WriteBackup(backupDate);
             bool backupCreated2 = _database!.WriteBackup(backupDate);
 
+            Assert.IsTrue(backupCreated1);
             Assert.IsFalse(backupCreated2);
             Assert.AreEqual(filePath, _database!.Diagnostics.LastWriteFilePath);
         }

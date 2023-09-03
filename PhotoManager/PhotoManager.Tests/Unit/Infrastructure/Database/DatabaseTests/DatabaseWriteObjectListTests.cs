@@ -64,7 +64,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -97,7 +97,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -130,7 +130,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -215,7 +215,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -319,7 +319,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -429,7 +429,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -500,7 +500,7 @@ public class DatabaseWriteObjectListTests
         string csv = csvUnescapedTextWithPipe!;
 
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {
@@ -606,7 +606,7 @@ public class DatabaseWriteObjectListTests
 
         string? tableName = null;
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, "Tables", tableName + ".db");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
 
         try
         {

@@ -5,9 +5,7 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
     private readonly IAssetRepository _assetRepository;
     private readonly IStorageService _storageService;
 
-    public FindDuplicatedAssetsService(
-        IAssetRepository assetRepository,
-        IStorageService storageService)
+    public FindDuplicatedAssetsService(IAssetRepository assetRepository, IStorageService storageService)
     {
         _assetRepository = assetRepository;
         _storageService = storageService;
@@ -20,12 +18,13 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
     /// where each item is a list of duplicated assets.</returns>
     public List<List<Asset>> GetDuplicatedAssets()
     {
+#pragma warning disable CS0162 // Unreachable code detected
         List<List<Asset>> result = new();
         List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
 
-        if (Constants.AssetConstants.DetectThumbnails && Constants.AssetConstants.UsingPHash)
+        if (AssetConstants.DetectThumbnails && AssetConstants.UsingPHash)
         {
-            return FindPHashDuplicates();
+            return FindPHashDuplicates(assets);
         }
 
         var assetGroups = assets.GroupBy(a => a.Hash).ToList();
@@ -67,6 +66,7 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
         }
 
         return result;
+#pragma warning restore CS0162 // Unreachable code detected
     }
 
     // Between Original and Thumbnail:
@@ -74,12 +74,11 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
     // DHash the hammingDistance is 16/17
     // MD5Hash the hammingDistance is 32/32
     // SHA512 the hammingDistance is 118/128
-    private List<List<Asset>> FindPHashDuplicates()
+    private static List<List<Asset>> FindPHashDuplicates(List<Asset> assets) // TODO: protected to test it
     {
         //Adjust it if needed, the max advised is less than 90 (for example 68 can detect false positives)
         //By keeping 40, it can detect a Thumbnail and an original with low quality as duplicates
         const int threshold = 40; //5 or 6 is often used as a default value in image comparison libraries
-        List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
         List<List<Asset>> duplicates = new();
 
         // Loop through all possible pairs of assets

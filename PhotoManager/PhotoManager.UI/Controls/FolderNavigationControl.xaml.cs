@@ -120,7 +120,7 @@ public partial class FolderNavigationControl : UserControl
 
         if (LacksSubItems(item))
         {
-            // TODO: SHOULD ASK THE USER IF HE WANTS TO SEE HIDDEN FOLDERS.
+            // TODO: SHOULD ASK THE USER IF HE WANTS TO SEE HIDDEN FOLDERS. -> No // TODO: Remove includeHidden everywhere
             AddSubItems(item, false);
         }
     }

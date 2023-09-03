@@ -2,6 +2,7 @@
 
 public class Asset
 {
+    // TODO: use intead Folder.FolderId ? -> if done, update tests
     public string FolderId { get; set; } // Why not a Guid? ?
     public Folder Folder { get; set; }
     public string FileName { get; set; }

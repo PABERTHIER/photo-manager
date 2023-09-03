@@ -122,17 +122,17 @@ public class Database : IDatabase
 
     public bool WriteBackup(DateTime backupDate)
     {
-        bool written = false;
+        bool backupHasBeenWritten = false;
         string backupFilePath = ResolveBackupFilePath(DataDirectory, backupDate);
 
         if (!BackupExists(backupDate))
         {
             Diagnostics = new Diagnostics { LastWriteFilePath = backupFilePath };
             _backupStorage.WriteFolderToZipFile(DataDirectory, backupFilePath);
-            written = true;
+            backupHasBeenWritten = true;
         }
 
-        return written;
+        return backupHasBeenWritten;
     }
 
     public bool BackupExists(DateTime backupDate)
@@ -172,12 +172,12 @@ public class Database : IDatabase
 
     private static string GetTablesDirectory(string dataDirectory)
     {
-        return Path.Combine(dataDirectory, "Tables");
+        return Path.Combine(dataDirectory, AssetConstants.Tables);
     }
 
     private static string GetBlobsDirectory(string dataDirectory)
     {
-        return Path.Combine(dataDirectory, "Blobs");
+        return Path.Combine(dataDirectory, AssetConstants.Blobs);
     }
 
     private static string GetBackupsDirectory(string dataDirectory)

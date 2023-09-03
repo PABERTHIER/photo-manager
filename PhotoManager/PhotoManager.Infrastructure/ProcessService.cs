@@ -24,12 +24,12 @@ public class ProcessService : IProcessService
         return result;
     }
 
-    private Process GetProcessById(int processId)
+    private static Process GetProcessById(int processId)
     {
         return Process.GetProcessById(processId);
     }
 
-    private Process[] GetProcessesByName(string processName)
+    private static Process[] GetProcessesByName(string processName)
     {
         return Process.GetProcessesByName(processName);
     }

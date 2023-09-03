@@ -9,7 +9,7 @@ public class DatabaseDataTableStorageTests
     //        "876283c6-780e-4ad5-975c-be63044c087a;20200720175810_3.jpg;363888;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\r\n" +
     //        "876283c6-780e-4ad5-975c-be63044c087a;20200720175816_3.jpg;343633;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\r\n";
     //    string tableName = "assets" + Guid.NewGuid();
-    //    string filePath = Path.Combine("TestData", "Tables", tableName + ".db");
+    //    string filePath = Path.Combine("TestData", AssetConstants.Tables, tableName + ".db");
 
     //    IDatabase database = new Database(new ObjectListStorage(),
     //        new DataTableStorage(),
@@ -87,7 +87,7 @@ public class DatabaseDataTableStorageTests
     //        "876283c6-780e-4ad5-975c-be63044c087a;20200720175810_3.jpg;363888;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\r\n" +
     //        "876283c6-780e-4ad5-975c-be63044c087a;20200720175816_3.jpg;343633;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\r\n";
     //    string tableName = "assets" + Guid.NewGuid();
-    //    string filePath = Path.Combine("TestData", "Tables", tableName + ".db");
+    //    string filePath = Path.Combine("TestData", AssetConstants.Tables, tableName + ".db");
 
     //    IDatabase database = new Database(new ObjectListStorage(),
     //        new DataTableStorage(),
@@ -147,7 +147,7 @@ public class DatabaseDataTableStorageTests
     //        "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"363888\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"25/07/2020 9:45:47\";\"First file description\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\"\r\n" +
     //        "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175816_3.jpg\";\"343633\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"25/07/2020 9:45:47\";\"Second file description; Includes separator character escaped.\";\"0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\"\r\n";
     //    string tableName = "assets" + Guid.NewGuid();
-    //    string filePath = Path.Combine("TestData", "Tables", tableName + ".db");
+    //    string filePath = Path.Combine("TestData", AssetConstants.Tables, tableName + ".db");
 
     //    IDatabase database = new Database(new ObjectListStorage(),
     //        new DataTableStorage(),
@@ -229,7 +229,7 @@ public class DatabaseDataTableStorageTests
     //        "\"876283c6-780e-4ad5-975c-be63044c087a\";20200720175810_3.jpg;363888;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;\"First file description\";4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\r\n" +
     //        "\"876283c6-780e-4ad5-975c-be63044c087a\";20200720175816_3.jpg;343633;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;\"Second file description; Includes separator character escaped.\";0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\r\n";
     //    string tableName = "assets" + Guid.NewGuid();
-    //    string filePath = Path.Combine("TestData", "Tables", tableName + ".db");
+    //    string filePath = Path.Combine("TestData", AssetConstants.Tables, tableName + ".db");
 
     //    IDatabase database = new Database(new ObjectListStorage(),
     //        new DataTableStorage(),
@@ -353,7 +353,7 @@ public class DatabaseDataTableStorageTests
     //public void WriteDataTable_DataColumnWithNoName_ThrowException()
     //{
     //    string tableName = "assets" + Guid.NewGuid();
-    //    string filePath = Path.Combine("TestData", "Tables", tableName + ".db");
+    //    string filePath = Path.Combine("TestData", AssetConstants.Tables, tableName + ".db");
 
     //    DataTable table = new(tableName);
     //    table.Columns.Add("FolderId");
@@ -378,7 +378,7 @@ public class DatabaseDataTableStorageTests
     //        "876283c6-780e-4ad5-975c-be63044c087a;20200720175810_3.jpg;363888;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\r\n" +
     //        "876283c6-780e-4ad5-975c-be63044c087a;20200720175816_3.jpg;343633;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\r\n";
     //    string tableName = "assets" + Guid.NewGuid();
-    //    string filePath = Path.Combine("TestData", "Tables", tableName + ".db");
+    //    string filePath = Path.Combine("TestData", AssetConstants.Tables, tableName + ".db");
 
     //    DataTable table = new(tableName);
     //    table.Columns.Add("FolderId");
@@ -441,7 +441,7 @@ public class DatabaseDataTableStorageTests
     //        "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"363888\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"25/07/2020 9:45:47\";\"First file description\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\"\r\n" +
     //        "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175816_3.jpg\";\"343633\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"25/07/2020 9:45:47\";\"Second file description; Includes separator character escaped.\";\"0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\"\r\n";
     //    string tableName = "assets" + Guid.NewGuid();
-    //    string filePath = Path.Combine("TestData", "Tables", tableName + ".db");
+    //    string filePath = Path.Combine("TestData", AssetConstants.Tables, tableName + ".db");
 
     //    DataTable table = new(tableName);
     //    table.Columns.Add("FolderId");
@@ -526,7 +526,7 @@ public class DatabaseDataTableStorageTests
     //        "\"876283c6-780e-4ad5-975c-be63044c087a\";20200720175810_3.jpg;363888;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;\"First file description\";4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\r\n" +
     //        "\"876283c6-780e-4ad5-975c-be63044c087a\";20200720175816_3.jpg;343633;Rotate0;1920;1080;200;112;25/07/2020 9:45:47;\"Second file description; Includes separator character escaped.\";0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\r\n";
     //    string tableName = "assets" + Guid.NewGuid();
-    //    string filePath = Path.Combine("TestData", "Tables", tableName + ".db");
+    //    string filePath = Path.Combine("TestData", AssetConstants.Tables, tableName + ".db");
 
     //    DataTable table = new(tableName);
     //    table.Columns.Add("FolderId");

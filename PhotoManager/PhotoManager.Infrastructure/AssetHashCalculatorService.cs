@@ -4,6 +4,7 @@ public class AssetHashCalculatorService : IAssetHashCalculatorService
 {
     public string CalculateHash(byte[] imageBytes, string filePath)
     {
+#pragma warning disable CS0162 // Unreachable code detected
         if (AssetConstants.UsingPHash)
         {
             return HashingHelper.CalculatePHash(filePath) ?? HashingHelper.CalculateHash(imageBytes);
@@ -20,5 +21,6 @@ public class AssetHashCalculatorService : IAssetHashCalculatorService
         }
 
         return HashingHelper.CalculateHash(imageBytes);
+#pragma warning restore CS0162 // Unreachable code detected
     }
 }

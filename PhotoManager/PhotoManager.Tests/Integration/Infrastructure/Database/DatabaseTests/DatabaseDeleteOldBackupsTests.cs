@@ -35,11 +35,19 @@ public class DatabaseDeleteOldBackupsTests
         try
         {
             _database!.Initialize(directoryPath, pipeSeparator);
-            _database!.WriteBackup(new DateTime(2023, 04, 04));
-            _database!.WriteBackup(new DateTime(2023, 03, 04));
-            _database!.WriteBackup(new DateTime(2023, 02, 04));
-            _database!.WriteBackup(new DateTime(2023, 01, 04));
-            _database!.WriteBackup(new DateTime(2023, 05, 04));
+
+            bool backupCreated1 = _database!.WriteBackup(new DateTime(2023, 04, 04));
+            bool backupCreated2 = _database!.WriteBackup(new DateTime(2023, 03, 04));
+            bool backupCreated3 = _database!.WriteBackup(new DateTime(2023, 02, 04));
+            bool backupCreated4 = _database!.WriteBackup(new DateTime(2023, 01, 04));
+            bool backupCreated5 = _database!.WriteBackup(new DateTime(2023, 05, 04));
+
+            Assert.True(backupCreated1);
+            Assert.True(backupCreated2);
+            Assert.True(backupCreated3);
+            Assert.True(backupCreated4);
+            Assert.True(backupCreated5);
+
             _database!.DeleteOldBackups(backupsToKeep);
 
             Assert.IsTrue(File.Exists(path1));
@@ -73,9 +81,15 @@ public class DatabaseDeleteOldBackupsTests
         try
         {
             _database!.Initialize(directoryPath, pipeSeparator);
-            _database!.WriteBackup(new DateTime(2023, 04, 04));
-            _database!.WriteBackup(new DateTime(2023, 03, 04));
-            _database!.WriteBackup(new DateTime(2023, 02, 04));
+
+            bool backupCreated1 = _database!.WriteBackup(new DateTime(2023, 04, 04));
+            bool backupCreated2 = _database!.WriteBackup(new DateTime(2023, 03, 04));
+            bool backupCreated3 = _database!.WriteBackup(new DateTime(2023, 02, 04));
+
+            Assert.True(backupCreated1);
+            Assert.True(backupCreated2);
+            Assert.True(backupCreated3);
+
             _database!.DeleteOldBackups(backupsToKeep);
 
             Assert.IsTrue(File.Exists(path1));

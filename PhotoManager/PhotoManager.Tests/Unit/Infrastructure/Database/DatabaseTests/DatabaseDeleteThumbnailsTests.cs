@@ -25,7 +25,7 @@ public class DatabaseDeleteThumbnailsTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string blobFilePath = Path.Combine(directoryPath, "Blobs", blobName);
+        string blobFilePath = Path.Combine(directoryPath, AssetConstants.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
             { "Image1.jpg", new byte[] { 1, 2, 3 } },
@@ -56,7 +56,7 @@ public class DatabaseDeleteThumbnailsTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string blobFilePath = Path.Combine(directoryPath, "Blobs", blobName);
+        string blobFilePath = Path.Combine(directoryPath, AssetConstants.Blobs, blobName);
 
         try
         {

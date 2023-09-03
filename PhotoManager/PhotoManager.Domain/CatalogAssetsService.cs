@@ -50,10 +50,10 @@ public class CatalogAssetsService : ICatalogAssetsService
                     //    var backupDirectories = Directory.GetDirectories("TestData_Backups_Test");
 
                     //    sourceDirectories.Should().HaveSameCount(backupDirectories);
-                    //    sourceDirectories[0].Should().Be(@"TestData\Blobs");
-                    //    sourceDirectories[1].Should().Be(@"TestData\Tables");
-                    //    backupDirectories[0].Should().Be(@"TestData_Backups_Test\Blobs");
-                    //    backupDirectories[1].Should().Be(@"TestData_Backups_Test\Tables");
+                    //    sourceDirectories[0].Should().Be(@"TestData\"AssetConstants.Blobs);
+                    //    sourceDirectories[1].Should().Be(@"TestData\"AssetConstants.Tables);
+                    //    backupDirectories[0].Should().Be(@"TestData_Backups_Test\"AssetConstants.Blobs);
+                    //    backupDirectories[1].Should().Be(@"TestData_Backups_Test\"AssetConstants.Tables);
                     _assetRepository.WriteBackup();
                     callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = string.Empty });
                 }
@@ -381,12 +381,14 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         cataloguedAssetsBatchCount += CreateAssets(newImageFileNames, false, directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
 
+#pragma warning disable CS0162 // Unreachable code detected
         if (AssetConstants.AnalyseVideos)
         {
             cataloguedAssetsBatchCount += CreateAssets(newVideoFileNames, true, directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
         }
 
         return cataloguedAssetsBatchCount;
+#pragma warning restore CS0162 // Unreachable code detected
     }
 
     private int CreateAssets(string[] fileNames, bool isAssetVideo, string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
