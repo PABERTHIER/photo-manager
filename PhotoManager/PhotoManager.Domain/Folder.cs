@@ -2,9 +2,10 @@
 
 public class Folder
 {
-    public string FolderId { get; set; } // Why not a Guid? ? -> update all tests that using a non Guid value
+    // TODO: FolderId not null -> when a new -> new guid
+    public string FolderId { get; set; } // Why not a Guid? ? -> update all tests and methods that using a non Guid value (like creation of id...)
     public string Path { get; set; }
-    public string ThumbnailsFilename => FolderId + ".bin";
+    public string ThumbnailsFilename => FolderId + ".bin"; // TODO: BlobFileName instead -> rename all methods like this
 
     public string Name
     {
@@ -17,7 +18,7 @@ public class Folder
         }
     }
 
-    // Only used here and BatchHelper which is not really used
+    // Only used here and BatchHelper which is not really used -> private ?
     public Folder? Parent
     {
         get
@@ -27,19 +28,11 @@ public class Folder
         }
     }
 
-    // Can be marked as private method
-    private string? GetParentPath()
-    {
-        string[] thisPathDirectories = Path.Split(System.IO.Path.DirectorySeparatorChar);
-        thisPathDirectories = thisPathDirectories.SkipLast(1).ToArray();
-        return thisPathDirectories.Length > 0 ? System.IO.Path.Combine(thisPathDirectories) : null;
-    }
-
-    public bool IsParentOf(Folder otherFolder)
+    public bool IsParentOf(Folder folder)
     {
         return !string.IsNullOrWhiteSpace(Path)
-            && !string.IsNullOrWhiteSpace(otherFolder?.Parent?.Path)
-            && string.Compare(Path, otherFolder?.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
+            && !string.IsNullOrWhiteSpace(folder?.Parent?.Path)
+            && string.Compare(Path, folder?.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
     }
 
     // Usefull ?
@@ -58,5 +51,12 @@ public class Folder
     public override string ToString()
     {
         return Path;
+    }
+
+    private string? GetParentPath()
+    {
+        string[]? directoriesPath = Path?.Split(System.IO.Path.DirectorySeparatorChar);
+        directoriesPath = directoriesPath?.SkipLast(1).ToArray();
+        return directoriesPath?.Length > 0 ? System.IO.Path.Combine(directoriesPath) : null;
     }
 }
