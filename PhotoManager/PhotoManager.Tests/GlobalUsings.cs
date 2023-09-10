@@ -13,5 +13,6 @@ global using PhotoManager.Domain.Interfaces;
 global using PhotoManager.Infrastructure;
 global using PhotoManager.Infrastructure.Database;
 global using PhotoManager.Infrastructure.Database.Storage;
+global using PhotoManager.Infrastructure.TablesConfig;
 global using PhotoManager.UI.Converters;
 global using PhotoManager.UI.ViewModels;
