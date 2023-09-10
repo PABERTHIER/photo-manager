@@ -26,7 +26,7 @@ public interface IStorageService
     bool FileExists(Asset asset, Folder folder);
     bool FileExists(string fullPath);
     bool FolderExists(string fullPath);
-    void GetFileInformation(Asset asset);
+    void LoadFileInformation(Asset asset);
     bool IsValidGDIPlusImage(byte[] imageData);
     bool IsValidHeic(byte[] imageData);
 }

@@ -108,7 +108,7 @@ public class StorageServiceTests
     {
         string[] fileNames = _storageService!.GetFileNames(dataDirectory!);
 
-        Assert.GreaterOrEqual(fileNames.Count(), 2);
+        Assert.GreaterOrEqual(fileNames.Length, 2);
         Assert.Contains("Image 2.jpg", fileNames);
         Assert.Contains("Image 1.jpg", fileNames);
     }
@@ -477,7 +477,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void GetFileInformation_FileExists_PopulatesAssetDates()
+    public void LoadFileInformation_FileExists_PopulatesAssetDates()
     {
         string fileName = "Image 1.jpg";
         Folder folder = new() { Path = dataDirectory! };
@@ -485,14 +485,14 @@ public class StorageServiceTests
         var creationTime = DateTime.Now;
         var modificationTime = new DateTime(2023, 1, 7);
 
-        _storageService!.GetFileInformation(asset);
+        _storageService!.LoadFileInformation(asset);
 
         Assert.That(creationTime.Date, Is.EqualTo(asset.FileCreationDateTime.Date));
         Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
     }
 
     [Test]
-    public void GetFileInformation_FileDoesNotExist_DoesNotPopulateAssetDates()
+    public void LoadFileInformation_FileDoesNotExist_DoesNotPopulateAssetDates()
     {
         string fileName = "nonexistent.jpg";
         Folder folder = new() { Path = dataDirectory! };
@@ -500,14 +500,14 @@ public class StorageServiceTests
         var creationTime = default(DateTime);
         var modificationTime = default(DateTime);
 
-        _storageService!.GetFileInformation(asset);
+        _storageService!.LoadFileInformation(asset);
 
         Assert.That(creationTime.Date, Is.EqualTo(asset.FileCreationDateTime.Date));
         Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
     }
 
     [Test]
-    public void GetFileInformation_NullFolder_DoesNotPopulateAssetDates()
+    public void LoadFileInformation_NullFolder_DoesNotPopulateAssetDates()
     {
         string fileName = "Image 1.jpg";
         Folder? folder = null;
@@ -515,29 +515,29 @@ public class StorageServiceTests
         var creationTime = default(DateTime);
         var modificationTime = default(DateTime);
 
-        _storageService!.GetFileInformation(asset);
+        _storageService!.LoadFileInformation(asset);
 
         Assert.That(creationTime.Date, Is.EqualTo(asset.FileCreationDateTime.Date));
         Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
     }
 
     [Test]
-    public void GetFileInformation_NullFilePath_ThrowsArgumentNullException()
+    public void LoadFileInformation_NullFilePath_ThrowsArgumentNullException()
     {
         string fileName = "Image 1.jpg";
         string? path = null;
         Folder folder = new() { Path = path! };
         Asset asset = new() { Folder = folder, FileName = fileName };
 
-        Assert.Throws<ArgumentNullException>(() => _storageService!.GetFileInformation(asset!));
+        Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFileInformation(asset!));
     }
 
     [Test]
-    public void GetFileInformation_NullAsset_ThrowsNullReferenceException()
+    public void LoadFileInformation_NullAsset_ThrowsNullReferenceException()
     {
         Asset? asset = null;
 
-        Assert.Throws<NullReferenceException>(() => _storageService!.GetFileInformation(asset!));
+        Assert.Throws<NullReferenceException>(() => _storageService!.LoadFileInformation(asset!));
     }
 
     [Test]

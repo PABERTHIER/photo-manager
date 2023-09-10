@@ -143,11 +143,11 @@ public class StorageService : IStorageService
         return Directory.Exists(fullPath);
     }
 
-    public void GetFileInformation(Asset asset)
+    public void LoadFileInformation(Asset asset)
     {
         if (FileExists(asset.FullPath))
         {
-            FileInfo info = new(asset.FullPath);
+            FileInfo info = new (asset.FullPath);
             asset.FileCreationDateTime = info.CreationTime;
             asset.FileModificationDateTime = info.LastWriteTime;
         }
@@ -168,7 +168,7 @@ public class StorageService : IStorageService
         List<DirectoryInfo> subdirs = GetSubDirectories(directoryPath);
         result.AddRange(subdirs);
 
-        foreach (var dir in subdirs)
+        foreach (DirectoryInfo dir in subdirs)
         {
             GetRecursiveSubDirectories(dir.FullName, result);
         }

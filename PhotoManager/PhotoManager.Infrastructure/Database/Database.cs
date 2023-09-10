@@ -56,7 +56,7 @@ public class Database : IDatabase
         }
 
         var group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName).Where(g => g.Count() > 1).FirstOrDefault();
-        
+
         if (group != null)
         {
             throw new ArgumentException("Duplicated column properties.", group.Key);
@@ -199,8 +199,7 @@ public class Database : IDatabase
         return Path.Combine(GetBackupsDirectory(dataDirectory), fileName);
     }
 
-    // TODO: Once Todo in AssetRepository done (implement the deletion here), pass this method in private
-    public string ResolveBlobFilePath(string dataDirectory, string blobName)
+    private static string ResolveBlobFilePath(string dataDirectory, string blobName)
     {
         return Path.Combine(GetBlobsDirectory(dataDirectory), blobName);
     }

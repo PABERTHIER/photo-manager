@@ -45,7 +45,7 @@ public class Application : IApplication
             _assetRepository.AddFolder(directory);
         }
 
-        return _assetRepository.GetAssets(directory);
+        return _assetRepository.GetAssetsByPath(directory);
     }
 
     public int GetAssetsCounter()

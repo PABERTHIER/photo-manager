@@ -789,7 +789,7 @@ public class BitmapHelperTests
         Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetGifBitmapImage(invalidImage!));
     }
 
-    private void AssertBrightnessValues(Bitmap bitmap, int x, int y)
+    private static void AssertBrightnessValues(Bitmap bitmap, int x, int y)
     {
         Color pixelColor = bitmap.GetPixel(x, y);
         float brightness = pixelColor.GetBrightness();

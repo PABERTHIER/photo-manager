@@ -280,7 +280,7 @@ public class CatalogAssetsService : ICatalogAssetsService
         string[] filesName = _storageService.GetFileNames(directory);
         totalFilesNumber += filesName.Length; // To compute the total number of files in every folders
         folder = _assetRepository.GetFolderByPath(directory);
-        List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
+        List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
         bool folderHasThumbnails = _assetRepository.FolderHasThumbnails(folder);
 
         if (!folderHasThumbnails)
@@ -326,7 +326,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (folder != null)
         {
-            List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
+            List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
 
             foreach (var asset in cataloguedAssets)
             {
@@ -346,7 +346,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 });
             }
 
-            cataloguedAssets = _assetRepository.GetCataloguedAssets(directory);
+            cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
 
             if (cataloguedAssets.Count == 0)
             {

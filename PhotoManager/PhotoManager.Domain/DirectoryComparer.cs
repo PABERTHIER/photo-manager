@@ -28,7 +28,7 @@ public class DirectoryComparer : IDirectoryComparer
     {
         foreach (Asset asset in cataloguedAssets)
         {
-            _storageService.GetFileInformation(asset);
+            _storageService.LoadFileInformation(asset);
         }
 
         return cataloguedAssets

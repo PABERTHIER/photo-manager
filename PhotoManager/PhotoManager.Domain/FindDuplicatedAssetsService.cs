@@ -19,7 +19,7 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
     public List<List<Asset>> GetDuplicatedAssets()
     {
 #pragma warning disable CS0162 // Unreachable code detected
-        List<List<Asset>> result = new();
+        List<List<Asset>> result = new(); // TODO: rename result
         List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
 
         if (AssetConstants.DetectThumbnails && AssetConstants.UsingPHash)
@@ -56,12 +56,11 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
 
         result = result.Where(r => r.Count > 1).ToList();
 
-        // Loads the file information for each asset.
-        foreach (List<Asset> duplicatedSet in result)
+        foreach (List<Asset> duplicatedSet in result) // TODO: merge with above ?
         {
             foreach (Asset asset in duplicatedSet)
             {
-                _storageService.GetFileInformation(asset);
+                _storageService.LoadFileInformation(asset);
             }
         }
 

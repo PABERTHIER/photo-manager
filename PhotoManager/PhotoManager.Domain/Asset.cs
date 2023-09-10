@@ -3,6 +3,7 @@
 public class Asset
 {
     // TODO: use intead Folder.FolderId ? -> if done, update tests
+    // TODO: property required
     public string FolderId { get; set; } // Why not a Guid? ?
     public Folder Folder { get; set; }
     public string FileName { get; set; }
@@ -14,7 +15,7 @@ public class Asset
     public Rotation ImageRotation { get; set; }
     public DateTime ThumbnailCreationDateTime { get; set; }
     public string Hash { get; set; }
-    public BitmapImage? ImageData { get; set; }
+    public BitmapImage? ImageData { get; set; } // TODO: required ?
     public string FullPath => Folder != null ? Path.Combine(Folder.Path, FileName) : FileName;
     public DateTime FileCreationDateTime { get; set; }
     public DateTime FileModificationDateTime { get; set; }
