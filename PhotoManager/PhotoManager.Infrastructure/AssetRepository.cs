@@ -209,7 +209,7 @@ public class AssetRepository : IAssetRepository
     {
         lock (syncLock)
         {
-            if (_database.WriteBackup(DateTime.Now.Date)) // TODO: System.IO.IOException: 'The process cannot access the file X because it is being used by another process.'
+            if (_database.WriteBackup(DateTime.Now.Date))
             {
                 _database.DeleteOldBackups(_userConfigurationService.GetBackupsToKeep());
             }
