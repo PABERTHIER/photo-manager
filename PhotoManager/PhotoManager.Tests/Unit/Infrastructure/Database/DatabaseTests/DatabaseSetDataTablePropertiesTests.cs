@@ -28,12 +28,8 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = "Folder",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            TableName = AssetConstants.FolderTableName,
+            ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
         try
@@ -45,9 +41,9 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey("Folder"));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary["Folder"].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary["Folder"].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.FolderTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.FolderTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.FolderTableName].ColumnProperties);
         }
         finally
         {
@@ -62,24 +58,8 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = "Asset",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "FileName" },
-                new ColumnProperties { ColumnName = "FileSize" },
-                new ColumnProperties { ColumnName = "ImageRotation" },
-                new ColumnProperties { ColumnName = "PixelWidth" },
-                new ColumnProperties { ColumnName = "PixelHeight" },
-                new ColumnProperties { ColumnName = "ThumbnailPixelWidth" },
-                new ColumnProperties { ColumnName = "ThumbnailPixelHeight" },
-                new ColumnProperties { ColumnName = "ThumbnailCreationDateTime" },
-                new ColumnProperties { ColumnName = "Hash" },
-                new ColumnProperties { ColumnName = "AssetCorruptedMessage" },
-                new ColumnProperties { ColumnName = "IsAssetCorrupted" },
-                new ColumnProperties { ColumnName = "AssetRotatedMessage" },
-                new ColumnProperties { ColumnName = "IsAssetRotated" }
-            }
+            TableName = AssetConstants.AssetTableName,
+            ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
 
         try
@@ -91,9 +71,9 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey("Asset"));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary["Asset"].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary["Asset"].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.AssetTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.AssetTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.AssetTableName].ColumnProperties);
         }
         finally
         {
@@ -108,14 +88,8 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = "Import",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "SourceDirectory" },
-                new ColumnProperties { ColumnName = "DestinationDirectory" },
-                new ColumnProperties { ColumnName = "IncludeSubFolders" },
-                new ColumnProperties { ColumnName = "DeleteAssetsNotInSource" }
-            }
+            TableName = AssetConstants.ImportTableName,
+            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
         };
 
         try
@@ -127,9 +101,9 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey("Import"));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary["Import"].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary["Import"].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.ImportTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.ImportTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.ImportTableName].ColumnProperties);
         }
         finally
         {
@@ -144,11 +118,8 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = "RecentTargetPaths",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            TableName = AssetConstants.RecentTargetPathsTableName,
+            ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         };
 
         try
@@ -160,9 +131,9 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey("RecentTargetPaths"));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary["RecentTargetPaths"].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary["RecentTargetPaths"].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.RecentTargetPathsTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.RecentTargetPathsTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.RecentTargetPathsTableName].ColumnProperties);
         }
         finally
         {
@@ -186,7 +157,7 @@ public class DatabaseSetDataTablePropertiesTests
         DataTableProperties properties = new()
         {
             TableName = "TestTable",
-            ColumnProperties = null
+            ColumnProperties = null!
         };
 
         var exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));

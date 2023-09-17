@@ -130,27 +130,7 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            Assert.Throws<FormatException>(() =>
-            {
-                _database!.ReadObjectList(tableName, f =>
-                new Asset
-                {
-                    FolderId = f[0],
-                    FileName = f[1],
-                    FileSize = long.Parse(f[2]),
-                    ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), f[3]),
-                    PixelWidth = int.Parse(f[4]),
-                    PixelHeight = int.Parse(f[5]),
-                    ThumbnailPixelWidth = int.Parse(f[6]),
-                    ThumbnailPixelHeight = int.Parse(f[7]),
-                    ThumbnailCreationDateTime = DateTime.Parse(f[8]),
-                    Hash = f[9],
-                    AssetCorruptedMessage = f[10],
-                    IsAssetCorrupted = bool.Parse(f[11]),
-                    AssetRotatedMessage = f[12],
-                    IsAssetRotated = bool.Parse(f[13])
-                });
-            });
+            Assert.Throws<FormatException>(() => _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
         }
         finally
         {
@@ -174,24 +154,7 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            List<Asset> assets = _database!.ReadObjectList(tableName, f =>
-                new Asset
-                {
-                    FolderId = f[0],
-                    FileName = f[1],
-                    FileSize = long.Parse(f[2]),
-                    ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), f[3]),
-                    PixelWidth = int.Parse(f[4]),
-                    PixelHeight = int.Parse(f[5]),
-                    ThumbnailPixelWidth = int.Parse(f[6]),
-                    ThumbnailPixelHeight = int.Parse(f[7]),
-                    ThumbnailCreationDateTime = DateTime.Parse(f[8]),
-                    Hash = f[9],
-                    AssetCorruptedMessage = f[10],
-                    IsAssetCorrupted = bool.Parse(f[11]),
-                    AssetRotatedMessage = f[12],
-                    IsAssetRotated = bool.Parse(f[13])
-                });
+            List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
             Asserts(assets, filePath, csv!);
         }
@@ -221,42 +184,25 @@ public class DatabaseReadObjectListTests
             {
                 TableName = tableName,
                 ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId", EscapeText = true },
-                new ColumnProperties { ColumnName = "FileName", EscapeText = false },
-                new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
-                new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
-                new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
-                new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
-                new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
-                new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
-                new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
-                new ColumnProperties { ColumnName = "Hash", EscapeText = false },
-                new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
-                new ColumnProperties { ColumnName = "IsAssetRotated", EscapeText = true }
-            }
+                {
+                    new ColumnProperties { ColumnName = "FolderId", EscapeText = true },
+                    new ColumnProperties { ColumnName = "FileName", EscapeText = false },
+                    new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
+                    new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
+                    new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
+                    new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
+                    new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
+                    new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
+                    new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
+                    new ColumnProperties { ColumnName = "Hash", EscapeText = false },
+                    new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
+                    new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
+                    new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
+                    new ColumnProperties { ColumnName = "IsAssetRotated", EscapeText = true }
+                }
             });
 
-            List<Asset> assets = _database!.ReadObjectList(tableName, f =>
-                new Asset
-                {
-                    FolderId = f[0],
-                    FileName = f[1],
-                    FileSize = long.Parse(f[2]),
-                    ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), f[3]),
-                    PixelWidth = int.Parse(f[4]),
-                    PixelHeight = int.Parse(f[5]),
-                    ThumbnailPixelWidth = int.Parse(f[6]),
-                    ThumbnailPixelHeight = int.Parse(f[7]),
-                    ThumbnailCreationDateTime = DateTime.Parse(f[8]),
-                    Hash = f[9],
-                    AssetCorruptedMessage = f[10],
-                    IsAssetCorrupted = bool.Parse(f[11]),
-                    AssetRotatedMessage = f[12],
-                    IsAssetRotated = bool.Parse(f[13])
-                });
+            List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
             Asserts(assets, filePath, csv!);
         }
@@ -286,42 +232,25 @@ public class DatabaseReadObjectListTests
             {
                 TableName = tableName,
                 ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId", EscapeText = false },
-                new ColumnProperties { ColumnName = "Toto", EscapeText = false },
-                new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
-                new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
-                new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
-                new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
-                new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
-                new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
-                new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
-                new ColumnProperties { ColumnName = "Tutu", EscapeText = false },
-                new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
-                new ColumnProperties { ColumnName = "Tata", EscapeText = false }
-            }
+                {
+                    new ColumnProperties { ColumnName = "FolderId", EscapeText = false },
+                    new ColumnProperties { ColumnName = "Toto", EscapeText = false },
+                    new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
+                    new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
+                    new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
+                    new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
+                    new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
+                    new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
+                    new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
+                    new ColumnProperties { ColumnName = "Tutu", EscapeText = false },
+                    new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
+                    new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
+                    new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
+                    new ColumnProperties { ColumnName = "Tata", EscapeText = false }
+                }
             });
 
-            List<Asset> assets = _database!.ReadObjectList(tableName, f =>
-                new Asset
-                {
-                    FolderId = f[0],
-                    FileName = f[1],
-                    FileSize = long.Parse(f[2]),
-                    ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), f[3]),
-                    PixelWidth = int.Parse(f[4]),
-                    PixelHeight = int.Parse(f[5]),
-                    ThumbnailPixelWidth = int.Parse(f[6]),
-                    ThumbnailPixelHeight = int.Parse(f[7]),
-                    ThumbnailCreationDateTime = DateTime.Parse(f[8]),
-                    Hash = f[9],
-                    AssetCorruptedMessage = f[10],
-                    IsAssetCorrupted = bool.Parse(f[11]),
-                    AssetRotatedMessage = f[12],
-                    IsAssetRotated = bool.Parse(f[13])
-                });
+            List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
             Asserts(assets, filePath, csv!);
         }
@@ -430,24 +359,7 @@ public class DatabaseReadObjectListTests
             }
         });
 
-        List<Asset> assets = _database!.ReadObjectList(tableName, f =>
-            new Asset
-            {
-                FolderId = f[0],
-                FileName = f[1],
-                FileSize = long.Parse(f[2]),
-                ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), f[3]),
-                PixelWidth = int.Parse(f[4]),
-                PixelHeight = int.Parse(f[5]),
-                ThumbnailPixelWidth = int.Parse(f[6]),
-                ThumbnailPixelHeight = int.Parse(f[7]),
-                ThumbnailCreationDateTime = DateTime.Parse(f[8]),
-                Hash = f[9],
-                AssetCorruptedMessage = f[10],
-                IsAssetCorrupted = bool.Parse(f[11]),
-                AssetRotatedMessage = f[12],
-                IsAssetRotated = bool.Parse(f[13])
-            });
+        List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
         return assets;
     }

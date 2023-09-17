@@ -174,30 +174,9 @@ public class DatabaseWriteObjectListTests
 
             _database!.Initialize(directoryPath, pipeSeparator);
 
-            var exception = Assert.Throws<Exception>(() =>
-                _database!.WriteObjectList(assets, tableName, (a, i) =>
-                {
-                    return i switch
-                    {
-                        0 => a.FolderId,
-                        1 => a.FileName,
-                        2 => a.FileSize,
-                        3 => a.ImageRotation,
-                        4 => a.PixelWidth,
-                        5 => a.PixelHeight,
-                        6 => a.ThumbnailPixelWidth,
-                        7 => a.ThumbnailPixelHeight,
-                        8 => a.ThumbnailCreationDateTime,
-                        9 => a.Hash,
-                        10 => a.AssetCorruptedMessage!,
-                        11 => a.IsAssetCorrupted,
-                        12 => a.AssetRotatedMessage!,
-                        13 => a.IsAssetRotated,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                }));
+            var exception = Assert.Throws<Exception>(() => _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
 
-            Assert.AreEqual($"Properties must be defined for the columns in the table NoTableName.", exception?.Message);
+            Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
 
             Assert.IsFalse(File.Exists(filePath));
         }
@@ -281,27 +260,7 @@ public class DatabaseWriteObjectListTests
                 }
             });
 
-            _database!.WriteObjectList(assets, tableName, (a, i) =>
-            {
-                return i switch
-                {
-                    0 => a.FolderId,
-                    1 => a.FileName,
-                    2 => a.FileSize,
-                    3 => a.ImageRotation,
-                    4 => a.PixelWidth,
-                    5 => a.PixelHeight,
-                    6 => a.ThumbnailPixelWidth,
-                    7 => a.ThumbnailPixelHeight,
-                    8 => a.ThumbnailCreationDateTime,
-                    9 => a.Hash,
-                    10 => a.AssetCorruptedMessage!,
-                    11 => a.IsAssetCorrupted,
-                    12 => a.AssetRotatedMessage!,
-                    13 => a.IsAssetRotated,
-                    _ => throw new ArgumentOutOfRangeException(nameof(i))
-                };
-            });
+            _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc);
 
             Asserts(filePath, csv);
         }
@@ -385,27 +344,7 @@ public class DatabaseWriteObjectListTests
                 }
             });
 
-            _database!.WriteObjectList(assets, tableName, (a, i) =>
-            {
-                return i switch
-                {
-                    0 => a.FolderId,
-                    1 => a.FileName,
-                    2 => a.FileSize,
-                    3 => a.ImageRotation,
-                    4 => a.PixelWidth,
-                    5 => a.PixelHeight,
-                    6 => a.ThumbnailPixelWidth,
-                    7 => a.ThumbnailPixelHeight,
-                    8 => a.ThumbnailCreationDateTime,
-                    9 => a.Hash,
-                    10 => a.AssetCorruptedMessage!,
-                    11 => a.IsAssetCorrupted,
-                    12 => a.AssetRotatedMessage!,
-                    13 => a.IsAssetRotated,
-                    _ => throw new ArgumentOutOfRangeException(nameof(i))
-                };
-            });
+            _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc);
 
             Assert.IsTrue(File.Exists(filePath));
 
@@ -440,47 +379,11 @@ public class DatabaseWriteObjectListTests
             _database!.SetDataTableProperties(new DataTableProperties
             {
                 TableName = tableName,
-                ColumnProperties = new ColumnProperties[]
-                {
-                    new ColumnProperties { ColumnName = "FolderId", EscapeText = false },
-                    new ColumnProperties { ColumnName = "FileName", EscapeText = false },
-                    new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
-                    new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
-                    new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
-                    new ColumnProperties { ColumnName = "Hash", EscapeText = false },
-                    new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                    new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                    new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
-                    new ColumnProperties { ColumnName = "IsAssetRotated", EscapeText = false }
-                }
+                ColumnProperties = AssetConfigs.ConfigureDataTable()
             });
 
             var exception = Assert.Throws<ArgumentNullException>(() =>
-                _database!.WriteObjectList(assets!, tableName, (a, i) =>
-                {
-                    return i switch
-                    {
-                        0 => a.FolderId,
-                        1 => a.FileName,
-                        2 => a.FileSize,
-                        3 => a.ImageRotation,
-                        4 => a.PixelWidth,
-                        5 => a.PixelHeight,
-                        6 => a.ThumbnailPixelWidth,
-                        7 => a.ThumbnailPixelHeight,
-                        8 => a.ThumbnailCreationDateTime,
-                        9 => a.Hash,
-                        10 => a.AssetCorruptedMessage!,
-                        11 => a.IsAssetCorrupted,
-                        12 => a.AssetRotatedMessage!,
-                        13 => a.IsAssetRotated,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                }));
+                _database!.WriteObjectList(assets!, tableName, AssetConfigs.WriteFunc));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'list')", exception?.Message);
             Assert.IsFalse(File.Exists(filePath));
@@ -547,47 +450,11 @@ public class DatabaseWriteObjectListTests
             _database!.SetDataTableProperties(new DataTableProperties
             {
                 TableName = tableName,
-                ColumnProperties = new ColumnProperties[]
-                {
-                    new ColumnProperties { ColumnName = "FolderId", EscapeText = false },
-                    new ColumnProperties { ColumnName = "FileName", EscapeText = false },
-                    new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
-                    new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
-                    new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
-                    new ColumnProperties { ColumnName = "Hash", EscapeText = false },
-                    new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                    new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                    new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
-                    new ColumnProperties { ColumnName = "IsAssetRotated", EscapeText = false }
-                }
+                ColumnProperties = AssetConfigs.ConfigureDataTable()
             });
 
             var exception = Assert.Throws<ArgumentNullException>(() =>
-                _database!.WriteObjectList(assets, tableName, (a, i) =>
-                {
-                    return i switch
-                    {
-                        0 => a.FolderId,
-                        1 => a.FileName,
-                        2 => a.FileSize,
-                        3 => a.ImageRotation,
-                        4 => a.PixelWidth,
-                        5 => a.PixelHeight,
-                        6 => a.ThumbnailPixelWidth,
-                        7 => a.ThumbnailPixelHeight,
-                        8 => a.ThumbnailCreationDateTime,
-                        9 => a.Hash,
-                        10 => a.AssetCorruptedMessage!,
-                        11 => a.IsAssetCorrupted,
-                        12 => a.AssetRotatedMessage!,
-                        13 => a.IsAssetRotated,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                }));
+                _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'tableName')", exception?.Message);
             Assert.IsFalse(File.Exists(filePath));
@@ -654,47 +521,11 @@ public class DatabaseWriteObjectListTests
                 _database!.SetDataTableProperties(new DataTableProperties
                 {
                     TableName = tableName!,
-                    ColumnProperties = new ColumnProperties[]
-                    {
-                        new ColumnProperties { ColumnName = "FolderId", EscapeText = false },
-                        new ColumnProperties { ColumnName = "FileName", EscapeText = false },
-                        new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
-                        new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
-                        new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
-                        new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
-                        new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
-                        new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
-                        new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
-                        new ColumnProperties { ColumnName = "Hash", EscapeText = false },
-                        new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                        new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                        new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
-                        new ColumnProperties { ColumnName = "IsAssetRotated", EscapeText = false }
-                    }
+                    ColumnProperties = AssetConfigs.ConfigureDataTable()
                 }));
 
             var exception2 = Assert.Throws<ArgumentNullException>(() =>
-                _database!.WriteObjectList(assets, tableName!, (a, i) =>
-                {
-                    return i switch
-                    {
-                        0 => a.FolderId,
-                        1 => a.FileName,
-                        2 => a.FileSize,
-                        3 => a.ImageRotation,
-                        4 => a.PixelWidth,
-                        5 => a.PixelHeight,
-                        6 => a.ThumbnailPixelWidth,
-                        7 => a.ThumbnailPixelHeight,
-                        8 => a.ThumbnailCreationDateTime,
-                        9 => a.Hash,
-                        10 => a.AssetCorruptedMessage!,
-                        11 => a.IsAssetCorrupted,
-                        12 => a.AssetRotatedMessage!,
-                        13 => a.IsAssetRotated,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                }));
+                _database!.WriteObjectList(assets, tableName!, AssetConfigs.WriteFunc));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception1?.Message);
             Assert.AreEqual("Value cannot be null. (Parameter 'tableName')", exception2?.Message);
@@ -771,27 +602,7 @@ public class DatabaseWriteObjectListTests
             }
         });
 
-        _database!.WriteObjectList(assets, tableName, (a, i) =>
-        {
-            return i switch
-            {
-                0 => a.FolderId,
-                1 => a.FileName,
-                2 => a.FileSize,
-                3 => a.ImageRotation,
-                4 => a.PixelWidth,
-                5 => a.PixelHeight,
-                6 => a.ThumbnailPixelWidth,
-                7 => a.ThumbnailPixelHeight,
-                8 => a.ThumbnailCreationDateTime,
-                9 => a.Hash,
-                10 => a.AssetCorruptedMessage!,
-                11 => a.IsAssetCorrupted,
-                12 => a.AssetRotatedMessage!,
-                13 => a.IsAssetRotated,
-                _ => throw new ArgumentOutOfRangeException(nameof(i))
-            };
-        });
+        _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc);
     }
 
     private void Asserts(string filePath, string csv)

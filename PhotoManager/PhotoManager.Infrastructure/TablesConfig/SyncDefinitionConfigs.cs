@@ -20,7 +20,7 @@ public static class SyncDefinitionConfigs
             SourceDirectory = values[0],
             DestinationDirectory = values[1],
             IncludeSubFolders = bool.Parse(values[2]),
-            DeleteAssetsNotInSource = values.Length > 3 && bool.Parse(values[3])
+            DeleteAssetsNotInSource = bool.Parse(values[3])
         };
     }
 

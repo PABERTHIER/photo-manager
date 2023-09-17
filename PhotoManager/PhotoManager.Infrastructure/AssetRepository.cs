@@ -449,54 +449,25 @@ public class AssetRepository : IAssetRepository
         _database.SetDataTableProperties(new DataTableProperties
         {
             TableName = AssetConstants.FolderTableName,
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            ColumnProperties = FolderConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
         {
             TableName = AssetConstants.AssetTableName,
-            ColumnProperties = new ColumnProperties[] // TODO: replace by ColumnProperties = AssetConfigs.ConfigureDataTable()
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "FileName" },
-                new ColumnProperties { ColumnName = "FileSize" },
-                new ColumnProperties { ColumnName = "ImageRotation" },
-                new ColumnProperties { ColumnName = "PixelWidth" },
-                new ColumnProperties { ColumnName = "PixelHeight" },
-                new ColumnProperties { ColumnName = "ThumbnailPixelWidth" },
-                new ColumnProperties { ColumnName = "ThumbnailPixelHeight" },
-                new ColumnProperties { ColumnName = "ThumbnailCreationDateTime" },
-                new ColumnProperties { ColumnName = "Hash" },
-                new ColumnProperties { ColumnName = "AssetCorruptedMessage" },
-                new ColumnProperties { ColumnName = "IsAssetCorrupted" },
-                new ColumnProperties { ColumnName = "AssetRotatedMessage" },
-                new ColumnProperties { ColumnName = "IsAssetRotated" }
-            }
+            ColumnProperties = AssetConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
         {
             TableName = AssetConstants.ImportTableName,
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "SourceDirectory" },
-                new ColumnProperties { ColumnName = "DestinationDirectory" },
-                new ColumnProperties { ColumnName = "IncludeSubFolders" },
-                new ColumnProperties { ColumnName = "DeleteAssetsNotInSource" }
-            }
+            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
         {
             TableName = AssetConstants.RecentTargetPathsTableName,
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         });
     }
 
@@ -516,16 +487,11 @@ public class AssetRepository : IAssetRepository
 
         try
         {
-            result = _database.ReadObjectList(AssetConstants.FolderTableName, f =>
-                new Folder
-                {
-                    FolderId = f[0],
-                    Path = f[1]
-                });
+            result = _database.ReadObjectList(AssetConstants.FolderTableName, FolderConfigs.ReadFunc);
         }
         catch (ArgumentException ex)
         {
-            throw new ApplicationException($"Error while trying to read data table 'Folder'. " +
+            throw new ApplicationException("Error while trying to read data table 'Folder'. " +
                 $"DataDirectory: {_database.DataDirectory} - " +
                 $"Separator: {_database.Separator} - " +
                 $"LastReadFilePath: {_database.Diagnostics.LastReadFilePath} - " +
@@ -542,29 +508,11 @@ public class AssetRepository : IAssetRepository
 
         try
         {
-            // TODO: use instead -> result = _database.ReadObjectList(AssetConstants.AssetTableName, AssetConfigs.ReadFunc); // And do it for the others
-            result = _database.ReadObjectList(AssetConstants.AssetTableName, f =>
-                new Asset
-                {
-                    FolderId = f[0],
-                    FileName = f[1],
-                    FileSize = long.Parse(f[2]),
-                    ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), f[3]),
-                    PixelWidth = int.Parse(f[4]),
-                    PixelHeight = int.Parse(f[5]),
-                    ThumbnailPixelWidth = int.Parse(f[6]),
-                    ThumbnailPixelHeight = int.Parse(f[7]),
-                    ThumbnailCreationDateTime = DateTime.Parse(f[8]),
-                    Hash = f[9],
-                    AssetCorruptedMessage = f[10],
-                    IsAssetCorrupted = bool.Parse(f[11]),
-                    AssetRotatedMessage = f[12],
-                    IsAssetRotated = bool.Parse(f[13])
-                });
+            result = _database.ReadObjectList(AssetConstants.AssetTableName, AssetConfigs.ReadFunc);
         }
         catch (ArgumentException ex)
         {
-            throw new ApplicationException($"Error while trying to read data table 'Asset'. " +
+            throw new ApplicationException("Error while trying to read data table 'Asset'. " +
                 $"DataDirectory: {_database.DataDirectory} - " +
                 $"Separator: {_database.Separator} - " +
                 $"LastReadFilePath: {_database.Diagnostics.LastReadFilePath} - " +
@@ -581,18 +529,11 @@ public class AssetRepository : IAssetRepository
 
         try
         {
-            result = _database.ReadObjectList(AssetConstants.ImportTableName, f =>
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = f[0],
-                    DestinationDirectory = f[1],
-                    IncludeSubFolders = bool.Parse(f[2]),
-                    DeleteAssetsNotInSource = f.Length > 3 && bool.Parse(f[3])
-                });
+            result = _database.ReadObjectList(AssetConstants.ImportTableName, SyncDefinitionConfigs.ReadFunc);
         }
         catch (ArgumentException ex)
         {
-            throw new ApplicationException($"Error while trying to read data table 'Import'. " +
+            throw new ApplicationException("Error while trying to read data table 'Import'. " +
                 $"DataDirectory: {_database.DataDirectory} - " +
                 $"Separator: {_database.Separator} - " +
                 $"LastReadFilePath: {_database.Diagnostics.LastReadFilePath} - " +
@@ -609,11 +550,11 @@ public class AssetRepository : IAssetRepository
 
         try
         {
-            result = _database.ReadObjectList(AssetConstants.RecentTargetPathsTableName, f => f[0]);
+            result = _database.ReadObjectList(AssetConstants.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
         }
         catch (ArgumentException ex)
         {
-            throw new ApplicationException($"Error while trying to read data table 'RecentTargetPaths'. " +
+            throw new ApplicationException("Error while trying to read data table 'RecentTargetPaths'. " +
                 $"DataDirectory: {_database.DataDirectory} - " +
                 $"Separator: {_database.Separator} - " +
                 $"LastReadFilePath: {_database.Diagnostics.LastReadFilePath} - " +
@@ -626,68 +567,22 @@ public class AssetRepository : IAssetRepository
 
     private void WriteFolders(List<Folder> folders)
     {
-        _database.WriteObjectList(folders, AssetConstants.FolderTableName, (f, i) =>
-        {
-            return i switch
-            {
-                0 => f.FolderId,
-                1 => f.Path,
-                _ => throw new ArgumentOutOfRangeException(nameof(i))
-            };
-        });
+        _database.WriteObjectList(folders, AssetConstants.FolderTableName, FolderConfigs.WriteFunc);
     }
 
     private void WriteAssets(List<Asset> assets)
     {
-        // TODO: _database.WriteObjectList(assets, AssetConstants.AssetTableName, AssetConfigs.WriteFunc);
-        _database.WriteObjectList(assets, AssetConstants.AssetTableName, (a, i) =>
-        {
-            return i switch
-            {
-                0 => a.FolderId,
-                1 => a.FileName,
-                2 => a.FileSize,
-                3 => a.ImageRotation,
-                4 => a.PixelWidth,
-                5 => a.PixelHeight,
-                6 => a.ThumbnailPixelWidth,
-                7 => a.ThumbnailPixelHeight,
-                8 => a.ThumbnailCreationDateTime,
-                9 => a.Hash,
-                10 => a.AssetCorruptedMessage!,
-                11 => a.IsAssetCorrupted,
-                12 => a.AssetRotatedMessage!,
-                13 => a.IsAssetRotated,
-                _ => throw new ArgumentOutOfRangeException(nameof(i))
-            };
-        });
+        _database.WriteObjectList(assets, AssetConstants.AssetTableName, AssetConfigs.WriteFunc);
     }
 
     private void WriteSyncDefinitions(List<SyncAssetsDirectoriesDefinition> definitions)
     {
-        _database.WriteObjectList(definitions, AssetConstants.ImportTableName, (d, i) =>
-        {
-            return i switch
-            {
-                0 => d.SourceDirectory,
-                1 => d.DestinationDirectory,
-                2 => d.IncludeSubFolders,
-                3 => d.DeleteAssetsNotInSource,
-                _ => throw new ArgumentOutOfRangeException(nameof(i))
-            };
-        });
+        _database.WriteObjectList(definitions, AssetConstants.ImportTableName, SyncDefinitionConfigs.WriteFunc);
     }
 
     private void WriteRecentTargetPaths(List<string> recentTargetPaths)
     {
-        _database.WriteObjectList(recentTargetPaths, AssetConstants.RecentTargetPathsTableName, (p, i) =>
-        {
-            return i switch
-            {
-                0 => p,
-                _ => throw new ArgumentOutOfRangeException(nameof(i))
-            };
-        });
+        _database.WriteObjectList(recentTargetPaths, AssetConstants.RecentTargetPathsTableName, RecentPathsConfigs.WriteFunc);
     }
 
     private Dictionary<string, byte[]> GetThumbnails(Folder? folder, out bool isNewFile)

@@ -26,24 +26,12 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Folder",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            TableName = AssetConstants.FolderTableName,
+            ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(
-            dataFilePath,
-            f =>
-                new Folder
-                {
-                    FolderId = f[0],
-                    Path = f[1]
-                },
-            new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<Folder>>(result);
         Assert.IsNotEmpty(result);
@@ -68,48 +56,12 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\asset.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Asset",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "FileName" },
-                new ColumnProperties { ColumnName = "FileSize" },
-                new ColumnProperties { ColumnName = "ImageRotation" },
-                new ColumnProperties { ColumnName = "PixelWidth" },
-                new ColumnProperties { ColumnName = "PixelHeight" },
-                new ColumnProperties { ColumnName = "ThumbnailPixelWidth" },
-                new ColumnProperties { ColumnName = "ThumbnailPixelHeight" },
-                new ColumnProperties { ColumnName = "ThumbnailCreationDateTime" },
-                new ColumnProperties { ColumnName = "Hash" },
-                new ColumnProperties { ColumnName = "AssetCorruptedMessage" },
-                new ColumnProperties { ColumnName = "IsAssetCorrupted" },
-                new ColumnProperties { ColumnName = "AssetRotatedMessage" },
-                new ColumnProperties { ColumnName = "IsAssetRotated" }
-            }
+            TableName = AssetConstants.AssetTableName,
+            ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(
-            dataFilePath,
-            f =>
-                new Asset
-                {
-                    FolderId = f[0],
-                    FileName = f[1],
-                    FileSize = long.Parse(f[2]),
-                    ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), f[3]),
-                    PixelWidth = int.Parse(f[4]),
-                    PixelHeight = int.Parse(f[5]),
-                    ThumbnailPixelWidth = int.Parse(f[6]),
-                    ThumbnailPixelHeight = int.Parse(f[7]),
-                    ThumbnailCreationDateTime = DateTime.Parse(f[8]),
-                    Hash = f[9],
-                    AssetCorruptedMessage = f[10],
-                    IsAssetCorrupted = bool.Parse(f[11]),
-                    AssetRotatedMessage = f[12],
-                    IsAssetRotated = bool.Parse(f[13])
-                },
-            new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, AssetConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<Asset>>(result);
         Assert.IsNotEmpty(result);
@@ -138,28 +90,12 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\import.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Import",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "SourceDirectory" },
-                new ColumnProperties { ColumnName = "DestinationDirectory" },
-                new ColumnProperties { ColumnName = "IncludeSubFolders" },
-                new ColumnProperties { ColumnName = "DeleteAssetsNotInSource" }
-            }
+            TableName = AssetConstants.ImportTableName,
+            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(
-            dataFilePath,
-            f =>
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = f[0],
-                    DestinationDirectory = f[1],
-                    IncludeSubFolders = bool.Parse(f[2]),
-                    DeleteAssetsNotInSource = f.Length > 3 && bool.Parse(f[3])
-                },
-            new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, SyncDefinitionConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
         Assert.IsNotEmpty(result);
@@ -184,15 +120,12 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\recenttargetpaths.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "RecentTargetPaths",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            TableName = AssetConstants.RecentTargetPathsTableName,
+            ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, f => f[0], new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsNotEmpty(result);
         Assert.AreEqual(2, result.Count);
@@ -206,28 +139,12 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\import_empty.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Import",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "SourceDirectory" },
-                new ColumnProperties { ColumnName = "DestinationDirectory" },
-                new ColumnProperties { ColumnName = "IncludeSubFolders" },
-                new ColumnProperties { ColumnName = "DeleteAssetsNotInSource" }
-            }
+            TableName = AssetConstants.ImportTableName,
+            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(
-            dataFilePath,
-            f =>
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = f[0],
-                    DestinationDirectory = f[1],
-                    IncludeSubFolders = bool.Parse(f[2]),
-                    DeleteAssetsNotInSource = f.Length > 3 && bool.Parse(f[3])
-                },
-            new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, SyncDefinitionConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
         Assert.IsEmpty(result);
@@ -240,15 +157,7 @@ public class ObjectListStorageTests
         DataTableProperties? dataTableProperties = null;
         _objectListStorage!.Initialize(dataTableProperties!, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(
-            dataFilePath,
-            f =>
-                new Folder
-                {
-                    FolderId = f[0],
-                    Path = f[1]
-                },
-            new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<Folder>>(result);
         Assert.IsNotEmpty(result);
@@ -263,15 +172,7 @@ public class ObjectListStorageTests
 
         Assert.Throws<IndexOutOfRangeException>(() =>
         {
-            _objectListStorage!.ReadObjectList(
-            dataFilePath,
-            f =>
-                new Folder
-                {
-                    FolderId = f[0],
-                    Path = f[1]
-                },
-            new Diagnostics());
+            _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
         });
     }
 
@@ -289,7 +190,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, f => f[0], new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsEmpty(result);
     }
@@ -308,7 +209,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, f => f[0], new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsEmpty(result);
     }
@@ -327,7 +228,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath!, f => f[0], new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath!, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsEmpty(result);
     }
@@ -338,12 +239,8 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Folder",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            TableName = AssetConstants.FolderTableName,
+            ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
@@ -377,30 +274,14 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Folder",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            TableName = AssetConstants.FolderTableName,
+            ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
         try
         {
             _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
-            _objectListStorage!.WriteObjectList(
-                dataFilePath,
-                folders,
-                (f, i) =>
-                {
-                    return i switch
-                    {
-                        0 => f.FolderId,
-                        1 => f.Path,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                },
-                new Diagnostics());
+            _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
         }
@@ -454,54 +335,14 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Asset",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "FileName" },
-                new ColumnProperties { ColumnName = "FileSize" },
-                new ColumnProperties { ColumnName = "ImageRotation" },
-                new ColumnProperties { ColumnName = "PixelWidth" },
-                new ColumnProperties { ColumnName = "PixelHeight" },
-                new ColumnProperties { ColumnName = "ThumbnailPixelWidth" },
-                new ColumnProperties { ColumnName = "ThumbnailPixelHeight" },
-                new ColumnProperties { ColumnName = "ThumbnailCreationDateTime" },
-                new ColumnProperties { ColumnName = "Hash" },
-                new ColumnProperties { ColumnName = "AssetCorruptedMessage" },
-                new ColumnProperties { ColumnName = "IsAssetCorrupted" },
-                new ColumnProperties { ColumnName = "AssetRotatedMessage" },
-                new ColumnProperties { ColumnName = "IsAssetRotated" }
-            }
+            TableName = AssetConstants.AssetTableName,
+            ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
 
         try
         {
             _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
-            _objectListStorage!.WriteObjectList(
-                dataFilePath,
-                assets,
-                (a, i) =>
-                {
-                    return i switch
-                    {
-                        0 => a.FolderId,
-                        1 => a.FileName,
-                        2 => a.FileSize,
-                        3 => a.ImageRotation,
-                        4 => a.PixelWidth,
-                        5 => a.PixelHeight,
-                        6 => a.ThumbnailPixelWidth,
-                        7 => a.ThumbnailPixelHeight,
-                        8 => a.ThumbnailCreationDateTime,
-                        9 => a.Hash,
-                        10 => a.AssetCorruptedMessage!,
-                        11 => a.IsAssetCorrupted,
-                        12 => a.AssetRotatedMessage!,
-                        13 => a.IsAssetRotated,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                },
-                new Diagnostics());
+            _objectListStorage!.WriteObjectList(dataFilePath, assets, AssetConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
         }
@@ -526,34 +367,14 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Import",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "SourceDirectory" },
-                new ColumnProperties { ColumnName = "DestinationDirectory" },
-                new ColumnProperties { ColumnName = "IncludeSubFolders" },
-                new ColumnProperties { ColumnName = "DeleteAssetsNotInSource" }
-            }
+            TableName = AssetConstants.ImportTableName,
+            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
         };
 
         try
         {
             _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
-            _objectListStorage!.WriteObjectList(
-                dataFilePath,
-                imports,
-                (d, i) =>
-                {
-                    return i switch
-                    {
-                        0 => d.SourceDirectory,
-                        1 => d.DestinationDirectory,
-                        2 => d.IncludeSubFolders,
-                        3 => d.DeleteAssetsNotInSource,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                },
-                new Diagnostics());
+            _objectListStorage!.WriteObjectList(dataFilePath, imports, SyncDefinitionConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
         }
@@ -575,28 +396,14 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "RecentTargetPaths",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            TableName = AssetConstants.RecentTargetPathsTableName,
+            ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         };
 
         try
         {
             _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
-            _objectListStorage!.WriteObjectList(
-                dataFilePath,
-                recentTargetPaths,
-                (p, i) =>
-                {
-                    return i switch
-                    {
-                        0 => p,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                },
-                new Diagnostics());
+            _objectListStorage!.WriteObjectList(dataFilePath, recentTargetPaths, RecentPathsConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
         }
@@ -633,22 +440,9 @@ public class ObjectListStorageTests
 
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var exception = Assert.Throws<Exception>(() =>
-            _objectListStorage!.WriteObjectList(
-                dataFilePath,
-                folders,
-                (f, i) =>
-                {
-                    return i switch
-                    {
-                        0 => f.FolderId,
-                        1 => f.Path,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                },
-                new Diagnostics()));
+        var exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
 
-        Assert.AreEqual($"Properties must be defined for the columns in the table NoTableName.", exception?.Message);
+        Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
 
         Assert.IsFalse(File.Exists(dataFilePath));
     }
@@ -678,31 +472,14 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = "Folder",
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId" },
-                new ColumnProperties { ColumnName = "Path" }
-            }
+            TableName = AssetConstants.FolderTableName,
+            ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
-        var exception = Assert.Throws<Exception>(() =>
-            _objectListStorage!.WriteObjectList(
-                dataFilePath,
-                folders,
-                (f, i) =>
-                {
-                    return i switch
-                    {
-                        0 => f.FolderId,
-                        1 => f.Path,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                },
-                new Diagnostics()));
+        var exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
 
 
-        Assert.AreEqual($"Properties must be defined for the columns in the table NoTableName.", exception?.Message);
+        Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
 
         Assert.IsFalse(File.Exists(dataFilePath));
     }
@@ -726,19 +503,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        Assert.Throws<DirectoryNotFoundException>(() =>
-            _objectListStorage!.WriteObjectList(
-                dataFilePath,
-                nonExistents,
-                (f, i) =>
-                {
-                    return i switch
-                    {
-                        0 => f,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                },
-                new Diagnostics()));
+        Assert.Throws<DirectoryNotFoundException>(() => _objectListStorage!.WriteObjectList(dataFilePath, nonExistents, RecentPathsConfigs.WriteFunc, new Diagnostics()));
 
         Assert.IsFalse(File.Exists(dataFilePath));
     }
@@ -762,19 +527,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        Assert.Throws<ArgumentNullException>(() =>
-            _objectListStorage!.WriteObjectList(
-                dataFilePath!,
-                nonExistents,
-                (f, i) =>
-                {
-                    return i switch
-                    {
-                        0 => f,
-                        _ => throw new ArgumentOutOfRangeException(nameof(i))
-                    };
-                },
-                new Diagnostics()));
+        Assert.Throws<ArgumentNullException>(() => _objectListStorage!.WriteObjectList(dataFilePath!, nonExistents, RecentPathsConfigs.WriteFunc, new Diagnostics()));
 
         Assert.IsFalse(File.Exists(dataFilePath));
     }
