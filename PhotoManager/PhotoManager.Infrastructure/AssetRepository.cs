@@ -1,5 +1,4 @@
 using log4net;
-using System.Data;
 using System.Reflection;
 
 namespace PhotoManager.Infrastructure;

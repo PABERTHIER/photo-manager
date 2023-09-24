@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace PhotoManager.Infrastructure.Database;
+﻿namespace PhotoManager.Infrastructure.Database;
 
 public class Database : IDatabase
 {
