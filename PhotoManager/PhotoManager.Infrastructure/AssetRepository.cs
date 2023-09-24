@@ -8,15 +8,15 @@ public class AssetRepository : IAssetRepository
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
     public bool IsInitialized { get; private set; }
-    private string dataDirectory;
+    private readonly string dataDirectory;
     private readonly IDatabase _database;
     private readonly IStorageService _storageService;
     private readonly IUserConfigurationService _userConfigurationService;
 
     private List<Asset> assets;
     private List<Folder> folders;
-    private SyncAssetsConfiguration _syncAssetsConfiguration;
-    private List<string> _recentTargetPaths;
+    private SyncAssetsConfiguration syncAssetsConfiguration;
+    private List<string> recentTargetPaths;
     protected Dictionary<string, Dictionary<string, byte[]>> Thumbnails { get; private set; }
     private readonly Queue<string> recentThumbnailsQueue;
     private bool hasChanges;
@@ -27,9 +27,14 @@ public class AssetRepository : IAssetRepository
         _database = database;
         _storageService = storageService;
         _userConfigurationService = userConfigurationService;
-        Thumbnails = new Dictionary<string, Dictionary<string, byte[]>>();
+        assets = new List<Asset>();
+        folders = new List<Folder>();
+        syncAssetsConfiguration = new SyncAssetsConfiguration();
+        recentTargetPaths = new List<string>();
         recentThumbnailsQueue = new Queue<string>();
+        Thumbnails = new Dictionary<string, Dictionary<string, byte[]>>();
         syncLock = new object();
+        dataDirectory = _storageService.ResolveDataDirectory(AssetConstants.StorageVersion);
         Initialize();
     }
 
@@ -183,8 +188,8 @@ public class AssetRepository : IAssetRepository
             {
                 WriteAssets(assets);
                 WriteFolders(folders);
-                WriteSyncDefinitions(_syncAssetsConfiguration.Definitions);
-                WriteRecentTargetPaths(_recentTargetPaths);
+                WriteSyncDefinitions(syncAssetsConfiguration.Definitions);
+                WriteRecentTargetPaths(recentTargetPaths);
 
                 hasChanges = false;
             }
@@ -378,17 +383,17 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            result = _syncAssetsConfiguration;
+            result = syncAssetsConfiguration;
         }
 
         return result;
     }
 
-    public void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfiguration)
+    public void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfig)
     {
         lock (syncLock)
         {
-            _syncAssetsConfiguration = syncAssetsConfiguration;
+            syncAssetsConfiguration = syncAssetsConfig;
             hasChanges = true;
         }
     }
@@ -399,17 +404,17 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            result = _recentTargetPaths;
+            result = recentTargetPaths;
         }
 
         return result;
     }
 
-    public void SaveRecentTargetPaths(List<string> recentTargetPaths)
+    public void SaveRecentTargetPaths(List<string> paths)
     {
         lock (syncLock)
         {
-            _recentTargetPaths = recentTargetPaths;
+            recentTargetPaths = paths;
             hasChanges = true;
         }
     }
@@ -429,19 +434,12 @@ public class AssetRepository : IAssetRepository
         {
             InitializeDatabase();
             ReadCatalog();
-
-            if (assets == null)
-            {
-                SaveCatalog(null);
-            }
-
             IsInitialized = true;
         }
     }
 
     private void InitializeDatabase()
     {
-        dataDirectory = _storageService.ResolveDataDirectory(AssetConstants.StorageVersion);
         var separatorChar = AssetConstants.Separator.ToCharArray().First();
         _database.Initialize(dataDirectory, separatorChar);
 
@@ -474,94 +472,29 @@ public class AssetRepository : IAssetRepository
     {
         assets = ReadAssets();
         folders = ReadFolders();
-        _syncAssetsConfiguration = new SyncAssetsConfiguration();
-        _syncAssetsConfiguration.Definitions.AddRange(ReadSyncDefinitions());
-        assets.ForEach(a => a.Folder = GetFolderById(a.FolderId)); // TODO: fix this
-        _recentTargetPaths = ReadRecentTargetPaths();
+        syncAssetsConfiguration.Definitions.AddRange(ReadSyncDefinitions());
+        recentTargetPaths = ReadRecentTargetPaths();
+        assets.ForEach(a => a.Folder = GetFolderById(a.FolderId) ?? new Folder());
     }
 
     private List<Folder> ReadFolders()
     {
-        List<Folder> result;
-
-        try
-        {
-            result = _database.ReadObjectList(AssetConstants.FolderTableName, FolderConfigs.ReadFunc);
-        }
-        catch (ArgumentException ex)
-        {
-            throw new ApplicationException("Error while trying to read data table 'Folder'. " +
-                $"DataDirectory: {_database.DataDirectory} - " +
-                $"Separator: {_database.Separator} - " +
-                $"LastReadFilePath: {_database.Diagnostics.LastReadFilePath} - " +
-                $"LastReadFileRaw: {_database.Diagnostics.LastReadFileRaw}",
-                ex);
-        }
-
-        return result;
+        return _database.ReadObjectList(AssetConstants.FolderTableName, FolderConfigs.ReadFunc);
     }
 
     private List<Asset> ReadAssets()
     {
-        List<Asset> result;
-
-        try
-        {
-            result = _database.ReadObjectList(AssetConstants.AssetTableName, AssetConfigs.ReadFunc);
-        }
-        catch (ArgumentException ex)
-        {
-            throw new ApplicationException("Error while trying to read data table 'Asset'. " +
-                $"DataDirectory: {_database.DataDirectory} - " +
-                $"Separator: {_database.Separator} - " +
-                $"LastReadFilePath: {_database.Diagnostics.LastReadFilePath} - " +
-                $"LastReadFileRaw: {_database.Diagnostics.LastReadFileRaw}",
-                ex);
-        }
-
-        return result;
+        return _database.ReadObjectList(AssetConstants.AssetTableName, AssetConfigs.ReadFunc);
     }
 
     private List<SyncAssetsDirectoriesDefinition> ReadSyncDefinitions()
     {
-        List<SyncAssetsDirectoriesDefinition> result;
-
-        try
-        {
-            result = _database.ReadObjectList(AssetConstants.ImportTableName, SyncDefinitionConfigs.ReadFunc);
-        }
-        catch (ArgumentException ex)
-        {
-            throw new ApplicationException("Error while trying to read data table 'Import'. " +
-                $"DataDirectory: {_database.DataDirectory} - " +
-                $"Separator: {_database.Separator} - " +
-                $"LastReadFilePath: {_database.Diagnostics.LastReadFilePath} - " +
-                $"LastReadFileRaw: {_database.Diagnostics.LastReadFileRaw}",
-                ex);
-        }
-
-        return result;
+        return _database.ReadObjectList(AssetConstants.ImportTableName, SyncDefinitionConfigs.ReadFunc);
     }
 
     private List<string> ReadRecentTargetPaths()
     {
-        List<string> result;
-
-        try
-        {
-            result = _database.ReadObjectList(AssetConstants.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
-        }
-        catch (ArgumentException ex)
-        {
-            throw new ApplicationException("Error while trying to read data table 'RecentTargetPaths'. " +
-                $"DataDirectory: {_database.DataDirectory} - " +
-                $"Separator: {_database.Separator} - " +
-                $"LastReadFilePath: {_database.Diagnostics.LastReadFilePath} - " +
-                $"LastReadFileRaw: {_database.Diagnostics.LastReadFileRaw}",
-                ex);
-        }
-
-        return result;
+        return _database.ReadObjectList(AssetConstants.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
     }
 
     private void WriteFolders(List<Folder> folders)

@@ -116,13 +116,18 @@ public class DatabaseReadObjectListTests
     }
 
     [Test]
-    public void ReadObjectList_AllColumnsAndPipeSeparatorEscapedTextWithoutDataTableProperties_ThrowsFormatException()
+    public void ReadObjectList_AllColumnsAndPipeSeparatorEscapedTextWithoutDataTableProperties_ThrowsArgumentException()
     {
         string csv = csvEscapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
+            $"DataDirectory: {directoryPath}\n" +
+            $"Separator: {pipeSeparator}\n" +
+            $"LastReadFilePath: {filePath}\n" +
+            $"LastReadFileRaw: {csv}";
 
         try
         {
@@ -130,7 +135,8 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            Assert.Throws<FormatException>(() => _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
+            Assert.AreEqual(exceptionMessage, exception?.Message);
         }
         finally
         {
@@ -312,17 +318,98 @@ public class DatabaseReadObjectListTests
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void ReadObjectList_CsvIsIncorrectPipeSeparator_ThrowsFormatException(bool escapeText)
+    public void ReadObjectList_CsvIsIncorrectPipeSeparator_ThrowsArgumentException(bool escapeText)
     {
         string csv = csvInvalid!;
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
+            $"DataDirectory: {directoryPath}\n" +
+            $"Separator: {pipeSeparator}\n" +
+            $"LastReadFilePath: {filePath}\n" +
+            $"LastReadFileRaw: {csv}";
 
         try
         {
-            Assert.Throws<FormatException>(() => ReadObjectList(directoryPath, pipeSeparator, filePath, csv, tableName, escapeText));
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => ReadObjectList(directoryPath, pipeSeparator, filePath, csv, tableName, escapeText));
+            Assert.AreEqual(exceptionMessage, exception?.Message);
+        }
+        finally
+        {
+            Directory.Delete(directoryPath, true);
+            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+        }
+    }
+
+    [Test]
+    public void ReadObjectList_FuncIsNull_ThrowsArgumentException()
+    {
+        string csv = csvUnescapedTextWithPipe!;
+        string tableName = "assets" + Guid.NewGuid();
+        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        Func<string[], Asset>? nullFunc = null;
+        string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
+            $"DataDirectory: {directoryPath}\n" +
+            $"Separator: {pipeSeparator}\n" +
+            $"LastReadFilePath: {filePath}\n" +
+            $"LastReadFileRaw: {csv}";
+
+        try
+        {
+            _database!.Initialize(directoryPath, pipeSeparator);
+
+            File.WriteAllText(filePath, csv);
+
+            _database!.SetDataTableProperties(new DataTableProperties
+            {
+                TableName = tableName,
+                ColumnProperties = AssetConfigs.ConfigureDataTable()
+            });
+
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, nullFunc!));
+            Assert.AreEqual(exceptionMessage, exception?.Message);
+        }
+        finally
+        {
+            Directory.Delete(directoryPath, true);
+            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+        }
+    }
+
+    [Test]
+    public void ReadObjectList_ErrorInObjectListStorage_ThrowsArgumentException()
+    {
+        string csv = csvUnescapedTextWithPipe!;
+        string tableName = "assets" + Guid.NewGuid();
+        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
+            $"DataDirectory: {directoryPath}\n" +
+            $"Separator: {pipeSeparator}\n" +
+            $"LastReadFilePath: {filePath}\n" +
+            $"LastReadFileRaw: {null}";
+
+        try
+        {
+            Mock<IObjectListStorage> objectListStorageMock = new();
+            objectListStorageMock.Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(), It.IsAny<Diagnostics>())).Throws(new Exception());
+            PhotoManager.Infrastructure.Database.Database? database = new(objectListStorageMock.Object, new BlobStorage(), new BackupStorage());
+
+            database!.Initialize(directoryPath, pipeSeparator);
+
+            File.WriteAllText(filePath, csv);
+
+            database!.SetDataTableProperties(new DataTableProperties
+            {
+                TableName = tableName,
+                ColumnProperties = AssetConfigs.ConfigureDataTable()
+            });
+
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
+            Assert.AreEqual(exceptionMessage, exception?.Message);
         }
         finally
         {

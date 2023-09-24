@@ -65,11 +65,23 @@ public class Database : IDatabase
 
     public List<T> ReadObjectList<T>(string tableName, Func<string[], T> mapObjectFromCsvFields)
     {
-        string dataFilePath = ResolveTableFilePath(DataDirectory, tableName);
-        Diagnostics = new Diagnostics { LastReadFilePath = dataFilePath };
-        DataTableProperties? properties = GetDataTableProperties(tableName);
-        _objectListStorage.Initialize(properties, Separator);
-        return _objectListStorage.ReadObjectList(dataFilePath, mapObjectFromCsvFields, Diagnostics);
+        try
+        {
+            string dataFilePath = ResolveTableFilePath(DataDirectory, tableName);
+            Diagnostics = new Diagnostics { LastReadFilePath = dataFilePath };
+            DataTableProperties? properties = GetDataTableProperties(tableName);
+            _objectListStorage.Initialize(properties, Separator);
+            return _objectListStorage.ReadObjectList(dataFilePath, mapObjectFromCsvFields, Diagnostics);
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentException($"Error while trying to read data table {tableName}.\n" +
+                $"DataDirectory: {DataDirectory}\n" +
+                $"Separator: {Separator}\n" +
+                $"LastReadFilePath: {Diagnostics.LastReadFilePath}\n" +
+                $"LastReadFileRaw: {Diagnostics.LastReadFileRaw}",
+                ex);
+        }
     }
 
     public void WriteObjectList<T>(List<T> list, string tableName, Func<T, int, object> mapCsvFieldIndexToCsvField)
