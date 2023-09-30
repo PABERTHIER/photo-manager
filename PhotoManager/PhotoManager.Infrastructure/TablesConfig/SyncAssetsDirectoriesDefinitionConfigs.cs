@@ -1,6 +1,6 @@
 ﻿namespace PhotoManager.Infrastructure.TablesConfig;
 
-public static class SyncDefinitionConfigs
+public static class SyncAssetsDirectoriesDefinitionConfigs
 {
     public static ColumnProperties[] ConfigureDataTable()
     {

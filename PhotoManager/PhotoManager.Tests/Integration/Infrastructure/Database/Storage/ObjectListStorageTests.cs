@@ -23,10 +23,10 @@ public class ObjectListStorageTests
     [Test]
     public void ReadObjectList_FolderType_ReturnsNotEmptyList()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.FolderTableName,
+            TableName = AssetConstants.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
@@ -53,10 +53,10 @@ public class ObjectListStorageTests
     [Test]
     public void ReadObjectList_AssetType_ReturnsNotEmptyList()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\asset.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\assets.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.AssetTableName,
+            TableName = AssetConstants.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
@@ -85,33 +85,33 @@ public class ObjectListStorageTests
     }
 
     [Test]
-    public void ReadObjectList_ImportType_ReturnsNotEmptyList()
+    public void ReadObjectList_SyncAssetsDirectoriesDefinitionType_ReturnsNotEmptyList()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\import.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\syncassetsdirectoriesdefinitions.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.ImportTableName,
-            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
+            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, SyncDefinitionConfigs.ReadFunc, new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
         Assert.IsNotEmpty(result);
         Assert.AreEqual(2, result.Count);
 
-        SyncAssetsDirectoriesDefinition? firstImport = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Toto\\Screenshots");
-        Assert.IsNotNull(firstImport);
-        Assert.AreEqual("C:\\Images\\Toto", firstImport!.DestinationDirectory);
-        Assert.AreEqual(false, firstImport.IncludeSubFolders);
-        Assert.AreEqual(false, firstImport.DeleteAssetsNotInSource);
+        SyncAssetsDirectoriesDefinition? firstSyncAssetsDirectoriesDefinition = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Toto\\Screenshots");
+        Assert.IsNotNull(firstSyncAssetsDirectoriesDefinition);
+        Assert.AreEqual("C:\\Images\\Toto", firstSyncAssetsDirectoriesDefinition!.DestinationDirectory);
+        Assert.AreEqual(false, firstSyncAssetsDirectoriesDefinition.IncludeSubFolders);
+        Assert.AreEqual(false, firstSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource);
 
-        SyncAssetsDirectoriesDefinition? secondImport = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Tutu\\Screenshots");
-        Assert.IsNotNull(secondImport);
-        Assert.AreEqual("C:\\Images\\Tutu", secondImport!.DestinationDirectory);
-        Assert.AreEqual(false, secondImport.IncludeSubFolders);
-        Assert.AreEqual(false, secondImport.DeleteAssetsNotInSource);
+        SyncAssetsDirectoriesDefinition? secondSyncAssetsDirectoriesDefinition = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Tutu\\Screenshots");
+        Assert.IsNotNull(secondSyncAssetsDirectoriesDefinition);
+        Assert.AreEqual("C:\\Images\\Tutu", secondSyncAssetsDirectoriesDefinition!.DestinationDirectory);
+        Assert.AreEqual(false, secondSyncAssetsDirectoriesDefinition.IncludeSubFolders);
+        Assert.AreEqual(false, secondSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource);
     }
 
     [Test]
@@ -134,17 +134,17 @@ public class ObjectListStorageTests
     }
 
     [Test]
-    public void ReadObjectList_ImportTypeEmpty_ReturnsEmptyList()
+    public void ReadObjectList_SyncAssetsDirectoriesDefinitionTypeEmpty_ReturnsEmptyList()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\import_empty.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\syncassetsdirectoriesdefinitions_empty.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.ImportTableName,
-            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
+            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, SyncDefinitionConfigs.ReadFunc, new Diagnostics());
+        var result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
         Assert.IsEmpty(result);
@@ -153,7 +153,7 @@ public class ObjectListStorageTests
     [Test]
     public void ReadObjectList_FolderTypeWithoutProperties_ReturnsNotEmptyList()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
         DataTableProperties? dataTableProperties = null;
         _objectListStorage!.Initialize(dataTableProperties!, pipeSeparator);
 
@@ -168,7 +168,7 @@ public class ObjectListStorageTests
     [Test]
     public void ReadObjectList_FolderTypeWithoutInitialize_ThrowsFormatException()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
 
         var exception = Assert.Throws<FormatException>(() =>
         {
@@ -178,23 +178,23 @@ public class ObjectListStorageTests
     }
 
     [Test]
-    public void ReadObjectList_ImportTypeWithoutInitialize_ThrowsIndexOutOfRangeException()
+    public void ReadObjectList_SyncAssetsDirectoriesDefinitionTypeWithoutInitialize_ThrowsIndexOutOfRangeException()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\import.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\syncassetsdirectoriesdefinitions.db");
 
         Assert.Throws<IndexOutOfRangeException>(() =>
         {
-            _objectListStorage!.ReadObjectList(dataFilePath, SyncDefinitionConfigs.ReadFunc, new Diagnostics());
+            _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
         });
     }
 
     [Test]
     public void ReadObjectList_AssetTypeButReadingWrongFile_ThrowsFormatException()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.AssetTableName,
+            TableName = AssetConstants.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
@@ -265,10 +265,10 @@ public class ObjectListStorageTests
     [Test]
     public void ReadObjectList_FolderTypeFuncIsNull_ThrowsNullReferenceException()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.FolderTableName,
+            TableName = AssetConstants.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
@@ -281,7 +281,7 @@ public class ObjectListStorageTests
     [Test]
     public void WriteObjectList_FolderType_WritesCorrectCsv()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "folder.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "folders.db");
         List<Folder> folders = new()
         {
             new Folder
@@ -303,7 +303,7 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.FolderTableName,
+            TableName = AssetConstants.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
@@ -323,7 +323,7 @@ public class ObjectListStorageTests
     [Test]
     public void WriteObjectList_AssetType_WritesCorrectCsv()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "asset.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "assets.db");
         List<Asset> assets = new()
         {
             new Asset
@@ -364,7 +364,7 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.AssetTableName,
+            TableName = AssetConstants.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
 
@@ -382,10 +382,10 @@ public class ObjectListStorageTests
     }
 
     [Test]
-    public void WriteObjectList_ImportType_WritesCorrectCsv()
+    public void WriteObjectList_SyncAssetsDirectoriesDefinitionType_WritesCorrectCsv()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "import.db");
-        List<SyncAssetsDirectoriesDefinition> imports = new()
+        string dataFilePath = Path.Combine(dataDirectory!, "syncassetsdirectoriesdefinitions.db");
+        List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitions = new()
         {
             new SyncAssetsDirectoriesDefinition
             {
@@ -396,14 +396,14 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.ImportTableName,
-            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
+            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
 
         try
         {
             _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
-            _objectListStorage!.WriteObjectList(dataFilePath, imports, SyncDefinitionConfigs.WriteFunc, new Diagnostics());
+            _objectListStorage!.WriteObjectList(dataFilePath, syncAssetsDirectoriesDefinitions, SyncAssetsDirectoriesDefinitionConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
         }
@@ -445,7 +445,7 @@ public class ObjectListStorageTests
     [Test]
     public void WriteObjectList_FolderTypeWithoutProperties_ThrowsException()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "folder.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "folders.db");
         List<Folder> folders = new()
         {
             new Folder
@@ -479,7 +479,7 @@ public class ObjectListStorageTests
     [Test]
     public void WriteObjectList_FolderTypeWithoutInitialize_ThrowsException()
     {
-        string dataFilePath = Path.Combine(dataDirectory!, "folder.db");
+        string dataFilePath = Path.Combine(dataDirectory!, "folders.db");
         List<Folder> folders = new()
         {
             new Folder
@@ -501,7 +501,7 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.FolderTableName,
+            TableName = AssetConstants.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 

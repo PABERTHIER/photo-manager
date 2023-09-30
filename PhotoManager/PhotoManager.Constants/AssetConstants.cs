@@ -17,9 +17,9 @@ public static class AssetConstants
     public const string AssetRotatedMessage = "The asset has been rotated";
     public const double StorageVersion = 1.0;
     public const string Separator = "|";
-    public const string AssetTableName = "Asset";
-    public const string FolderTableName = "Folder";
-    public const string ImportTableName = "Import";
+    public const string AssetsTableName = "Assets";
+    public const string FoldersTableName = "Folders";
+    public const string SyncAssetsDirectoriesDefinitionsTableName = "SyncAssetsDirectoriesDefinitions";
     public const string RecentTargetPathsTableName = "RecentTargetPaths";
     public const string Tables = "Tables";
     public const string Blobs = "Blobs";

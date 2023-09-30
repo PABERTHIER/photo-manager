@@ -28,7 +28,7 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = AssetConstants.FolderTableName,
+            TableName = AssetConstants.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
@@ -41,9 +41,9 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.FolderTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.FolderTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.FolderTableName].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.FoldersTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.FoldersTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.FoldersTableName].ColumnProperties);
         }
         finally
         {
@@ -58,7 +58,7 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = AssetConstants.AssetTableName,
+            TableName = AssetConstants.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
 
@@ -71,9 +71,9 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.AssetTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.AssetTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.AssetTableName].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.AssetsTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.AssetsTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.AssetsTableName].ColumnProperties);
         }
         finally
         {
@@ -83,13 +83,13 @@ public class DatabaseSetDataTablePropertiesTests
     }
 
     [Test]
-    public void SetDataTableProperties_ImportType_SetsDataTableProperties()
+    public void SetDataTableProperties_SyncAssetsDirectoriesDefinitionType_SetsDataTableProperties()
     {
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = AssetConstants.ImportTableName,
-            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
+            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
 
         try
@@ -101,9 +101,9 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.ImportTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.ImportTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.ImportTableName].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.SyncAssetsDirectoriesDefinitionsTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.SyncAssetsDirectoriesDefinitionsTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.SyncAssetsDirectoriesDefinitionsTableName].ColumnProperties);
         }
         finally
         {

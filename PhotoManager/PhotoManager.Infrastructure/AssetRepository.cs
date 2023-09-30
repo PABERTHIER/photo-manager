@@ -188,7 +188,7 @@ public class AssetRepository : IAssetRepository
             {
                 WriteAssets(assets);
                 WriteFolders(folders);
-                WriteSyncDefinitions(syncAssetsConfiguration.Definitions);
+                WriteSyncAssetsDirectoriesDefinitions(syncAssetsConfiguration.Definitions);
                 WriteRecentTargetPaths(recentTargetPaths);
 
                 hasChanges = false;
@@ -445,20 +445,20 @@ public class AssetRepository : IAssetRepository
 
         _database.SetDataTableProperties(new DataTableProperties
         {
-            TableName = AssetConstants.FolderTableName,
+            TableName = AssetConstants.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
         {
-            TableName = AssetConstants.AssetTableName,
+            TableName = AssetConstants.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
         {
-            TableName = AssetConstants.ImportTableName,
-            ColumnProperties = SyncDefinitionConfigs.ConfigureDataTable()
+            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
@@ -472,24 +472,24 @@ public class AssetRepository : IAssetRepository
     {
         assets = ReadAssets();
         folders = ReadFolders();
-        syncAssetsConfiguration.Definitions.AddRange(ReadSyncDefinitions());
+        syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
         recentTargetPaths = ReadRecentTargetPaths();
         assets.ForEach(a => a.Folder = GetFolderById(a.FolderId) ?? new Folder());
     }
 
     private List<Folder> ReadFolders()
     {
-        return _database.ReadObjectList(AssetConstants.FolderTableName, FolderConfigs.ReadFunc);
+        return _database.ReadObjectList(AssetConstants.FoldersTableName, FolderConfigs.ReadFunc);
     }
 
     private List<Asset> ReadAssets()
     {
-        return _database.ReadObjectList(AssetConstants.AssetTableName, AssetConfigs.ReadFunc);
+        return _database.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
     }
 
-    private List<SyncAssetsDirectoriesDefinition> ReadSyncDefinitions()
+    private List<SyncAssetsDirectoriesDefinition> ReadSyncAssetsDirectoriesDefinitions()
     {
-        return _database.ReadObjectList(AssetConstants.ImportTableName, SyncDefinitionConfigs.ReadFunc);
+        return _database.ReadObjectList(AssetConstants.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
     }
 
     private List<string> ReadRecentTargetPaths()
@@ -499,17 +499,17 @@ public class AssetRepository : IAssetRepository
 
     private void WriteFolders(List<Folder> folders)
     {
-        _database.WriteObjectList(folders, AssetConstants.FolderTableName, FolderConfigs.WriteFunc);
+        _database.WriteObjectList(folders, AssetConstants.FoldersTableName, FolderConfigs.WriteFunc);
     }
 
     private void WriteAssets(List<Asset> assets)
     {
-        _database.WriteObjectList(assets, AssetConstants.AssetTableName, AssetConfigs.WriteFunc);
+        _database.WriteObjectList(assets, AssetConstants.AssetsTableName, AssetConfigs.WriteFunc);
     }
 
-    private void WriteSyncDefinitions(List<SyncAssetsDirectoriesDefinition> definitions)
+    private void WriteSyncAssetsDirectoriesDefinitions(List<SyncAssetsDirectoriesDefinition> definitions)
     {
-        _database.WriteObjectList(definitions, AssetConstants.ImportTableName, SyncDefinitionConfigs.WriteFunc);
+        _database.WriteObjectList(definitions, AssetConstants.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.WriteFunc);
     }
 
     private void WriteRecentTargetPaths(List<string> recentTargetPaths)

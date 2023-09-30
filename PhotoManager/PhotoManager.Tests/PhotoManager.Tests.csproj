@@ -38,10 +38,10 @@
     <None Remove="TestFiles\IMAGE_WITH_UPPERCASE_NAME.JPG" />
     <None Remove="TestFiles\TestBackup\v1.0\Blobs\18033543-defb-4d37-837b-d8063eda3a25.bin" />
     <None Remove="TestFiles\TestBackup\v1.0\Blobs\f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\asset.db" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\folder.db" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\import.db" />
-    <None Remove="TestFiles\TestBackup\v1.0\Tables\import_empty.db" />
+    <None Remove="TestFiles\TestBackup\v1.0\Tables\assets.db" />
+    <None Remove="TestFiles\TestBackup\v1.0\Tables\folders.db" />
+    <None Remove="TestFiles\TestBackup\v1.0\Tables\syncassetsdirectoriesdefinitions.db" />
+    <None Remove="TestFiles\TestBackup\v1.0\Tables\syncassetsdirectoriesdefinitions_empty.db" />
     <None Remove="TestFiles\TestBackup\v1.0\Tables\recenttargetpaths.db" />
     <None Remove="TestFiles\TestBackup\v1.0_Backups\20230819.zip" />
     <None Remove="TestFiles\TestFolder\EmptyFile.txt" />
@@ -125,16 +125,16 @@
     <Content Include="TestFiles\TestBackup\v1.0\Blobs\f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\asset.db">
+    <Content Include="TestFiles\TestBackup\v1.0\Tables\assets.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\folder.db">
+    <Content Include="TestFiles\TestBackup\v1.0\Tables\folders.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\import.db">
+    <Content Include="TestFiles\TestBackup\v1.0\Tables\syncassetsdirectoriesdefinitions.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFiles\TestBackup\v1.0\Tables\import_empty.db">
+    <Content Include="TestFiles\TestBackup\v1.0\Tables\syncassetsdirectoriesdefinitions_empty.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\TestBackup\v1.0\Tables\recenttargetpaths.db">
