@@ -43,7 +43,7 @@ public class AssetRepositoryLoadThumbnailTests
 
         asset1 = new()
         {
-            FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
             FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
@@ -238,7 +238,7 @@ public class AssetRepositoryLoadThumbnailTests
     {
         try
         {
-            string folderId = Guid.NewGuid().ToString();
+            Guid folderId = Guid.NewGuid();
             asset1!.Folder = new Folder() { FolderId = folderId, Path = dataDirectory! };
             asset1!.FolderId = folderId;
             _testableAssetRepository!.AddAsset(asset1!, Array.Empty<byte>());

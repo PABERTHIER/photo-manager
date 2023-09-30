@@ -46,7 +46,7 @@ public class AssetRepositoryConcurrentAccessTests
 
         asset1 = new()
         {
-            FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
             FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
@@ -63,7 +63,7 @@ public class AssetRepositoryConcurrentAccessTests
         };
         asset2 = new()
         {
-            FolderId = "68493435-e299-4bb5-9e02-214da41d0256",
+            FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = "Image 9.png",
             FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
@@ -80,7 +80,7 @@ public class AssetRepositoryConcurrentAccessTests
         };
         asset3 = new()
         {
-            FolderId = "f91b8c81-6938-431a-a689-d86c7c4db126",
+            FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
             FileName = "Image_11.heic",
             FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
@@ -102,7 +102,7 @@ public class AssetRepositoryConcurrentAccessTests
     {
         Asset asset4 = new()
         {
-            FolderId = "cf9293ad-d835-4126-8a76-17c7bbfe626e",
+            FolderId = new Guid("cf9293ad-d835-4126-8a76-17c7bbfe626e"),
             FileName = "Image 2.jpg",
             FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
@@ -119,7 +119,7 @@ public class AssetRepositoryConcurrentAccessTests
         };
         Asset asset5 = new()
         {
-            FolderId = "1e3c2274-bc11-482a-a7b4-e86e5aeb17f1",
+            FolderId = new Guid("1e3c2274-bc11-482a-a7b4-e86e5aeb17f1"),
             FileName = "Image 3.jpg",
             FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
@@ -144,8 +144,8 @@ public class AssetRepositoryConcurrentAccessTests
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 
-            Folder folder3 = new() { FolderId = Guid.NewGuid().ToString(), Path = folderPath3 };
-            Folder folder4 = new() { FolderId = Guid.NewGuid().ToString(), Path = folderPath4 };
+            Folder folder3 = new() { FolderId = Guid.NewGuid(), Path = folderPath3 };
+            Folder folder4 = new() { FolderId = Guid.NewGuid(), Path = folderPath4 };
 
             asset1!.Folder = folder1;
             asset1!.FolderId = folder1.FolderId;

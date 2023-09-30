@@ -456,7 +456,7 @@ public class DatabaseReadObjectListTests
         Assert.AreEqual(2, assets.Count);
 
         Asset asset1 = assets[0];
-        Assert.AreEqual("876283c6-780e-4ad5-975c-be63044c087a", asset1.FolderId);
+        Assert.AreEqual(new Guid("876283c6-780e-4ad5-975c-be63044c087a"), asset1.FolderId);
         Assert.AreEqual("20200720175810_3.jpg", asset1.FileName);
         Assert.AreEqual(363888, asset1.FileSize);
         Assert.AreEqual(Rotation.Rotate0, asset1.ImageRotation);
@@ -472,7 +472,7 @@ public class DatabaseReadObjectListTests
         Assert.AreEqual(false, asset1.IsAssetRotated);
 
         Asset asset2 = assets[1];
-        Assert.AreEqual("876283c6-780e-4ad5-975c-be63044c087a", asset2.FolderId);
+        Assert.AreEqual(new Guid("876283c6-780e-4ad5-975c-be63044c087a"), asset2.FolderId);
         Assert.AreEqual("20200720175816_3.jpg", asset2.FileName);
         Assert.AreEqual(343633, asset2.FileSize);
         Assert.AreEqual(Rotation.Rotate0, asset2.ImageRotation);

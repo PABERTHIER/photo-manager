@@ -15,7 +15,7 @@ public static class FolderConfigs
     {
         return new Folder
         {
-            FolderId = values[0],
+            FolderId = new Guid(values[0]),
             Path = values[1]
         };
     }

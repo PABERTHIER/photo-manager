@@ -3,7 +3,7 @@
 [TestFixture]
 public class FolderConfigsTests
 {
-    private readonly string folderId = Guid.NewGuid().ToString();
+    private readonly Guid folderId = Guid.NewGuid();
 
     [Test]
     public void ConfigureDataTable_ReturnsCorrectColumnNames()
@@ -22,7 +22,7 @@ public class FolderConfigsTests
     {
         string[] validValues = new string[]
         {
-            folderId,
+            folderId.ToString(),
             "D:\\folder\\newFolder"
         };
 
@@ -38,7 +38,7 @@ public class FolderConfigsTests
     {
         string[] tooManyValues = new string[]
         {
-            folderId,
+            folderId.ToString(),
             "D:\\folder\\newFolder",
             "toto",
             "15"
@@ -52,15 +52,13 @@ public class FolderConfigsTests
     }
 
     [Test]
-    public void ReadFunc_NullValues_ParsesStringArrayOfNullValuesIntoFolder()
+    public void ReadFunc_NullValues_ThrowsArgumentNullException()
     {
         string[] nullValues = new string[2];
 
-        Folder folder = FolderConfigs.ReadFunc(nullValues);
+        var exception = Assert.Throws<ArgumentNullException>(() => FolderConfigs.ReadFunc(nullValues));
 
-        Assert.IsNotNull(folder);
-        Assert.AreEqual(null, folder.FolderId);
-        Assert.AreEqual(null, folder.Path);
+        Assert.AreEqual("Value cannot be null. (Parameter 'g')", exception?.Message);
     }
 
     [Test]

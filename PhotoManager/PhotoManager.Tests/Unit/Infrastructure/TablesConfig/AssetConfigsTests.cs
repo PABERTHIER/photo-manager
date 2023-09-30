@@ -3,7 +3,7 @@
 [TestFixture]
 public class AssetConfigsTests
 {
-    private readonly string folderId = Guid.NewGuid().ToString();
+    private readonly Guid folderId = Guid.NewGuid();
     private string[]? validValues;
     private string[]? tooManyValues;
 
@@ -12,7 +12,7 @@ public class AssetConfigsTests
     {
         validValues = new string[]
         {
-            folderId,
+            folderId.ToString(),
             "Image 1.jpg",
             "1000",
             "0",
@@ -30,7 +30,7 @@ public class AssetConfigsTests
 
         tooManyValues = new string[]
         {
-            folderId,
+            folderId.ToString(),
             "Image 1.jpg",
             "1000",
             "0",
@@ -124,7 +124,7 @@ public class AssetConfigsTests
 
         var exception = Assert.Throws<ArgumentNullException>(() => AssetConfigs.ReadFunc(nullValues));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 's')", exception?.Message);
+        Assert.AreEqual("Value cannot be null. (Parameter 'g')", exception?.Message);
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class AssetConfigsTests
     {
         string[] invalidValues = new string[]
         {
-            folderId,
+            folderId.ToString(),
             "Image 1.jpg",
             "toto",
             "0",

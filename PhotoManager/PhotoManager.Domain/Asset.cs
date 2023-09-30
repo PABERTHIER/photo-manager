@@ -4,7 +4,7 @@ public class Asset
 {
     // TODO: use intead Folder.FolderId ? -> if done, update tests
     // TODO: property required
-    public string FolderId { get; set; } // Why not a Guid? ?
+    public Guid FolderId { get; set; }
     public Folder Folder { get; set; }
     public string FileName { get; set; }
     public long FileSize { get; set; }
@@ -24,20 +24,20 @@ public class Asset
     public bool IsAssetRotated { get; set; }
     public string? AssetRotatedMessage { get; set; }
 
-    // Keep this code for UT only, whereas, one UT will fail... -> investigate which one is it
+    // TODO: Keep this code for UT only, whereas, one UT will fail... -> investigate which one is it
     public override bool Equals(object? obj)
     {
         return obj is Asset asset && asset.FolderId == FolderId && asset.FileName == FileName;
     }
 
-    // Only for UT
+    // TODO: Only for UT
     public override int GetHashCode()
     {
-        // TODO: if FolderId has been passed into Guid?, it has to be .ToString() before the GetHashCode() calling
-        return (!string.IsNullOrEmpty(FolderId) ? FolderId.GetHashCode() : base.GetHashCode()) + (!string.IsNullOrEmpty(FileName) ? FileName.GetHashCode() : base.GetHashCode());
+        string folderId = FolderId.ToString();
+        return (!string.IsNullOrEmpty(folderId) ? folderId.GetHashCode() : base.GetHashCode()) + (!string.IsNullOrEmpty(FileName) ? FileName.GetHashCode() : base.GetHashCode());
     }
 
-    // Only for UT
+    // TODO: Only for UT
     public override string ToString()
     {
         return FileName;

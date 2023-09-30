@@ -37,15 +37,15 @@ public class ObjectListStorageTests
         Assert.IsNotEmpty(result);
         Assert.AreEqual(3, result.Count);
 
-        Folder? folder1 = result.FirstOrDefault(x => x.FolderId == "f1f00403-0554-4201-9b6b-11a6b4cea3a9");
+        Folder? folder1 = result.FirstOrDefault(x => x.FolderId == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9"));
         Assert.IsNotNull(folder1);
         Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test", folder1!.Path);
 
-        Folder? folder2 = result.FirstOrDefault(x => x.FolderId == "2c107211-1a1c-4e73-8e8b-35d18ca8ef85");
+        Folder? folder2 = result.FirstOrDefault(x => x.FolderId == new Guid("2c107211-1a1c-4e73-8e8b-35d18ca8ef85"));
         Assert.IsNotNull(folder2);
         Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame", folder2!.Path);
 
-        Folder? folder3 = result.FirstOrDefault(x => x.FolderId == "18033543-defb-4d37-837b-d8063eda3a25");
+        Folder? folder3 = result.FirstOrDefault(x => x.FolderId == new Guid("18033543-defb-4d37-837b-d8063eda3a25"));
         Assert.IsNotNull(folder3);
         Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test\\toto", folder3!.Path);
     }
@@ -70,7 +70,7 @@ public class ObjectListStorageTests
         Asset? asset = result.FirstOrDefault(x => x.Hash == "ee43714d8b96d7ed3308d18afcb701444198c783fbe4103ce44e95aaf99c2095ae70e6e2035a7a438d1598fadaf5fe8cb0d541378387d20e91f26819fcc64b82");
         Assert.IsNotNull(asset);
         Assert.AreEqual("533.JPG", asset!.FileName);
-        Assert.AreEqual("f1f00403-0554-4201-9b6b-11a6b4cea3a9", asset!.FolderId);
+        Assert.AreEqual(new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9"), asset!.FolderId);
         Assert.AreEqual(2986996, asset!.FileSize);
         Assert.AreEqual(Rotation.Rotate270, asset!.ImageRotation);
         Assert.AreEqual(3072, asset!.PixelWidth);
@@ -115,7 +115,7 @@ public class ObjectListStorageTests
     }
 
     [Test]
-    public void ReadObjectList_RecentTargetPathsType_ReturnsNotList()
+    public void ReadObjectList_RecentTargetPathsType_ReturnsNotEmptyList()
     {
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\recenttargetpaths.db");
         DataTableProperties dataTableProperties = new()
@@ -162,17 +162,46 @@ public class ObjectListStorageTests
         Assert.IsInstanceOf<List<Folder>>(result);
         Assert.IsNotEmpty(result);
         Assert.AreEqual(3, result.Count);
-        Assert.IsNotNull(result.FirstOrDefault(x => x.FolderId == "f1f00403-0554-4201-9b6b-11a6b4cea3a9"));
+        Assert.IsNotNull(result.FirstOrDefault(x => x.FolderId == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9")));
     }
 
     [Test]
-    public void ReadObjectList_FolderTypeWithoutInitialize_ThrowsIndexOutOfRangeException()
+    public void ReadObjectList_FolderTypeWithoutInitialize_ThrowsFormatException()
     {
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
 
-        Assert.Throws<IndexOutOfRangeException>(() =>
+        var exception = Assert.Throws<FormatException>(() =>
         {
             _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
+        });
+        Assert.AreEqual("Guid should contain 32 digits with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).", exception?.Message);
+    }
+
+    [Test]
+    public void ReadObjectList_ImportTypeWithoutInitialize_ThrowsIndexOutOfRangeException()
+    {
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\import.db");
+
+        Assert.Throws<IndexOutOfRangeException>(() =>
+        {
+            _objectListStorage!.ReadObjectList(dataFilePath, SyncDefinitionConfigs.ReadFunc, new Diagnostics());
+        });
+    }
+
+    [Test]
+    public void ReadObjectList_AssetTypeButReadingWrongFile_ThrowsFormatException()
+    {
+        string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folder.db");
+        DataTableProperties dataTableProperties = new()
+        {
+            TableName = AssetConstants.AssetTableName,
+            ColumnProperties = AssetConfigs.ConfigureDataTable()
+        };
+        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+
+        Assert.Throws<FormatException>(() =>
+        {
+            _objectListStorage!.ReadObjectList(dataFilePath, AssetConfigs.ReadFunc, new Diagnostics());
         });
     }
 
@@ -257,17 +286,17 @@ public class ObjectListStorageTests
         {
             new Folder
             {
-                FolderId = "dfc8aab7-3543-48e7-9fdc-596ba733761e",
+                FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
                 Path = "D:\\Workspace\\PhotoManager\\Test"
             },
             new Folder
             {
-                FolderId = "8f9dff55-4a15-411e-a4cb-7ec3024b2238",
+                FolderId = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"
             },
             new Folder
             {
-                FolderId = "db4d226f-6901-43f9-9e82-e6a052f627d2",
+                FolderId = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\toto"
             }
         };
@@ -299,7 +328,7 @@ public class ObjectListStorageTests
         {
             new Asset
             {
-                FolderId = "dfc8aab7-3543-48e7-9fdc-596ba733761e",
+                FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
                 FileName = "1336.JPG",
                 FileSize = 4526710,
                 ImageRotation = Rotation.Rotate0,
@@ -316,7 +345,7 @@ public class ObjectListStorageTests
             },
             new Asset
             {
-                FolderId = "dfc8aab7-3543-48e7-9fdc-596ba733761f",
+                FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761f"),
                 FileName = "1452.DNG",
                 FileSize = 5286168,
                 ImageRotation = Rotation.Rotate90,
@@ -421,17 +450,17 @@ public class ObjectListStorageTests
         {
             new Folder
             {
-                FolderId = "dfc8aab7-3543-48e7-9fdc-596ba733761e",
+                FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
                 Path = "D:\\Workspace\\PhotoManager\\Test"
             },
             new Folder
             {
-                FolderId = "8f9dff55-4a15-411e-a4cb-7ec3024b2238",
+                FolderId = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"
             },
             new Folder
             {
-                FolderId = "db4d226f-6901-43f9-9e82-e6a052f627d2",
+                FolderId = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\toto"
             }
         };
@@ -455,17 +484,17 @@ public class ObjectListStorageTests
         {
             new Folder
             {
-                FolderId = "dfc8aab7-3543-48e7-9fdc-596ba733761e",
+                FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
                 Path = "D:\\Workspace\\PhotoManager\\Test"
             },
             new Folder
             {
-                FolderId = "8f9dff55-4a15-411e-a4cb-7ec3024b2238",
+                FolderId = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"
             },
             new Folder
             {
-                FolderId = "db4d226f-6901-43f9-9e82-e6a052f627d2",
+                FolderId = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\toto"
             }
         };

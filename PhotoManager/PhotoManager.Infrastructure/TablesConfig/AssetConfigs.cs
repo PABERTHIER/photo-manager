@@ -27,7 +27,7 @@ public static class AssetConfigs
     {
         return new Asset
         {
-            FolderId = values[0],
+            FolderId = new Guid(values[0]),
             FileName = values[1],
             FileSize = long.Parse(values[2]),
             ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), values[3]),

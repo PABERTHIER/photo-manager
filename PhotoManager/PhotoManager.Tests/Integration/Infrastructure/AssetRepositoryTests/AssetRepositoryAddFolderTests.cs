@@ -8,6 +8,7 @@ public class AssetRepositoryAddFolderTests
     private string? dataDirectory;
     private const string backupEndPath = "DatabaseTests\\v1.0";
     private string? backupPath;
+    private readonly Guid defaultGuid = Guid.Empty;
 
     private IAssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageService;
@@ -50,10 +51,10 @@ public class AssetRepositoryAddFolderTests
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
             Assert.AreEqual(folderPath1, addedFolder1.Path);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(addedFolder1.FolderId));
+            Assert.IsFalse(addedFolder1.FolderId == defaultGuid);
 
             Assert.AreEqual(folderPath2, addedFolder2.Path);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(addedFolder2.FolderId));
+            Assert.IsFalse(addedFolder2.FolderId == defaultGuid);
 
             Assert.AreNotEqual(addedFolder1.Path, addedFolder2.Path);
             Assert.AreNotEqual(addedFolder1.FolderId, addedFolder2.FolderId);
@@ -97,10 +98,10 @@ public class AssetRepositoryAddFolderTests
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath1);
 
             Assert.AreEqual(folderPath1, addedFolder1.Path);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(addedFolder1.FolderId));
+            Assert.IsFalse(addedFolder1.FolderId == defaultGuid);
 
             Assert.AreEqual(folderPath1, addedFolder2.Path);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(addedFolder2.FolderId));
+            Assert.IsFalse(addedFolder2.FolderId == defaultGuid);
 
             Assert.AreEqual(addedFolder1.Path, addedFolder2.Path);
             Assert.AreNotEqual(addedFolder1.FolderId, addedFolder2.FolderId);
@@ -151,10 +152,10 @@ public class AssetRepositoryAddFolderTests
             );
 
             Assert.AreEqual(folderPath1, addedFolder1.Path);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(addedFolder1.FolderId));
+            Assert.IsFalse(addedFolder1.FolderId == defaultGuid);
 
             Assert.AreEqual(folderPath2, addedFolder2.Path);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(addedFolder2.FolderId));
+            Assert.IsFalse(addedFolder2.FolderId == defaultGuid);
 
             Assert.AreNotEqual(addedFolder1.Path, addedFolder2.Path);
             Assert.AreNotEqual(addedFolder1.FolderId, addedFolder2.FolderId);

@@ -138,7 +138,7 @@ public class DatabaseWriteObjectListTests
             {
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
@@ -155,7 +155,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
@@ -202,7 +202,7 @@ public class DatabaseWriteObjectListTests
             {
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
@@ -219,7 +219,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
@@ -286,7 +286,7 @@ public class DatabaseWriteObjectListTests
             {
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
@@ -303,7 +303,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
@@ -411,7 +411,7 @@ public class DatabaseWriteObjectListTests
             {
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
@@ -428,7 +428,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
@@ -481,7 +481,7 @@ public class DatabaseWriteObjectListTests
             {
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
@@ -498,7 +498,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new Asset
                 {
-                    FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
@@ -544,7 +544,7 @@ public class DatabaseWriteObjectListTests
         {
             new Asset
             {
-                FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                 FileName = "20200720175810_3.jpg",
                 FileSize = 363888,
                 ImageRotation = Rotation.Rotate0,
@@ -561,7 +561,7 @@ public class DatabaseWriteObjectListTests
             },
             new Asset
             {
-                FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+                FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
                 FileName = "20200720175816_3.jpg",
                 FileSize = 343633,
                 ImageRotation = Rotation.Rotate0,

@@ -128,7 +128,7 @@ public class AssetRepository : IAssetRepository
         {
             folder = new Folder
             {
-                FolderId = Guid.NewGuid().ToString(), // TODO: Why not a Guid? ?
+                FolderId = Guid.NewGuid(),
                 Path = path
             };
 
@@ -565,7 +565,7 @@ public class AssetRepository : IAssetRepository
         _database.WriteBlob(thumbnails, thumbnailsFileName);
     }
 
-    private Folder? GetFolderById(string folderId) // Why not a Guid? ?
+    private Folder? GetFolderById(Guid folderId)
     {
         Folder? result = null;
 
@@ -577,7 +577,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
-    private List<Asset> GetAssetsByFolderId(string folderId)  // Why not a Guid? ?
+    private List<Asset> GetAssetsByFolderId(Guid folderId)
     {
         List<Asset> result = new ();
 
@@ -589,7 +589,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
-    private Asset? GetAssetByFolderIdAndFileName(string folderId, string fileName) // Why not a Guid? ?
+    private Asset? GetAssetByFolderIdAndFileName(Guid folderId, string fileName)
     {
         Asset? asset = null;
 

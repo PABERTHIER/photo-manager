@@ -3,7 +3,7 @@
 public class Folder
 {
     // TODO: FolderId not null -> when a new -> new guid
-    public string FolderId { get; set; } // Why not a Guid? ? -> update all tests and methods that using a non Guid value (like creation of id...)
+    public Guid FolderId { get; set; }
     public string Path { get; set; }
     public string ThumbnailsFilename => FolderId + ".bin"; // TODO: BlobFileName instead -> rename all methods like this
 

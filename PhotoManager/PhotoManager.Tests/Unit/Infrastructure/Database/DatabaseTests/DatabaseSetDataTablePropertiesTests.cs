@@ -181,7 +181,7 @@ public class DatabaseSetDataTablePropertiesTests
     [TestCase(null)]
     [TestCase("")]
     [TestCase(" ")]
-    public void SetDataTableProperties_WithInvalidColumnName_ThrowsArgumentException(string columnName)
+    public void SetDataTableProperties_WithInvalidColumnName_ThrowsArgumentNullException(string columnName)
     {
         DataTableProperties properties = new()
         {
@@ -193,7 +193,7 @@ public class DatabaseSetDataTablePropertiesTests
             }
         };
 
-        var exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
+        var exception = Assert.Throws<ArgumentNullException>(() => _database!.SetDataTableProperties(properties));
         Assert.AreEqual("All column properties should have a ColumnName (Parameter 'ColumnName')", exception?.Message);
         Assert.AreEqual(nameof(ColumnProperties.ColumnName), exception?.ParamName);
     }

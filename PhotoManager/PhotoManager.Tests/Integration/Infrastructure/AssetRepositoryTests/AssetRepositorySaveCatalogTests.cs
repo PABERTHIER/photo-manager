@@ -42,7 +42,7 @@ public class AssetRepositorySaveCatalogTests
 
         asset1 = new()
         {
-            FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
             FileSize = 363888,
             ImageRotation = Rotation.Rotate0,

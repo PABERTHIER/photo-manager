@@ -50,7 +50,7 @@ public class Database : IDatabase
 
         if (dataTableProperties.ColumnProperties.Any(c => string.IsNullOrWhiteSpace(c.ColumnName)))
         {
-            throw new ArgumentException("All column properties should have a ColumnName", nameof(ColumnProperties.ColumnName));
+            throw new ArgumentNullException(nameof(ColumnProperties.ColumnName), "All column properties should have a ColumnName");
         }
 
         var group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName).Where(g => g.Count() > 1).FirstOrDefault();

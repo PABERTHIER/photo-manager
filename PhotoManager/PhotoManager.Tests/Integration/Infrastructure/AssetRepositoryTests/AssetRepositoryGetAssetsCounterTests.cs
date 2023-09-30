@@ -43,7 +43,7 @@ public class AssetRepositoryGetAssetsCounterTests
 
         asset1 = new()
         {
-            FolderId = "876283c6-780e-4ad5-975c-be63044c087a",
+            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
             FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
@@ -60,7 +60,7 @@ public class AssetRepositoryGetAssetsCounterTests
         };
         asset2 = new()
         {
-            FolderId = "68493435-e299-4bb5-9e02-214da41d0256",
+            FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = "Image 9.png",
             FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
@@ -77,7 +77,7 @@ public class AssetRepositoryGetAssetsCounterTests
         };
         asset3 = new()
         {
-            FolderId = "f91b8c81-6938-431a-a689-d86c7c4db126",
+            FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
             FileName = "Image_11.heic",
             FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
