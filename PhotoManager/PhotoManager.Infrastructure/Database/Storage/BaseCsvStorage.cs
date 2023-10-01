@@ -2,7 +2,7 @@
 
 public abstract class BaseCsvStorage
 {
-    protected const string QUOTE = "\"";
+    protected const char QUOTE = '"';
     protected DataTableProperties? Properties { get; set; }
     protected char Separator { get; set; }
 
@@ -17,6 +17,7 @@ public abstract class BaseCsvStorage
         string[] fields = new string[Properties!.ColumnProperties.Length];
         int startIndex = 0;
         int endIndex;
+        string quoteAndSeparator = string.Format("{0}{1}", QUOTE, Separator);
 
         for (int i = 0; i < Properties.ColumnProperties.Length; i++)
         {
@@ -24,7 +25,7 @@ public abstract class BaseCsvStorage
 
             if (escapeText)
             {
-                endIndex = line.IndexOf(QUOTE + Separator, startIndex);
+                endIndex = line.IndexOf(quoteAndSeparator, startIndex);
                 startIndex++;
             }
             else
@@ -34,13 +35,13 @@ public abstract class BaseCsvStorage
 
             if (endIndex >= 0 && (endIndex < (line.Length - 1)))
             {
-                string field = line.Substring(startIndex, endIndex - startIndex);
+                string field = line[startIndex..endIndex];
                 fields[i] = field;
                 startIndex = endIndex + (escapeText ? 2 : 1);
             }
             else if (endIndex == -1)
             {
-                string field = escapeText ? line.Substring(startIndex, line.Length - startIndex - 1) : line.Substring(startIndex);
+                string field = escapeText ? line.Substring(startIndex, line.Length - startIndex - 1) : line[startIndex..];
                 fields[i] = field;
             }
         }

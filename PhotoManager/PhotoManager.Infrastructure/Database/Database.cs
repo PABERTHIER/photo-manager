@@ -23,6 +23,12 @@ public class Database : IDatabase
         //_dataTableStorage = dataTableStorage;
         _blobStorage = blobStorage;
         _backupStorage = backupStorage;
+        DataDirectory = string.Empty;
+        TablesDirectory = string.Empty;
+        BlobsDirectory = string.Empty;
+        BackupsDirectory = string.Empty;
+        Diagnostics = new Diagnostics();
+        DataTablePropertiesDictionary = new();
     }
 
     public void Initialize(string dataDirectory, char separator)

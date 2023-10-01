@@ -57,7 +57,7 @@ public class DatabaseDeleteOldBackupsTests
             Assert.IsTrue(File.Exists(path5));
 
             Assert.IsNotNull(_database!.Diagnostics.LastDeletedBackupFilePaths);
-            Assert.AreEqual(2, _database!.Diagnostics.LastDeletedBackupFilePaths.Length);
+            Assert.AreEqual(2, _database!.Diagnostics.LastDeletedBackupFilePaths!.Length);
             Assert.AreEqual(path4, _database!.Diagnostics.LastDeletedBackupFilePaths[0]);
             Assert.AreEqual(path3, _database!.Diagnostics.LastDeletedBackupFilePaths[1]);
         }
@@ -97,7 +97,7 @@ public class DatabaseDeleteOldBackupsTests
             Assert.IsTrue(File.Exists(path3));
 
             Assert.IsNotNull(_database!.Diagnostics.LastDeletedBackupFilePaths);
-            Assert.AreEqual(0, _database!.Diagnostics.LastDeletedBackupFilePaths.Length);
+            Assert.AreEqual(0, _database!.Diagnostics.LastDeletedBackupFilePaths!.Length);
         }
         finally
         {

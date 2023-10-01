@@ -66,10 +66,11 @@ public class DatabaseInitializeTests
         Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
         Assert.AreEqual(directoryPath, _testableDatabase!.DataDirectory);
-        Assert.AreEqual(directoryPath, tablesDirectory);
-        Assert.AreEqual(directoryPath, blobsDirectory);
-        Assert.AreEqual(directoryPath, backupsDirectory);
+        Assert.AreEqual(string.Empty, tablesDirectory);
+        Assert.AreEqual(string.Empty, blobsDirectory);
+        Assert.AreEqual(string.Empty, backupsDirectory);
         Assert.AreEqual('\0', _testableDatabase!.Separator);
-        Assert.IsNull(dataTablePropertiesDictionary);
+        Assert.IsNotNull(dataTablePropertiesDictionary);
+        Assert.IsEmpty(dataTablePropertiesDictionary);
     }
 }

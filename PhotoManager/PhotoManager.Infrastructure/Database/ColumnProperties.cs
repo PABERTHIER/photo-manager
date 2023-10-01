@@ -2,6 +2,6 @@
 
 public class ColumnProperties
 {
-    public string ColumnName { get; set; }
+    public required string ColumnName { get; set; }
     public bool EscapeText { get; set; }
 }

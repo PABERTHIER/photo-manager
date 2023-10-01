@@ -71,7 +71,7 @@ public class UserConfigurationService : IUserConfigurationService
 
         if (File.Exists(asset.FullPath))
         {
-            SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, asset.FullPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+            _ = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, asset.FullPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
         }
     }
 
