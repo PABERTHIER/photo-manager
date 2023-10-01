@@ -34,12 +34,12 @@ public class Database : IDatabase
     public void Initialize(string dataDirectory, char separator)
     {
         DataDirectory = dataDirectory;
-        TablesDirectory = GetTablesDirectory(dataDirectory);
-        BlobsDirectory = GetBlobsDirectory(dataDirectory);
-        BackupsDirectory = GetBackupsDirectory(dataDirectory);
+        TablesDirectory = GetTablesDirectory();
+        BlobsDirectory = GetBlobsDirectory();
+        BackupsDirectory = GetBackupsDirectory();
         Separator = separator;
         DataTablePropertiesDictionary = new Dictionary<string, DataTableProperties>();
-        InitializeDirectory(dataDirectory);
+        InitializeDirectory();
     }
 
     public void SetDataTableProperties(DataTableProperties dataTableProperties)
@@ -73,7 +73,7 @@ public class Database : IDatabase
     {
         try
         {
-            string dataFilePath = ResolveTableFilePath(DataDirectory, tableName);
+            string dataFilePath = ResolveTableFilePath(tableName);
             Diagnostics = new Diagnostics { LastReadFilePath = dataFilePath };
             DataTableProperties? properties = GetDataTableProperties(tableName);
             _objectListStorage.Initialize(properties, Separator);
@@ -102,7 +102,7 @@ public class Database : IDatabase
             throw new ArgumentNullException(nameof(tableName));
         }
 
-        string dataFilePath = ResolveTableFilePath(DataDirectory, tableName);
+        string dataFilePath = ResolveTableFilePath(tableName);
         Diagnostics = new Diagnostics { LastWriteFilePath = dataFilePath };
         DataTableProperties? properties = GetDataTableProperties(tableName);
         _objectListStorage.Initialize(properties, Separator);
@@ -111,14 +111,14 @@ public class Database : IDatabase
 
     public Dictionary<string, byte[]>? ReadBlob(string blobName) // Key is imageName (string), value is the binary file -> image data (byte[])
     {
-        string blobFilePath = ResolveBlobFilePath(DataDirectory, blobName);
+        string blobFilePath = ResolveBlobFilePath(blobName);
         Diagnostics = new Diagnostics { LastReadFilePath = blobFilePath };
         return _blobStorage.ReadFromBinaryFile(blobFilePath);
     }
 
     public void WriteBlob(Dictionary<string, byte[]> blob, string blobName) // One Blob per folder, Key is imageName (string), value is the binary file -> image data (byte[])
     {
-        string blobFilePath = ResolveBlobFilePath(DataDirectory, blobName);
+        string blobFilePath = ResolveBlobFilePath(blobName);
         Diagnostics = new Diagnostics { LastWriteFilePath = blobFilePath, LastWriteFileRaw = blob };
         _blobStorage.WriteToBinaryFile(blob, blobFilePath);
     }
@@ -126,20 +126,20 @@ public class Database : IDatabase
     // This method verifies if the folder has its .bin generated, but not if there are data in it or not
     public bool FolderHasThumbnails(string blobName) // FolderId + ".bin"
     {
-        var blobFilePath = ResolveBlobFilePath(DataDirectory, blobName);
+        var blobFilePath = ResolveBlobFilePath(blobName);
         return File.Exists(blobFilePath);
     }
 
     public void DeleteThumbnails(string blobName) // FolderId + ".bin"
     {
-        string thumbnailsFilePath = ResolveBlobFilePath(DataDirectory, blobName);
+        string thumbnailsFilePath = ResolveBlobFilePath(blobName);
         File.Delete(thumbnailsFilePath);
     }
 
     public bool WriteBackup(DateTime backupDate)
     {
         bool backupHasBeenWritten = false;
-        string backupFilePath = ResolveBackupFilePath(DataDirectory, backupDate);
+        string backupFilePath = ResolveBackupFilePath(backupDate);
 
         if (!BackupExists(backupDate))
         {
@@ -153,7 +153,7 @@ public class Database : IDatabase
 
     public bool BackupExists(DateTime backupDate)
     {
-        string backupFilePath = ResolveBackupFilePath(DataDirectory, backupDate);
+        string backupFilePath = ResolveBackupFilePath(backupDate);
         return File.Exists(backupFilePath);
     }
 
@@ -172,9 +172,9 @@ public class Database : IDatabase
         Diagnostics = new Diagnostics { LastDeletedBackupFilePaths = deletedBackupFilePaths.ToArray() };
     }
 
-    private void InitializeDirectory(string dataDirectory)
+    private void InitializeDirectory()
     {
-        Directory.CreateDirectory(dataDirectory);
+        Directory.CreateDirectory(DataDirectory);
         Directory.CreateDirectory(TablesDirectory);
         Directory.CreateDirectory(BlobsDirectory);
         Directory.CreateDirectory(BackupsDirectory);
@@ -186,43 +186,41 @@ public class Database : IDatabase
             DataTablePropertiesDictionary[tableName] : null;
     }
 
-    private static string GetTablesDirectory(string dataDirectory)
+    private string GetTablesDirectory()
     {
-        return Path.Combine(dataDirectory, AssetConstants.Tables);
+        return Path.Combine(DataDirectory, AssetConstants.Tables);
     }
 
-    private static string GetBlobsDirectory(string dataDirectory)
+    private string GetBlobsDirectory()
     {
-        return Path.Combine(dataDirectory, AssetConstants.Blobs);
+        return Path.Combine(DataDirectory, AssetConstants.Blobs);
     }
 
-    private static string GetBackupsDirectory(string dataDirectory)
+    private string GetBackupsDirectory()
     {
-        return dataDirectory + "_Backups";
+        return DataDirectory + "_Backups";
     }
 
-    private static string ResolveTableFilePath(string dataDirectory, string entityName)
+    private string ResolveTableFilePath(string entityName)
     {
-        dataDirectory = !string.IsNullOrEmpty(dataDirectory) ? dataDirectory : string.Empty;
         string fileName = string.Format(DATA_FILE_FORMAT, entityName).ToLower();
-        return Path.Combine(GetTablesDirectory(dataDirectory), fileName);
+        return Path.Combine(TablesDirectory, fileName);
     }
 
-    private static string ResolveBackupFilePath(string dataDirectory, DateTime backupDate)
+    private string ResolveBackupFilePath(DateTime backupDate)
     {
-        dataDirectory = !string.IsNullOrEmpty(dataDirectory) ? dataDirectory : string.Empty;
         string fileName = backupDate.ToString("yyyyMMdd") + ".zip";
-        return Path.Combine(GetBackupsDirectory(dataDirectory), fileName);
+        return Path.Combine(BackupsDirectory, fileName);
     }
 
-    private static string ResolveBlobFilePath(string dataDirectory, string blobName)
+    private string ResolveBlobFilePath(string blobName)
     {
-        return Path.Combine(GetBlobsDirectory(dataDirectory), blobName);
+        return Path.Combine(BlobsDirectory, blobName);
     }
 
     //public DataTable ReadDataTable(string tableName)
     //{
-    //    string dataFilePath = ResolveTableFilePath(DataDirectory, tableName);
+    //    string dataFilePath = ResolveTableFilePath(tableName);
     //    Diagnostics = new Diagnostics { LastReadFilePath = dataFilePath };
     //    DataTableProperties? properties = GetDataTableProperties(tableName);
     //    _dataTableStorage.Initialize(properties, Separator);
@@ -243,7 +241,7 @@ public class Database : IDatabase
     //            throw new ArgumentException("All columns should have a name.", nameof(dataTable));
     //    }
 
-    //    string dataFilePath = ResolveTableFilePath(DataDirectory, dataTable.TableName);
+    //    string dataFilePath = ResolveTableFilePath(dataTable.TableName);
     //    Diagnostics = new Diagnostics { LastWriteFilePath = dataFilePath };
     //    DataTableProperties? properties = GetDataTableProperties(dataTable.TableName);
     //    _dataTableStorage.Initialize(properties, Separator);
