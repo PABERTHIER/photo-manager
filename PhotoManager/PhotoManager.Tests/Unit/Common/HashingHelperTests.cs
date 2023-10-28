@@ -160,10 +160,12 @@ public class HashingHelperTests
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
     [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
-    public void CalculateMD5Hash_ValidFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
+    public void CalculateMD5Hash_ValidImageBytes_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         var filePath = Path.Combine(dataDirectory!, fileName);
-        string md5Hash = HashingHelper.CalculateMD5Hash(filePath);
+        byte[] imageBytes = File.ReadAllBytes(filePath);
+
+        string md5Hash = HashingHelper.CalculateMD5Hash(imageBytes);
 
         Assert.False(string.IsNullOrWhiteSpace(md5Hash));
         Assert.AreEqual(32, md5Hash.Length); // The MD5Hash is a 32-character hexadecimal string
@@ -171,19 +173,24 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateMD5Hash_InvalidFilePath_ThrowsFileNotFoundException()
+    public void CalculateMD5Hash_EmptyImageBytes_ReturnsSameHash()
     {
-        var filePath = Path.Combine(dataDirectory!, "invalid_path.png");
+        byte[] imageBytes = Array.Empty<byte>();
+        var expectedHash = "d41d8cd98f00b204e9800998ecf8427e";
 
-        Assert.Throws<FileNotFoundException>(() => HashingHelper.CalculateMD5Hash(filePath));
+        string hash = HashingHelper.CalculateMD5Hash(imageBytes);
+
+        Assert.False(string.IsNullOrWhiteSpace(hash));
+        Assert.AreEqual(32, hash.Length);
+        Assert.AreEqual(expectedHash, hash.ToLower());
     }
 
     [Test]
-    public void CalculateMD5Hash_NullFilePath_ThrowsArgumentNullException()
+    public void CalculateMD5Hash_NullImageBytes_ThrowsArgumentNullException()
     {
-        string? filePath = null;
+        byte[]? imageBytes = null;
 
-        Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateMD5Hash(filePath!));
+        Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateMD5Hash(imageBytes!));
     }
 
     [Test]

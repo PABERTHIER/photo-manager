@@ -17,7 +17,7 @@ public class AssetHashCalculatorService : IAssetHashCalculatorService
 
         if (AssetConstants.UsingMD5Hash)
         {
-            return HashingHelper.CalculateMD5Hash(filePath) ?? HashingHelper.CalculateHash(imageBytes);
+            return HashingHelper.CalculateMD5Hash(imageBytes) ?? HashingHelper.CalculateHash(imageBytes);
         }
 
         return HashingHelper.CalculateHash(imageBytes);

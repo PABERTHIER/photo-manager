@@ -9,7 +9,7 @@ public static class HashingHelper
     public static string CalculateHash(byte[] imageBytes)
     {
         StringBuilder hashBuilder = new();
-        byte[] hash = SHA512.Create().ComputeHash(imageBytes);
+        byte[] hash = SHA512.HashData(imageBytes);
 
         foreach (byte hashByte in hash)
         {
@@ -64,15 +64,11 @@ public static class HashingHelper
         return hash.ToString();
     }
 
-    public static string CalculateMD5Hash(string filePath)
+    public static string CalculateMD5Hash(byte[] imageBytes)
     {
-        using (var stream = File.OpenRead(filePath))
-        {
-            var md5 = MD5.Create();
-            var hashBytes = md5.ComputeHash(stream);
-            var hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-            return hashString;
-        }
+        byte[] hashBytes = MD5.HashData(imageBytes);
+        string md5Hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+        return md5Hash;
     }
 
     //The best use is for PHash method, the more accurate
