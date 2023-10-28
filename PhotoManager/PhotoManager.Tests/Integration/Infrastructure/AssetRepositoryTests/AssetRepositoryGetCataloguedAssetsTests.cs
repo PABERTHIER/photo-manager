@@ -84,7 +84,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
             string folderPath1 = Path.Combine(dataDirectory!, "NewFolder1");
             string folderPath2 = Path.Combine(dataDirectory!, "NewFolder2");
 
-            asset1!.Folder = new ()
+            asset1!.Folder = new()
             {
                 Path = folderPath1
             };
@@ -148,9 +148,9 @@ public class AssetRepositoryGetCataloguedAssetsTests
 
             Assert.IsTrue(_assetRepository.HasChanges());
 
-            List<Asset> assets1 = new ();
-            List<Asset> assets2 = new ();
-            List<Asset> assets3 = new ();
+            List<Asset> assets1 = new();
+            List<Asset> assets2 = new();
+            List<Asset> assets3 = new();
 
             // Simulate concurrent access
             Parallel.Invoke(

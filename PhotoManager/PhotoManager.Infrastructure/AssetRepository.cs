@@ -40,7 +40,7 @@ public class AssetRepository : IAssetRepository
 
     public Asset[] GetAssetsByPath(string directory)
     {
-        List<Asset> assetsList = new (); // TODO: Why array at the end ?
+        List<Asset> assetsList = new(); // TODO: Why array at the end ?
         bool isNewFile = false;
 
         try
@@ -233,7 +233,7 @@ public class AssetRepository : IAssetRepository
 
     public List<Asset> GetCataloguedAssetsByPath(string directory)
     {
-        List<Asset> cataloguedAssets = new ();
+        List<Asset> cataloguedAssets = new();
 
         lock (syncLock)
         {
@@ -399,7 +399,7 @@ public class AssetRepository : IAssetRepository
 
     public List<string> GetRecentTargetPaths()
     {
-        List<string> result = new ();
+        List<string> result = new();
 
         lock (syncLock)
         {
@@ -519,7 +519,7 @@ public class AssetRepository : IAssetRepository
     private Dictionary<string, byte[]> GetThumbnails(Folder? folder, out bool isNewFile)
     {
         isNewFile = false;
-        Dictionary<string, byte[]>? thumbnails = new ();
+        Dictionary<string, byte[]>? thumbnails = new();
 
         if (folder == null)
         {
@@ -578,7 +578,7 @@ public class AssetRepository : IAssetRepository
 
     private List<Asset> GetAssetsByFolderId(Guid folderId)
     {
-        List<Asset> result = new ();
+        List<Asset> result = new();
 
         lock (syncLock)
         {

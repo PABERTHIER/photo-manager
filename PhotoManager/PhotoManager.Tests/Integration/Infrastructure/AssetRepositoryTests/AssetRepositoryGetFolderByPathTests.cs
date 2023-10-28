@@ -143,7 +143,7 @@ public class AssetRepositoryGetFolderByPathTests
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
-            Folder? folderByPath1 = new ();
+            Folder? folderByPath1 = new();
             Folder? folderByPath2 = new();
 
             // Simulate concurrent access

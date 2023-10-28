@@ -172,7 +172,7 @@ public class AssetRepositoryGetAssetsByPathTests
     public void GetAssetsByPath_ThumbnailsAndFolderExistButLoadBitmapThumbnailImageReturnsNull_ReturnsEmptyArray()
     {
         BitmapImage? bitmapImage = null;
-        Mock<IStorageService> storageService = new ();
+        Mock<IStorageService> storageService = new();
         storageService!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
         storageService.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
@@ -290,7 +290,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string folderPath2 = Path.Combine(dataDirectory!, "NewFolder2");
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
 
-            asset1!.Folder = new () { Path = folderPath2 };
+            asset1!.Folder = new() { Path = folderPath2 };
             asset1!.FolderId = folder1.FolderId;
             byte[] assetData1 = new byte[] { 1, 2, 3 };
 

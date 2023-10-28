@@ -150,7 +150,7 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
             asset1!.FolderId = addedFolder1.FolderId;
             _assetRepository!.AddAsset(asset1!, Array.Empty<byte>());
 
-            List<Asset> cataloguedAssets1 = new ();
+            List<Asset> cataloguedAssets1 = new();
             List<Asset> cataloguedAssets2 = new();
 
             // Simulate concurrent access

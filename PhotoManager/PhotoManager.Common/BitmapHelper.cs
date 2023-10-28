@@ -63,12 +63,12 @@ public static class BitmapHelper
                     MagickImageApplyRotation(magickImage, rotation);
 
                     // Convert the MagickImage to a BitmapImage
-                    using (MemoryStream bitmapStream = new ())
+                    using (MemoryStream bitmapStream = new())
                     {
                         magickImage.Write(bitmapStream, MagickFormat.Bmp);
                         bitmapStream.Position = 0;
 
-                        BitmapImage bitmapImage = new ();
+                        BitmapImage bitmapImage = new();
                         bitmapImage.BeginInit();
                         bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;

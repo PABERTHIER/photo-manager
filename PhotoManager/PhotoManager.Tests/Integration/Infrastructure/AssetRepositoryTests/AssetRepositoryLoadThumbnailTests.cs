@@ -150,7 +150,7 @@ public class AssetRepositoryLoadThumbnailTests
     [Test]
     public void LoadThumbnail_AssetDoesNotExistButBinExistsAndRemoveOldThumbnailsDictionaryEntriesIs0_ReturnsNull()
     {
-        Mock<IConfigurationRoot> configurationRoot = new ();
+        Mock<IConfigurationRoot> configurationRoot = new();
         configurationRoot
             .MockGetValue("appsettings:CatalogBatchSize", "100")
             .MockGetValue("appsettings:CatalogCooldownMinutes", "5")

@@ -116,9 +116,9 @@ public class AssetRepositoryGetSyncAssetsConfigurationTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfigurationToSave);
 
-            SyncAssetsConfiguration syncAssetsConfiguration1 = new ();
-            SyncAssetsConfiguration syncAssetsConfiguration2 = new ();
-            SyncAssetsConfiguration syncAssetsConfiguration3 = new ();
+            SyncAssetsConfiguration syncAssetsConfiguration1 = new();
+            SyncAssetsConfiguration syncAssetsConfiguration2 = new();
+            SyncAssetsConfiguration syncAssetsConfiguration3 = new();
 
             // Simulate concurrent access
             Parallel.Invoke(

@@ -90,9 +90,9 @@ public class AssetRepositoryGetRecentTargetPathsTests
 
             _assetRepository!.SaveRecentTargetPaths(recentTargetPathsToSave);
 
-            List<string> recentTargetPaths1 = new ();
-            List<string> recentTargetPaths2 = new ();
-            List<string> recentTargetPaths3 = new ();
+            List<string> recentTargetPaths1 = new();
+            List<string> recentTargetPaths2 = new();
+            List<string> recentTargetPaths3 = new();
 
             // Simulate concurrent access
             Parallel.Invoke(

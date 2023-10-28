@@ -164,7 +164,7 @@ public class AssetConfigsTests
     [Test]
     public void WriteFunc_AssetWithValidValues_ConvertsAssetPropertiesToIndexInArray()
     {
-        Asset asset = new ()
+        Asset asset = new()
         {
             FolderId = folderId,
             FileName = "Image 1.jpg",
