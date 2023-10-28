@@ -283,39 +283,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
         }
     }
-
-    [Test]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NoDuplicatedAssets_ReturnsEmptyList()
-    {
-        try
-        {
-            string folderPath = Path.Combine(dataDirectory!, "NewFolder");
-
-            Folder folder = new() { Path = folderPath };
-
-            asset1!.Folder = folder;
-            asset1.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            asset2!.Folder = folder;
-            asset2.Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
-
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
-            byte[] assetData2 = Array.Empty<byte>();
-
-            _assetRepository!.AddAsset(asset1!, assetData1);
-            _assetRepository.AddAsset(asset2!, assetData2);
-
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
-
-            Assert.IsEmpty(duplicatedAssets);
-        }
-        finally
-        {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
-        }
-    }
-
+    
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_DuplicatesButOneFileDoesNotExist_ReturnsEmptyList()
     {
@@ -398,6 +366,38 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         try
         {
             List<Asset> assets = _assetRepository!.GetCataloguedAssets();
+
+            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
+
+            Assert.IsEmpty(duplicatedAssets);
+        }
+        finally
+        {
+            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+        }
+    }
+
+    [Test]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NoDuplicatedAssets_ReturnsEmptyList()
+    {
+        try
+        {
+            string folderPath = Path.Combine(dataDirectory!, "NewFolder");
+
+            Folder folder = new() { Path = folderPath };
+
+            asset1!.Folder = folder;
+            asset1.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
+            asset2!.Folder = folder;
+            asset2.Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
+
+            byte[] assetData1 = new byte[] { 1, 2, 3 };
+            byte[] assetData2 = Array.Empty<byte>();
+
+            _assetRepository!.AddAsset(asset1!, assetData1);
+            _assetRepository.AddAsset(asset2!, assetData2);
+
+            List<Asset> assets = _assetRepository.GetCataloguedAssets();
 
             List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
 
