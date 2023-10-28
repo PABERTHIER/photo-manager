@@ -50,7 +50,9 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
     public void SetDuplicates(List<List<Asset>> duplicatedAssets)
     {
         if (duplicatedAssets == null)
+        {
             throw new ArgumentNullException(nameof(duplicatedAssets));
+        }
 
         _duplicatedAssets = duplicatedAssets;
         List<DuplicatedSetViewModel> collection = new();

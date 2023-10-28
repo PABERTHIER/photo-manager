@@ -36,6 +36,37 @@
     <None Remove="TestFiles\Image_11_180.heic" />
     <None Remove="TestFiles\Image_11_270.heic" />
     <None Remove="TestFiles\IMAGE_WITH_UPPERCASE_NAME.JPG" />
+    <None Remove="TestFiles\Duplicates\NewFolder1\Image 1.jpg" />
+    <None Remove="TestFiles\Duplicates\NewFolder2\Image 1_duplicate.jpg" />
+    <None Remove="TestFiles\Duplicates\NewFolder2\Image 9.png" />
+    <None Remove="TestFiles\Duplicates\NewFolder2\Image 9_duplicate.png" />
+    <None Remove="TestFiles\Duplicates\NewFolder2\Image_11.heic" />
+    <None Remove="TestFiles\Duplicates\NotDuplicate\Sample1\1336.JPG" />
+    <None Remove="TestFiles\Duplicates\NotDuplicate\Sample1\1337.JPG" />
+    <None Remove="TestFiles\Duplicates\NotDuplicate\Sample2\1349.JPG" />
+    <None Remove="TestFiles\Duplicates\NotDuplicate\Sample2\1350.JPG" />
+    <None Remove="TestFiles\Duplicates\NotDuplicate\Sample3\1413.JPG" />
+    <None Remove="TestFiles\Duplicates\NotDuplicate\Sample3\1414.JPG" />
+    <None Remove="TestFiles\Duplicates\NotDuplicate\Sample3\1415.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_BottomLeftPart.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_BottomPart.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_BottomRightPart.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_LeftPart.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_Original.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_RightPart.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_TopLeftPart.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_TopPart.JPG" />
+    <None Remove="TestFiles\Duplicates\Part\1336_TopRightPart.JPG" />
+    <None Remove="TestFiles\Duplicates\Resolution\1336_1K.JPG" />
+    <None Remove="TestFiles\Duplicates\Resolution\1336_2K.JPG" />
+    <None Remove="TestFiles\Duplicates\Resolution\1336_3K.JPG" />
+    <None Remove="TestFiles\Duplicates\Resolution\1336_4K_Original.JPG" />
+    <None Remove="TestFiles\Duplicates\Resolution\1336_8K.JPG" />
+    <None Remove="TestFiles\Duplicates\Resolution\1336_Thumbnail.JPG" />
+    <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_Mini.JPG" />
+    <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_Original.JPG" />
+    <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_ShitQuality.JPG" />
+    <None Remove="TestFiles\Duplicates\Thumbnail\Image_1336_Small.JPG" />
     <None Remove="TestFiles\TestBackup\v1.0\Blobs\18033543-defb-4d37-837b-d8063eda3a25.bin" />
     <None Remove="TestFiles\TestBackup\v1.0\Blobs\f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin" />
     <None Remove="TestFiles\TestBackup\v1.0\Tables\assets.db" />
@@ -117,6 +148,99 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\IMAGE_WITH_UPPERCASE_NAME.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NewFolder1\Image 1.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NewFolder2\Image 1_duplicate.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NewFolder2\Image 9.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NewFolder2\Image 9_duplicate.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NewFolder2\Image_11.heic">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NotDuplicate\Sample1\1336.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NotDuplicate\Sample1\1337.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NotDuplicate\Sample2\1349.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NotDuplicate\Sample2\1350.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NotDuplicate\Sample3\1413.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NotDuplicate\Sample3\1414.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\NotDuplicate\Sample3\1415.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_BottomLeftPart.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_BottomPart.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_BottomRightPart.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_LeftPart.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_Original.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_RightPart.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_TopLeftPart.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_TopPart.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Part\1336_TopRightPart.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Resolution\1336_1K.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Resolution\1336_2K.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Resolution\1336_3K.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Resolution\1336_4K_Original.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Resolution\1336_8K.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Resolution\1336_Thumbnail.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Thumbnail\Image_1336_Mini.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Thumbnail\Image_1336_Original.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Thumbnail\Image_1336_ShitQuality.JPG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Duplicates\Thumbnail\Image_1336_Small.JPG">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\TestBackup\v1.0\Blobs\18033543-defb-4d37-837b-d8063eda3a25.bin">

@@ -19,113 +19,98 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
     public List<List<Asset>> GetDuplicatedAssets()
     {
 #pragma warning disable CS0162 // Unreachable code detected
-        List<List<Asset>> result = new(); // TODO: rename result
+        List<List<Asset>> duplicatedAssetsSets = new();
         List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
 
         if (AssetConstants.DetectThumbnails && AssetConstants.UsingPHash)
         {
-            return FindPHashDuplicates(assets);
+            return GetDuplicatesBetweenOriginalAndThumbnail(assets, AssetConstants.PHashThreshold);
         }
 
-        var assetGroups = assets.GroupBy(a => a.Hash).ToList();
-        assetGroups = assetGroups.Where(g => g.Count() > 1).ToList();
+        var assetGroups = assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1).ToList();
 
         foreach (var group in assetGroups)
         {
-            result.Add(group.ToList());
-        }
+            List<Asset> duplicatedSet = group.ToList();
+            duplicatedSet.RemoveAll(asset => !_storageService.FileExists(asset.FullPath));
 
-        // Removes stale assets, whose files no longer exists.
-        foreach (List<Asset> duplicatedSet in result)
-        {
-            List<Asset> assetsToRemove = new();
-
-            for (int i = 0; i < duplicatedSet.Count; i++)
+            if (duplicatedSet.Count > 1)
             {
-                if (!_storageService.FileExists(duplicatedSet[i].FullPath))
-                {
-                    assetsToRemove.Add(duplicatedSet[i]);
-                }
-            }
-
-            foreach (Asset asset in assetsToRemove)
-            {
-                duplicatedSet.Remove(asset);
+                duplicatedAssetsSets.Add(duplicatedSet);
+                LoadFileInformation(duplicatedSet);
             }
         }
 
-        result = result.Where(r => r.Count > 1).ToList();
-
-        foreach (List<Asset> duplicatedSet in result) // TODO: merge with above ?
-        {
-            foreach (Asset asset in duplicatedSet)
-            {
-                _storageService.LoadFileInformation(asset);
-            }
-        }
-
-        return result;
+        return duplicatedAssetsSets;
 #pragma warning restore CS0162 // Unreachable code detected
     }
 
     // Between Original and Thumbnail:
-    // PHash the hammingDistance is 36/210
+    // PHash the hammingDistance is 36/210 => the more accurate
     // DHash the hammingDistance is 16/17
     // MD5Hash the hammingDistance is 32/32
     // SHA512 the hammingDistance is 118/128
-    private static List<List<Asset>> FindPHashDuplicates(List<Asset> assets) // TODO: protected to test it
+    protected List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(List<Asset> assets, int threshold)
     {
-        //Adjust it if needed, the max advised is less than 90 (for example 68 can detect false positives)
-        //By keeping 40, it can detect a Thumbnail and an original with low quality as duplicates
-        const int threshold = 40; //5 or 6 is often used as a default value in image comparison libraries
-        List<List<Asset>> duplicates = new();
+        List<List<Asset>> duplicatedAssetsSets = new();
 
-        // Loop through all possible pairs of assets
-        for (int i = 0; i < assets.Count - 1; i++)
+        // Create a dictionary to store assets by their Hash values
+        Dictionary<string, List<Asset>> assetDictionary = new();
+
+        assets.RemoveAll(asset => !_storageService.FileExists(asset.FullPath));
+
+        for (int i = 0; i < assets.Count; i++)
         {
-            for (int j = i + 1; j < assets.Count; j++)
-            {
-                var asset1 = assets[i];
-                var asset2 = assets[j];
-                // Calculate the Hamming distance between the pair of assets
-                int hammingDistance = HashingHelper.CalculateHammingDistance(asset1.Hash, asset2.Hash);
+            Asset asset1 = assets[i];
+            string hash1 = asset1.Hash;
 
-                // If the Hamming distance is below the threshold, add the pair of assets to the duplicates list
+            // Create a flag to check if the asset is already added to any set
+            bool addedToSet = false;
+
+            // Check if the asset dictionary contains entries with similar Hash values
+            foreach (KeyValuePair<string, List<Asset>> kvp in assetDictionary)
+            {
+                string hash2 = kvp.Key;
+
+                // Calculate the Hamming distance between the Hash values
+                int hammingDistance = HashingHelper.CalculateHammingDistance(hash1, hash2);
+
+                // If the Hamming distance is below the threshold, add the asset to the duplicates list
                 if (hammingDistance <= threshold)
                 {
-                    // Check if the duplicates list already contains a list with one of the assets
-                    bool addedToExistingList = false;
-                    foreach (List<Asset> list in duplicates)
+                    if (!kvp.Value.Contains(asset1))
                     {
-                        if (list.Contains(assets[i]))
-                        {
-                            list.Add(assets[j]);
-                            addedToExistingList = true;
-                            break;
-                        }
-                        else if (list.Contains(assets[j]))
-                        {
-                            list.Add(assets[i]);
-                            addedToExistingList = true;
-                            break;
-                        }
-                    }
-
-                    // If the pair of assets is not added to an existing list, create a new list for them
-                    if (!addedToExistingList)
-                    {
-                        List<Asset> newDuplicatesList = new()
-                        {
-                            assets[i],
-                            assets[j]
-                        };
-
-                        duplicates.Add(newDuplicatesList);
+                        kvp.Value.Add(asset1);
+                        addedToSet = true;
                     }
                 }
             }
+
+            // If the asset is not in the dictionary and hasn't been added to any set, create a new entry
+            if (!assetDictionary.ContainsKey(hash1) && !addedToSet)
+            {
+                assetDictionary[hash1] = new List<Asset> { asset1 };
+            }
         }
 
-        return duplicates;
+        // Create the result list of duplicated asset sets
+        foreach (List<Asset> assetSet in assetDictionary.Values)
+        {
+            if (assetSet.Count > 1)
+            {
+                LoadFileInformation(assetSet);
+                duplicatedAssetsSets.Add(assetSet);
+            }
+        }
+
+        return duplicatedAssetsSets;
+    }
+
+    private void LoadFileInformation(List<Asset> duplicatedSet)
+    {
+        foreach (Asset asset in duplicatedSet)
+        {
+            _storageService.LoadFileInformation(asset);
+        }
     }
 }

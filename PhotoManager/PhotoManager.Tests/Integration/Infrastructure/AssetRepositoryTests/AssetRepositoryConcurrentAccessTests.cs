@@ -75,8 +75,8 @@ public class AssetRepositoryConcurrentAccessTests
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            AssetRotatedMessage = "The asset has been rotated",
+            IsAssetRotated = true
         };
         asset3 = new()
         {

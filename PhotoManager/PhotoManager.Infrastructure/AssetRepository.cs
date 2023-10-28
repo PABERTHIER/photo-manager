@@ -116,7 +116,6 @@ public class AssetRepository : IAssetRepository
                 assets.Add(asset);
                 hasChanges = true;
             }
-
         }
     }
 

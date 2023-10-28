@@ -20,7 +20,7 @@ namespace PhotoManager.UI.Windows;
 public partial class DuplicatedAssetsWindow : Window
 {
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
+    // TODO: Rename this file
     public DuplicatedAssetsWindow(FindDuplicatedAssetsViewModel viewModel)
     {
         try

@@ -166,14 +166,14 @@ public class CatalogAssetsService : ICatalogAssetsService
             // If the original image is landscape
             if (originalDecodeWidth > originalDecodeHeight)
             {
-                thumbnailDecodeWidth = AssetConstants.MaxWidth;
-                percentage = (AssetConstants.MaxWidth * 100d / originalDecodeWidth);
+                thumbnailDecodeWidth = AssetConstants.ThumbnailMaxWidth;
+                percentage = (AssetConstants.ThumbnailMaxWidth * 100d / originalDecodeWidth);
                 thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
             }
             else // If the original image is portrait
             {
-                thumbnailDecodeHeight = AssetConstants.MaxHeight;
-                percentage = (AssetConstants.MaxHeight * 100d / originalDecodeHeight);
+                thumbnailDecodeHeight = AssetConstants.ThumbnailMaxHeight;
+                percentage = (AssetConstants.ThumbnailMaxHeight * 100d / originalDecodeHeight);
                 thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
             }
 
@@ -465,14 +465,14 @@ public class CatalogAssetsService : ICatalogAssetsService
         // If the original image is landscape
         if (originalDecodeWidth > originalDecodeHeight)
         {
-            thumbnailDecodeWidth = AssetConstants.MaxWidth;
-            percentage = (AssetConstants.MaxWidth * 100d / originalDecodeWidth);
+            thumbnailDecodeWidth = AssetConstants.ThumbnailMaxWidth;
+            percentage = (AssetConstants.ThumbnailMaxWidth * 100d / originalDecodeWidth);
             thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
         }
         else // If the original image is portrait
         {
-            thumbnailDecodeHeight = AssetConstants.MaxHeight;
-            percentage = (AssetConstants.MaxHeight * 100d / originalDecodeHeight);
+            thumbnailDecodeHeight = AssetConstants.ThumbnailMaxHeight;
+            percentage = (AssetConstants.ThumbnailMaxHeight * 100d / originalDecodeHeight);
             thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
         }
 

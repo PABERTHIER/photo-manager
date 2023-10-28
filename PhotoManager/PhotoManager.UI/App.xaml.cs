@@ -72,6 +72,8 @@ public partial class App : System.Windows.Application
 
         IConfigurationRoot configuration = builder.Build();
 
+        // TODO: group by module
+
         services.AddSingleton(configuration);
         services.AddSingleton<IObjectListStorage, ObjectListStorage>();
         //services.AddSingleton<IDataTableStorage, DataTableStorage>();
