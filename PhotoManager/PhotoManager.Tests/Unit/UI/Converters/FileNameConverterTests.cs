@@ -8,9 +8,10 @@ public class FileNameConverterTests
     [Test]
     [TestCase("", "")]
     [TestCase("example.jpg", "example.jpg")]
-    [TestCase("_example.jpg", "__example.jpg")] // Always adding an extra _ because XAML remove it thinking it is an event
-    [TestCase("_toto_toto_toto_toto.jpg", "__toto_toto_toto_toto.jpg")] // Always adding an extra _ because XAML remove it thinking it is an event
-    [TestCase("_____toto_toto_toto_toto.jpg", "______toto_toto_toto_toto.jpg")] // Always adding an extra _ because XAML remove it thinking it is an event
+    [TestCase("_example.jpg", "__example.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
+    [TestCase("_toto_toto_toto_toto.jpg", "__toto__toto__toto__toto.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
+    [TestCase("_____toto_toto_toto_toto.jpg", "__________toto__toto__toto__toto.jpg")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
+    [TestCase("toto_tutu", "toto__tutu")] // Always adding an extra _ per _ because XAML remove it thinking it is an event
     public void Convert_InputStringNotNull_ReturnsFormattedFileName(string name, string expected)
     {
         FileNameConverter fileNameConverter = new();

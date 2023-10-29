@@ -10,9 +10,9 @@ public class FileNameConverter : IValueConverter
     {
         if (value is string fileName)
         {
-            if (!string.IsNullOrEmpty(fileName) && fileName[0] == '_')
+            if (!string.IsNullOrWhiteSpace(fileName))
             {
-                return "_" + fileName;
+                return fileName.Replace("_", "__");
             }
         }
         return value;
