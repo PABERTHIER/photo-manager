@@ -287,8 +287,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             if (expected > 0)
             {
                 IList<string> assetsNameList = assetsName.ToList();
-                Assert.AreEqual(assetsNameList.Count, duplicatedAssets[0].Count);
-                Assert.IsTrue(assetsNameList.Intersect(duplicatedAssets[0].Select(y => y.FileName)).Any());
+                Assert.IsTrue(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)));
             }
         }
         finally
@@ -357,8 +356,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             if (expected > 0)
             {
                 IList<string> assetsNameList = assetsName.ToList();
-                Assert.AreEqual(assetsNameList.Count, duplicatedAssets[0].Count);
-                Assert.IsTrue(assetsNameList.Intersect(duplicatedAssets[0].Select(y => y.FileName)).Any());
+                Assert.IsTrue(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)));
             }
         }
         finally
@@ -418,7 +416,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     [TestCase(5, 0, new string[] { })]
     [TestCase(9, 0, new string[] { })]
     [TestCase(11, 0, new string[] { })]
-    [TestCase(14, 1, new string[] { "1349.JPG", "1350.JPG" })]
+    [TestCase(14, 1, new string[] { "1349.JPG", "Image 1.jpg" })]
     [TestCase(17, 1, new string[] { "1349.JPG", "1350.JPG", "Image 1.jpg" })]
     public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample2DHashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
     {
@@ -452,8 +450,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             if (expected > 0)
             {
                 IList<string> assetsNameList = assetsName.ToList();
-                Assert.AreEqual(assetsNameList.Count, duplicatedAssets[0].Count);
-                Assert.IsTrue(assetsNameList.Intersect(duplicatedAssets[0].Select(y => y.FileName)).Any());
+                Assert.IsTrue(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)));
             }
         }
         finally
@@ -505,15 +502,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = assetsName1.ToList();
-                Assert.AreEqual(assetsNameList.Count, duplicatedAssets[0].Count);
-                Assert.IsTrue(assetsNameList.Intersect(duplicatedAssets[0].Select(y => y.FileName)).Any());
+                IList<string> assetsNameList1 = assetsName1.ToList();
+                Assert.IsTrue(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)));
             }
             if (expected > 1)
             {
                 IList<string> assetsNameList2 = assetsName2.ToList();
-                Assert.AreEqual(assetsNameList2.Count, duplicatedAssets[1].Count);
-                Assert.IsTrue(assetsNameList2.Intersect(duplicatedAssets[1].Select(y => y.FileName)).Any());
+                Assert.IsTrue(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)));
             }
         }
         finally
@@ -589,21 +584,18 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = assetsName1.ToList();
-                Assert.AreEqual(assetsNameList.Count, duplicatedAssets[0].Count);
-                Assert.IsTrue(assetsNameList.Intersect(duplicatedAssets[0].Select(y => y.FileName)).Any());
+                IList<string> assetsNameList1 = assetsName1.ToList();
+                Assert.IsTrue(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)));
             }
             if (expected > 1)
             {
                 IList<string> assetsNameList2 = assetsName2.ToList();
-                Assert.AreEqual(assetsNameList2.Count, duplicatedAssets[1].Count);
-                Assert.IsTrue(assetsNameList2.Intersect(duplicatedAssets[1].Select(y => y.FileName)).Any());
+                Assert.IsTrue(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)));
             }
             if (expected > 2)
             {
                 IList<string> assetsNameList3 = assetsName3.ToList();
-                Assert.AreEqual(assetsNameList3.Count, duplicatedAssets[2].Count);
-                Assert.IsTrue(assetsNameList3.Intersect(duplicatedAssets[2].Select(y => y.FileName)).Any());
+                Assert.IsTrue(assetsNameList3.SequenceEqual(duplicatedAssets[2].Select(y => y.FileName)));
             }
         }
         finally
