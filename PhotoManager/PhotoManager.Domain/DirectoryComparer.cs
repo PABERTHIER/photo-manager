@@ -14,7 +14,7 @@ public class DirectoryComparer : IDirectoryComparer
         return GetNewFileNamesList(fileNames, cataloguedAssets.Select(ca => ca.FileName).ToArray());
     }
 
-    public string[] GetNewFileNames(string[] sourceFileNames, string[] destinationFileNames)
+    public string[] GetNewFileNamesToSync(string[] sourceFileNames, string[] destinationFileNames)
     {
         return GetNewFileNamesList(sourceFileNames, destinationFileNames);
     }
@@ -24,18 +24,14 @@ public class DirectoryComparer : IDirectoryComparer
         return GetImageAndVideoNamesList(fileNames);
     }
 
-    public string[] GetUpdatedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
+    public string[] GetUpdatedFileNames(List<Asset> cataloguedAssets)
     {
         foreach (Asset asset in cataloguedAssets)
         {
             _storageService.LoadFileInformation(asset);
         }
 
-        return cataloguedAssets
-            .Where(ca => ca.FileCreationDateTime > ca.ThumbnailCreationDateTime ||
-                ca.FileModificationDateTime > ca.ThumbnailCreationDateTime)
-            .Select(ca => ca.FileName)
-            .ToArray();
+        return cataloguedAssets.Where(IsUpdatedAsset()).Select(ca => ca.FileName).ToArray();
     }
 
     public string[] GetDeletedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
@@ -43,22 +39,30 @@ public class DirectoryComparer : IDirectoryComparer
         return cataloguedAssets.Select(ca => ca.FileName).Except(fileNames).ToArray();
     }
 
-    public string[] GetDeletedFileNames(string[] fileNames, string[] destinationFileNames)
+    public string[] GetDeletedFileNamesToSync(string[] fileNames, string[] destinationFileNames)
     {
         return destinationFileNames.Except(fileNames).ToArray();
     }
 
     private static string[] GetNewFileNamesList(string[] fileNames, string[] destinationFileNames)
     {
-        return fileNames.Except(destinationFileNames)
-                        .Where(fileName => ImageHelper.IsImageFile(fileName) || VideoHelper.IsVideoFile(fileName))
-                        .ToArray();
+        return fileNames.Except(destinationFileNames).Where(IsValidAsset).ToArray();
+    }
+
+    private static bool IsValidAsset(string assetFileName)
+    {
+        return ImageHelper.IsImageFile(assetFileName) || VideoHelper.IsVideoFile(assetFileName);
+    }
+
+    private static Func<Asset, bool> IsUpdatedAsset()
+    {
+        return a => a.FileCreationDateTime > a.ThumbnailCreationDateTime || a.FileModificationDateTime > a.ThumbnailCreationDateTime;
     }
 
     private static (string[], string[]) GetImageAndVideoNamesList(string[] fileNames)
     {
-        var imageNames = new List<string>();
-        var videoNames = new List<string>();
+        List<string> imageNames = new();
+        List<string> videoNames = new();
 
         foreach (var fileName in fileNames)
         {

@@ -69,7 +69,7 @@ public class SyncAssetsService : ISyncAssetsService
 
                 string[] sourceFileNames = _storageService.GetFileNames(sourceDirectory);
                 string[] destinationFileNames = _storageService.GetFileNames(destinationDirectory);
-                string[] newFileNames = _directoryComparer.GetNewFileNames(sourceFileNames, destinationFileNames);
+                string[] newFileNames = _directoryComparer.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
                 newFileNames = GetFilesNotAlreadyInDestinationSubDirectories(newFileNames, destinationDirectory);
 
                 foreach (string newImage in newFileNames)
@@ -88,7 +88,7 @@ public class SyncAssetsService : ISyncAssetsService
 
                 if (deleteAssetsNotInSource)
                 {
-                    string[] deletedFileNames = _directoryComparer.GetDeletedFileNames(sourceFileNames, destinationFileNames);
+                    string[] deletedFileNames = _directoryComparer.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
                     foreach (string deletedImage in deletedFileNames)
                     {
@@ -148,7 +148,7 @@ public class SyncAssetsService : ISyncAssetsService
             foreach (var dir in destinationSubDirectories)
             {
                 string[] destinationFileNames = _storageService.GetFileNames(dir.FullName);
-                newFileNames = _directoryComparer.GetNewFileNames(newFileNames, destinationFileNames);
+                newFileNames = _directoryComparer.GetNewFileNamesToSync(newFileNames, destinationFileNames);
             }
         }
 
