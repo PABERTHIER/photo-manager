@@ -13,14 +13,12 @@ public class Database : IDatabase
     protected Dictionary<string, DataTableProperties> DataTablePropertiesDictionary { get; private set; }
 
     private readonly IObjectListStorage _objectListStorage;
-    //private readonly IDataTableStorage _dataTableStorage;
     private readonly IBlobStorage _blobStorage;
     private readonly IBackupStorage _backupStorage;
 
     public Database(IObjectListStorage objectListStorage, IBlobStorage blobStorage, IBackupStorage backupStorage)
     {
         _objectListStorage = objectListStorage;
-        //_dataTableStorage = dataTableStorage;
         _blobStorage = blobStorage;
         _backupStorage = backupStorage;
         DataDirectory = string.Empty;
@@ -217,45 +215,4 @@ public class Database : IDatabase
     {
         return Path.Combine(BlobsDirectory, blobName);
     }
-
-    //public DataTable ReadDataTable(string tableName)
-    //{
-    //    string dataFilePath = ResolveTableFilePath(tableName);
-    //    Diagnostics = new Diagnostics { LastReadFilePath = dataFilePath };
-    //    DataTableProperties? properties = GetDataTableProperties(tableName);
-    //    _dataTableStorage.Initialize(properties, Separator);
-    //    return _dataTableStorage.ReadDataTable(dataFilePath, tableName, Diagnostics);
-    //}
-
-    //public void WriteDataTable(DataTable dataTable)
-    //{
-    //    if (dataTable == null)
-    //        throw new ArgumentNullException(nameof(dataTable));
-
-    //    if (dataTable.Columns.Count == 0)
-    //        throw new ArgumentException("DataTable should have at least one column.", nameof(dataTable));
-
-    //    for (int i = 0; i < dataTable.Columns.Count; i++)
-    //    {
-    //        if (string.IsNullOrWhiteSpace(dataTable.Columns[i].ColumnName))
-    //            throw new ArgumentException("All columns should have a name.", nameof(dataTable));
-    //    }
-
-    //    string dataFilePath = ResolveTableFilePath(dataTable.TableName);
-    //    Diagnostics = new Diagnostics { LastWriteFilePath = dataFilePath };
-    //    DataTableProperties? properties = GetDataTableProperties(dataTable.TableName);
-    //    _dataTableStorage.Initialize(properties, Separator);
-    //    _dataTableStorage.WriteDataTable(dataFilePath, dataTable, Diagnostics);
-    //}
-
-    //public DateTime[] GetBackupDates()
-    //{
-    //    string[] filesPaths = _backupStorage.GetBackupFilesPaths(BackupsDirectory);
-
-    //    return filesPaths
-    //        .Select(f => Path.GetFileName(f))
-    //        .Select(f => DateTime.ParseExact(f.Replace(".zip", ""), "yyyyMMdd", CultureInfo.InvariantCulture))
-    //        .OrderBy(f => f)
-    //        .ToArray();
-    //}
 }

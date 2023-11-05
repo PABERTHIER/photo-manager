@@ -18,8 +18,7 @@ public class Folder
         }
     }
 
-    // Only used here and BatchHelper which is not really used -> private ?
-    public Folder? Parent
+    private Folder? Parent
     {
         get
         {
@@ -33,24 +32,6 @@ public class Folder
         return !string.IsNullOrWhiteSpace(Path)
             && !string.IsNullOrWhiteSpace(folder?.Parent?.Path)
             && string.Compare(Path, folder?.Parent?.Path, StringComparison.OrdinalIgnoreCase) == 0;
-    }
-
-    // Usefull ?
-    public override bool Equals(object? obj)
-    {
-        return obj is Folder folder && folder.Path == Path;
-    }
-
-    // Only for UT
-    public override int GetHashCode()
-    {
-        return Path != null ? Path.GetHashCode() : base.GetHashCode();
-    }
-
-    // Only for UT
-    public override string ToString()
-    {
-        return Path;
     }
 
     private string? GetParentPath()

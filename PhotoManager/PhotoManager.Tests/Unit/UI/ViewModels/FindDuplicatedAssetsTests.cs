@@ -9,7 +9,6 @@
 // public class FindDuplicatedAssetsTests
 // {
 //     private readonly IApplication _application;
-//     private readonly TestFixture _fixture; // TODO: Remove this file and the rest of xunit conf c#
 //     private readonly Folder _folder1;
 //     private readonly Folder _folder2;
 //     private readonly Folder _folder3;
@@ -26,10 +25,8 @@
 
 //     private const string pathLocationToExemptTheFolder = "D:\\Inexistent Folder1";
 
-//     public FindDuplicatedAssetsTests(TestFixture fixture)
+//     public FindDuplicatedAssetsTests()
 //     {
-//         _fixture = fixture;
-
 //         _folder1 = new() { FolderId = "1", Path = "D:\\Inexistent Folder1" };
 //         _folder2 = new() { FolderId = "2", Path = "D:\\Inexistent Folder2" };
 //         _folder3 = new() { FolderId = "3", Path = "D:\\Inexistent Folder3" };

@@ -23,23 +23,4 @@ public class Asset
     public string? AssetCorruptedMessage { get; set; }
     public bool IsAssetRotated { get; set; }
     public string? AssetRotatedMessage { get; set; }
-
-    // TODO: Keep this code for UT only, whereas, one UT will fail... -> investigate which one is it
-    public override bool Equals(object? obj)
-    {
-        return obj is Asset asset && asset.FolderId == FolderId && asset.FileName == FileName;
-    }
-
-    // TODO: Only for UT
-    public override int GetHashCode()
-    {
-        string folderId = FolderId.ToString();
-        return (!string.IsNullOrEmpty(folderId) ? folderId.GetHashCode() : base.GetHashCode()) + (!string.IsNullOrEmpty(FileName) ? FileName.GetHashCode() : base.GetHashCode());
-    }
-
-    // TODO: Only for UT
-    public override string ToString()
-    {
-        return FileName;
-    }
 }

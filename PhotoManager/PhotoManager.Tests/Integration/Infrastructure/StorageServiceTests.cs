@@ -604,18 +604,4 @@ public class StorageServiceTests
 
         Assert.Throws<ArgumentException>(() => _storageService!.IsValidHeic(emptyHeicData));
     }
-
-    //[Test]
-    //[Category("Supplemental")]
-    //public void GetDrivesTest()
-    //{
-    //    Folder[] drives = GetDrives();
-    //    Assert.IsNotEmpty(drives);
-    //}
-
-    //private static Folder[] GetDrives()
-    //{
-    //    string[] drives = Directory.GetLogicalDrives();
-    //    return drives.Select(d => new Folder { Path = d }).ToArray();
-    //}
 }

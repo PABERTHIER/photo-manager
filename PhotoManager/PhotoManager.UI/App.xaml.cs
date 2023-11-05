@@ -76,7 +76,6 @@ public partial class App : System.Windows.Application
 
         services.AddSingleton(configuration);
         services.AddSingleton<IObjectListStorage, ObjectListStorage>();
-        //services.AddSingleton<IDataTableStorage, DataTableStorage>();
         services.AddSingleton<IBlobStorage, BlobStorage>();
         services.AddSingleton<IBackupStorage, BackupStorage>();
         services.AddSingleton<IDatabase, Database>();
@@ -107,7 +106,6 @@ public partial class App : System.Windows.Application
 
     //    // Assert
     //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IObjectListStorage)));
-    //    // Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IDataTableStorage)));
     //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IBlobStorage)));
     //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IBackupStorage)));
     //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IDatabase)));

@@ -152,15 +152,6 @@ public class MoveAssetsService : IMoveAssetsService
         return _storageService.FileExists(sourcePath) && _storageService.FileExists(destinationPath);
     }
 
-    public bool MoveImage(string sourcePath, string destinationPath)
-    {
-        string destinationFolderPath = new FileInfo(destinationPath).Directory.FullName;
-        _storageService.CreateDirectory(destinationFolderPath);
-        File.Move(sourcePath, destinationPath);
-
-        return !_storageService.FileExists(sourcePath) && _storageService.FileExists(destinationPath);
-    }
-
     // TODO: Extend automated tests to evaluate recent target paths.
     private void AddTargetPathToRecent(Folder destinationFolder)
     {
