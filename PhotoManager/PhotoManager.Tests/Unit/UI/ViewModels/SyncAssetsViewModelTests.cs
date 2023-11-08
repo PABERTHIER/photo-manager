@@ -7,7 +7,7 @@
 
 // public class SyncAssetsViewModelTests
 // {
-//     [Fact]
+//     [Test]
 //     public void ViewModelTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -46,7 +46,7 @@
 //         viewModel.Definitions[2].DestinationDirectory.Should().Be(@"C:\Images\MyGame3");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void DeleteDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -85,7 +85,7 @@
 //         viewModel.Definitions[1].DestinationDirectory.Should().Be(@"C:\Images\MyGame3");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void AdvanceStepTest()
 //     {
 //         var results = new ObservableCollection<SyncAssetsResult>
@@ -138,7 +138,7 @@
 //         viewModel.ResultsVisible.Should().Be(Visibility.Visible);
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void MoveUpDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -179,7 +179,7 @@
 //         viewModel.Definitions[2].DestinationDirectory.Should().Be(@"C:\Images\MyGame3");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void MoveDownDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -220,7 +220,7 @@
 //         viewModel.Definitions[2].DestinationDirectory.Should().Be(@"C:\Images\MyGame2");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void NotifySyncImageTest()
 //     {
 //         Mock<IApplication> mock = new();

@@ -83,6 +83,8 @@ public partial class MainWindow : Window
     {
         try
         {
+            // TODO: Rework this code because there is no way to trigger MoveAssets by doing ctrl + C / M
+            // Window_KeyDown is instantly triggered after the ctrl click
             if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
             {
                 switch (e.Key)
@@ -378,7 +380,7 @@ public partial class MainWindow : Window
 
             if (assets != null)
             {
-                _application.DeleteAssets(assets, deleteFiles: true);
+                _application.DeleteAssets(assets, true);
                 ViewModel.RemoveAssets(assets);
                 ShowImage();
             }
@@ -395,7 +397,7 @@ public partial class MainWindow : Window
         {
             if (assets != null)
             {
-                _application.DeleteAssets(assets, deleteFiles: true);
+                _application.DeleteAssets(assets, true);
                 ViewModel.RemoveAssets(assets);
             }
         }

@@ -6,7 +6,7 @@
 
 // public class FindDuplicatedAssetsViewModelTests
 // {
-//     [Fact]
+//     [Test]
 //     public void ViewModelTest()
 //     {
 //         List<List<Asset>> duplicatedAssetSets = new()
@@ -37,7 +37,7 @@
 //         viewModel.CurrentDuplicatedAsset.Asset.FileName.Should().Be("Image 2 duplicated.jpg");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void ViewModel_EmptyDuplicatedAssetCollectionTest()
 //     {
 //         List<List<Asset>> duplicatedAssetSets = new();
@@ -58,7 +58,7 @@
 //         viewModel.CurrentDuplicatedAsset.Should().BeNull();
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void ViewModel_NullDuplicatedAssetCollectionTest()
 //     {
 //         List<List<Asset>> duplicatedAssetSets = null;

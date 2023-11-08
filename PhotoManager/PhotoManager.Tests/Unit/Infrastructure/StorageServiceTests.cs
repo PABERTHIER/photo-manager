@@ -29,7 +29,7 @@ public class StorageServiceTests
 
         string result = _storageService!.ResolveDataDirectory(storageVersion);
 
-        Assert.False(string.IsNullOrWhiteSpace(result));
+        Assert.IsFalse(string.IsNullOrWhiteSpace(result));
         Assert.AreEqual(expected, result);
     }
 

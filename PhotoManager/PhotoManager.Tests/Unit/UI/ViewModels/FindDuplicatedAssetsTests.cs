@@ -97,7 +97,7 @@
 //         _duplicatedAssets.Add(_duplicatedSetViewModel2);
 //     }
 
-//     [Fact]
+//     [Test]
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void SelectedAsset_Sould_Be_CurrentAsset()
 //     {
@@ -120,7 +120,7 @@
 //         assetSelected?.Asset.Should().Be(currentAsset);
 //     }
 
-//     [Fact]
+//     [Test]
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void An_Other_Asset_Sould_Not_Be_CurrentAsset()
 //     {
@@ -143,7 +143,7 @@
 //         assetSelected?.Asset.Should().NotBe(currentAsset);
 //     }
 
-//     [Fact]
+//     [Test]
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void AssetsToDelete_Should_BeEquivalentTo_The_DuplicatedAssets_Selected()
 //     {
@@ -170,7 +170,7 @@
 //         assetsToDelete.Should().NotBeEquivalentTo(duplicatedAssetViewModelList);
 //     }
 
-//     [Fact]
+//     [Test]
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void AssetsToDelete_Should_NotContain_The_DuplicatedAsset_Selected()
 //     {
@@ -197,7 +197,7 @@
 //         assetsToDelete.Should().BeEquivalentTo(duplicatedAssetViewModelList);
 //     }
 
-//     [Fact]
+//     [Test]
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void AssetsToDelete_Should_NotBeEquivalentTo_An_Other_DuplicatedAssets()
 //     {
@@ -224,7 +224,7 @@
 //         assetsToDelete.Should().NotBeEquivalentTo(duplicatedAssetViewModelList);
 //     }
 
-//     [Fact]
+//     [Test]
 //     [Trait("Category", "DeleteEveryDuplicatedAssets")]
 //     public void ShouldNot_Delete_DuplicatedAssets_FromExemptFolder()
 //     {
@@ -249,7 +249,7 @@
 //         assetsToDelete.Should().Contain(_duplicatedAssetViewModel4);
 //     }
 
-//     [Fact]
+//     [Test]
 //     [Trait("Category", "DeleteEveryDuplicatedAssets")]
 //     public void ShouldNot_Delete_DuplicatedAssets_WhichIsNotIncluded_In_The_ExemptedFolder()
 //     {

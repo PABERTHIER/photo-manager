@@ -42,11 +42,11 @@ public class DatabaseDeleteOldBackupsTests
             bool backupCreated4 = _database!.WriteBackup(new DateTime(2023, 01, 04));
             bool backupCreated5 = _database!.WriteBackup(new DateTime(2023, 05, 04));
 
-            Assert.True(backupCreated1);
-            Assert.True(backupCreated2);
-            Assert.True(backupCreated3);
-            Assert.True(backupCreated4);
-            Assert.True(backupCreated5);
+            Assert.IsTrue(backupCreated1);
+            Assert.IsTrue(backupCreated2);
+            Assert.IsTrue(backupCreated3);
+            Assert.IsTrue(backupCreated4);
+            Assert.IsTrue(backupCreated5);
 
             _database!.DeleteOldBackups(backupsToKeep);
 
@@ -86,9 +86,9 @@ public class DatabaseDeleteOldBackupsTests
             bool backupCreated2 = _database!.WriteBackup(new DateTime(2023, 03, 04));
             bool backupCreated3 = _database!.WriteBackup(new DateTime(2023, 02, 04));
 
-            Assert.True(backupCreated1);
-            Assert.True(backupCreated2);
-            Assert.True(backupCreated3);
+            Assert.IsTrue(backupCreated1);
+            Assert.IsTrue(backupCreated2);
+            Assert.IsTrue(backupCreated3);
 
             _database!.DeleteOldBackups(backupsToKeep);
 

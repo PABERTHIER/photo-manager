@@ -6,7 +6,7 @@
 
 // public class ViewModelExtensionsTests
 // {
-//     [Fact]
+//     [Test]
 //     public void MoveUpSecondDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -39,7 +39,7 @@
 //         definitions[2].DestinationDirectory.Should().Be(@"C:\Images");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void MoveUpThirdDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -72,7 +72,7 @@
 //         definitions[2].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void MoveUpFirstDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -105,7 +105,7 @@
 //         definitions[2].DestinationDirectory.Should().Be(@"C:\Images");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void MoveDownSecondDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -138,7 +138,7 @@
 //         definitions[2].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void MoveDownFirstDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
@@ -171,7 +171,7 @@
 //         definitions[2].DestinationDirectory.Should().Be(@"C:\Images");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void MoveDownLastDefinitionTest()
 //     {
 //         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>

@@ -30,6 +30,6 @@ public class AssetHashCalculatorServiceTests
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
         Assert.IsInstanceOf<string>(hash);
-        Assert.False(string.IsNullOrWhiteSpace(hash));
+        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
     }
 }

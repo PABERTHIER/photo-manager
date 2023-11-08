@@ -95,7 +95,7 @@ public class Application : IApplication
     /// where each item is a list of duplicated assets.</returns>
     public List<List<Asset>> GetDuplicatedAssets() => _findDuplicatedAssetsService.GetDuplicatedAssets();
 
-    public void DeleteAssets(Asset[] assets, bool deleteFiles) => _moveAssetsService.DeleteAssets(assets, deleteFiles);
+    public void DeleteAssets(Asset[] assets, bool saveCatalog) => _moveAssetsService.DeleteAssets(assets, saveCatalog);
 
     public AboutInformation GetAboutInformation(Assembly assembly) => _userConfigurationService.GetAboutInformation(assembly);
 

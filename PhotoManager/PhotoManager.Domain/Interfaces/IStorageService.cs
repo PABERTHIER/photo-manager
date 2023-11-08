@@ -19,7 +19,6 @@ public interface IStorageService
     ushort GetExifOrientation(byte[] buffer);
     ushort GetHeicExifOrientation(byte[] buffer);
     Rotation GetImageRotation(ushort exifOrientation);
-    //bool HasSameContent(Asset assetA, Asset assetB);
     byte[] GetJpegBitmapImage(BitmapImage thumbnailImage);
     byte[] GetPngBitmapImage(BitmapImage thumbnailImage);
     byte[] GetGifBitmapImage(BitmapImage thumbnailImage);

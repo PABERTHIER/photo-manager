@@ -25,7 +25,7 @@
 //        _configuration = configurationMock.Object;
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void GetDuplicatedAssets_WithDuplicates_ReturnArray()
 //    {
 //        IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
@@ -51,15 +51,15 @@
 //        Folder folder = repository.AddFolder(dataDirectory);
 
 //        string imagePath = Path.Combine(dataDirectory, "Image 2.jpg");
-//        Assert.True(File.Exists(imagePath));
+//        Assert.IsTrue(File.Exists(imagePath));
 //        Asset asset = catalogAssetsService.CreateAsset(dataDirectory, "Image 2.jpg");
 
 //        imagePath = Path.Combine(dataDirectory, "Image 1.jpg");
-//        Assert.True(File.Exists(imagePath));
+//        Assert.IsTrue(File.Exists(imagePath));
 //        Asset anotherAsset = catalogAssetsService.CreateAsset(dataDirectory, "Image 1.jpg");
 
 //        imagePath = Path.Combine(dataDirectory, "Image 2 duplicated.jpg");
-//        Assert.True(File.Exists(imagePath));
+//        Assert.IsTrue(File.Exists(imagePath));
 //        Asset duplicatedAsset = catalogAssetsService.CreateAsset(dataDirectory, "Image 2 duplicated.jpg");
 
 //        Console.WriteLine("database.DataDirectory: " + database.DataDirectory);
@@ -81,7 +81,7 @@
 //        repository.LoadThumbnail(duplicatedAssets[1].Folder.Path, duplicatedAssets[1].FileName, duplicatedAssets[1].ThumbnailPixelWidth, duplicatedAssets[1].ThumbnailPixelHeight).Should().NotBeNull();
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void GetDuplicatedAssets_WithoutDuplicates_ReturnEmptyArray()
 //    {
 //        IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
@@ -120,7 +120,7 @@
 //    /// Tests an scenario when the user searches for duplicates before an
 //    /// old entry gets deleted from the catalog.
 //    /// </summary>
-//    [Fact]
+//    [Test]
 //    public void GetDuplicatedAssets_WithInexistingDuplicatedAsset_ReturnEmptyArray()
 //    {
 //        IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
@@ -171,7 +171,7 @@
 //    /// Tests an scenario when the user searches for duplicates before an
 //    /// old entry gets deleted from the catalog.
 //    /// </summary>
-//    [Fact]
+//    [Test]
 //    public void GetDuplicatedAssets_WithInexistingNotDuplicatedAsset_ReturnEmptyArray()
 //    {
 //        IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
@@ -217,7 +217,7 @@
 //        duplicatedAssetSets.Should().BeEmpty();
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void AddAssets_ToNonExistingFolder_AddFolderToCatalog()
 //    {
 //        IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);
@@ -252,7 +252,7 @@
 //        folder.Name.Should().Be("Inexistent Folder");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void GetAssets_WithThumbnailNotFound_ReturnArrayIncludingAssetWithNoThumbnail()
 //    {
 //        IUserConfigurationService userConfigurationService = new UserConfigurationService(_configuration);

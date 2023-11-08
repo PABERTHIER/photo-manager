@@ -15,7 +15,7 @@
 //        dataDirectory = Path.Combine(dataDirectory, "TestFiles");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void GetAssets_ValidDirectory_ReturnAssetsArray()
 //    {
 //        string directory = @"D:\Imágenes";

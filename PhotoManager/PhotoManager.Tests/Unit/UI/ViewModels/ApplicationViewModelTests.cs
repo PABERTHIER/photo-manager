@@ -7,7 +7,7 @@
 
 //public class ApplicationViewModelTests
 //{
-//    [Fact]
+//    [Test]
 //    public void ChangeAppMode_NoParameter_ChangeAppMode()
 //    {
 //        using var mock = AutoMock.GetLoose();
@@ -192,7 +192,7 @@
 //        viewModel.ViewerPosition.Should().Be(goToAssetIndex);
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void GoToAsset_NotInList_KeepPosition()
 //    {
 //        Folder folder = new() { Path = @"D:\Data" };
@@ -221,7 +221,7 @@
 //        viewModel.ViewerPosition.Should().Be(4);
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void NotifyCatalogChange_CreatedToNonEmptyListCurrentFolder_AddNewAssetToList()
 //    {
 //        Folder folder = new() { Path = @"D:\Data" };
@@ -262,7 +262,7 @@
 //        viewModel.StatusMessage.Should().Be(statusMessage);
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void NotifyCatalogChange_CreatedToEmptyListCurrentFolderWithCataloguedAssets_AddAllCataloguedAssetsToList()
 //    {
 //        Folder folder = new() { Path = @"D:\Data" };
@@ -303,7 +303,7 @@
 //        viewModel.StatusMessage.Should().Be(statusMessage);
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void NotifyCatalogChange_CreatedToEmptyListCurrentFolderWithoutCataloguedAssets_AddNewAssetToList()
 //    {
 //        Folder folder = new() { Path = @"D:\Data" };
@@ -326,7 +326,7 @@
 //        viewModel.ObservableAssets.Should().ContainSingle();
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void NotifyCatalogChange_CreatedToNonEmptyListDifferentFolder_KeepExistingList()
 //    {
 //        Folder folder = new() { Path = @"D:\Data" };
@@ -364,7 +364,7 @@
 //        viewModel.ObservableAssets[4].FileName.Should().Be("Image5.jpg");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void NotifyCatalogChange_NullFolder_IgnoreNewAsset()
 //    {
 //        Folder folder = new() { Path = @"D:\Data" };
@@ -465,7 +465,7 @@
 //        viewModel.ObservableAssets[4].FileName.Should().Be("Image5.jpg");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void NotifyCatalogChange_DeletedInFromCurrentFolder_RemoveFromAssetList()
 //    {
 //        Folder folder = new() { Path = @"D:\Data" };
@@ -533,7 +533,7 @@
 //        viewModel.ObservableAssets.Should().HaveCount(4);
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void RemoveAsset_SoleElement_ListBeEmptyAndPositionBeforeFirstItem()
 //    {
 //        Asset[] assets = new Asset[]
@@ -555,7 +555,7 @@
 //        viewModel.ObservableAssets.Should().BeEmpty();
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void RemoveAsset_NullAssetFromEmptyAssetList_EmptyAssetList()
 //    {
 //        Asset[] assets = Array.Empty<Asset>();
@@ -574,7 +574,7 @@
 //        viewModel.ObservableAssets.Should().BeEmpty();
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void RemoveAsset_NullAssetFromNullAssetList_NullAssetList()
 //    {
 //        using var mock = AutoMock.GetLoose();
@@ -649,7 +649,7 @@
 //        viewModel.AppTitle.Should().Be(expected);
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortAssetsByCriteria_NullAssetList_AssetListIsNull()
 //    {
 //        Asset[] assets = null;
@@ -665,7 +665,7 @@
 //        viewModel.ObservableAssets.Should().BeNull();
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortAssetsByCriteria_EmptyAssetList_AssetListIsEmpty()
 //    {
 //        Asset[] assets = Array.Empty<Asset>();
@@ -717,7 +717,7 @@
 //        viewModel.ObservableAssets[0].FileName.Should().Be("Image1.jpg");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortAssetsByCriteria_ByFileNameMultipleAssetsList_AssetListSortedByFileName()
 //    {
 //        Asset[] assets = new Asset[]
@@ -747,7 +747,7 @@
 //        viewModel.ObservableAssets[4].FileName.Should().Be("Image5.jpg");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortAssetsByCriteria_ByFileNameMultipleAssetsListMultipleTimes_AssetListSortedByFileNameChangingSortingDirection()
 //    {
 //        Asset[] assets = new Asset[]
@@ -795,7 +795,7 @@
 //        }
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortAssetsByCriteria_ByThumbnailCreationDateTimeMultipleAssetsList_AssetListSortedByThumbnailCreationDateTime()
 //    {
 //        Asset[] assets = new Asset[]
@@ -824,7 +824,7 @@
 //        viewModel.ObservableAssets[4].FileName.Should().Be("Image5.jpg");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortAssetsByCriteria_ByThumbnailCreationDateTimeMultipleAssetsListMultipleTimes_AssetListSortedByThumbnailCreationDateTimeChangingSortingDirection()
 //    {
 //        Asset[] assets = new Asset[]
@@ -871,7 +871,7 @@
 //        }
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortAssetsByCriteria_ByFileCreationDateTimeMultipleAssetsList_AssetListSortedByFileCreationDateTime()
 //    {
 //        Asset[] assets = new Asset[]
@@ -900,7 +900,7 @@
 //        viewModel.ObservableAssets[4].FileName.Should().Be("Image5.jpg");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortAssetsByCriteria_ByFileCreationDateTimeMultipleAssetsListMultipleTimes_AssetListSortedByFileCreationDateTimeChangingSortingDirection()
 //    {
 //        Asset[] assets = new Asset[]
@@ -947,7 +947,7 @@
 //        }
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortByFileModificationDateTimeMultipleFilesOneTimeTest()
 //    {
 //        Asset[] assets = new Asset[]
@@ -976,7 +976,7 @@
 //        viewModel.ObservableAssets[4].FileName.Should().Be("Image5.jpg");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortByFileModificationDateTimeMultipleFilesMultipleTimesTest()
 //    {
 //        Asset[] assets = new Asset[]
@@ -1021,7 +1021,7 @@
 //        }
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortByFileSizeMultipleFilesOneTimeTest()
 //    {
 //        Asset[] assets = new Asset[]
@@ -1050,7 +1050,7 @@
 //        viewModel.ObservableAssets[4].FileName.Should().Be("Image5.jpg");
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void SortByFileSizeMultipleFilesMultipleTimesTest()
 //    {
 //        Asset[] assets = new Asset[]

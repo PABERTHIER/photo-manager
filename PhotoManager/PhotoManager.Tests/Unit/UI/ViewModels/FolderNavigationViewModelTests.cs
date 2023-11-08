@@ -7,7 +7,7 @@
 
 //public class FolderNavigationViewModelTests
 //{
-//    [Fact]
+//    [Test]
 //    public void ViewModelTest()
 //    {
 //        using var mock = AutoMock.GetLoose();
@@ -50,7 +50,7 @@
 //        viewModel.CanConfirm.Should().Be(expected);
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void CanConfirmNullSourceFolderTest()
 //    {
 //        using var mock = AutoMock.GetLoose();
@@ -67,7 +67,7 @@
 //        viewModel.CanConfirm.Should().BeFalse();
 //    }
 
-//    [Fact]
+//    [Test]
 //    public void CanConfirmNullTargetPathTest()
 //    {
 //        using var mock = AutoMock.GetLoose();

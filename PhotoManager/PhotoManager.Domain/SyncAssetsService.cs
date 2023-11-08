@@ -72,15 +72,15 @@ public class SyncAssetsService : ISyncAssetsService
                 string[] newFileNames = _directoryComparer.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
                 newFileNames = GetFilesNotAlreadyInDestinationSubDirectories(newFileNames, destinationDirectory);
 
-                foreach (string newImage in newFileNames)
+                foreach (string newFileName in newFileNames)
                 {
-                    string sourcePath = Path.Combine(sourceDirectory, newImage);
-                    string destinationPath = Path.Combine(destinationDirectory, newImage);
+                    string sourceFilePath = Path.Combine(sourceDirectory, newFileName);
+                    string destinationFilePath = Path.Combine(destinationDirectory, newFileName);
 
-                    if (_moveAssetsService.CopyImage(sourcePath, destinationPath))
+                    if (_moveAssetsService.CopyAsset(sourceFilePath, destinationFilePath))
                     {
                         result.SyncedImages++;
-                        callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"'{sourcePath}' => '{destinationPath}'" });
+                        callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"'{sourceFilePath}' => '{destinationFilePath}'" });
                     }
                 }
 

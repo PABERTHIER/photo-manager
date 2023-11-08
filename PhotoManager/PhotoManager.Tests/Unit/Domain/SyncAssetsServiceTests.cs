@@ -7,7 +7,7 @@
 
 // public class SyncAssetsServiceTests
 // {
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceEmptyDestinationEmptyTest()
 //     {
 //         using var mock = AutoMock.GetLoose(
@@ -44,7 +44,7 @@
 
 //         mock.Mock<IAssetRepository>().Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         mock.Mock<IStorageService>().Verify(s => s.GetFileNames(sourceDirectory), Times.Once);
-//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -53,7 +53,7 @@
 //         statusChanges.Should().BeEmpty();
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceNotEmptyDestinationEmptyTest()
 //     {
 //         using var mock = AutoMock.GetLoose(
@@ -92,7 +92,7 @@
 //         mock.Mock<IStorageService>().Setup(s => s.GetFileNames(sourceDirectory))
 //             .Returns(sourceFileNames);
 
-//         mock.Mock<IMoveAssetsService>().Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         mock.Mock<IMoveAssetsService>().Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         SyncAssetsService syncAssetsService = mock.Container.Resolve<SyncAssetsService>();
@@ -103,9 +103,9 @@
 
 //         mock.Mock<IAssetRepository>().Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         mock.Mock<IStorageService>().Verify(s => s.GetFileNames(sourceDirectory), Times.Once);
-//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
-//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
-//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
+//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
+//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
+//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -117,7 +117,7 @@
 //         statusChanges[2].NewStatus.Should().Be(@$"'C:\MyGame\Screenshots\NewImage3.jpg' => 'C:\Images\MyGame\NewImage3.jpg'");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncedAssetsSourceNotEmptyDestinationNotEmptyMultipleNewImagesTest()
 //     {
 //         using var mock = AutoMock.GetLoose(
@@ -169,7 +169,7 @@
 //         mock.Mock<IStorageService>().Setup(s => s.GetFileNames(destinationDirectory))
 //             .Returns(destinationFileNames);
 
-//         mock.Mock<IMoveAssetsService>().Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         mock.Mock<IMoveAssetsService>().Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         SyncAssetsService syncAssetsService = mock.Container.Resolve<SyncAssetsService>();
@@ -180,9 +180,9 @@
 
 //         mock.Mock<IAssetRepository>().Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         mock.Mock<IStorageService>().Verify(s => s.GetFileNames(sourceDirectory), Times.Once);
-//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
-//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
-//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
+//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
+//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
+//         mock.Mock<IMoveAssetsService>().Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -194,7 +194,7 @@
 //         statusChanges[2].NewStatus.Should().Be(@$"'C:\MyGame\Screenshots\NewImage3.jpg' => 'C:\Images\MyGame\NewImage3.jpg'");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceNotEmptyDestinationNotEmptyOneNewImageTest()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -245,7 +245,7 @@
 //         storageServiceMock.Setup(s => s.GetFileNames(destinationDirectory))
 //             .Returns(destinationFileNames);
 
-//         moveAssetsServiceMock.Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         moveAssetsServiceMock.Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         SyncAssetsService syncAssetsService = new(
@@ -260,7 +260,7 @@
 
 //         repositoryMock.Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(sourceDirectory), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -270,7 +270,7 @@
 //         statusChanges[0].NewStatus.Should().Be(@$"'C:\MyGame\Screenshots\NewImage1.jpg' => 'C:\Images\MyGame\NewImage1.jpg'");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceNotEmptyDestinationNotEmptyTwoDefinitionsTest()
 //     {
 //         string firstSourceDirectory = @"C:\MyFirstGame\Screenshots";
@@ -358,7 +358,7 @@
 //         storageServiceMock.Setup(s => s.GetFileNames(secondDestinationDirectory))
 //             .Returns(secondDestinationFileNames);
 
-//         moveAssetsServiceMock.Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         moveAssetsServiceMock.Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         SyncAssetsService syncAssetsService = new(
@@ -374,11 +374,11 @@
 //         repositoryMock.Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(firstSourceDirectory), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(secondSourceDirectory), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyFirstGame\Screenshots\NewImage1.jpg", @"C:\Images\MyFirstGame\NewImage1.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyFirstGame\Screenshots\NewImage2.jpg", @"C:\Images\MyFirstGame\NewImage2.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyFirstGame\Screenshots\NewImage3.jpg", @"C:\Images\MyFirstGame\NewImage3.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MySecondGame\Screenshots\NewImage1.jpg", @"C:\Images\MySecondGame\NewImage1.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MySecondGame\Screenshots\NewImage2.jpg", @"C:\Images\MySecondGame\NewImage2.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyFirstGame\Screenshots\NewImage1.jpg", @"C:\Images\MyFirstGame\NewImage1.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyFirstGame\Screenshots\NewImage2.jpg", @"C:\Images\MyFirstGame\NewImage2.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyFirstGame\Screenshots\NewImage3.jpg", @"C:\Images\MyFirstGame\NewImage3.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MySecondGame\Screenshots\NewImage1.jpg", @"C:\Images\MySecondGame\NewImage1.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MySecondGame\Screenshots\NewImage2.jpg", @"C:\Images\MySecondGame\NewImage2.jpg"), Times.Once);
 //         result.Should().HaveCount(2);
 //         result[0].SourceDirectory.Should().Be(@"C:\MyFirstGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyFirstGame");
@@ -396,7 +396,7 @@
 //         statusChanges[4].NewStatus.Should().Be(@$"'C:\MySecondGame\Screenshots\NewImage2.jpg' => 'C:\Images\MySecondGame\NewImage2.jpg'");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceNotEmptyDestinationNotEmptySomeSourceImagesInTargetSubDirectoriesSingleLevelWithoutSourceSubDirectories()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -483,7 +483,7 @@
 //         storageServiceMock.Setup(s => s.GetFileNames(destinationSubDirectory2))
 //             .Returns(destinationSubDirectory2FileNames);
 
-//         moveAssetsServiceMock.Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         moveAssetsServiceMock.Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         SyncAssetsService syncAssetsService = new(
@@ -501,9 +501,9 @@
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationDirectory), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationSubDirectory1), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationSubDirectory2), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -515,7 +515,7 @@
 //         statusChanges[2].NewStatus.Should().Be(@$"'C:\MyGame\Screenshots\NewImage3.jpg' => 'C:\Images\MyGame\NewImage3.jpg'");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceNotEmptyDestinationNotEmptySomeSourceImagesInTargetSubDirectoriesMultipleLevelsWithoutSourceSubDirectories()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -621,7 +621,7 @@
 //         storageServiceMock.Setup(s => s.GetFileNames(destinationSubDirectory2))
 //             .Returns(destinationSubDirectory2FileNames);
 
-//         moveAssetsServiceMock.Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         moveAssetsServiceMock.Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         SyncAssetsService syncAssetsService = new(
@@ -639,9 +639,9 @@
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationDirectory), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationSubDirectory1), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationSubDirectory2), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -653,7 +653,7 @@
 //         statusChanges[2].NewStatus.Should().Be(@$"'C:\MyGame\Screenshots\NewImage3.jpg' => 'C:\Images\MyGame\NewImage3.jpg'");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceNotEmptyDestinationNotEmptySomeSourceImagesInTargetSubDirectoriesWithSourceSubDirectories()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -762,7 +762,7 @@
 //         storageServiceMock.Setup(s => s.GetFileNames(destinationSubDirectory2))
 //             .Returns(destinationSubDirectory2FileNames);
 
-//         moveAssetsServiceMock.Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         moveAssetsServiceMock.Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         SyncAssetsService syncAssetsService = new(
@@ -781,11 +781,11 @@
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationDirectory), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationSubDirectory1), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationSubDirectory2), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\SubDirectory\NewImage4.jpg", @"C:\Images\MyGame\SubDirectory\NewImage4.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\SubDirectory\NewImage5.jpg", @"C:\Images\MyGame\SubDirectory\NewImage5.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\SubDirectory\NewImage4.jpg", @"C:\Images\MyGame\SubDirectory\NewImage4.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\SubDirectory\NewImage5.jpg", @"C:\Images\MyGame\SubDirectory\NewImage5.jpg"), Times.Once);
 //         result.Should().HaveCount(2);
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -803,7 +803,7 @@
 //         statusChanges[4].NewStatus.Should().Be(@$"'C:\MyGame\Screenshots\SubDirectory\NewImage5.jpg' => 'C:\Images\MyGame\SubDirectory\NewImage5.jpg'");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceNotEmptyDestinationNotEmptyAllSourceImagesInTargetSubDirectories()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -887,7 +887,7 @@
 //         storageServiceMock.Setup(s => s.GetFileNames(destinationSubDirectory2))
 //             .Returns(destinationSubDirectory2FileNames);
 
-//         moveAssetsServiceMock.Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         moveAssetsServiceMock.Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         SyncAssetsService syncAssetsService = new(
@@ -905,7 +905,7 @@
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationDirectory), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationSubDirectory1), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(destinationSubDirectory2), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -914,7 +914,7 @@
 //         statusChanges.Should().BeEmpty();
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void ValidateAllValidDefinitionsTest()
 //     {
 //         SyncAssetsConfiguration syncConfiguration = new();
@@ -951,7 +951,7 @@
 //         syncConfiguration.Definitions[2].DestinationDirectory.Should().Be(@"C:\Images");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void ValidateOneInvalidDefinitionTest()
 //     {
 //         SyncAssetsConfiguration syncConfiguration = new();
@@ -1000,7 +1000,7 @@
 //         syncConfiguration.Definitions[1].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public void NormalizeTest()
 //     {
 //         SyncAssetsConfiguration syncConfiguration = new();
@@ -1046,7 +1046,7 @@
 //         syncConfiguration.Definitions[3].DestinationDirectory.Should().Be(@"C:\Images");
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsInexistentSourceDirectory()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -1088,7 +1088,7 @@
 
 //         repositoryMock.Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(sourceDirectory), Times.Never);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -1097,7 +1097,7 @@
 //         statusChanges.Should().BeEmpty();
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsInexistentDestinationDirectory()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -1140,7 +1140,7 @@
 //         repositoryMock.Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         storageServiceMock.Verify(s => s.CreateDirectory(destinationDirectory), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(sourceDirectory), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");
@@ -1149,7 +1149,7 @@
 //         statusChanges.Should().BeEmpty();
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsInaccessibleDestinationDirectory()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -1194,7 +1194,7 @@
 
 //         repositoryMock.Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(sourceDirectory), Times.Never);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 //         result.Should().ContainSingle();
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"\\MyServer\MyGame");
@@ -1203,7 +1203,7 @@
 //         statusChanges.Should().BeEmpty();
 //     }
 
-//     [Fact]
+//     [Test]
 //     public async void SyncAssetsSourceNotEmptyDestinationEmptyIncludingSubFoldersTest()
 //     {
 //         string sourceDirectory = @"C:\MyGame\Screenshots";
@@ -1248,7 +1248,7 @@
 //         storageServiceMock.Setup(s => s.GetFileNames(sourceDirectory))
 //             .Returns(sourceFileNames);
 
-//         moveAssetsServiceMock.Setup(s => s.CopyImage(It.IsAny<string>(), It.IsAny<string>()))
+//         moveAssetsServiceMock.Setup(s => s.CopyAsset(It.IsAny<string>(), It.IsAny<string>()))
 //             .Returns(true);
 
 //         storageServiceMock.Setup(s => s.GetSubDirectories(sourceDirectory)).Returns(
@@ -1271,9 +1271,9 @@
 
 //         repositoryMock.Verify(r => r.GetSyncAssetsConfiguration(), Times.Once);
 //         storageServiceMock.Verify(s => s.GetFileNames(sourceDirectory), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
-//         moveAssetsServiceMock.Verify(s => s.CopyImage(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage1.jpg", @"C:\Images\MyGame\NewImage1.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage2.jpg", @"C:\Images\MyGame\NewImage2.jpg"), Times.Once);
+//         moveAssetsServiceMock.Verify(s => s.CopyAsset(@"C:\MyGame\Screenshots\NewImage3.jpg", @"C:\Images\MyGame\NewImage3.jpg"), Times.Once);
 //         result.Should().HaveCount(2);
 //         result[0].SourceDirectory.Should().Be(@"C:\MyGame\Screenshots");
 //         result[0].DestinationDirectory.Should().Be(@"C:\Images\MyGame");

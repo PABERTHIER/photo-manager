@@ -269,7 +269,7 @@ public class AssetRepository : IAssetRepository
 
             if (folder != null)
             {
-                Asset? deletedAsset = GetAssetByFolderIdAndFileName(folder.FolderId, fileName);
+                Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.FolderId, fileName);
 
                 if (!Thumbnails.ContainsKey(folder.Path))
                 {
@@ -287,9 +287,9 @@ public class AssetRepository : IAssetRepository
                 //    Thumbnails.Remove(folder.Path);
                 //}
 
-                if (deletedAsset != null)
+                if (assetToDelete != null)
                 {
-                    assets.Remove(deletedAsset);
+                    assets.Remove(assetToDelete);
                     hasChanges = true;
                 }
             }
