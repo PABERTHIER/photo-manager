@@ -2,7 +2,6 @@
 
 public class MoveAssetsService : IMoveAssetsService
 {
-    //private const int RECENT_TARGET_PATHS_MAX_COUNT = 20; // MoveAssetsService should not have this responsability
     private readonly IAssetRepository _assetRepository;
     private readonly IStorageService _storageService;
     private readonly ICatalogAssetsService _catalogAssetsService;
@@ -19,49 +18,12 @@ public class MoveAssetsService : IMoveAssetsService
 
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles)
     {
-        #region Parameters validation
-
-        // TODO: Refacto and optimize it
-
-        // if (assets == null || assets.Length == 0)
-        // {
-        //     throw new ArgumentNullException(nameof(assets), "Assets cannot be null or empty.");
-        // }
-
-        // if (destinationFolder == null)
-        // {
-        //     throw new ArgumentNullException(nameof(destinationFolder), "destinationFolder cannot be null.");
-        // }
-
-        // if (assets.Any(asset => asset == null || asset.Folder == null)) // To refacto it, passing a delegate ?
-        // {
-        //     throw new ArgumentNullException(nameof(assets), "An asset or its folder cannot be null.");
-        // }
-
-        if (assets == null || assets.Length == 0)
-        {
-            throw new ArgumentNullException(nameof(assets), "Assets cannot be null.");
-        }
-
         if (destinationFolder == null)
         {
             throw new ArgumentNullException(nameof(destinationFolder), "destinationFolder cannot be null.");
         }
 
-        foreach (Asset asset in assets)
-        {
-            if (asset == null)
-            {
-                throw new ArgumentNullException(nameof(asset), "asset cannot be null.");
-            }
-
-            if (asset.Folder == null)
-            {
-                throw new ArgumentNullException(nameof(asset.Folder), "asset.Folder cannot be null.");
-            }
-        }
-
-        #endregion
+        ValidateParameters(assets);
 
         bool result = false;
         Folder? folder = _assetRepository.GetFolderByPath(destinationFolder.Path); // If the folder is null, it means is not present in the catalog
@@ -79,7 +41,7 @@ public class MoveAssetsService : IMoveAssetsService
             string sourceFilePath = asset.FullPath;
             string destinationFilePath = Path.Combine(destinationFolder.Path, asset.FileName);
 
-            result = CopyAsset(sourceFilePath, destinationFilePath);
+            result = Copy(sourceFilePath, destinationFilePath);
 
             if (!result)
             {
@@ -94,108 +56,123 @@ public class MoveAssetsService : IMoveAssetsService
             }
 
             _catalogAssetsService.CreateAsset(destinationFolder.Path, asset.FileName);
+
+            if (result && !preserveOriginalFiles && !destinationFolder.IsSameDirectory(assets[0].Folder))
+            {
+                DeleteAsset(asset);
+            }
         }
 
         if (result)
         {
-            if (!preserveOriginalFiles && !IsInSameDirectory(assets[0], destinationFolder))
-            {
-                DeleteAssets(assets, false);
-            }
-
-            UpdateTargetPathToRecent(destinationFolder);
-            _assetRepository.SaveCatalog(destinationFolder);
+            _assetRepository.UpdateTargetPathToRecent(destinationFolder);
+            SaveCatalog(destinationFolder);
         }
 
         return result;
     }
 
-    public void DeleteAssets(Asset[] assets, bool saveCatalog)
+    public void DeleteAssets(Asset[] assets)
     {
-        #region Parameters validation
-
-        // TODO: Refacto and optimize it
-        if (assets == null || assets.Length == 0)
-        {
-            throw new ArgumentNullException(nameof(assets), "Assets cannot be null.");
-        }
+        ValidateParameters(assets);
 
         foreach (Asset asset in assets)
         {
-            if (asset == null)
-            {
-                throw new ArgumentNullException(nameof(asset), "Asset cannot be null.");
-            }
-
-            if (asset.Folder == null)
-            {
-                throw new ArgumentNullException(nameof(asset), "Asset.Folder cannot be null.");
-            }
-
-            if (!_storageService.FileExists(asset, asset.Folder))
-            {
-                throw new ArgumentException("File does not exist: " + asset.FullPath);
-            }
+            DeleteAsset(asset);
         }
 
-        #endregion
-
-        foreach (Asset asset in assets)
-        {
-            _assetRepository.DeleteAsset(asset.Folder.Path, asset.FileName);
-            _storageService.DeleteFile(asset.Folder.Path, asset.FileName);
-        }
-
-        if (saveCatalog)
-        {
-            _assetRepository.SaveCatalog(assets[0].Folder);
-        }
+        SaveCatalog(assets[0].Folder);
     }
 
     public bool CopyAsset(string sourceFilePath, string destinationFilePath)
     {
-        if (_storageService.FileExists(destinationFilePath))
-        {
-            // TODO: Log the file already exists in the destination
-            return _storageService.FileExists(sourceFilePath);
-        }
-
         if (string.IsNullOrWhiteSpace(destinationFilePath))
         {
             // TODO: Log the destinationFolderPath is null or empty
             return false;
         }
 
-        string destinationFolderPath = new FileInfo(destinationFilePath).Directory!.FullName;
-
-        if (!Directory.Exists(destinationFolderPath))
-        {
-            _storageService.CreateDirectory(destinationFolderPath);
-        }
-
-        // TODO: try catch to handle errors
-        File.Copy(sourceFilePath, destinationFilePath);
-
-        return _storageService.FileExists(sourceFilePath) && _storageService.FileExists(destinationFilePath);
+        return Copy(sourceFilePath, destinationFilePath);
     }
 
-    private static bool IsInSameDirectory(Asset asset, Folder destinationFolder)
+    private void ValidateParameters(Asset[] assets)
     {
-        return asset.Folder.Path.Equals(destinationFolder.Path);
-    }
-
-    private void UpdateTargetPathToRecent(Folder destinationFolder)
-    {
-        List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
-
-        if (recentTargetPaths.Contains(destinationFolder.Path))
+        if (assets == null || assets.Length == 0)
         {
-            recentTargetPaths.Remove(destinationFolder.Path);
+            throw new ArgumentNullException(nameof(assets), "assets cannot be null or empty.");
         }
 
-        recentTargetPaths.Insert(0, destinationFolder.Path);
+        foreach (Asset asset in assets)
+        {
+            if (asset == null)
+            {
+                throw new ArgumentNullException(nameof(asset), "asset cannot be null.");
+            }
 
-        //recentTargetPaths = recentTargetPaths.Take(RECENT_TARGET_PATHS_MAX_COUNT).ToList(); // TODO: MoveAssetsService should not have this responsability
-        _assetRepository.SaveRecentTargetPaths(recentTargetPaths);
+            if (asset.Folder == null)
+            {
+                throw new ArgumentNullException(nameof(asset.Folder), "asset.Folder cannot be null.");
+            }
+
+            if (!_storageService.FileExists(asset, asset.Folder))
+            {
+                throw new FileNotFoundException($"File does not exist: '{asset.FullPath}'.");
+            }
+        }
+    }
+
+    private void DeleteAsset(Asset asset)
+    {
+        _assetRepository.DeleteAsset(asset.Folder.Path, asset.FileName);
+        _storageService.DeleteFile(asset.Folder.Path, asset.FileName);
+    }
+
+    private bool Copy(string sourceFilePath, string destinationFilePath)
+    {
+        try
+        {
+            if (_storageService.FileExists(destinationFilePath))
+            {
+                // TODO: Log the file already exists in the destination
+                return _storageService.FileExists(sourceFilePath);
+            }
+
+            string destinationFolderPath = new FileInfo(destinationFilePath).Directory!.FullName;
+
+            if (!Directory.Exists(destinationFolderPath))
+            {
+                _storageService.CreateDirectory(destinationFolderPath);
+            }
+
+            File.Copy(sourceFilePath, destinationFilePath);
+
+            return _storageService.FileExists(sourceFilePath) && _storageService.FileExists(destinationFilePath);
+        }
+        catch (FileNotFoundException)
+        {
+            throw new FileNotFoundException($"File does not exist: '{sourceFilePath}'.");
+        }
+        catch (DirectoryNotFoundException)
+        {
+            throw new DirectoryNotFoundException($"Could not find a part of the path '{sourceFilePath}'.");
+        }
+        catch (ArgumentNullException)
+        {
+            throw new ArgumentNullException(nameof(sourceFilePath), "Value cannot be null.");
+        }
+        catch (ArgumentException)
+        {
+            throw new ArgumentException("The value cannot be an empty string.", nameof(sourceFilePath));
+        }
+        catch
+        {
+            // TODO: Log the file could not be copied: insufficient permissions, disk space issues, or file locking problems ?
+            return false;
+        }
+    }
+
+    private void SaveCatalog(Folder folder)
+    {
+        _assetRepository.SaveCatalog(folder);
     }
 }

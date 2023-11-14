@@ -380,7 +380,7 @@ public partial class MainWindow : Window
 
             if (assets != null)
             {
-                _application.DeleteAssets(assets, true);
+                _application.DeleteAssets(assets);
                 ViewModel.RemoveAssets(assets);
                 ShowImage();
             }
@@ -397,7 +397,7 @@ public partial class MainWindow : Window
         {
             if (assets != null)
             {
-                _application.DeleteAssets(assets, true);
+                _application.DeleteAssets(assets);
                 ViewModel.RemoveAssets(assets);
             }
         }

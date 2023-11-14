@@ -5,6 +5,8 @@ namespace PhotoManager.Infrastructure;
 
 public class AssetRepository : IAssetRepository
 {
+    private const int RECENT_TARGET_PATHS_MAX_COUNT = 20;
+
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
     public bool IsInitialized { get; private set; }
@@ -415,6 +417,25 @@ public class AssetRepository : IAssetRepository
         {
             recentTargetPaths = paths;
             hasChanges = true;
+        }
+    }
+
+    public void UpdateTargetPathToRecent(Folder destinationFolder)
+    {
+        lock (syncLock)
+        {
+            List<string> recentTargetPathsUpdated = new(recentTargetPaths);
+
+            if (recentTargetPathsUpdated.Contains(destinationFolder.Path))
+            {
+                recentTargetPathsUpdated.Remove(destinationFolder.Path);
+            }
+
+            recentTargetPathsUpdated.Insert(0, destinationFolder.Path);
+
+            recentTargetPathsUpdated = recentTargetPathsUpdated.Take(RECENT_TARGET_PATHS_MAX_COUNT).ToList();
+
+            SaveRecentTargetPaths(recentTargetPathsUpdated);
         }
     }
 

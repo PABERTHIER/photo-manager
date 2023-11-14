@@ -16,7 +16,7 @@ public interface IApplication
     Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null);
     void SetAsWallpaper(Asset asset, WallpaperStyle style);
     List<List<Asset>> GetDuplicatedAssets();
-    void DeleteAssets(Asset[] assets, bool saveCatalog);
+    void DeleteAssets(Asset[] assets);
     AboutInformation GetAboutInformation(Assembly assembly);
     Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
     string GetInitialFolder();
