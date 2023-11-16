@@ -25,19 +25,20 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    [TestCase(WallpaperStyle.Fill, "10", "0")]
+    [Ignore("Tests ignored to prevent effects on the client computer")]
     [TestCase(WallpaperStyle.Fit, "6", "0")]
     [TestCase(WallpaperStyle.Stretch, "2", "0")]
     [TestCase(WallpaperStyle.Tile, "0", "1")]
     [TestCase(WallpaperStyle.Center, "0", "0")]
     [TestCase(WallpaperStyle.Span, "22", "0")]
+    [TestCase(WallpaperStyle.Fill, "10", "0")]
     public void SetAsWallpaper_ValidStyleAndTile_RegistersExpectedValues(WallpaperStyle style, string expectedStyleValue, string expectedTileValue)
     {
         Folder folder = new() { Path = dataDirectory! };
         Asset asset = new() { Folder = folder, FileName = "NonExistentFile.jpg" }; // Not giving an existing file to prevent the wallpaper to be changed
 
         // Set up a StringWriter to capture console output
-        var stringWriter = new StringWriter();
+        StringWriter stringWriter = new();
         Console.SetOut(stringWriter);
 
         _userConfigurationService!.SetAsWallpaper(asset, style);
