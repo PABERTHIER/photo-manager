@@ -25,7 +25,7 @@ public class BlobStorageTests
     {
         string blobFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0", AssetConstants.Blobs, blobFileName);
 
-        var deserializedObject = _blobStorage!.ReadFromBinaryFile(blobFilePath);
+        Dictionary<string, byte[]>? deserializedObject = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 
         Assert.IsNotNull(deserializedObject);
         Assert.IsInstanceOf<Dictionary<string, byte[]>?>(deserializedObject);
@@ -38,7 +38,7 @@ public class BlobStorageTests
     {
         string blobFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Blobs\\eacd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
 
-        var result = _blobStorage!.ReadFromBinaryFile(blobFilePath);
+        Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 
         Assert.IsNull(result);
     }

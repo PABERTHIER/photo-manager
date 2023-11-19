@@ -752,7 +752,7 @@ public class MoveAssetsServiceTests
 
             Asset[] assets = { asset1, asset2 };
 
-            var exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, false));
+            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, false));
             Assert.AreEqual($"File does not exist: '{newSourceFilePath2}'.", exception?.Message);
 
             Assert.IsTrue(File.Exists(newSourceFilePath1));
@@ -1040,7 +1040,7 @@ public class MoveAssetsServiceTests
             asset.FileName = assetNewFileName;
             Asset[] assets = { asset };
 
-            var exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
+            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
 
             Assert.AreEqual($"File does not exist: '{Path.Combine(sourceDirectory, assetNewFileName)}'.", exception?.Message);
 
@@ -1140,7 +1140,7 @@ public class MoveAssetsServiceTests
             asset.FileName = assetNewFileName;
             Asset[] assets = { asset };
 
-            var exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, sourceFolder, preserveOriginalFile));
+            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, sourceFolder, preserveOriginalFile));
 
             Assert.AreEqual($"File does not exist: '{Path.Combine(destinationDirectory, assetNewFileName)}'.", exception?.Message);
 
@@ -1185,7 +1185,7 @@ public class MoveAssetsServiceTests
 
             Folder destinationFolder = new() { Path = dataDirectory! };
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
 
             Assert.AreEqual("assets cannot be null or empty. (Parameter 'assets')", exception?.Message);
             Assert.AreEqual(nameof(assets), exception?.ParamName);
@@ -1207,7 +1207,7 @@ public class MoveAssetsServiceTests
 
             Folder destinationFolder = new() { Path = dataDirectory! };
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
 
             Assert.AreEqual("assets cannot be null or empty. (Parameter 'assets')", exception?.Message);
             Assert.AreEqual(nameof(assets), exception?.ParamName);
@@ -1232,7 +1232,7 @@ public class MoveAssetsServiceTests
 
             Folder destinationFolder = new() { Path = dataDirectory! };
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
 
             Assert.AreEqual("asset cannot be null. (Parameter 'asset')", exception?.Message);
             Assert.AreEqual("asset", exception?.ParamName);
@@ -1259,7 +1259,7 @@ public class MoveAssetsServiceTests
 
             Folder destinationFolder = new() { Path = dataDirectory! };
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
 
             Assert.AreEqual("asset.Folder cannot be null. (Parameter 'Folder')", exception?.Message);
             Assert.AreEqual(nameof(Folder), exception?.ParamName);
@@ -1281,7 +1281,7 @@ public class MoveAssetsServiceTests
 
             Folder? destinationFolder = null;
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder!, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder!, preserveOriginalFile));
 
             Assert.AreEqual("destinationFolder cannot be null. (Parameter 'destinationFolder')", exception?.Message);
             Assert.AreEqual(nameof(destinationFolder), exception?.ParamName);
@@ -1319,7 +1319,7 @@ public class MoveAssetsServiceTests
                 FolderId = sourceFolder.FolderId
             };
 
-            var exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(new Asset[] { asset }, destinationFolder, preserveOriginalFile));
+            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(new Asset[] { asset }, destinationFolder, preserveOriginalFile));
             Assert.AreEqual($"File does not exist: '{sourceFilePath}'.", exception?.Message);
         }
         finally
@@ -1403,7 +1403,7 @@ public class MoveAssetsServiceTests
         {
             Asset[]? assets = null;
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
 
             Assert.AreEqual("assets cannot be null or empty. (Parameter 'assets')", exception?.Message);
             Assert.AreEqual(nameof(assets), exception?.ParamName);
@@ -1421,7 +1421,7 @@ public class MoveAssetsServiceTests
         {
             Asset[]? assets = Array.Empty<Asset>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
 
             Assert.AreEqual("assets cannot be null or empty. (Parameter 'assets')", exception?.Message);
             Assert.AreEqual(nameof(assets), exception?.ParamName);
@@ -1442,7 +1442,7 @@ public class MoveAssetsServiceTests
             Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new Folder() { Path = dataDirectory! } };
             Asset[] assets = { asset1, asset2!, asset3 };
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
 
             Assert.AreEqual("asset cannot be null. (Parameter 'asset')", exception?.Message);
             Assert.AreEqual("asset", exception?.ParamName);
@@ -1465,7 +1465,7 @@ public class MoveAssetsServiceTests
             Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new Folder() { Path = dataDirectory! } };
             Asset[] assets = { asset1, asset2, asset3 };
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
 
             Assert.AreEqual("asset.Folder cannot be null. (Parameter 'Folder')", exception?.Message);
             Assert.AreEqual(nameof(Folder), exception?.ParamName);
@@ -1481,11 +1481,11 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            var folder = new Folder { Path = dataDirectory! };
-            var asset = new Asset { FileName = "NonExistentFile.jpg", Folder = folder };
+            Folder folder = new() { Path = dataDirectory! };
+            Asset asset = new() { FileName = "NonExistentFile.jpg", Folder = folder };
             Asset[] assets = { asset };
 
-            var exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.DeleteAssets(assets!));
 
             Assert.AreEqual($"File does not exist: '{asset.FullPath}'.", exception?.Message);
         }
@@ -1653,7 +1653,7 @@ public class MoveAssetsServiceTests
             string nonExistentFilePath = Path.Combine(dataDirectory!, "NonExistentFile.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image.jpg");
 
-            var exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.CopyAsset(nonExistentFilePath, destinationFilePath));
+            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.CopyAsset(nonExistentFilePath, destinationFilePath));
 
             Assert.AreEqual($"File does not exist: '{nonExistentFilePath}'.", exception?.Message);
             Assert.IsFalse(File.Exists(destinationFilePath));
@@ -1678,7 +1678,7 @@ public class MoveAssetsServiceTests
             string nonExistentFilePath = Path.Combine(nonExistentSource, "NonExistentFile.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image.jpg");
 
-            var exception = Assert.Throws<DirectoryNotFoundException>(() => _moveAssetsService!.CopyAsset(nonExistentFilePath, destinationFilePath));
+            DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _moveAssetsService!.CopyAsset(nonExistentFilePath, destinationFilePath));
 
             Assert.AreEqual($"Could not find a part of the path '{nonExistentFilePath}'.", exception?.Message);
             Assert.IsFalse(File.Exists(destinationFilePath));
@@ -1743,7 +1743,7 @@ public class MoveAssetsServiceTests
             string sourceFilePath = string.Empty;
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
-            var exception = Assert.Throws<ArgumentException>(() => _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath));
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath));
 
             Assert.AreEqual("The value cannot be an empty string. (Parameter 'sourceFilePath')", exception?.Message);
             Assert.IsFalse(File.Exists(destinationFilePath));
@@ -1783,7 +1783,7 @@ public class MoveAssetsServiceTests
             string? sourceFilePath = null;
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
-            var exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.CopyAsset(sourceFilePath!, destinationFilePath));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.CopyAsset(sourceFilePath!, destinationFilePath));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'sourceFilePath')", exception?.Message);
             Assert.IsFalse(File.Exists(destinationFilePath));

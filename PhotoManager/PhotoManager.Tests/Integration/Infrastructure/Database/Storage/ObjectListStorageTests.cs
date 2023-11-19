@@ -31,7 +31,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
+        List<Folder> result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<Folder>>(result);
         Assert.IsNotEmpty(result);
@@ -61,7 +61,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, AssetConfigs.ReadFunc, new Diagnostics());
+        List<Asset> result = _objectListStorage!.ReadObjectList(dataFilePath, AssetConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<Asset>>(result);
         Assert.IsNotEmpty(result);
@@ -95,7 +95,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
+        List<SyncAssetsDirectoriesDefinition> result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
         Assert.IsNotEmpty(result);
@@ -125,7 +125,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
+        List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsNotEmpty(result);
         Assert.AreEqual(2, result.Count);
@@ -144,7 +144,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
+        List<SyncAssetsDirectoriesDefinition> result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
         Assert.IsEmpty(result);
@@ -157,7 +157,7 @@ public class ObjectListStorageTests
         DataTableProperties? dataTableProperties = null;
         _objectListStorage!.Initialize(dataTableProperties!, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
+        List<Folder> result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsInstanceOf<List<Folder>>(result);
         Assert.IsNotEmpty(result);
@@ -170,7 +170,7 @@ public class ObjectListStorageTests
     {
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
 
-        var exception = Assert.Throws<FormatException>(() =>
+        FormatException? exception = Assert.Throws<FormatException>(() =>
         {
             _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
         });
@@ -219,7 +219,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
+        List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsEmpty(result);
     }
@@ -238,7 +238,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
+        List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsEmpty(result);
     }
@@ -257,7 +257,7 @@ public class ObjectListStorageTests
         };
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var result = _objectListStorage!.ReadObjectList(dataFilePath!, RecentPathsConfigs.ReadFunc, new Diagnostics());
+        List<string> result = _objectListStorage!.ReadObjectList(dataFilePath!, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
         Assert.IsEmpty(result);
     }
@@ -469,7 +469,7 @@ public class ObjectListStorageTests
 
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
-        var exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
+        Exception? exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
 
         Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
 
@@ -505,7 +505,7 @@ public class ObjectListStorageTests
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
-        var exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
+        Exception? exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
 
 
         Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);

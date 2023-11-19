@@ -22,17 +22,17 @@ public static class HashingHelper
     // Performances are decreased by 6 times with CalculatePHash
     public static string? CalculatePHash(string filePath)
     {
-        var image = new MagickImage(filePath);
+        MagickImage image = new (filePath);
 
         // Resize the image
-        var size = new MagickGeometry(32, 32);
-        image.Resize(size);
+        MagickGeometry geometry = new (32, 32);
+        image.Resize(geometry);
 
         // Convert the image to grayscale
         image.Grayscale(PixelIntensityMethod.Average);
 
         // Calculate the PHash of the image
-        var phash = image.PerceptualHash()?.ToString();
+        string? phash = image.PerceptualHash()?.ToString();
         return phash;
     }
 
@@ -44,15 +44,15 @@ public static class HashingHelper
 
         image = isHeicFile ? BitmapHelper.LoadBitmapFromPath(filePath!) : new Bitmap(filePath!);
 
-        var hash = 0UL;
-        var mask = 1UL;
+        ulong hash = 0UL;
+        ulong mask = 1UL;
 
         for (int y = 0; y < 8; y++)
         {
             for (int x = 0; x < 7; x++)
             {
-                var leftPixel = image?.GetPixel(x, y).GetBrightness();
-                var rightPixel = image?.GetPixel(x + 1, y).GetBrightness();
+                float? leftPixel = image?.GetPixel(x, y).GetBrightness();
+                float? rightPixel = image?.GetPixel(x + 1, y).GetBrightness();
                 if (leftPixel < rightPixel)
                 {
                     hash |= mask;

@@ -140,7 +140,7 @@ public class StorageServiceTests
     [TestCase("Image 8.jpeg", 1)]
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOriention)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = _storageService!.GetExifOrientation(buffer);
@@ -155,7 +155,7 @@ public class StorageServiceTests
     [TestCase("Image_11.heic", AssetConstants.OrientationCorruptedImage)] // Error on BitmapFrame.Create(stream)
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsOrientationCorruptedImage(string fileName, int expectedOriention)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = _storageService!.GetExifOrientation(buffer);
@@ -201,7 +201,7 @@ public class StorageServiceTests
     //[TestCase("Image_11_270.heic", 270, 6)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
     public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int degrees, int orientationExpected)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
         //byte[] bufferRotated = GetHeicRotatedBuffer(buffer, degrees);
 
@@ -242,7 +242,7 @@ public class StorageServiceTests
     [TestCase("Image 1.jpg")]
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetJpegBitmapImage(image);
@@ -257,7 +257,7 @@ public class StorageServiceTests
     [Test]
     public void GetJpegBitmapImage_HeicValidImage_ReturnsJpegByteArray()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -292,7 +292,7 @@ public class StorageServiceTests
     [TestCase("Image 1.jpg")]
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetPngBitmapImage(image);
@@ -307,7 +307,7 @@ public class StorageServiceTests
     [Test]
     public void GetPngBitmapImage_HeicValidImage_ReturnsPngByteArray()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -342,7 +342,7 @@ public class StorageServiceTests
     [TestCase("Image 1.jpg")]
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetGifBitmapImage(image);
@@ -357,7 +357,7 @@ public class StorageServiceTests
     [Test]
     public void GetGifBitmapImage_HeicValidImage_ReturnsGifByteArray()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -423,7 +423,7 @@ public class StorageServiceTests
     [Test]
     public void FileExistsFullPath_ExistingFile_ReturnsTrue()
     {
-        var fullPath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string fullPath = Path.Combine(dataDirectory!, "Image 1.jpg");
 
         bool exists = _storageService!.FileExists(fullPath);
 
@@ -433,7 +433,7 @@ public class StorageServiceTests
     [Test]
     public void FileExistsFullPath_NonExistentFile_ReturnsFalse()
     {
-        var fullPath = Path.Combine(dataDirectory!, "nonexistent.txt");
+        string fullPath = Path.Combine(dataDirectory!, "nonexistent.txt");
 
         bool exists = _storageService!.FileExists(fullPath);
 
@@ -482,8 +482,8 @@ public class StorageServiceTests
         string fileName = "Image 1.jpg";
         Folder folder = new() { Path = dataDirectory! };
         Asset asset = new() { Folder = folder, FileName = fileName };
-        var creationTime = DateTime.Now;
-        var modificationTime = new DateTime(2023, 1, 7);
+        DateTime creationTime = DateTime.Now;
+        DateTime modificationTime = new (2023, 1, 7);
 
         _storageService!.LoadFileInformation(asset);
 
@@ -497,8 +497,8 @@ public class StorageServiceTests
         string fileName = "nonexistent.jpg";
         Folder folder = new() { Path = dataDirectory! };
         Asset asset = new() { Folder = folder, FileName = fileName };
-        var creationTime = default(DateTime);
-        var modificationTime = default(DateTime);
+        DateTime creationTime = default;
+        DateTime modificationTime = default;
 
         _storageService!.LoadFileInformation(asset);
 
@@ -512,8 +512,8 @@ public class StorageServiceTests
         string fileName = "Image 1.jpg";
         Folder? folder = null;
         Asset asset = new() { Folder = folder!, FileName = fileName };
-        var creationTime = default(DateTime);
-        var modificationTime = default(DateTime);
+        DateTime creationTime = default;
+        DateTime modificationTime = default;
 
         _storageService!.LoadFileInformation(asset);
 
@@ -547,7 +547,7 @@ public class StorageServiceTests
     [TestCase("Homer.gif")]
     public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
         bool result = _storageService!.IsValidGDIPlusImage(validImageData);
@@ -558,7 +558,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidGDIPlusImage_InvalidImageData_ReturnsFalse()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] invalidImageData = File.ReadAllBytes(filePath);
 
         bool result = _storageService!.IsValidGDIPlusImage(invalidImageData);
@@ -571,7 +571,7 @@ public class StorageServiceTests
     {
         byte[] emptyHeicData = Array.Empty<byte>();
 
-        var result = _storageService!.IsValidGDIPlusImage(emptyHeicData);
+        bool result = _storageService!.IsValidGDIPlusImage(emptyHeicData);
 
         Assert.IsFalse(result);
     }
@@ -579,7 +579,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidHeic_ValidImageData_ReturnsTrue()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] validHeicData = File.ReadAllBytes(filePath);
 
         bool result = _storageService!.IsValidHeic(validHeicData);

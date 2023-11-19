@@ -122,7 +122,7 @@ public class AssetConfigsTests
     {
         string[] nullValues = new string[14];
 
-        var exception = Assert.Throws<ArgumentNullException>(() => AssetConfigs.ReadFunc(nullValues));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => AssetConfigs.ReadFunc(nullValues));
 
         Assert.AreEqual("Value cannot be null. (Parameter 'g')", exception?.Message);
     }
@@ -156,7 +156,7 @@ public class AssetConfigsTests
             "False"
         };
 
-        var exception = Assert.Throws<FormatException>(() => AssetConfigs.ReadFunc(invalidValues));
+        FormatException? exception = Assert.Throws<FormatException>(() => AssetConfigs.ReadFunc(invalidValues));
 
         Assert.AreEqual("The input string 'toto' was not in a correct format.", exception?.Message);
     }
@@ -260,7 +260,7 @@ public class AssetConfigsTests
             IsAssetRotated = false
         };
 
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => AssetConfigs.WriteFunc(asset, 15));
+        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => AssetConfigs.WriteFunc(asset, 15));
 
         Assert.AreEqual("Specified argument was out of the range of valid values. (Parameter 'i')", exception?.Message);
     }

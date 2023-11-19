@@ -32,7 +32,7 @@ public class FileNameConverterTests
         string? fileName = null;
         object? parameter = null;
 
-        var result = fileNameConverter.Convert(fileName!, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        object result = fileNameConverter.Convert(fileName!, typeof(string), parameter!, CultureInfo.InvariantCulture);
 
         Assert.IsNull(result);
     }
@@ -41,10 +41,10 @@ public class FileNameConverterTests
     public void Convert_InputValueType_ReturnsInputValue()
     {
         FileNameConverter fileNameConverter = new();
-        var input = 123;
+        int input = 123;
         object? parameter = null;
 
-        var result = fileNameConverter.Convert(input, typeof(int), parameter!, CultureInfo.InvariantCulture);
+        object result = fileNameConverter.Convert(input, typeof(int), parameter!, CultureInfo.InvariantCulture);
 
         Assert.AreEqual(input, result);
     }

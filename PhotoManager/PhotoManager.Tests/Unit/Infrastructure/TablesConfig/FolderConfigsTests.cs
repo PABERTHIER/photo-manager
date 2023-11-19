@@ -56,7 +56,7 @@ public class FolderConfigsTests
     {
         string[] nullValues = new string[2];
 
-        var exception = Assert.Throws<ArgumentNullException>(() => FolderConfigs.ReadFunc(nullValues));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => FolderConfigs.ReadFunc(nullValues));
 
         Assert.AreEqual("Value cannot be null. (Parameter 'g')", exception?.Message);
     }
@@ -115,7 +115,7 @@ public class FolderConfigsTests
             Path = "D:\\folder\\newFolder"
         };
 
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => FolderConfigs.WriteFunc(folder, 15));
+        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => FolderConfigs.WriteFunc(folder, 15));
 
         Assert.AreEqual("Specified argument was out of the range of valid values. (Parameter 'i')", exception?.Message);
     }

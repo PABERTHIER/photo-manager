@@ -57,7 +57,7 @@ public class Database : IDatabase
             throw new ArgumentNullException(nameof(ColumnProperties.ColumnName), "All column properties should have a ColumnName");
         }
 
-        var group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName).Where(g => g.Count() > 1).FirstOrDefault();
+        IGrouping<string, ColumnProperties>? group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName).Where(g => g.Count() > 1).FirstOrDefault();
 
         if (group != null)
         {
@@ -124,7 +124,7 @@ public class Database : IDatabase
     // This method verifies if the folder has its .bin generated, but not if there are data in it or not
     public bool FolderHasThumbnails(string blobName) // FolderId + ".bin"
     {
-        var blobFilePath = ResolveBlobFilePath(blobName);
+        string blobFilePath = ResolveBlobFilePath(blobName);
         return File.Exists(blobFilePath);
     }
 

@@ -20,7 +20,7 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
 
     public void WriteObjectList<T>(string dataFilePath, List<T> list, Func<T, int, object> mapCsvFieldIndexToCsvField, Diagnostics diagnostics)
     {
-        var tableName = Properties?.TableName ?? "NoTableName";
+        string tableName = Properties?.TableName ?? "NoTableName";
         string csv = GetCsvFromObjectList(list, tableName, mapCsvFieldIndexToCsvField);
         diagnostics.LastWriteFileRaw = csv;
         File.WriteAllText(dataFilePath, csv);

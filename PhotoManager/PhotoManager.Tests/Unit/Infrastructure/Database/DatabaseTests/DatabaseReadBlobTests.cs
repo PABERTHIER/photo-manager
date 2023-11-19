@@ -40,7 +40,7 @@ public class DatabaseReadBlobTests
             _database!.WriteBlob(blobToWrite, blobName);
             Assert.IsTrue(File.Exists(blobFilePath));
 
-            var blob = _database!.ReadBlob(blobName);
+            Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
             Assert.IsNotNull(blob);
             Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
@@ -78,7 +78,7 @@ public class DatabaseReadBlobTests
             _database!.WriteBlob(blobToWrite, blobName);
             Assert.IsTrue(File.Exists(blobFilePath));
 
-            var blob = _database!.ReadBlob(blobName);
+            Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
             Assert.IsNotNull(blob);
             Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
@@ -108,7 +108,7 @@ public class DatabaseReadBlobTests
         {
             _database!.Initialize(directoryPath, pipeSeparator);
 
-            var blob = _database!.ReadBlob(blobName);
+            Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
             Assert.IsNull(blob);
             Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastReadFilePath);

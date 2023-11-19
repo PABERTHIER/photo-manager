@@ -35,7 +35,7 @@ public class FileSizeConverterTests
         string? input = null;
         object? parameter = null;
 
-        var result = fileSizeConverter.Convert(input!, typeof(long), parameter!, CultureInfo.InvariantCulture);
+        object result = fileSizeConverter.Convert(input!, typeof(long), parameter!, CultureInfo.InvariantCulture);
 
         Assert.AreEqual("0 bytes", result);
     }
@@ -44,10 +44,10 @@ public class FileSizeConverterTests
     public void Convert_NonNumberInputType_ReturnsFileSize()
     {
         FileSizeConverter fileSizeConverter = new();
-        var input = "12345";
+        string input = "12345";
         object? parameter = null;
 
-        var result = fileSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        object result = fileSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);
 
         Assert.AreEqual("12.1 KB", result);
     }
@@ -56,7 +56,7 @@ public class FileSizeConverterTests
     public void Convert_InvalidFormat_ThrowsFormatException()
     {
         FileSizeConverter fileSizeConverter = new();
-        var input = "abc";
+        string input = "abc";
         object? parameter = null;
 
         Assert.Throws<FormatException>(() =>
@@ -82,7 +82,7 @@ public class FileSizeConverterTests
     public void Convert_Overflow_ThrowsOverflowException()
     {
         FileSizeConverter fileSizeConverter = new();
-        var input = long.MaxValue.ToString() + "0"; // Adding a digit to exceed the maximum value
+        string input = long.MaxValue.ToString() + "0"; // Adding a digit to exceed the maximum value
         object? parameter = null;
 
         Assert.Throws<OverflowException>(() =>

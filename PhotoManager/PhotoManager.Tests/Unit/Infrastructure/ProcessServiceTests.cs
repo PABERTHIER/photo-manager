@@ -8,7 +8,7 @@ public class ProcessServiceTests
     [Test]
     public void IsAlreadyRunning_NoOtherProcesses_ReturnsFalse()
     {
-        var processService = new ProcessService();
+        ProcessService processService = new();
 
         bool result = processService.IsAlreadyRunning(Environment.ProcessId);
 
@@ -18,11 +18,11 @@ public class ProcessServiceTests
     [Test]
     public void IsAlreadyRunning_OtherProcesses_ReturnsTrue()
     {
-        var processService = new ProcessService();
-        var processes = Process.GetProcesses();
+        ProcessService processService = new();
+        Process[] processes = Process.GetProcesses();
         int processId;
-        var fontdrvhostProcessId = processes?.FirstOrDefault(p => p.ProcessName == "fontdrvhost")?.Id; // A Windows process
-        var svchostProcessId = processes?.FirstOrDefault(p => p.ProcessName == "svchost")?.Id; // A Windows DLL process
+        int? fontdrvhostProcessId = processes?.FirstOrDefault(p => p.ProcessName == "fontdrvhost")?.Id; // A Windows process
+        int? svchostProcessId = processes?.FirstOrDefault(p => p.ProcessName == "svchost")?.Id; // A Windows DLL process
 
         if (fontdrvhostProcessId == null)
         {
@@ -30,7 +30,7 @@ public class ProcessServiceTests
         }
         else
         {
-            processId = fontdrvhostProcessId ?? 0;
+            processId = (int)fontdrvhostProcessId;
         }
 
         bool result = processService.IsAlreadyRunning(processId);

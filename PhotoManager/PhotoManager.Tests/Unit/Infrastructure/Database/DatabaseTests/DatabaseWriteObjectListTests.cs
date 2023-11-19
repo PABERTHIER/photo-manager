@@ -174,7 +174,7 @@ public class DatabaseWriteObjectListTests
 
             _database!.Initialize(directoryPath, pipeSeparator);
 
-            var exception = Assert.Throws<Exception>(() => _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
+            Exception? exception = Assert.Throws<Exception>(() => _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
 
             Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
 
@@ -382,7 +382,7 @@ public class DatabaseWriteObjectListTests
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
             });
 
-            var exception = Assert.Throws<ArgumentNullException>(() =>
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
                 _database!.WriteObjectList(assets!, tableName, AssetConfigs.WriteFunc));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'list')", exception?.Message);
@@ -453,7 +453,7 @@ public class DatabaseWriteObjectListTests
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
             });
 
-            var exception = Assert.Throws<ArgumentNullException>(() =>
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
                 _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'tableName')", exception?.Message);
@@ -517,14 +517,14 @@ public class DatabaseWriteObjectListTests
 
             _database!.Initialize(directoryPath, pipeSeparator);
 
-            var exception1 = Assert.Throws<ArgumentNullException>(() =>
+            ArgumentNullException? exception1 = Assert.Throws<ArgumentNullException>(() =>
                 _database!.SetDataTableProperties(new DataTableProperties
                 {
                     TableName = tableName!,
                     ColumnProperties = AssetConfigs.ConfigureDataTable()
                 }));
 
-            var exception2 = Assert.Throws<ArgumentNullException>(() =>
+            ArgumentNullException? exception2 = Assert.Throws<ArgumentNullException>(() =>
                 _database!.WriteObjectList(assets, tableName!, AssetConfigs.WriteFunc));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception1?.Message);

@@ -76,7 +76,7 @@ public class RecentPathsConfigsTests
     {
         string recentPath = "D:\\folder\\newFolder";
 
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => RecentPathsConfigs.WriteFunc(recentPath, 2));
+        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => RecentPathsConfigs.WriteFunc(recentPath, 2));
 
         Assert.AreEqual("Specified argument was out of the range of valid values. (Parameter 'i')", exception?.Message);
     }

@@ -8,10 +8,10 @@ public class DatabaseServiceConfigurationMockTests
     [Test]
     public void RegisterDatabaseTypes_RegistersAllRequiredTypes()
     {
-        var containerBuilder = new ContainerBuilder();
+        ContainerBuilder containerBuilder = new();
 
         containerBuilder.RegisterDatabaseTypes();
-        var container = containerBuilder.Build();
+        IContainer container = containerBuilder.Build();
 
         Assert.IsTrue(container.IsRegistered<IObjectListStorage>());
         Assert.IsTrue(container.IsRegistered<IBlobStorage>());

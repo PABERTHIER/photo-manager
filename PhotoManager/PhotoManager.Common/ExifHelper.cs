@@ -24,7 +24,7 @@ public static class ExifHelper
                 if (bitmapFrame.Metadata is BitmapMetadata bitmapMetadata)
                 {
                 
-                    var orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
+                    object orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
 
                     if (orientation == null)
                     {
@@ -58,13 +58,13 @@ public static class ExifHelper
             using (MemoryStream stream = new(buffer))
             {
                 // https://github.com/dlemstra/Magick.NET/issues/836
-                //var settings = new MagickReadSettings();
+                //MagickReadSettings settings = new();
                 //settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
 
                 //using (MagickImage image = new(stream, settings))
                 using (MagickImage image = new(stream))
                 {
-                    var orientation = image.GetAttribute("exif:Orientation");
+                    string? orientation = image.GetAttribute("exif:Orientation");
                     //image.AutoOrient();
                     //image.GetExifProfile();
                     if (orientation != null && ushort.TryParse(orientation, out ushort orientationValue))

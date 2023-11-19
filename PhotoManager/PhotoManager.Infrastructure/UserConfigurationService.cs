@@ -79,7 +79,7 @@ public class UserConfigurationService : IUserConfigurationService
     {
         string? product = null;
         string version = "v" + GetProductVersion();
-        var attrs = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute));
+        IEnumerable<Attribute> attrs = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute));
 
         if (attrs.SingleOrDefault() is AssemblyProductAttribute assemblyProduct)
         {

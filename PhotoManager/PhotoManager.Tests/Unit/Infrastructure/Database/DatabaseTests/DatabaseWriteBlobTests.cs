@@ -43,7 +43,7 @@ public class DatabaseWriteBlobTests
             Assert.IsInstanceOf<Dictionary<string, byte[]>?>(_database!.Diagnostics.LastWriteFileRaw);
             Assert.AreEqual(blobToWrite, _database!.Diagnostics.LastWriteFileRaw);
 
-            var blob = _database!.ReadBlob(blobName);
+            Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
             Assert.IsNotNull(blob);
             Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
@@ -83,7 +83,7 @@ public class DatabaseWriteBlobTests
             Assert.IsInstanceOf<Dictionary<string, byte[]>?>(_database!.Diagnostics.LastWriteFileRaw);
             Assert.AreEqual(blobToWrite, _database!.Diagnostics.LastWriteFileRaw);
 
-            var blob = _database!.ReadBlob(blobName);
+            Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
             Assert.IsNotNull(blob);
             Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
@@ -142,7 +142,7 @@ public class DatabaseWriteBlobTests
             Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastWriteFilePath);
             Assert.AreEqual(blobToWrite, _database!.Diagnostics.LastWriteFileRaw);
 
-            var blob = _database!.ReadBlob(blobName);
+            Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
             Assert.IsNotNull(blob);
             Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);

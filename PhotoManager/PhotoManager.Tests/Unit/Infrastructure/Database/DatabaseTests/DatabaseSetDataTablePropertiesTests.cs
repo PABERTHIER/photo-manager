@@ -147,7 +147,7 @@ public class DatabaseSetDataTablePropertiesTests
     {
         DataTableProperties? dataTableProperties = null;
 
-        var exception = Assert.Throws<ArgumentNullException>(() => _database!.SetDataTableProperties(dataTableProperties!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _database!.SetDataTableProperties(dataTableProperties!));
         Assert.AreEqual("dataTableProperties", exception?.ParamName);
     }
 
@@ -160,7 +160,7 @@ public class DatabaseSetDataTablePropertiesTests
             ColumnProperties = null!
         };
 
-        var exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
         Assert.AreEqual("Column properties must not be empty.", exception?.Message);
     }
 
@@ -173,7 +173,7 @@ public class DatabaseSetDataTablePropertiesTests
             ColumnProperties = Array.Empty<ColumnProperties>()
         };
 
-        var exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
         Assert.AreEqual("Column properties must not be empty.", exception?.Message);
     }
 
@@ -193,7 +193,7 @@ public class DatabaseSetDataTablePropertiesTests
             }
         };
 
-        var exception = Assert.Throws<ArgumentNullException>(() => _database!.SetDataTableProperties(properties));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _database!.SetDataTableProperties(properties));
         Assert.AreEqual("All column properties should have a ColumnName (Parameter 'ColumnName')", exception?.Message);
         Assert.AreEqual(nameof(ColumnProperties.ColumnName), exception?.ParamName);
     }
@@ -211,7 +211,7 @@ public class DatabaseSetDataTablePropertiesTests
             }
         };
 
-        var exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
         Assert.AreEqual("Duplicated column properties. (Parameter 'Column1')", exception?.Message);
         Assert.AreEqual("Column1", exception?.ParamName);
     }

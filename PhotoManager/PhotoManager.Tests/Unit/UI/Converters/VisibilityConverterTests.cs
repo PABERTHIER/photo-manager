@@ -23,7 +23,7 @@ public class VisibilityConverterTests
         object value = new SomeOtherType();
         object? parameter = null;
 
-        var result = visibilityConverter.Convert(value, typeof(Visibility), parameter!, CultureInfo.InvariantCulture);
+        object result = visibilityConverter.Convert(value, typeof(Visibility), parameter!, CultureInfo.InvariantCulture);
 
         Assert.AreEqual(Visibility.Visible, result);
     }

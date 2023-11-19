@@ -39,7 +39,7 @@ public class BlobStorage : IBlobStorage
             {
                 writer.Write(data.Count);
 
-                foreach (var kvp in data)
+                foreach (KeyValuePair<string, byte[]> kvp in data)
                 {
                     writer.Write(kvp.Key);
                     writer.Write(kvp.Value.Length);

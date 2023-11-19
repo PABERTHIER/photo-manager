@@ -112,7 +112,7 @@ public class AssetRepository : IAssetRepository
                 RemoveOldThumbnailsDictionaryEntries(asset.Folder);
             }
 
-            if (Thumbnails.TryGetValue(asset.Folder.Path, out var folderThumbnails))
+            if (Thumbnails.TryGetValue(asset.Folder.Path, out Dictionary<string, byte[]>? folderThumbnails))
             {
                 folderThumbnails[asset.FileName] = thumbnailData;
                 assets.Add(asset);
@@ -460,7 +460,7 @@ public class AssetRepository : IAssetRepository
 
     private void InitializeDatabase()
     {
-        var separatorChar = AssetConstants.Separator.ToCharArray().First();
+        char separatorChar = AssetConstants.Separator.ToCharArray().First();
         _database.Initialize(dataDirectory, separatorChar);
 
         _database.SetDataTableProperties(new DataTableProperties

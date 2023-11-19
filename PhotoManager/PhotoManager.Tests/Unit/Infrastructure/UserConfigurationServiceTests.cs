@@ -44,7 +44,7 @@ public class UserConfigurationServiceTests
         _userConfigurationService!.SetAsWallpaper(asset, style);
 
         // Get the captured console output
-        var consoleOutput = stringWriter.ToString();
+        string consoleOutput = stringWriter.ToString();
 
         // Assert that the expected error message was printed to the console
         Assert.IsTrue(consoleOutput.Contains($"Wallpaper set for style {expectedStyleValue} and tile {expectedTileValue}"));

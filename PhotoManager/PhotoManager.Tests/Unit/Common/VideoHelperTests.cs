@@ -51,43 +51,43 @@ public class VideoHelperTests
     [TestCase(".", false)]
     public void Should_Detect_When_AssetIsVideo(string fileExtension, bool expected)
     {
-        var result = VideoHelper.IsVideoFile(fileExtension);
+        bool result = VideoHelper.IsVideoFile(fileExtension);
         Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
     public void GetFirstFrame_ExistingFile_ExtractsFirstFrame()
     {
-        var fileName = "Homer.mp4";
+        string fileName = "Homer.mp4";
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
 
-        var expectedFileName = "Homer.jpg";
+        string expectedFileName = "Homer.jpg";
         string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
         string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
         // Create a mock of IProcessExecutor
-        var mockProcessExecutor = new Mock<IProcessExecutor>();
+        Mock<IProcessExecutor> mockProcessExecutor = new();
 
         // Set the static ProcessExecutor to the mock instance
         VideoHelper.ProcessExecutor = mockProcessExecutor.Object;
 
         // Create a virtual file system using System.IO.Abstractions
-        var fileSystem = new FileSystem();
+        FileSystem fileSystem = new();
         fileSystem.Directory.CreateDirectory(destinationPath);
         fileSystem.File.WriteAllText(Path.Combine(destinationPath, expectedFileName), "fake video content");
 
         // Set up a StringWriter to capture console output
-        var stringWriter = new StringWriter();
+        StringWriter stringWriter = new();
         Console.SetOut(stringWriter);
 
         try
         {
-            var firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsTrue(fileSystem.File.Exists(firstFrameVideoPath));
             // Get the captured console output
-            var consoleOutput = stringWriter.ToString();
+            string consoleOutput = stringWriter.ToString();
 
             // Assert that the expected error message was printed to the console
             Assert.IsTrue(consoleOutput.Contains("First frame extracted successfully for:"));
@@ -108,27 +108,27 @@ public class VideoHelperTests
     [Test]
     public void GetFirstFrame_NonExistingFile_ReturnsPathButNoFileCreated()
     {
-        var fileName = "non_existing_video.mp4";
+        string fileName = "non_existing_video.mp4";
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
 
         try
         {
             // Create a mock of IProcessExecutor
-            var mockProcessExecutor = new Mock<IProcessExecutor>();
+            Mock<IProcessExecutor> mockProcessExecutor = new();
 
             // Set the static ProcessExecutor to the mock instance
             VideoHelper.ProcessExecutor = mockProcessExecutor.Object;
 
             // Set up a StringWriter to capture console output
-            var stringWriter = new StringWriter();
+            StringWriter stringWriter = new();
             Console.SetOut(stringWriter);
 
-            var firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsFalse(File.Exists(firstFrameVideoPath));
             // Get the captured console output
-            var consoleOutput = stringWriter.ToString();
+            string consoleOutput = stringWriter.ToString();
 
             // Assert that the expected error message was printed to the console
             Assert.IsTrue(consoleOutput.Contains("First frame extracted successfully for:"));
@@ -143,13 +143,13 @@ public class VideoHelperTests
     [Test]
     public void GetFirstFrame_ExecuteFFmpegCommandThrowsException_PrintsErrorMessage()
     {
-        var fileName = "Homer.mp4";
+        string fileName = "Homer.mp4";
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
 
         try
         {
             // Create a mock of IProcessExecutor that throws an exception when ExecuteFFmpegCommand is called
-            var mockProcessExecutor = new Mock<IProcessExecutor>();
+            Mock<IProcessExecutor> mockProcessExecutor = new();
             mockProcessExecutor
                 .Setup(x => x.ExecuteFFmpegCommand(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new Exception("Error executing FFmpeg command"));
@@ -158,16 +158,16 @@ public class VideoHelperTests
             VideoHelper.ProcessExecutor = mockProcessExecutor.Object;
 
             // Set up a StringWriter to capture console output
-            var stringWriter = new StringWriter();
+            StringWriter stringWriter = new();
             Console.SetOut(stringWriter);
 
-            var firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsFalse(File.Exists(firstFrameVideoPath));
 
             // Get the captured console output
-            var consoleOutput = stringWriter.ToString();
+            string consoleOutput = stringWriter.ToString();
 
             // Assert that the expected error message was printed to the console
             Assert.IsTrue(consoleOutput.Contains("Failed to extract the first frame for:"));

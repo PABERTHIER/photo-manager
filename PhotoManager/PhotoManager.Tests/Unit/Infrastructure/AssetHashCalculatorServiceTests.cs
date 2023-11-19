@@ -23,7 +23,7 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image_11.heic")]
     public void CalculateHash_ValidImageBytesAndFilePath_ReturnsHash(string fileName)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
         AssetHashCalculatorService assetHashCalculatorService = new();
 

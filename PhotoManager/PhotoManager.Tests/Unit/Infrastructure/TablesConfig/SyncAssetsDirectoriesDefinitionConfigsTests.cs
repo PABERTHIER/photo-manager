@@ -64,7 +64,7 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     {
         string[] nullValues = new string[4];
 
-        var exception = Assert.Throws<ArgumentNullException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(nullValues));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(nullValues));
 
         Assert.AreEqual("Value cannot be null. (Parameter 'value')", exception?.Message);
     }
@@ -88,7 +88,7 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
             "False"
         };
 
-        var exception = Assert.Throws<FormatException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(invalidValues));
+        FormatException? exception = Assert.Throws<FormatException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(invalidValues));
 
         Assert.AreEqual("String '15' was not recognized as a valid Boolean.", exception?.Message);
     }
@@ -148,7 +148,7 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
             DeleteAssetsNotInSource = false
         };
 
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.WriteFunc(syncAssetsDirectoriesDefinition, 5));
+        ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.WriteFunc(syncAssetsDirectoriesDefinition, 5));
 
         Assert.AreEqual("Specified argument was out of the range of valid values. (Parameter 'i')", exception?.Message);
     }

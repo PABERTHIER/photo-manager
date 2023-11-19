@@ -24,7 +24,7 @@ public class HashingHelperTests
     [TestCase("Image_11.heic", "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931")]
     public void CalculateHash_ValidImageBytes_ReturnsCorrectHash(string fileName, string expectedHash)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = HashingHelper.CalculateHash(imageBytes);
@@ -38,7 +38,7 @@ public class HashingHelperTests
     public void CalculateHash_EmptyImageBytes_ReturnsSameHash()
     {
         byte[] imageBytes = Array.Empty<byte>();
-        var expectedHash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e";
+        string expectedHash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e";
 
         string hash = HashingHelper.CalculateHash(imageBytes);
 
@@ -66,7 +66,7 @@ public class HashingHelperTests
     [TestCase("Image_11.heic", "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056")]
     public void CalculatePHash_ValidImagePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
 
         string? phash = HashingHelper.CalculatePHash(filePath);
 
@@ -78,7 +78,7 @@ public class HashingHelperTests
     [Test]
     public void CalculatePHash_InvalidImagePath_ThrowsMagickBlobErrorException()
     {
-        var filePath = Path.Combine(dataDirectory!, "invalid_path.png");
+        string filePath = Path.Combine(dataDirectory!, "invalid_path.png");
 
         Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(filePath!));
     }
@@ -100,7 +100,7 @@ public class HashingHelperTests
     [TestCase("Image 10 portrait.png", "36116814863094786")]
     public void CalculateDHash_ValidImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
 
         string dhash = HashingHelper.CalculateDHash(filePath);
 
@@ -113,7 +113,7 @@ public class HashingHelperTests
     [TestCase("Homer.gif", "0")]
     public void CalculateDHash_GifImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
 
         string dhash = HashingHelper.CalculateDHash(filePath);
 
@@ -126,7 +126,7 @@ public class HashingHelperTests
     [TestCase("Image_11.heic", "9077567998918656")]
     public void CalculateDHash_HeicImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
 
         string dhash = HashingHelper.CalculateDHash(filePath);
 
@@ -138,7 +138,7 @@ public class HashingHelperTests
     [Test]
     public void CalculateDHash_InvalidImagePath_ThrowsArgumentException()
     {
-        var filePath = Path.Combine(dataDirectory!, "invalid_path.png");
+        string filePath = Path.Combine(dataDirectory!, "invalid_path.png");
 
         Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(filePath));
     }
@@ -162,7 +162,7 @@ public class HashingHelperTests
     [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
     public void CalculateMD5Hash_ValidImageBytes_ReturnsCorrectHash(string fileName, string expectedHash)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string md5Hash = HashingHelper.CalculateMD5Hash(imageBytes);
@@ -176,7 +176,7 @@ public class HashingHelperTests
     public void CalculateMD5Hash_EmptyImageBytes_ReturnsSameHash()
     {
         byte[] imageBytes = Array.Empty<byte>();
-        var expectedHash = "d41d8cd98f00b204e9800998ecf8427e";
+        string expectedHash = "d41d8cd98f00b204e9800998ecf8427e";
 
         string hash = HashingHelper.CalculateMD5Hash(imageBytes);
 

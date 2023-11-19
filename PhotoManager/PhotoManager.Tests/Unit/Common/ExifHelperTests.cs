@@ -19,7 +19,7 @@ public class ExifHelperTests
     [TestCase("Image 8.jpeg", 1)]
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOriention)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = ExifHelper.GetExifOrientation(buffer);
@@ -34,7 +34,7 @@ public class ExifHelperTests
     [TestCase("Image_11.heic", AssetConstants.OrientationCorruptedImage)] // Error on BitmapFrame.Create(stream)
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsOrientationCorruptedImage(string fileName, int expectedOriention)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = ExifHelper.GetExifOrientation(buffer);
@@ -80,7 +80,7 @@ public class ExifHelperTests
     //[TestCase("Image_11_270.heic", 270, 6)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
     public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int degrees, int orientationExpected)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
         //byte[] bufferRotated = GetHeicRotatedBuffer(buffer, degrees);
 
@@ -141,7 +141,7 @@ public class ExifHelperTests
     [Test]
     public void GetImageRotation_InvalidExifOrientation_ReturnsCorrectRotationValue()
     {
-        var exifOrientation = -10;
+        int exifOrientation = -10;
         Rotation rotation = ExifHelper.GetImageRotation((ushort)exifOrientation);
 
         Assert.AreEqual(Rotation.Rotate0, rotation);
@@ -162,7 +162,7 @@ public class ExifHelperTests
     [TestCase("Homer.gif")]
     public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
-        var filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidGDIPlusImage(validImageData);
@@ -173,7 +173,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidGDIPlusImage_InvalidImageData_ReturnsFalse()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] invalidImageData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidGDIPlusImage(invalidImageData);
@@ -186,7 +186,7 @@ public class ExifHelperTests
     {
         byte[] emptyHeicData = Array.Empty<byte>();
 
-        var result = ExifHelper.IsValidGDIPlusImage(emptyHeicData);
+        bool result = ExifHelper.IsValidGDIPlusImage(emptyHeicData);
 
         Assert.IsFalse(result);
     }
@@ -194,7 +194,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidHeic_ValidImageData_ReturnsTrue()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] validHeicData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidHeic(validHeicData);
@@ -234,9 +234,9 @@ public class ExifHelperTests
     //            //MemoryStream newStream = stream;
     //            //stream.CopyTo(newStream);
 
-    //            //var readSettings = new MagickReadSettings() { Format = MagickFormat.Heic };
+    //            //MagickReadSettings readSettings = new() { Format = MagickFormat.Heic };
     //            //newStream.Seek(0, SeekOrigin.Begin); //THIS IS NEEDED!!!
-    //            //var newImage = new MagickImage(newStream, readSettings);
+    //            //MagickImage newImage = new (newStream, readSettings);
     //            //newImage.Rotate(degrees);
     //            byte[] rotatedImageData = image.ToByteArray(MagickFormat.Heic);
 

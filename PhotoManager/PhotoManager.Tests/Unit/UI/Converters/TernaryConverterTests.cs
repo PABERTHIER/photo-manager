@@ -18,7 +18,7 @@ public class TernaryConverterTests
             AssetCorruptedMessage = message,
         };
 
-        var converterParameters = new object[] { asset.IsAssetCorrupted, asset.AssetCorruptedMessage };
+        object[] converterParameters = [asset.IsAssetCorrupted, asset.AssetCorruptedMessage];
         object? parameter = null;
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);
@@ -39,7 +39,7 @@ public class TernaryConverterTests
             AssetRotatedMessage = message,
         };
 
-        var converterParameters = new object[] { asset.IsAssetRotated, asset.AssetRotatedMessage };
+        object[] converterParameters = [asset.IsAssetRotated, asset.AssetRotatedMessage];
         object? parameter = null;
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);

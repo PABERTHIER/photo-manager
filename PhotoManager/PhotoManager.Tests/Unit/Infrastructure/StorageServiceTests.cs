@@ -58,7 +58,7 @@ public class StorageServiceTests
     [TestCase(null, null, null)]
     public void LoadBitmapThumbnailImage_ValidBufferAndRotationAndWidthAndHeight_ReturnsBitmapImage(Rotation rotation, int width, int height)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapThumbnailImage(buffer, rotation, width, height);
@@ -74,7 +74,7 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_LargeWidthAndHeight_ThrowsOverflowException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         Assert.Throws<OverflowException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000));
@@ -114,7 +114,7 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_InvalidRotation_ThrowsArgumentException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = (Rotation)999;
 
@@ -125,7 +125,7 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_InvalidImageFormat_ThrowsArgumentException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = Rotation.Rotate90;
 
@@ -150,7 +150,7 @@ public class StorageServiceTests
     [TestCase(null, null)]
     public void LoadBitmapThumbnailImageAssetRepository_ValidBufferAndWidthAndHeight_ReturnsBitmapImage(int width, int height)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapThumbnailImage(buffer, width, height);
@@ -166,7 +166,7 @@ public class StorageServiceTests
     [Category("From AssetRepository")]
     public void LoadBitmapThumbnailImageAssetRepository_LargeWidthAndHeight_ThrowsOverflowException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         Assert.Throws<OverflowException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, 1000000, 1000000));
@@ -203,7 +203,7 @@ public class StorageServiceTests
     [Category("From AssetRepository")]
     public void LoadBitmapThumbnailImageAssetRepository_InvalidImageFormat_ThrowsArgumentException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, 100, 100));
@@ -218,7 +218,7 @@ public class StorageServiceTests
     [TestCase(null, 1280, 720)]
     public void LoadBitmapOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedPixelWidth, int expectedPixelHeight)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapOriginalImage(buffer, rotation);
@@ -266,7 +266,7 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_InvalidRotation_ThrowsArgumentException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = (Rotation)999;
 
@@ -277,7 +277,7 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_InvalidImageFormat_ThrowsArgumentException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = Rotation.Rotate90;
 
@@ -293,7 +293,7 @@ public class StorageServiceTests
     [TestCase(null)]
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
 
         BitmapImage image = _storageService!.LoadBitmapImageFromPath(filePath, rotation);
 
@@ -308,7 +308,7 @@ public class StorageServiceTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
     public void LoadBitmapImageFromPath_FileNotExists_ReturnsDefaultBitmapImage()
     {
-        var filePath = Path.Combine(dataDirectory!, "Invalid.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Invalid.jpg");
         Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = _storageService!.LoadBitmapImageFromPath(filePath, rotation);
@@ -340,7 +340,7 @@ public class StorageServiceTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
     public void LoadBitmapImageFromPath_InvalidRotation_ThrowsArgumentException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         Rotation rotation = (Rotation)999;
 
         Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapImageFromPath(filePath, rotation));
@@ -350,7 +350,7 @@ public class StorageServiceTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
     public void LoadBitmapImageFromPath_InvalidImageFormat_ThrowsArgumentException()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         Rotation rotation = Rotation.Rotate90;
 
         Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapImageFromPath(filePath, rotation));
@@ -365,7 +365,7 @@ public class StorageServiceTests
     [TestCase(null, 3024, 4032)]
     public void LoadBitmapHeicOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedPixelWidth, int expectedPixelHeight)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicOriginalImage(buffer, rotation);
@@ -421,7 +421,7 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
     public void LoadBitmapHeicOriginalImage_InvalidRotation_ReturnsPartialBitmapImage()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = (Rotation)999;
 
@@ -457,7 +457,7 @@ public class StorageServiceTests
     [TestCase(null, null, null)]
     public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int width, int height)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
@@ -478,7 +478,7 @@ public class StorageServiceTests
     [TestCase(-100, -100)]
     public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = Rotation.Rotate90;
 
@@ -489,11 +489,11 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_LargeWidthAndHeight_ReturnsDefaultBitmapImage()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = Rotation.Rotate90;
 
-        var image = _storageService!.LoadBitmapHeicThumbnailImage(buffer!, rotation, 1000000, 1000000);
+        BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer!, rotation, 1000000, 1000000);
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
@@ -542,7 +542,7 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_InvalidRotation_ReturnsPartialBitmapImage()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = (Rotation)999;
 
@@ -564,7 +564,7 @@ public class StorageServiceTests
     [TestCase(null)]
     public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotation_ReturnsBitmapImage(Rotation rotation)
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
 
         BitmapImage image = _storageService!.LoadBitmapHeicImageFromPath(filePath, rotation);
 
@@ -597,7 +597,7 @@ public class StorageServiceTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
     public void LoadBitmapHeicImageFromPathViewerUserControl_FileNotExists_ReturnsDefaultBitmapImage()
     {
-        var filePath = Path.Combine(dataDirectory!, "invalid_path.heic");
+        string filePath = Path.Combine(dataDirectory!, "invalid_path.heic");
         Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = _storageService!.LoadBitmapHeicImageFromPath(filePath, rotation);
@@ -613,7 +613,7 @@ public class StorageServiceTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
     public void LoadBitmapHeicImageFromPathViewerUserControl_InvalidRotation_ReturnsPartialBitmapImage()
     {
-        var filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         Rotation rotation = (Rotation)999;
 
         Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicImageFromPath(filePath, rotation));
@@ -644,7 +644,7 @@ public class StorageServiceTests
     [Test]
     public void GetImageRotation_InvalidExifOrientation_ReturnsCorrectRotationValue()
     {
-        var exifOrientation = -10;
+        int exifOrientation = -10;
         Rotation rotation = _storageService!.GetImageRotation((ushort)exifOrientation);
 
         Assert.AreEqual(Rotation.Rotate0, rotation);

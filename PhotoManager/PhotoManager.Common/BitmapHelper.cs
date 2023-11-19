@@ -249,7 +249,7 @@ public static class BitmapHelper
         byte[] imageBuffer;
         encoder.Frames.Add(BitmapFrame.Create(image));
 
-        using (var memoryStream = new MemoryStream())
+        using (MemoryStream memoryStream = new())
         {
             encoder.Save(memoryStream);
             imageBuffer = memoryStream.ToArray();
