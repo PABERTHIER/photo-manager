@@ -56,7 +56,7 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void GetFirstFrame_ExistingFile_ExtractsFirstFrame()
+    public void GetFirstFramePath_ExistingFile_ExtractsFirstFrame()
     {
         string fileName = "Homer.mp4";
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
@@ -82,7 +82,7 @@ public class VideoHelperTests
 
         try
         {
-            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsTrue(fileSystem.File.Exists(firstFrameVideoPath));
@@ -106,7 +106,7 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void GetFirstFrame_NonExistingFile_ReturnsPathButNoFileCreated()
+    public void GetFirstFramePath_NonExistingFile_ReturnsPathButNoFileCreated()
     {
         string fileName = "non_existing_video.mp4";
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
@@ -123,7 +123,7 @@ public class VideoHelperTests
             StringWriter stringWriter = new();
             Console.SetOut(stringWriter);
 
-            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsFalse(File.Exists(firstFrameVideoPath));
@@ -141,7 +141,7 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void GetFirstFrame_ExecuteFFmpegCommandThrowsException_PrintsErrorMessage()
+    public void GetFirstFramePath_ExecuteFFmpegCommandThrowsException_PrintsErrorMessage()
     {
         string fileName = "Homer.mp4";
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
@@ -161,7 +161,7 @@ public class VideoHelperTests
             StringWriter stringWriter = new();
             Console.SetOut(stringWriter);
 
-            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsFalse(File.Exists(firstFrameVideoPath));

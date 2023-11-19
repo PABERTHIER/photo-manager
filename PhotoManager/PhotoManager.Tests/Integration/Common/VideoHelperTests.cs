@@ -12,7 +12,7 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void GetFirstFrame_IntegrationTest()
+    public void GetFirstFramePath_IntegrationTest()
     {
         string fileName = "Homer.mp4";
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
@@ -22,7 +22,7 @@ public class VideoHelperTests
 
         try
         {
-            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);
@@ -39,7 +39,7 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void NotGetFirstFrame_IntegrationTest()
+    public void NotGetFirstFramePath_IntegrationTest()
     {
         string fileName = "Homer1s.mp4"; // Video that has less than 1 second
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
@@ -49,7 +49,7 @@ public class VideoHelperTests
             string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-            string firstFrameVideoPath = VideoHelper.GetFirstFrame(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);

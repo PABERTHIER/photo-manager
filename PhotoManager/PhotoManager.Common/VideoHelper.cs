@@ -42,7 +42,7 @@ public static class VideoHelper
         };
     }
 
-    public static string GetFirstFrame(string directoryName, string fileName, string destinationPath)
+    public static string GetFirstFramePath(string directoryName, string fileName, string destinationPath)
     {
         string videoPath = Path.Combine(directoryName, fileName);
 
