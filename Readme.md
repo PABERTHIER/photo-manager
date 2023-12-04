@@ -118,7 +118,7 @@ This feature is only here to let you to identify if you got some videos duplicat
 
 ## Technologies used
 
-- [.NET 7.0](https://dotnet.microsoft.com/)
+- [.NET 8.0](https://dotnet.microsoft.com/)
 - [Windows Presentation Foundation](https://docs.microsoft.com/en-us/dotnet/framework/wpf/)
 - [NUnit](https://nunit.org/)
 - [Moq framework for .NET](https://github.com/moq/moq4)

@@ -100,7 +100,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (isVideo)
         {
-            firstFrameVideoPath = VideoHelper.GetFirstFrame(directoryName, fileName, PathConstants.PathFirstFrameVideos); // Create an asset from the video file
+            firstFrameVideoPath = VideoHelper.GetFirstFramePath(directoryName, fileName, PathConstants.PathFirstFrameVideos); // Create an asset from the video file
         }
 
         if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
