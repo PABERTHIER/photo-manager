@@ -44,10 +44,7 @@ namespace PhotoManager.UI.Windows
         {
             var configuration = ViewModel.GetProcessConfiguration();
 
-            if (configuration == null)
-            {
-                configuration = new SyncAssetsConfiguration();
-            }
+            configuration ??= new SyncAssetsConfiguration();
 
             ViewModel.Definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>(configuration.Definitions);
         }

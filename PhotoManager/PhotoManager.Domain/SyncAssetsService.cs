@@ -1,32 +1,24 @@
 ﻿namespace PhotoManager.Domain;
 
-public class SyncAssetsService : ISyncAssetsService
+public class SyncAssetsService(
+    IAssetRepository assetRepository,
+    IStorageService storageService,
+    IDirectoryComparer directoryComparer,
+    IMoveAssetsService moveAssetsService) : ISyncAssetsService
 {
-    private readonly IAssetRepository _assetRepository;
-    private readonly IStorageService _storageService;
-    private readonly IDirectoryComparer _directoryComparer;
-    private readonly IMoveAssetsService _moveAssetsService;
-
-    public SyncAssetsService(
-        IAssetRepository assetRepository,
-        IStorageService storageService,
-        IDirectoryComparer directoryComparer,
-        IMoveAssetsService moveAssetsService)
-    {
-        _assetRepository = assetRepository;
-        _storageService = storageService;
-        _directoryComparer = directoryComparer;
-        _moveAssetsService = moveAssetsService;
-    }
+    private readonly IAssetRepository _assetRepository = assetRepository;
+    private readonly IStorageService _storageService = storageService;
+    private readonly IDirectoryComparer _directoryComparer = directoryComparer;
+    private readonly IMoveAssetsService _moveAssetsService = moveAssetsService;
 
     public async Task<List<SyncAssetsResult>> ExecuteAsync(ProcessStatusChangedCallback callback)
     {
         return await Task.Run(() =>
         {
-            List<SyncAssetsResult> result = new();
-            var configuration = _assetRepository.GetSyncAssetsConfiguration();
+            List<SyncAssetsResult> result = [];
+            SyncAssetsConfiguration configuration = _assetRepository.GetSyncAssetsConfiguration();
 
-            foreach (var definition in configuration.Definitions)
+            foreach (SyncAssetsDirectoriesDefinition definition in configuration.Definitions)
             {
                 Execute(definition.SourceDirectory,
                     definition.DestinationDirectory,
@@ -40,14 +32,15 @@ public class SyncAssetsService : ISyncAssetsService
         });
     }
 
-    private void Execute(string sourceDirectory,
+    private void Execute(
+        string sourceDirectory,
         string destinationDirectory,
         bool includeSubFolders,
         bool deleteAssetsNotInSource,
         ProcessStatusChangedCallback callback,
-        List<SyncAssetsResult> resultList)
+        List<SyncAssetsResult> result)
     {
-        SyncAssetsResult result = new()
+        SyncAssetsResult syncAssetsResult = new()
         {
             SourceDirectory = sourceDirectory,
             DestinationDirectory = destinationDirectory
@@ -55,8 +48,8 @@ public class SyncAssetsService : ISyncAssetsService
 
         if (!_storageService.FolderExists(sourceDirectory))
         {
-            result.Message = $"Source directory '{sourceDirectory}' not found.";
-            resultList.Add(result);
+            syncAssetsResult.Message = $"Source directory '{sourceDirectory}' not found.";
+            result.Add(syncAssetsResult);
         }
         else
         {
@@ -79,12 +72,10 @@ public class SyncAssetsService : ISyncAssetsService
 
                     if (_moveAssetsService.CopyAsset(sourceFilePath, destinationFilePath))
                     {
-                        result.SyncedImages++;
+                        syncAssetsResult.SyncedImages++;
                         callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"'{sourceFilePath}' => '{destinationFilePath}'" });
                     }
                 }
-
-                // TODO: Detect and sync updated assets.
 
                 if (deleteAssetsNotInSource)
                 {
@@ -94,47 +85,42 @@ public class SyncAssetsService : ISyncAssetsService
                     {
                         string destinationPath = Path.Combine(destinationDirectory, deletedImage);
                         _storageService.DeleteFile(destinationDirectory, deletedImage);
-                        result.SyncedImages++;
+                        syncAssetsResult.SyncedImages++;
                         callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"Deleted '{destinationPath}'" });
                     }
                 }
 
-                result.Message = result.SyncedImages switch
+                syncAssetsResult.Message = syncAssetsResult.SyncedImages switch
                 {
                     0 => $"No images synced from '{sourceDirectory}' to '{destinationDirectory}'.",
-                    1 => $"{result.SyncedImages} image synced from '{sourceDirectory}' to '{destinationDirectory}'.",
-                    _ => $"{result.SyncedImages} images synced from '{sourceDirectory}' to '{destinationDirectory}'.",
+                    1 => $"{syncAssetsResult.SyncedImages} image synced from '{sourceDirectory}' to '{destinationDirectory}'.",
+                    _ => $"{syncAssetsResult.SyncedImages} images synced from '{sourceDirectory}' to '{destinationDirectory}'.",
                 };
 
-                resultList.Add(result);
+                result.Add(syncAssetsResult);
 
                 if (includeSubFolders)
                 {
-                    var subdirectories = _storageService.GetSubDirectories(sourceDirectory);
+                    List<DirectoryInfo> subdirectories = _storageService.GetSubDirectories(sourceDirectory);
 
                     if (subdirectories != null)
                     {
-                        foreach (var subdir in subdirectories)
+                        foreach (DirectoryInfo subdir in subdirectories)
                         {
                             Execute(subdir.FullName,
                                 Path.Combine(destinationDirectory, subdir.Name),
                                 includeSubFolders,
                                 deleteAssetsNotInSource,
                                 callback,
-                                resultList);
+                                result);
                         }
                     }
                 }
             }
-            catch (DirectoryNotFoundException)
+            catch (Exception ex)
             {
-                result.Message = $"Destination directory '{destinationDirectory}' not found.";
-                resultList.Add(result);
-            }
-            catch (IOException ex)
-            {
-                result.Message = ex.Message;
-                resultList.Add(result);
+                syncAssetsResult.Message = ex.Message;
+                result.Add(syncAssetsResult);
             }
         }
     }
@@ -145,7 +131,7 @@ public class SyncAssetsService : ISyncAssetsService
 
         if (destinationSubDirectories != null)
         {
-            foreach (var dir in destinationSubDirectories)
+            foreach (DirectoryInfo dir in destinationSubDirectories)
             {
                 string[] destinationFileNames = _storageService.GetFileNames(dir.FullName);
                 newFileNames = _directoryComparer.GetNewFileNamesToSync(newFileNames, destinationFileNames);
