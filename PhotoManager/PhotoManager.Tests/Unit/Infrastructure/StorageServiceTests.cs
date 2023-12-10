@@ -65,9 +65,9 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+        Assert.AreEqual(rotation, image.Rotation);
+        Assert.AreEqual(width, image.DecodePixelWidth);
+        Assert.AreEqual(height, image.DecodePixelHeight);
     }
 
     [Test]
@@ -157,9 +157,9 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
+        Assert.AreEqual(width, image.DecodePixelWidth);
+        Assert.AreEqual(height, image.DecodePixelHeight);
     }
 
     [Test]
@@ -225,7 +225,7 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.AreEqual(rotation, image.Rotation);
         Assert.IsNotNull(image.Width);
         Assert.IsNotNull(image.Height);
         Assert.AreEqual(image.PixelWidth, expectedPixelWidth);
@@ -299,7 +299,7 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.AreEqual(rotation, image.Rotation);
         Assert.IsNotNull(image.Width);
         Assert.IsNotNull(image.Height);
     }
@@ -315,7 +315,7 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.IsNotNull(image.DecodePixelWidth);
         Assert.IsNotNull(image.DecodePixelHeight);
     }
@@ -331,7 +331,7 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.IsNotNull(image.DecodePixelWidth);
         Assert.IsNotNull(image.DecodePixelHeight);
     }
@@ -372,7 +372,7 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0)); // Rotate0 because the BitmapImage (default rotation 0) is created from a MagickImage (containing the right rotation)
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation); // Rotate0 because the BitmapImage (default rotation 0) is created from a MagickImage (containing the right rotation)
         Assert.IsNotNull(image.Width);
         Assert.IsNotNull(image.Height);
         Assert.IsNotNull(image.DecodePixelWidth);
@@ -414,7 +414,7 @@ public class StorageServiceTests
         Assert.IsNull(image.StreamSource);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
@@ -431,7 +431,7 @@ public class StorageServiceTests
         Assert.IsNotNull(image.StreamSource);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
@@ -464,7 +464,7 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0)); // Rotate0 because the BitmapImage (default rotation 0) is created from a MagickImage (containing the right rotation)
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation); // Rotate0 because the BitmapImage (default rotation 0) is created from a MagickImage (containing the right rotation)
         Assert.IsNotNull(image.Width);
         Assert.IsNotNull(image.Height);
         Assert.IsNotNull(image.DecodePixelWidth);
@@ -499,7 +499,7 @@ public class StorageServiceTests
         Assert.IsNull(image.StreamSource);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
@@ -535,7 +535,7 @@ public class StorageServiceTests
         Assert.IsNull(image.StreamSource);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
@@ -552,7 +552,7 @@ public class StorageServiceTests
         Assert.IsNotNull(image.StreamSource);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
@@ -570,7 +570,7 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.AreEqual(rotation, image.Rotation);
         Assert.IsNotNull(image.Width);
         Assert.IsNotNull(image.Height);
         Assert.IsNotNull(image.DecodePixelWidth);
@@ -588,7 +588,7 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.IsNotNull(image.DecodePixelWidth);
         Assert.IsNotNull(image.DecodePixelHeight);
     }
@@ -606,7 +606,7 @@ public class StorageServiceTests
         Assert.IsNull(image.StreamSource);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]

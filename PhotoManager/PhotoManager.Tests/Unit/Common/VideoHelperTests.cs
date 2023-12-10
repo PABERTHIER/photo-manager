@@ -52,7 +52,7 @@ public class VideoHelperTests
     public void Should_Detect_When_AssetIsVideo(string fileExtension, bool expected)
     {
         bool result = VideoHelper.IsVideoFile(fileExtension);
-        Assert.That(result, Is.EqualTo(expected));
+        Assert.AreEqual(expected, result);
     }
 
     [Test]

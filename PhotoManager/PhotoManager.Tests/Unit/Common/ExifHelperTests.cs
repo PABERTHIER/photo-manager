@@ -25,7 +25,7 @@ public class ExifHelperTests
         ushort orientation = ExifHelper.GetExifOrientation(buffer);
 
         Assert.IsNotNull(orientation);
-        Assert.That(orientation, Is.EqualTo(expectedOriention));
+        Assert.AreEqual(expectedOriention, orientation);
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class ExifHelperTests
         ushort orientation = ExifHelper.GetExifOrientation(buffer);
 
         Assert.IsNotNull(orientation);
-        Assert.That(orientation, Is.EqualTo(expectedOriention));
+        Assert.AreEqual(expectedOriention, orientation);
     }
 
     [Test]
@@ -78,7 +78,7 @@ public class ExifHelperTests
     //[TestCase("Image_11_90.heic", 90, 8)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
     //[TestCase("Image_11_180.heic", 180, 3)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
     //[TestCase("Image_11_270.heic", 270, 6)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
-    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int degrees, int orientationExpected)
+    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int degrees, int expectedOriention)
     {
         string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -87,7 +87,7 @@ public class ExifHelperTests
         ushort orientation = ExifHelper.GetHeicExifOrientation(buffer);
 
         Assert.IsNotNull(orientation);
-        Assert.That(orientation, Is.EqualTo(orientationExpected));
+        Assert.AreEqual(expectedOriention, orientation);
     }
 
     [Test]

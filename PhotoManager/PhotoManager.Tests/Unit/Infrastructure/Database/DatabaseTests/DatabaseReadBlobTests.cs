@@ -50,7 +50,7 @@ public class DatabaseReadBlobTests
             CollectionAssert.AreEqual(blobToWrite["Image1.jpg"], blob["Image1.jpg"]);
             CollectionAssert.AreEqual(blobToWrite["Image2.png"], blob["Image2.png"]);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
-            Assert.That(blobToWrite, Is.EqualTo(blob));
+            Assert.AreEqual(blobToWrite, blob);
         }
         finally
         {
@@ -88,7 +88,7 @@ public class DatabaseReadBlobTests
             CollectionAssert.AreEqual(blobToWrite["Image1.jpg"], blob["Image1.jpg"]);
             CollectionAssert.AreEqual(blobToWrite["Image2.png"], blob["Image2.png"]);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
-            Assert.That(blobToWrite, Is.EqualTo(blob));
+            Assert.AreEqual(blobToWrite, blob);
         }
         finally
         {
