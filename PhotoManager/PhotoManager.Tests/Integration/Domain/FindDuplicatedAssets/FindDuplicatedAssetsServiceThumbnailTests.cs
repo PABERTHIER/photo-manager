@@ -137,13 +137,40 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_DuplicatedAssetsFound_ReturnsListOfDuplicatedSets()
     {
+        string destinationPath1 = Path.Combine(dataDirectory!, "Duplicates\\DestinationToCopy1");
+        string destinationPath2 = Path.Combine(dataDirectory!, "Duplicates\\DestinationToCopy2");
+
         try
         {
-            string folderPath1 = Path.Combine(dataDirectory!, "Duplicates\\NewFolder1");
-            string folderPath2 = Path.Combine(dataDirectory!, "Duplicates\\NewFolder2");
+            Directory.CreateDirectory(destinationPath1);
+            Directory.CreateDirectory(destinationPath2);
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            string sourcePath1 = Path.Combine(dataDirectory!, "Duplicates\\NewFolder1");
+            string sourcePath2 = Path.Combine(dataDirectory!, "Duplicates\\NewFolder2");
+
+            string asset1DestinationPath = Path.Combine(destinationPath1, asset1!.FileName);
+            string asset2DestinationPath = Path.Combine(destinationPath2, asset2!.FileName);
+            string asset3DestinationPath = Path.Combine(destinationPath2, asset3!.FileName);
+            string asset4DestinationPath = Path.Combine(destinationPath2, asset4!.FileName);
+            string asset5DestinationPath = Path.Combine(destinationPath2, asset5!.FileName);
+
+            File.Copy(Path.Combine(sourcePath1, asset1!.FileName), asset1DestinationPath);
+            File.Copy(Path.Combine(sourcePath2, asset2!.FileName), asset2DestinationPath);
+            File.Copy(Path.Combine(sourcePath2, asset3!.FileName), asset3DestinationPath);
+            File.Copy(Path.Combine(sourcePath2, asset4!.FileName), asset4DestinationPath);
+            File.Copy(Path.Combine(sourcePath2, asset5!.FileName), asset5DestinationPath);
+
+            DateTime oldDateTime1 = DateTime.Now.AddDays(-1);
+            DateTime oldDateTime2 = DateTime.Now.AddDays(-5);
+
+            File.SetLastWriteTime(asset1DestinationPath, oldDateTime1);
+            File.SetLastWriteTime(asset2DestinationPath, oldDateTime1);
+            File.SetLastWriteTime(asset3DestinationPath, oldDateTime2);
+            File.SetLastWriteTime(asset4DestinationPath, oldDateTime2);
+            File.SetLastWriteTime(asset5DestinationPath, oldDateTime1);
+
+            Folder folder1 = new() { Path = destinationPath1 };
+            Folder folder2 = new() { Path = destinationPath2 };
 
             asset1!.Folder = folder1;
             asset1.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
@@ -182,16 +209,15 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Asset? duplicatedAsset3 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == asset3.FileName);
 
             DateTime actualDate = DateTime.Now.Date;
-            DateTime fileModificationDate = new DateTime(2023, 1, 7).Date;
 
             Assert.IsNotNull(duplicatedAsset1);
             Assert.IsNotNull(duplicatedAsset3);
             Assert.AreEqual(asset1.FileName, duplicatedAsset1!.FileName);
             Assert.AreEqual(actualDate, duplicatedAsset1!.FileCreationDateTime.Date);
-            Assert.AreEqual(fileModificationDate, duplicatedAsset1!.FileModificationDateTime.Date);
+            Assert.AreEqual(oldDateTime1.Date, duplicatedAsset1!.FileModificationDateTime.Date);
             Assert.AreEqual(asset3.FileName, duplicatedAsset3!.FileName);
             Assert.AreEqual(actualDate, duplicatedAsset3!.FileCreationDateTime.Date);
-            Assert.AreEqual(fileModificationDate, duplicatedAsset3!.FileModificationDateTime.Date);
+            Assert.AreEqual(oldDateTime2.Date, duplicatedAsset3!.FileModificationDateTime.Date);
 
             Asset? duplicatedAsset2 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == asset2.FileName);
             Asset? duplicatedAsset4 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == asset4.FileName);
@@ -200,26 +226,51 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Assert.IsNotNull(duplicatedAsset4);
             Assert.AreEqual(asset2.FileName, duplicatedAsset2!.FileName);
             Assert.AreEqual(actualDate, duplicatedAsset2!.FileCreationDateTime.Date);
-            Assert.AreEqual(fileModificationDate, duplicatedAsset2!.FileModificationDateTime.Date);
+            Assert.AreEqual(oldDateTime1.Date, duplicatedAsset2!.FileModificationDateTime.Date);
             Assert.AreEqual(asset4.FileName, duplicatedAsset4!.FileName);
             Assert.AreEqual(actualDate, duplicatedAsset4!.FileCreationDateTime.Date);
-            Assert.AreEqual(fileModificationDate, duplicatedAsset4!.FileModificationDateTime.Date);
+            Assert.AreEqual(oldDateTime2.Date, duplicatedAsset4!.FileModificationDateTime.Date);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(destinationPath1, true);
+            Directory.Delete(destinationPath2, true);
         }
     }
 
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_MultiplesAssetsSameHash_ReturnsListOfDuplicatedSets()
     {
+        string destinationPath = Path.Combine(dataDirectory!, "Duplicates\\DestinationToCopy");
+
         try
         {
-            string hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960";
-            string folderPath = Path.Combine(dataDirectory!, "Duplicates\\NewFolder2");
+            Directory.CreateDirectory(destinationPath);
 
-            Folder folder = new() { Path = folderPath };
+            string hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960";
+
+            string sourcePath = Path.Combine(dataDirectory!, "Duplicates\\NewFolder2");
+
+            string asset2DestinationPath = Path.Combine(destinationPath, asset2!.FileName);
+            string asset3DestinationPath = Path.Combine(destinationPath, asset3!.FileName);
+            string asset4DestinationPath = Path.Combine(destinationPath, asset4!.FileName);
+            string asset5DestinationPath = Path.Combine(destinationPath, asset5!.FileName);
+
+            File.Copy(Path.Combine(sourcePath, asset2!.FileName), asset2DestinationPath);
+            File.Copy(Path.Combine(sourcePath, asset3!.FileName), asset3DestinationPath);
+            File.Copy(Path.Combine(sourcePath, asset4!.FileName), asset4DestinationPath);
+            File.Copy(Path.Combine(sourcePath, asset5!.FileName), asset5DestinationPath);
+
+            DateTime oldDateTime1 = DateTime.Now.AddDays(-1);
+            DateTime oldDateTime2 = DateTime.Now.AddDays(-5);
+
+            File.SetLastWriteTime(asset2DestinationPath, oldDateTime1);
+            File.SetLastWriteTime(asset3DestinationPath, oldDateTime2);
+            File.SetLastWriteTime(asset4DestinationPath, oldDateTime2);
+            File.SetLastWriteTime(asset5DestinationPath, oldDateTime1);
+
+            Folder folder = new() { Path = destinationPath };
 
             asset2!.Folder = folder;
             asset2.Hash = hash;
@@ -255,7 +306,6 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Asset? duplicatedAsset5 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == asset5.FileName);
 
             DateTime actualDate = DateTime.Now.Date;
-            DateTime fileModificationDate = new DateTime(2023, 1, 7).Date;
 
             Assert.IsNotNull(duplicatedAsset2);
             Assert.IsNotNull(duplicatedAsset3);
@@ -264,23 +314,24 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             Assert.AreEqual(asset2.FileName, duplicatedAsset2!.FileName);
             Assert.AreEqual(actualDate, duplicatedAsset2!.FileCreationDateTime.Date);
-            Assert.AreEqual(fileModificationDate, duplicatedAsset2!.FileModificationDateTime.Date);
+            Assert.AreEqual(oldDateTime1.Date, duplicatedAsset2!.FileModificationDateTime.Date);
 
             Assert.AreEqual(asset3.FileName, duplicatedAsset3!.FileName);
             Assert.AreEqual(actualDate, duplicatedAsset3!.FileCreationDateTime.Date);
-            Assert.AreEqual(fileModificationDate, duplicatedAsset3!.FileModificationDateTime.Date);
+            Assert.AreEqual(oldDateTime2.Date, duplicatedAsset3!.FileModificationDateTime.Date);
 
             Assert.AreEqual(asset4.FileName, duplicatedAsset4!.FileName);
             Assert.AreEqual(actualDate, duplicatedAsset4!.FileCreationDateTime.Date);
-            Assert.AreEqual(fileModificationDate, duplicatedAsset4!.FileModificationDateTime.Date);
+            Assert.AreEqual(oldDateTime2.Date, duplicatedAsset4!.FileModificationDateTime.Date);
 
             Assert.AreEqual(asset5.FileName, duplicatedAsset5!.FileName);
             Assert.AreEqual(actualDate, duplicatedAsset5!.FileCreationDateTime.Date);
-            Assert.AreEqual(new DateTime(2023, 8, 9).Date, duplicatedAsset5!.FileModificationDateTime.Date);
+            Assert.AreEqual(oldDateTime1.Date, duplicatedAsset5!.FileModificationDateTime.Date);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(destinationPath, true);
         }
     }
     

@@ -551,16 +551,37 @@ public class StorageServiceTests
     [Test]
     public void LoadFileInformation_FileExists_PopulatesAssetDates()
     {
-        string fileName = "Image 1.jpg";
-        Folder folder = new() { Path = dataDirectory! };
-        Asset asset = new() { Folder = folder, FileName = fileName };
-        DateTime creationTime = DateTime.Now;
-        DateTime modificationTime = new (2023, 1, 7);
+        string destinationPath = Path.Combine(dataDirectory!, "DestinationToCopy");
 
-        _storageService!.LoadFileInformation(asset);
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
 
-        Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
-        Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+            string fileName = "Image 1.jpg";
+
+            string sourceFilePath = Path.Combine(dataDirectory!, fileName);
+            string destinationFilePath = Path.Combine(destinationPath, fileName);
+
+            File.Copy(sourceFilePath, destinationFilePath);
+
+            Folder folder = new() { Path = destinationPath };
+
+            DateTime creationTime = DateTime.Now;
+            DateTime oldDateTime = DateTime.Now.AddDays(-1);
+
+            File.SetLastWriteTime(destinationFilePath, oldDateTime);
+
+            Asset asset = new() { Folder = folder, FileName = fileName };
+
+            _storageService!.LoadFileInformation(asset);
+
+            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime.Date, asset.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
     }
 
     [Test]

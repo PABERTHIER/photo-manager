@@ -73,30 +73,55 @@ public class DirectoryComparerTests
     [Test]
     public void GetUpdatedFileNames_ThumbnailCreationDateTimeBeforeFileCreationOrModificationDateTime_ReturnsArrayOfNamesOfAssetsUpdated()
     {
-        string[] expectedFileNames = { asset1!.FileName, asset2!.FileName };
+        string destinationPath = Path.Combine(dataDirectory!, "DestinationToCopy");
 
-        Folder folder = new() { Path = dataDirectory! };
-        asset1!.Folder = folder;
-        asset2!.Folder = folder;
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
 
-        asset1.ThumbnailCreationDateTime = DateTime.Now.AddDays(-1);
-        asset2.ThumbnailCreationDateTime = DateTime.Now.AddDays(-1);
+            string[] expectedFileNames = { asset1!.FileName, asset2!.FileName };
 
-        List<Asset> cataloguedAssets = new() { asset1!, asset2! };
+            string sourceFilePath1 = Path.Combine(dataDirectory!, asset1!.FileName);
+            string sourceFilePath2 = Path.Combine(dataDirectory!, asset2!.FileName);
 
-        string[] updatedFileNames = _directoryComparer!.GetUpdatedFileNames(cataloguedAssets);
+            string destinationFilePath1 = Path.Combine(destinationPath, asset1!.FileName);
+            string destinationFilePath2 = Path.Combine(destinationPath, asset2!.FileName);
 
-        Assert.IsNotEmpty(updatedFileNames);
-        CollectionAssert.AreEquivalent(expectedFileNames, updatedFileNames);
+            File.Copy(sourceFilePath1, destinationFilePath1);
+            File.Copy(sourceFilePath2, destinationFilePath2);
 
-        DateTime actualDate = DateTime.Now.Date;
-        DateTime fileModificationDate = new DateTime(2023, 1, 7).Date;
+            Folder folder = new() { Path = destinationPath };
+            asset1!.Folder = folder;
+            asset2!.Folder = folder;
 
-        Assert.AreEqual(actualDate, asset1.FileCreationDateTime.Date);
-        Assert.AreEqual(fileModificationDate, asset1.FileModificationDateTime.Date);
+            DateTime oldDateTime1 = DateTime.Now.AddDays(-1);
+            DateTime oldDateTime2 = DateTime.Now.AddDays(-2);
 
-        Assert.AreEqual(actualDate, asset2.FileCreationDateTime.Date);
-        Assert.AreEqual(fileModificationDate, asset2.FileModificationDateTime.Date);
+            asset1.ThumbnailCreationDateTime = oldDateTime1;
+            asset2.ThumbnailCreationDateTime = oldDateTime2;
+
+            File.SetLastWriteTime(destinationFilePath1, oldDateTime1);
+            File.SetLastWriteTime(destinationFilePath2, oldDateTime2);
+
+            List<Asset> cataloguedAssets = new() { asset1!, asset2! };
+
+            string[] updatedFileNames = _directoryComparer!.GetUpdatedFileNames(cataloguedAssets);
+
+            Assert.IsNotEmpty(updatedFileNames);
+            CollectionAssert.AreEquivalent(expectedFileNames, updatedFileNames);
+
+            DateTime actualDate = DateTime.Now.Date;
+
+            Assert.AreEqual(actualDate, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime1.Date, asset1.FileModificationDateTime.Date);
+
+            Assert.AreEqual(actualDate, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime2.Date, asset2.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
     }
 
     [Test]

@@ -42,14 +42,14 @@ public class SyncAssetsServiceTests
     [SetUp]
     public void Setup()
     {
-        _database = new Database(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(_database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new StorageService(userConfigurationService);
-        _catalogAssetsService = new CatalogAssetsService(_assetRepository, new AssetHashCalculatorService(), _storageService, userConfigurationService, new DirectoryComparer(_storageService));
-        _moveAssetsService = new MoveAssetsService(_assetRepository, _storageService, _catalogAssetsService);
-        _directoryComparer = new DirectoryComparer(_storageService);
-        _syncAssetsService = new SyncAssetsService(_assetRepository, _storageService, _directoryComparer, _moveAssetsService);
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+        _assetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
+        _storageService = new (userConfigurationService);
+        _catalogAssetsService = new (_assetRepository, new AssetHashCalculatorService(), _storageService, userConfigurationService, new DirectoryComparer(_storageService));
+        _moveAssetsService = new (_assetRepository, _storageService, _catalogAssetsService);
+        _directoryComparer = new (_storageService);
+        _syncAssetsService = new (_assetRepository, _storageService, _directoryComparer, _moveAssetsService);
     }
 
     [Test]
