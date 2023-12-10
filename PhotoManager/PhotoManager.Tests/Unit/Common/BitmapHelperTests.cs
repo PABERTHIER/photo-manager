@@ -30,8 +30,8 @@ public class BitmapHelperTests
         Assert.AreEqual(rotation, image.Rotation);
         Assert.IsNotNull(image.Width);
         Assert.IsNotNull(image.Height);
-        Assert.AreEqual(image.PixelWidth, expectedPixelWidth);
-        Assert.AreEqual(image.PixelHeight, expectedPixelHeight);
+        Assert.AreEqual(expectedPixelWidth, image.PixelWidth);
+        Assert.AreEqual(expectedPixelHeight, image.PixelHeight);
     }
 
     [Test]
@@ -206,8 +206,8 @@ public class BitmapHelperTests
         Assert.IsNotNull(image.Height);
         Assert.IsNotNull(image.DecodePixelWidth);
         Assert.IsNotNull(image.DecodePixelHeight);
-        Assert.AreEqual(image.PixelWidth, expectedPixelWidth);
-        Assert.AreEqual(image.PixelHeight, expectedPixelHeight);
+        Assert.AreEqual(expectedPixelWidth, image.PixelWidth);
+        Assert.AreEqual(expectedPixelHeight, image.PixelHeight);
     }
 
     [Test]
@@ -609,8 +609,8 @@ public class BitmapHelperTests
         Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(filePath);
 
         Assert.IsNotNull(bitmap);
-        Assert.AreEqual(bitmap!.Width, expectedWidth);
-        Assert.AreEqual(bitmap.Height, expectedHeight);
+        Assert.AreEqual(expectedWidth, bitmap!.Width);
+        Assert.AreEqual(expectedHeight, bitmap.Height);
 
         AssertBrightnessValues(bitmap, 0, 0);
         AssertBrightnessValues(bitmap, 1, 0);

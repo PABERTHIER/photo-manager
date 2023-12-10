@@ -29,7 +29,7 @@ public class BlobStorageTests
 
         Assert.IsNotNull(deserializedObject);
         Assert.IsInstanceOf<Dictionary<string, byte[]>?>(deserializedObject);
-        Assert.AreEqual(deserializedObject!.Count, countExpected);
+        Assert.AreEqual(countExpected, deserializedObject!.Count);
         Assert.IsTrue(deserializedObject.ContainsKey(keyContained));
     }
 
@@ -60,11 +60,11 @@ public class BlobStorageTests
 
             Assert.IsTrue(File.Exists(binaryFilePath));
 
-            Dictionary<string, byte[]>? readData = _blobStorage!.ReadFromBinaryFile(binaryFilePath);
-            Assert.IsNotNull(readData);
-            Assert.AreEqual(data.Count, readData!.Count);
-            CollectionAssert.AreEqual(data["Image1.jpg"], readData["Image1.jpg"]);
-            CollectionAssert.AreEqual(data["Image2.png"], readData["Image2.png"]);
+            Dictionary<string, byte[]>? dataRead = _blobStorage!.ReadFromBinaryFile(binaryFilePath);
+            Assert.IsNotNull(dataRead);
+            Assert.AreEqual(data.Count, dataRead!.Count);
+            CollectionAssert.AreEqual(data["Image1.jpg"], dataRead["Image1.jpg"]);
+            CollectionAssert.AreEqual(data["Image2.png"], dataRead["Image2.png"]);
         }
         finally
         {
@@ -103,9 +103,9 @@ public class BlobStorageTests
 
             Assert.IsTrue(File.Exists(binaryFilePath));
 
-            Dictionary<string, byte[]>? readData = _blobStorage!.ReadFromBinaryFile(binaryFilePath);
-            Assert.IsNotNull(readData);
-            Assert.AreEqual(data.Count, readData!.Count);
+            Dictionary<string, byte[]>? dataRead = _blobStorage!.ReadFromBinaryFile(binaryFilePath);
+            Assert.IsNotNull(dataRead);
+            Assert.AreEqual(data.Count, dataRead!.Count);
         }
         finally
         {

@@ -77,7 +77,7 @@ public class AssetRepositoryDeleteAssetTests
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, asset1.FileName));
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.AreEqual(1, assets.Count);
-            Assert.AreEqual(assets.FirstOrDefault()?.FileName, asset1.FileName);
+            Assert.AreEqual(asset1.FileName, assets.FirstOrDefault()?.FileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.AreEqual(1, thumbnails.Count);
@@ -161,7 +161,7 @@ public class AssetRepositoryDeleteAssetTests
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, asset1.FileName));
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.AreEqual(1, assets.Count);
-            Assert.AreEqual(assets.FirstOrDefault()?.FileName, asset1.FileName);
+            Assert.AreEqual(asset1.FileName, assets.FirstOrDefault()?.FileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.AreEqual(1, thumbnails.Count);
@@ -248,7 +248,7 @@ public class AssetRepositoryDeleteAssetTests
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, asset1.FileName));
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.AreEqual(1, assets.Count);
-            Assert.AreEqual(assets.FirstOrDefault()?.FileName, asset1.FileName);
+            Assert.AreEqual(asset1.FileName, assets.FirstOrDefault()?.FileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.AreEqual(1, thumbnails.Count);
@@ -292,7 +292,7 @@ public class AssetRepositoryDeleteAssetTests
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, asset1.FileName));
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.AreEqual(1, assets.Count);
-            Assert.AreEqual(assets.FirstOrDefault()?.FileName, asset1.FileName);
+            Assert.AreEqual(asset1.FileName, assets.FirstOrDefault()?.FileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.AreEqual(1, thumbnails.Count);
@@ -357,7 +357,7 @@ public class AssetRepositoryDeleteAssetTests
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, asset1.FileName));
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.AreEqual(1, assets.Count);
-            Assert.AreEqual(assets.FirstOrDefault()?.FileName, asset1.FileName);
+            Assert.AreEqual(asset1.FileName, assets.FirstOrDefault()?.FileName);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.AreEqual(1, thumbnails.Count);
