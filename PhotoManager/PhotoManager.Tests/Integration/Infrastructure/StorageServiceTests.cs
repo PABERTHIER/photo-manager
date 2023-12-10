@@ -248,7 +248,7 @@ public class StorageServiceTests
         byte[] imageBuffer = _storageService!.GetJpegBitmapImage(image);
 
         Assert.IsNotNull(imageBuffer);
-        Assert.That(imageBuffer.Length, Is.Not.EqualTo(0));
+        Assert.AreNotEqual(0, imageBuffer.Length);
         // Optionally, you can save the byte array to a file and verify that it's a valid JPEG image.
         // For example:
         // File.WriteAllBytes("path/to/your/image_converted.jpg", imageBuffer);
@@ -265,7 +265,7 @@ public class StorageServiceTests
         byte[] imageBuffer = _storageService!.GetJpegBitmapImage(image);
 
         Assert.IsNotNull(imageBuffer);
-        Assert.That(imageBuffer.Length, Is.Not.EqualTo(0));
+        Assert.AreNotEqual(0, imageBuffer.Length);
         // Optionally, you can save the byte array to a file and verify that it's a valid JPEG image.
         // For example:
         // File.WriteAllBytes("path/to/your/image_converted.jpg", imageBuffer);
@@ -298,7 +298,7 @@ public class StorageServiceTests
         byte[] imageBuffer = _storageService!.GetPngBitmapImage(image);
 
         Assert.IsNotNull(imageBuffer);
-        Assert.That(imageBuffer.Length, Is.Not.EqualTo(0));
+        Assert.AreNotEqual(0, imageBuffer.Length);
         // Optionally, you can save the byte array to a file and verify that it's a valid PNG image.
         // For example:
         // File.WriteAllBytes("path/to/your/image_converted.png", imageBuffer);
@@ -315,7 +315,7 @@ public class StorageServiceTests
         byte[] imageBuffer = _storageService!.GetPngBitmapImage(image);
 
         Assert.IsNotNull(imageBuffer);
-        Assert.That(imageBuffer.Length, Is.Not.EqualTo(0));
+        Assert.AreNotEqual(0, imageBuffer.Length);
         // Optionally, you can save the byte array to a file and verify that it's a valid PNG image.
         // For example:
         // File.WriteAllBytes("path/to/your/image_converted.png", imageBuffer);
@@ -348,7 +348,7 @@ public class StorageServiceTests
         byte[] imageBuffer = _storageService!.GetGifBitmapImage(image);
 
         Assert.IsNotNull(imageBuffer);
-        Assert.That(imageBuffer.Length, Is.Not.EqualTo(0));
+        Assert.AreNotEqual(0, imageBuffer.Length);
         // Optionally, you can save the byte array to a file and verify that it's a valid GIF image.
         // For example:
         // File.WriteAllBytes("path/to/your/image_converted.gif", imageBuffer);
@@ -365,7 +365,7 @@ public class StorageServiceTests
         byte[] imageBuffer = _storageService!.GetGifBitmapImage(image);
 
         Assert.IsNotNull(imageBuffer);
-        Assert.That(imageBuffer.Length, Is.Not.EqualTo(0));
+        Assert.AreNotEqual(0, imageBuffer.Length);
         // Optionally, you can save the byte array to a file and verify that it's a valid GIF image.
         // For example:
         // File.WriteAllBytes("path/to/your/image_converted.gif", imageBuffer);
