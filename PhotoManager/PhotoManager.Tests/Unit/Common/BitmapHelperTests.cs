@@ -651,9 +651,21 @@ public class BitmapHelperTests
 
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
-        // Optionally, you can save the byte array to a file and verify that it's a valid JPEG image.
-        // For example:
-        // File.WriteAllBytes("path/to/your/image_converted.jpg", imageBuffer);
+
+        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+
+        try
+        {
+            Assert.IsTrue(ExifHelper.IsValidGDIPlusImage(imageBuffer));
+            Directory.CreateDirectory(destinationNewFileDirectory);
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.jpeg");
+            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+        }
+        finally
+        {
+            Directory.Delete(destinationNewFileDirectory, true);
+        }
     }
 
     [Test]
@@ -668,9 +680,21 @@ public class BitmapHelperTests
 
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
-        // Optionally, you can save the byte array to a file and verify that it's a valid JPEG image.
-        // For example:
-        // File.WriteAllBytes("path/to/your/image_converted.jpg", imageBuffer);
+
+        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+
+        try
+        {
+            Assert.IsTrue(ExifHelper.IsValidGDIPlusImage(imageBuffer));
+            Directory.CreateDirectory(destinationNewFileDirectory);
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.jpeg");
+            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+        }
+        finally
+        {
+            Directory.Delete(destinationNewFileDirectory, true);
+        }
     }
 
     [Test]
@@ -701,9 +725,21 @@ public class BitmapHelperTests
 
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
-        // Optionally, you can save the byte array to a file and verify that it's a valid PNG image.
-        // For example:
-        // File.WriteAllBytes("path/to/your/image_converted.png", imageBuffer);
+
+        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+
+        try
+        {
+            Assert.IsTrue(ExifHelper.IsValidGDIPlusImage(imageBuffer));
+            Directory.CreateDirectory(destinationNewFileDirectory);
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.png");
+            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+        }
+        finally
+        {
+            Directory.Delete(destinationNewFileDirectory, true);
+        }
     }
 
     [Test]
@@ -718,9 +754,21 @@ public class BitmapHelperTests
 
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
-        // Optionally, you can save the byte array to a file and verify that it's a valid PNG image.
-        // For example:
-        // File.WriteAllBytes("path/to/your/image_converted.png", imageBuffer);
+
+        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+
+        try
+        {
+            Assert.IsTrue(ExifHelper.IsValidGDIPlusImage(imageBuffer));
+            Directory.CreateDirectory(destinationNewFileDirectory);
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.png");
+            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+        }
+        finally
+        {
+            Directory.Delete(destinationNewFileDirectory, true);
+        }
     }
 
     [Test]
@@ -751,9 +799,21 @@ public class BitmapHelperTests
 
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
-        // Optionally, you can save the byte array to a file and verify that it's a valid GIF image.
-        // For example:
-        // File.WriteAllBytes("path/to/your/image_converted.gif", imageBuffer);
+
+        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+
+        try
+        {
+            Assert.IsTrue(ExifHelper.IsValidGDIPlusImage(imageBuffer));
+            Directory.CreateDirectory(destinationNewFileDirectory);
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.gif");
+            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+        }
+        finally
+        {
+            Directory.Delete(destinationNewFileDirectory, true);
+        }
     }
 
     [Test]
@@ -768,9 +828,21 @@ public class BitmapHelperTests
 
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
-        // Optionally, you can save the byte array to a file and verify that it's a valid GIF image.
-        // For example:
-        // File.WriteAllBytes("path/to/your/image_converted.gif", imageBuffer);
+
+        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+
+        try
+        {
+            Assert.IsTrue(ExifHelper.IsValidGDIPlusImage(imageBuffer));
+            Directory.CreateDirectory(destinationNewFileDirectory);
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.gif");
+            File.WriteAllBytes(destinationNewFilePath, imageBuffer);
+            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+        }
+        finally
+        {
+            Directory.Delete(destinationNewFileDirectory, true);
+        }
     }
 
     [Test]
@@ -797,5 +869,22 @@ public class BitmapHelperTests
         Assert.IsNotNull(brightness);
         Assert.Greater(brightness, 0);
         Assert.Less(brightness, 1);
+    }
+
+    private static bool IsValidImage(string filePath)
+    {
+        try
+        {
+            using (var image = Image.FromFile(filePath))
+            {
+                // The image is successfully loaded; consider it valid
+                return true;
+            }
+        }
+        catch (Exception)
+        {
+            // An exception occurred while loading the image; consider it invalid
+            return false;
+        }
     }
 }
