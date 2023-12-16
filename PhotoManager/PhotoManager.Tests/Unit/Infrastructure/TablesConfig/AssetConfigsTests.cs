@@ -20,7 +20,7 @@ public class AssetConfigsTests
             "1080",
             "120",
             "60",
-            "2023-08-30T12:00:00",
+            "12/30/2023 12:00:00",
             "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             "The asset is corrupted",
             "True",
@@ -38,7 +38,7 @@ public class AssetConfigsTests
             "1080",
             "120",
             "60",
-            "2023-08-30T12:00:00",
+            "12/30/2023 12:00:00",
             "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             "The asset is corrupted",
             "True",
@@ -87,7 +87,7 @@ public class AssetConfigsTests
         Assert.AreEqual(1080, asset.PixelHeight);
         Assert.AreEqual(120, asset.ThumbnailPixelWidth);
         Assert.AreEqual(60, asset.ThumbnailPixelHeight);
-        Assert.AreEqual(new DateTime(2023, 08, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
+        Assert.AreEqual(new DateTime(2023, 12, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset.Hash);
         Assert.AreEqual("The asset is corrupted", asset.AssetCorruptedMessage);
         Assert.IsTrue(asset.IsAssetCorrupted);
@@ -109,7 +109,7 @@ public class AssetConfigsTests
         Assert.AreEqual(1080, asset.PixelHeight);
         Assert.AreEqual(120, asset.ThumbnailPixelWidth);
         Assert.AreEqual(60, asset.ThumbnailPixelHeight);
-        Assert.AreEqual(new DateTime(2023, 08, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
+        Assert.AreEqual(new DateTime(2023, 12, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset.Hash);
         Assert.AreEqual("The asset is corrupted", asset.AssetCorruptedMessage);
         Assert.IsTrue(asset.IsAssetCorrupted);
@@ -196,7 +196,7 @@ public class AssetConfigsTests
         Assert.AreEqual(1080, result[5]);
         Assert.AreEqual(120, result[6]);
         Assert.AreEqual(60, result[7]);
-        Assert.AreEqual(new DateTime(2023, 08, 30, 12, 0, 0), result[8]);
+        Assert.AreEqual(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss"), result[8]);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", result[9]);
         Assert.AreEqual("The asset is corrupted", result[10]);
         Assert.AreEqual(true, result[11]);
@@ -231,7 +231,7 @@ public class AssetConfigsTests
         Assert.AreEqual(0, result[5]);
         Assert.AreEqual(0, result[6]);
         Assert.AreEqual(0, result[7]);
-        Assert.AreEqual(new DateTime(2023, 08, 30, 12, 0, 0), result[8]);
+        Assert.AreEqual(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss"), result[8]);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", result[9]);
         Assert.AreEqual("The asset is corrupted", result[10]);
         Assert.AreEqual(false, result[11]);

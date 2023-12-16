@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Infrastructure.TablesConfig;
+﻿using System.Globalization;
+
+namespace PhotoManager.Infrastructure.TablesConfig;
 
 public static class AssetConfigs
 {
@@ -25,6 +27,13 @@ public static class AssetConfigs
 
     public static Asset ReadFunc(string[] values)
     {
+        string[] formats = ["M/dd/yyyy HH:mm:ss"];
+
+        if (!DateTime.TryParseExact(values[8], formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime thumbnailCreationDateTime))
+        {
+            thumbnailCreationDateTime = DateTime.Now;
+        }
+
         return new Asset
         {
             FolderId = new Guid(values[0]),
@@ -35,7 +44,7 @@ public static class AssetConfigs
             PixelHeight = int.Parse(values[5]),
             ThumbnailPixelWidth = int.Parse(values[6]),
             ThumbnailPixelHeight = int.Parse(values[7]),
-            ThumbnailCreationDateTime = DateTime.Parse(values[8]),
+            ThumbnailCreationDateTime = thumbnailCreationDateTime,
             Hash = values[9],
             AssetCorruptedMessage = values[10],
             IsAssetCorrupted = bool.Parse(values[11]),
@@ -56,7 +65,7 @@ public static class AssetConfigs
             5 => a.PixelHeight,
             6 => a.ThumbnailPixelWidth,
             7 => a.ThumbnailPixelHeight,
-            8 => a.ThumbnailCreationDateTime,
+            8 => a.ThumbnailCreationDateTime.ToString("M/dd/yyyy HH:mm:ss"),
             9 => a.Hash,
             10 => a.AssetCorruptedMessage!,
             11 => a.IsAssetCorrupted,
