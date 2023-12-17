@@ -41,7 +41,9 @@ public class BitmapHelperTests
         byte[]? buffer = null;
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer!, rotation));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer!, rotation));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
 
     [Test]
@@ -51,7 +53,9 @@ public class BitmapHelperTests
         byte[] buffer = Array.Empty<byte>();
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -61,7 +65,9 @@ public class BitmapHelperTests
         byte[] buffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -72,7 +78,9 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = (Rotation)999;
 
-        Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+
+        Assert.AreEqual($"'{rotation}' is not a valid value for property 'Rotation'.", exception?.Message);
     }
 
     [Test]
@@ -83,7 +91,9 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -130,7 +140,9 @@ public class BitmapHelperTests
         string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        Assert.Throws<OverflowException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000));
+        OverflowException? exception = Assert.Throws<OverflowException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000));
+
+        Assert.AreEqual("The image data generated an overflow during processing.", exception?.Message);
     }
 
     [Test]
@@ -140,7 +152,9 @@ public class BitmapHelperTests
         byte[]? buffer = null;
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
 
     [Test]
@@ -150,7 +164,9 @@ public class BitmapHelperTests
         byte[] buffer = Array.Empty<byte>();
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -160,7 +176,9 @@ public class BitmapHelperTests
         byte[] buffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -171,7 +189,9 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = (Rotation)999;
 
-        Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+
+        Assert.AreEqual($"'{rotation}' is not a valid value for property 'Rotation'.", exception?.Message);
     }
 
     [Test]
@@ -182,7 +202,9 @@ public class BitmapHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -217,7 +239,9 @@ public class BitmapHelperTests
         byte[]? buffer = null;
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer!, rotation));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer!, rotation));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
 
     [Test]
@@ -227,7 +251,9 @@ public class BitmapHelperTests
         byte[] buffer = Array.Empty<byte>();
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation));
+
+        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }
 
     [Test]
@@ -302,16 +328,18 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    [TestCase(-100, 100)]
-    [TestCase(100, -100)]
-    [TestCase(-100, -100)]
-    public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height)
+    [TestCase(-100, 100, "width")]
+    [TestCase(100, -100, "height")]
+    [TestCase(-100, -100, "width")]
+    public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height, string exceptionParameter)
     {
         string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, width, height));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, width, height));
+
+        Assert.AreEqual($"Value should not be negative. (Parameter '{exceptionParameter}')", exception?.Message);
     }
 
     [Test]
@@ -338,7 +366,9 @@ public class BitmapHelperTests
         byte[]? buffer = null;
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, 100, 100));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, 100, 100));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
 
     [Test]
@@ -348,7 +378,9 @@ public class BitmapHelperTests
         byte[] buffer = Array.Empty<byte>();
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
+
+        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }
 
     [Test]
@@ -443,7 +475,9 @@ public class BitmapHelperTests
         string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         Rotation rotation = (Rotation)999;
 
-        Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapImageFromPath(filePath, rotation));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapImageFromPath(filePath, rotation));
+
+        Assert.AreEqual($"'{rotation}' is not a valid value for property 'Rotation'.", exception?.Message);
     }
 
     [Test]
@@ -453,7 +487,9 @@ public class BitmapHelperTests
         string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         Rotation rotation = Rotation.Rotate90;
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapImageFromPath(filePath, rotation));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapImageFromPath(filePath, rotation));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -517,7 +553,9 @@ public class BitmapHelperTests
         string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         Rotation rotation = (Rotation)999;
 
-        Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation));
+
+        Assert.AreEqual($"'{rotation}' is not a valid value for property 'Rotation'.", exception?.Message);
     }
 
     [Test]
@@ -557,7 +595,9 @@ public class BitmapHelperTests
         string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        Assert.Throws<OverflowException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 1000000, 1000000));
+        OverflowException? exception = Assert.Throws<OverflowException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 1000000, 1000000));
+
+        Assert.AreEqual("The image data generated an overflow during processing.", exception?.Message);
     }
 
     [Test]
@@ -566,7 +606,9 @@ public class BitmapHelperTests
     {
         byte[]? buffer = null;
 
-        Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer!, 100, 100));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer!, 100, 100));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
 
     [Test]
@@ -575,7 +617,9 @@ public class BitmapHelperTests
     {
         byte[] buffer = Array.Empty<byte>();
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -584,7 +628,9 @@ public class BitmapHelperTests
     {
         byte[] buffer = Array.Empty<byte>();
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -594,7 +640,9 @@ public class BitmapHelperTests
         string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+
+        Assert.AreEqual("No imaging component suitable to complete this operation was found.", exception?.Message);
     }
 
     [Test]
@@ -710,7 +758,9 @@ public class BitmapHelperTests
     {
         BitmapImage image = new();
 
-        Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetJpegBitmapImage(image));
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetJpegBitmapImage(image));
+
+        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
     }
 
     [Test]
@@ -718,7 +768,9 @@ public class BitmapHelperTests
     {
         BitmapImage? invalidImage = null;
 
-        Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetJpegBitmapImage(invalidImage!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetJpegBitmapImage(invalidImage!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]
@@ -784,7 +836,9 @@ public class BitmapHelperTests
     {
         BitmapImage image = new();
 
-        Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetPngBitmapImage(image));
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetPngBitmapImage(image));
+
+        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
     }
 
     [Test]
@@ -792,7 +846,9 @@ public class BitmapHelperTests
     {
         BitmapImage? invalidImage = null;
 
-        Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetPngBitmapImage(invalidImage!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetPngBitmapImage(invalidImage!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]
@@ -858,7 +914,9 @@ public class BitmapHelperTests
     {
         BitmapImage image = new();
 
-        Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetGifBitmapImage(image));
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => BitmapHelper.GetGifBitmapImage(image));
+
+        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
     }
 
     [Test]
@@ -866,7 +924,9 @@ public class BitmapHelperTests
     {
         BitmapImage? invalidImage = null;
 
-        Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetGifBitmapImage(invalidImage!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.GetGifBitmapImage(invalidImage!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     private static void AssertBrightnessValues(Bitmap bitmap, int x, int y)

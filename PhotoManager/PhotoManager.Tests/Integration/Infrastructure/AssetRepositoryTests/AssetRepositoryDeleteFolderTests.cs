@@ -66,7 +66,9 @@ public class AssetRepositoryDeleteFolderTests
         {
             Folder? folder = null;
 
-            Assert.Throws<NullReferenceException>(() => _testableAssetRepository!.DeleteFolder(folder!));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _testableAssetRepository!.DeleteFolder(folder!));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
         }
         finally
         {

@@ -127,7 +127,7 @@ public class StorageService : IStorageService
         return BitmapHelper.GetGifBitmapImage(thumbnailImage);
     }
 
-    public bool FileExists(Asset asset, Folder folder)
+    public bool FileExists(Folder folder, Asset asset)
     {
         string fullPath = Path.Combine(folder.Path, asset.FileName);
         return FileExists(fullPath);

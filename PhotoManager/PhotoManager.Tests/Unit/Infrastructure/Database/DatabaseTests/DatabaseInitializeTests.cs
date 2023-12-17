@@ -58,7 +58,9 @@ public class DatabaseInitializeTests
     {
         string? directoryPath = null;
 
-        Assert.Throws<ArgumentNullException>(() => _testableDatabase!.Initialize(directoryPath!, pipeSeparator));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _testableDatabase!.Initialize(directoryPath!, pipeSeparator));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
 
         string tablesDirectory = _testableDatabase!.GetTablesDirectory();
         string blobsDirectory = _testableDatabase!.GetBlobsDirectory();

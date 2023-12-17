@@ -132,7 +132,9 @@ public class AssetConfigsTests
     {
         string[] emptyArrray = Array.Empty<string>();
 
-        Assert.Throws<IndexOutOfRangeException>(() => AssetConfigs.ReadFunc(emptyArrray));
+        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => AssetConfigs.ReadFunc(emptyArrray));
+
+        Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
     }
 
     [Test]
@@ -272,7 +274,9 @@ public class AssetConfigsTests
 
         for (int i = 0; i < 14; i++)
         {
-            Assert.Throws<NullReferenceException>(() => AssetConfigs.WriteFunc(asset!, i));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => AssetConfigs.WriteFunc(asset!, i));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
         }
     }
 }

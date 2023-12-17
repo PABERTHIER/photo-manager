@@ -19,6 +19,7 @@ public class FileNameConverterTests
         {
             FileName = name,
         };
+
         object? parameter = null;
 
         string result = (string)fileNameConverter.Convert(asset.FileName, typeof(string), parameter!, CultureInfo.InvariantCulture);
@@ -55,6 +56,8 @@ public class FileNameConverterTests
         FileNameConverter fileNameConverter = new();
         Type? targetType = null;
 
-        Assert.Throws<NotImplementedException>(() => fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType!, CultureInfo.InvariantCulture));
+
+        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
     }
 }

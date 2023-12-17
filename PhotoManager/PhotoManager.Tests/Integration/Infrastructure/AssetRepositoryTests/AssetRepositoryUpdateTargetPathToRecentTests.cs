@@ -163,7 +163,10 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             _assetRepository!.UpdateTargetPathToRecent(folder1);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
-            Assert.Throws<NullReferenceException>(() => _assetRepository!.UpdateTargetPathToRecent(folder3!));
+
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetRepository!.UpdateTargetPathToRecent(folder3!));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 

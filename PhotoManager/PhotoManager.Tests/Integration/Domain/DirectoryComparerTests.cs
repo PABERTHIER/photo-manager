@@ -170,6 +170,8 @@ public class DirectoryComparerTests
     {
         List<Asset>? cataloguedAssets = null;
 
-        Assert.Throws<NullReferenceException>(() => _directoryComparer!.GetUpdatedFileNames(cataloguedAssets!));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _directoryComparer!.GetUpdatedFileNames(cataloguedAssets!));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
     }
 }

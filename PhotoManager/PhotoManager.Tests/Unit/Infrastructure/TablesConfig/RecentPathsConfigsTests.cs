@@ -58,7 +58,9 @@ public class RecentPathsConfigsTests
     {
         string[] emptyArrray = Array.Empty<string>();
 
-        Assert.Throws<IndexOutOfRangeException>(() => RecentPathsConfigs.ReadFunc(emptyArrray));
+        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => RecentPathsConfigs.ReadFunc(emptyArrray));
+
+        Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
     }
 
     [Test]

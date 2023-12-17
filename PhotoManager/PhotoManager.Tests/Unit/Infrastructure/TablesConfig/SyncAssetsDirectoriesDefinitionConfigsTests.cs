@@ -74,7 +74,9 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     {
         string[] emptyArrray = Array.Empty<string>();
 
-        Assert.Throws<IndexOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(emptyArrray));
+        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(emptyArrray));
+
+        Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
     }
 
     [Test]
@@ -160,7 +162,9 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
 
         for (int i = 0; i < 4; i++)
         {
-            Assert.Throws<NullReferenceException>(() => SyncAssetsDirectoriesDefinitionConfigs.WriteFunc(syncAssetsDirectoriesDefinition!, i));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => SyncAssetsDirectoriesDefinitionConfigs.WriteFunc(syncAssetsDirectoriesDefinition!, i));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
         }
     }
 }

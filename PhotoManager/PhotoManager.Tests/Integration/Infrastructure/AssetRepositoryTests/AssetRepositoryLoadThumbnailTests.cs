@@ -315,7 +315,12 @@ public class AssetRepositoryLoadThumbnailTests
             asset1!.FolderId = addedFolder1.FolderId;
             _testableAssetRepository!.AddAsset(asset1!, Array.Empty<byte>());
 
-            Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.LoadThumbnail(directoryName!, asset1!.FileName, asset1.ThumbnailPixelWidth, asset1.ThumbnailPixelHeight));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            {
+                _testableAssetRepository!.LoadThumbnail(directoryName!, asset1!.FileName, asset1.ThumbnailPixelWidth, asset1.ThumbnailPixelHeight);
+            });
+
+            Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception?.Message);
         }
         finally
         {
@@ -335,7 +340,9 @@ public class AssetRepositoryLoadThumbnailTests
 
             string? fileName = null;
 
-            Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.LoadThumbnail(dataDirectory!, fileName!, 0, 0));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.LoadThumbnail(dataDirectory!, fileName!, 0, 0));
+
+            Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception?.Message);
         }
         finally
         {

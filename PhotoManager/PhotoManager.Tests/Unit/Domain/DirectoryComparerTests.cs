@@ -100,7 +100,9 @@ public class DirectoryComparerTests
             new Asset { FileName = "file3.mp4" }
         };
 
-        Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetNewFileNames(fileNames!, cataloguedAssets));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetNewFileNames(fileNames!, cataloguedAssets));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'first')", exception?.Message);
     }
 
     [Test]
@@ -121,7 +123,9 @@ public class DirectoryComparerTests
         string[] fileNames = { "file1.jpg", "file2.png", "file3.mp4", "toto.txt", "tutu.bat" };
         List<Asset>? cataloguedAssets = null;
 
-        Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetNewFileNames(fileNames, cataloguedAssets!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetNewFileNames(fileNames, cataloguedAssets!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]
@@ -176,7 +180,9 @@ public class DirectoryComparerTests
         string[]? sourceFileNames = null;
         string[] destinationFileNames = { "file1.jpg", "file2.png", "file3.mp4" };
 
-        Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetNewFileNamesToSync(sourceFileNames!, destinationFileNames));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetNewFileNamesToSync(sourceFileNames!, destinationFileNames));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'first')", exception?.Message);
     }
 
     [Test]
@@ -197,7 +203,9 @@ public class DirectoryComparerTests
         string[] sourceFileNames = { "file1.jpg", "file2.png", "file3.mp4", "toto.txt", "tutu.bat" };
         string[]? destinationFileNames = null;
 
-        Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'second')", exception?.Message);
     }
 
     [Test]
@@ -221,7 +229,9 @@ public class DirectoryComparerTests
     {
         string[]? fileNames = null;
 
-        Assert.Throws<NullReferenceException>(() => _directoryComparer!.GetImageAndVideoNames(fileNames!));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _directoryComparer!.GetImageAndVideoNames(fileNames!));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
     }
 
     [Test]
@@ -301,7 +311,9 @@ public class DirectoryComparerTests
             new Asset { FileName = "file3.mp4" }
         };
 
-        Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetDeletedFileNames(fileNames!, cataloguedAssets));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetDeletedFileNames(fileNames!, cataloguedAssets));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'second')", exception?.Message);
     }
 
     [Test]
@@ -321,7 +333,9 @@ public class DirectoryComparerTests
         string[] fileNames = { "file1.jpg", "file2.png", "file3.mp4", "toto.txt", "tutu.bat" };
         List<Asset>? cataloguedAssets = null;
 
-        Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetDeletedFileNames(fileNames, cataloguedAssets!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetDeletedFileNames(fileNames, cataloguedAssets!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]
@@ -377,7 +391,9 @@ public class DirectoryComparerTests
         string[]? sourceFileNames = null;
         string[] destinationFileNames = { "file1.jpg", "file2.png", "file3.mp4" };
 
-        Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetDeletedFileNamesToSync(sourceFileNames!, destinationFileNames));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetDeletedFileNamesToSync(sourceFileNames!, destinationFileNames));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'second')", exception?.Message);
     }
 
     [Test]
@@ -397,6 +413,8 @@ public class DirectoryComparerTests
         string[] sourceFileNames = { "file1.jpg", "file2.png", "file3.mp4", "toto.txt", "tutu.bat" };
         string[]? destinationFileNames = null;
 
-        Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _directoryComparer!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'first')", exception?.Message);
     }
 }

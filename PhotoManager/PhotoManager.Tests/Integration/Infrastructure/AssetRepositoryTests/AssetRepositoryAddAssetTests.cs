@@ -365,8 +365,9 @@ public class AssetRepositoryAddAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Assert.Throws<NullReferenceException>(() => _testableAssetRepository.AddAsset(asset!, assetData));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _testableAssetRepository.AddAsset(asset!, assetData));
 
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
             Assert.IsFalse(_testableAssetRepository.HasChanges());
             Assert.IsEmpty(assets);
             Assert.IsEmpty(thumbnails);

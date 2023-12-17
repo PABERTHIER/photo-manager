@@ -59,10 +59,12 @@ public class FileSizeConverterTests
         string input = "abc";
         object? parameter = null;
 
-        Assert.Throws<FormatException>(() =>
+        FormatException? exception = Assert.Throws<FormatException>(() =>
         {
             fileSizeConverter.Convert(input, typeof(long), parameter!, CultureInfo.InvariantCulture);
         });
+
+        Assert.AreEqual("The input string 'abc' was not in a correct format.", exception?.Message);
     }
 
     [Test]
@@ -72,10 +74,12 @@ public class FileSizeConverterTests
         IConvertible input = new InvalidConvertible();
         object? parameter = null;
 
-        Assert.Throws<InvalidCastException>(() =>
+        InvalidCastException? exception = Assert.Throws<InvalidCastException>(() =>
         {
             fileSizeConverter.Convert(input, typeof(long), parameter!, CultureInfo.InvariantCulture);
         });
+
+        Assert.AreEqual("Specified cast is not valid.", exception?.Message);
     }
 
     [Test]
@@ -85,10 +89,12 @@ public class FileSizeConverterTests
         string input = long.MaxValue.ToString() + "0"; // Adding a digit to exceed the maximum value
         object? parameter = null;
 
-        Assert.Throws<OverflowException>(() =>
+        OverflowException? exception = Assert.Throws<OverflowException>(() =>
         {
             fileSizeConverter.Convert(input, typeof(long), parameter!, CultureInfo.InvariantCulture);
         });
+
+        Assert.AreEqual("Value was either too large or too small for an Int64.", exception?.Message);
     }
 
     [Test]
@@ -97,7 +103,9 @@ public class FileSizeConverterTests
         FileSizeConverter fileSizeConverter = new();
         object? parameter = null;
 
-        Assert.Throws<NotImplementedException>(() => fileSizeConverter.ConvertBack("17.3 KB", typeof(string), parameter!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => fileSizeConverter.ConvertBack("17.3 KB", typeof(string), parameter!, CultureInfo.InvariantCulture));
+
+        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
     }
 
     private class InvalidConvertible : IConvertible

@@ -345,7 +345,9 @@ public class AssetRepositoryContainsThumbnailTests
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
 
-            Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.ContainsThumbnail(directoryName!, asset1!.FileName));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.ContainsThumbnail(directoryName!, asset1!.FileName));
+
+            Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception?.Message);
         }
         finally
         {

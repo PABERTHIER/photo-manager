@@ -114,7 +114,7 @@ public class MoveAssetsService : IMoveAssetsService
                 throw new ArgumentNullException(nameof(asset.Folder), "asset.Folder cannot be null.");
             }
 
-            if (!_storageService.FileExists(asset, asset.Folder))
+            if (!_storageService.FileExists(asset.Folder, asset))
             {
                 throw new FileNotFoundException($"File does not exist: '{asset.FullPath}'.");
             }

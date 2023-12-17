@@ -53,6 +53,8 @@ public class PixelSizeConverterTests
         PixelSizeConverter pixelSizeConverter = new();
         object? parameter = null;
 
-        Assert.Throws<NotImplementedException>(() => pixelSizeConverter.ConvertBack("1920x1080 pixels", typeof(string), parameter!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => pixelSizeConverter.ConvertBack("1920x1080 pixels", typeof(string), parameter!, CultureInfo.InvariantCulture));
+
+        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
     }
 }

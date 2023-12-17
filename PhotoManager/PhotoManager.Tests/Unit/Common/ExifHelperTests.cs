@@ -105,7 +105,9 @@ public class ExifHelperTests
     {
         byte[]? nullBuffer = null;
 
-        Assert.Throws<ArgumentNullException>(() => ExifHelper.GetHeicExifOrientation(nullBuffer!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => ExifHelper.GetHeicExifOrientation(nullBuffer!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
 
     [Test]
@@ -113,7 +115,9 @@ public class ExifHelperTests
     {
         byte[] emptyBuffer = Array.Empty<byte>();
 
-        Assert.Throws<ArgumentException>(() => ExifHelper.GetHeicExifOrientation(emptyBuffer));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => ExifHelper.GetHeicExifOrientation(emptyBuffer));
+
+        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }
 
     [Test]
@@ -152,7 +156,9 @@ public class ExifHelperTests
     {
         ushort? exifOrientation = null;
 
-        Assert.Throws<InvalidOperationException>(() => ExifHelper.GetImageRotation((ushort)exifOrientation!));
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => ExifHelper.GetImageRotation((ushort)exifOrientation!));
+
+        Assert.AreEqual("Nullable object must have a value.", exception?.Message);
     }
 
     [Test]
@@ -217,7 +223,9 @@ public class ExifHelperTests
     {
         byte[] emptyHeicData = Array.Empty<byte>();
 
-        Assert.Throws<ArgumentException>(() => ExifHelper.IsValidHeic(emptyHeicData));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => ExifHelper.IsValidHeic(emptyHeicData));
+
+        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }
 
     //private static byte[] GetHeicRotatedBuffer(byte[] buffer, int degrees)

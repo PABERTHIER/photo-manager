@@ -81,7 +81,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
         {
             Folder? folder = null;
 
-            Assert.Throws<NullReferenceException>(() => _assetRepository!.FolderHasThumbnails(folder!));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetRepository!.FolderHasThumbnails(folder!));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
         }
         finally
         {

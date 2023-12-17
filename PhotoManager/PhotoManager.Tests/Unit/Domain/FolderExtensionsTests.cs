@@ -80,7 +80,9 @@ public class FolderExtensionsTests
         Folder folder1 = new() { Path = path1 };
         Folder folder2 = new() { Path = path2 };
 
-        Assert.Throws<NullReferenceException>(() => folder1.IsSameDirectory(folder2));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => folder1.IsSameDirectory(folder2));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
 
         bool isSameDirectory = folder2.IsSameDirectory(folder1);
 
@@ -99,7 +101,9 @@ public class FolderExtensionsTests
 
         Assert.IsFalse(isSameDirectory);
 
-        Assert.Throws<NullReferenceException>(() => folder2.IsSameDirectory(folder1));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => folder2.IsSameDirectory(folder1));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
 
         Assert.AreNotEqual(folder1.Path, folder2.Path);
     }
@@ -113,10 +117,13 @@ public class FolderExtensionsTests
         Folder folder1 = new() { Path = nullPath1! };
         Folder folder2 = new() { Path = nullPath2! };
 
-        Assert.Throws<NullReferenceException>(() => folder1.IsSameDirectory(folder2));
+        NullReferenceException? exception1 = Assert.Throws<NullReferenceException>(() => folder1.IsSameDirectory(folder2));
 
-        Assert.Throws<NullReferenceException>(() => folder2.IsSameDirectory(folder1));
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception1?.Message);
 
+        NullReferenceException? exception2 = Assert.Throws<NullReferenceException>(() => folder2.IsSameDirectory(folder1));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception2?.Message);
         Assert.AreEqual(folder1.Path, folder2.Path);
     }
 
@@ -126,8 +133,13 @@ public class FolderExtensionsTests
         Folder? folder1 = null;
         Folder folder2 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
 
-        Assert.Throws<NullReferenceException>(() => folder1!.IsSameDirectory(folder2));
-        Assert.Throws<NullReferenceException>(() => folder2.IsSameDirectory(folder1!));
+        NullReferenceException? exception1 = Assert.Throws<NullReferenceException>(() => folder1!.IsSameDirectory(folder2));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception1?.Message);
+
+        NullReferenceException? exception2 = Assert.Throws<NullReferenceException>(() => folder2.IsSameDirectory(folder1!));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception2?.Message);
     }
 
     [Test]
@@ -136,8 +148,13 @@ public class FolderExtensionsTests
         Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
         Folder? folder2 = null;
 
-        Assert.Throws<NullReferenceException>(() => folder1.IsSameDirectory(folder2!));
-        Assert.Throws<NullReferenceException>(() => folder2!.IsSameDirectory(folder1));
+        NullReferenceException? exception1 = Assert.Throws<NullReferenceException>(() => folder1.IsSameDirectory(folder2!));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception1?.Message);
+
+        NullReferenceException? exception2 = Assert.Throws<NullReferenceException>(() => folder2!.IsSameDirectory(folder1));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception2?.Message);
     }
 
     [Test]
@@ -146,7 +163,12 @@ public class FolderExtensionsTests
         Folder? folder1 = null;
         Folder? folder2 = null;
 
-        Assert.Throws<NullReferenceException>(() => folder1!.IsSameDirectory(folder2!));
-        Assert.Throws<NullReferenceException>(() => folder2!.IsSameDirectory(folder1!));
+        NullReferenceException? exception1 = Assert.Throws<NullReferenceException>(() => folder1!.IsSameDirectory(folder2!));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception1?.Message);
+
+        NullReferenceException? exception2 = Assert.Throws<NullReferenceException>(() => folder2!.IsSameDirectory(folder1!));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception2?.Message);
     }
 }

@@ -22,7 +22,7 @@ public interface IStorageService
     byte[] GetJpegBitmapImage(BitmapImage thumbnailImage);
     byte[] GetPngBitmapImage(BitmapImage thumbnailImage);
     byte[] GetGifBitmapImage(BitmapImage thumbnailImage);
-    bool FileExists(Asset asset, Folder folder);
+    bool FileExists(Folder folder, Asset asset);
     bool FileExists(string fullPath);
     bool FolderExists(string fullPath);
     void LoadFileInformation(Asset asset);

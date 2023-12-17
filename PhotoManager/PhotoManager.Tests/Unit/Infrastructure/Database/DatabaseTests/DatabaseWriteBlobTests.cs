@@ -113,7 +113,9 @@ public class DatabaseWriteBlobTests
         {
             _database!.Initialize(directoryPath, pipeSeparator);
 
-            Assert.Throws<NullReferenceException>(() => _database!.WriteBlob(blobToWrite!, blobName));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _database!.WriteBlob(blobToWrite!, blobName));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
             Assert.IsTrue(File.Exists(blobFilePath));
             Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastWriteFilePath);
             Assert.AreEqual(blobToWrite, _database!.Diagnostics.LastWriteFileRaw);

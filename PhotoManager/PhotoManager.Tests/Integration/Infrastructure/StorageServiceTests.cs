@@ -41,7 +41,9 @@ public class StorageServiceTests
     {
         string directoryPath = Path.Combine(dataDirectory!, "NonExistentDirectory");
 
-        Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetSubDirectories(directoryPath));
+        DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetSubDirectories(directoryPath));
+
+        Assert.AreEqual($"Could not find a part of the path '{directoryPath}'.", exception?.Message);
     }
 
     [Test]
@@ -67,7 +69,9 @@ public class StorageServiceTests
     {
         string directoryPath = Path.Combine(dataDirectory!, "NonExistentDirectory");
 
-        Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetRecursiveSubDirectories(directoryPath));
+        DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetRecursiveSubDirectories(directoryPath));
+
+        Assert.AreEqual($"Could not find a part of the path '{directoryPath}'.", exception?.Message);
     }
 
     [Test]
@@ -129,7 +133,9 @@ public class StorageServiceTests
     {
         string nonExistentFilePath = Path.Combine(dataDirectory!, "NonExistentFile.jpg");
 
-        Assert.Throws<FileNotFoundException>(() => _storageService!.GetFileBytes(nonExistentFilePath));
+        FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _storageService!.GetFileBytes(nonExistentFilePath));
+
+        Assert.AreEqual($"Could not find file '{nonExistentFilePath}'.", exception?.Message);
     }
 
     [Test]
@@ -233,7 +239,9 @@ public class StorageServiceTests
     {
         byte[]? nullBuffer = null;
 
-        Assert.Throws<ArgumentNullException>(() => _storageService!.GetHeicExifOrientation(nullBuffer!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.GetHeicExifOrientation(nullBuffer!));
+        
+        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
 
     [Test]
@@ -241,7 +249,9 @@ public class StorageServiceTests
     {
         byte[] emptyBuffer = Array.Empty<byte>();
 
-        Assert.Throws<ArgumentException>(() => _storageService!.GetHeicExifOrientation(emptyBuffer));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.GetHeicExifOrientation(emptyBuffer));
+
+        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }
 
     [Test]
@@ -307,7 +317,9 @@ public class StorageServiceTests
     {
         BitmapImage image = new();
 
-        Assert.Throws<InvalidOperationException>(() => _storageService!.GetJpegBitmapImage(image));
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _storageService!.GetJpegBitmapImage(image));
+
+        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
     }
 
     [Test]
@@ -315,7 +327,9 @@ public class StorageServiceTests
     {
         BitmapImage? invalidImage = null;
 
-        Assert.Throws<ArgumentNullException>(() => _storageService!.GetJpegBitmapImage(invalidImage!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.GetJpegBitmapImage(invalidImage!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]
@@ -381,7 +395,9 @@ public class StorageServiceTests
     {
         BitmapImage image = new();
 
-        Assert.Throws<InvalidOperationException>(() => _storageService!.GetPngBitmapImage(image));
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _storageService!.GetPngBitmapImage(image));
+
+        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
     }
 
     [Test]
@@ -389,7 +405,9 @@ public class StorageServiceTests
     {
         BitmapImage? invalidImage = null;
 
-        Assert.Throws<ArgumentNullException>(() => _storageService!.GetPngBitmapImage(invalidImage!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.GetPngBitmapImage(invalidImage!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]
@@ -455,7 +473,9 @@ public class StorageServiceTests
     {
         BitmapImage image = new();
 
-        Assert.Throws<InvalidOperationException>(() => _storageService!.GetGifBitmapImage(image));
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _storageService!.GetGifBitmapImage(image));
+
+        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
     }
 
     [Test]
@@ -463,16 +483,18 @@ public class StorageServiceTests
     {
         BitmapImage? invalidImage = null;
 
-        Assert.Throws<ArgumentNullException>(() => _storageService!.GetGifBitmapImage(invalidImage!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.GetGifBitmapImage(invalidImage!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]
     public void FileExists_ExistingFile_ReturnsTrue()
     {
-        Asset asset = new() { FileName = "Image 1.jpg" };
         Folder folder = new() { Path = dataDirectory! };
+        Asset asset = new() { FileName = "Image 1.jpg" };
 
-        bool exists = _storageService!.FileExists(asset, folder);
+        bool exists = _storageService!.FileExists(folder, asset);
 
         Assert.IsTrue(exists);
     }
@@ -480,23 +502,25 @@ public class StorageServiceTests
     [Test]
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
-        Asset asset = new() { FileName = "nonexistent.txt" };
         Folder folder = new() { Path = dataDirectory! };
+        Asset asset = new() { FileName = "nonexistent.txt" };
 
-        bool exists = _storageService!.FileExists(asset, folder);
+        bool exists = _storageService!.FileExists(folder, asset);
 
         Assert.IsFalse(exists);
     }
 
     [Test]
-    [TestCase("Image 1.jpg", null)]
-    [TestCase(null, "toto")]
-    public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string fileName, string path)
+    [TestCase("toto", null, "path2")]
+    [TestCase(null, "Image 1.jpg", "path1")]
+    public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string path, string fileName, string exceptionParameter)
     {
-        Asset asset = new() { FileName = fileName };
         Folder folder = new() { Path = path };
+        Asset asset = new() { FileName = fileName };
 
-        Assert.Throws<ArgumentNullException>(() => _storageService!.FileExists(asset, folder));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.FileExists(folder, asset));
+
+        Assert.AreEqual($"Value cannot be null. (Parameter '{exceptionParameter}')", exception?.Message);
     }
 
     [Test]
@@ -629,7 +653,9 @@ public class StorageServiceTests
         Folder folder = new() { Path = path! };
         Asset asset = new() { Folder = folder, FileName = fileName };
 
-        Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFileInformation(asset!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFileInformation(asset!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
     }
 
     [Test]
@@ -637,7 +663,9 @@ public class StorageServiceTests
     {
         Asset? asset = null;
 
-        Assert.Throws<NullReferenceException>(() => _storageService!.LoadFileInformation(asset!));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.LoadFileInformation(asset!));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
     }
 
     [Test]
@@ -702,7 +730,9 @@ public class StorageServiceTests
     {
         byte[] emptyHeicData = Array.Empty<byte>();
 
-        Assert.Throws<ArgumentException>(() => _storageService!.IsValidHeic(emptyHeicData));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.IsValidHeic(emptyHeicData));
+
+        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }
 
     private static bool IsValidImage(string filePath)

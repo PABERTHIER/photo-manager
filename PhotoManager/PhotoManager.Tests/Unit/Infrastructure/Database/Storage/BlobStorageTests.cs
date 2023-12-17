@@ -99,7 +99,9 @@ public class BlobStorageTests
         {
             Dictionary<string, byte[]>? data = null;
 
-            Assert.Throws<NullReferenceException>(() => _blobStorage!.WriteToBinaryFile(data!, binaryFilePath));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _blobStorage!.WriteToBinaryFile(data!, binaryFilePath));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
             Assert.IsTrue(File.Exists(binaryFilePath));
         }
         finally
@@ -141,6 +143,7 @@ public class BlobStorageTests
         };
 
         UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _blobStorage!.WriteToBinaryFile(data, dataDirectory!));
+
         Assert.AreEqual($"Access to the path '{dataDirectory!}' is denied.", exception?.Message);
     }
 
@@ -155,6 +158,8 @@ public class BlobStorageTests
             { "Image2.png", new byte[] { 4, 5, 6 } }
         };
 
-        Assert.Throws<ArgumentNullException>(() => _blobStorage!.WriteToBinaryFile(data, binaryFilePath!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _blobStorage!.WriteToBinaryFile(data, binaryFilePath!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
     }
 }

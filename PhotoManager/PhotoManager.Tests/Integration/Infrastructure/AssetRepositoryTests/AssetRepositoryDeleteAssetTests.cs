@@ -301,8 +301,9 @@ public class AssetRepositoryDeleteAssetTests
             Assert.IsTrue(thumbnails[folderPath1].ContainsKey(asset1.FileName));
             Assert.AreEqual(Array.Empty<byte>(), thumbnails[folderPath1][asset1.FileName]);
 
-            Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.DeleteAsset(folderPath1!, assetFileName!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.DeleteAsset(folderPath1!, assetFileName!));
 
+            Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception?.Message);
             Assert.AreEqual(1, thumbnails.Count);
             Assert.IsTrue(thumbnails.ContainsKey(folderPath1));
             Assert.AreEqual(1, thumbnails[folderPath1].Count);

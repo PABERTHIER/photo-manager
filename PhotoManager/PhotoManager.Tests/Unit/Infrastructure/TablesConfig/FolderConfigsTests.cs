@@ -66,7 +66,9 @@ public class FolderConfigsTests
     {
         string[] emptyArrray = Array.Empty<string>();
 
-        Assert.Throws<IndexOutOfRangeException>(() => FolderConfigs.ReadFunc(emptyArrray));
+        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => FolderConfigs.ReadFunc(emptyArrray));
+
+        Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
     }
 
     [Test]
@@ -127,7 +129,9 @@ public class FolderConfigsTests
 
         for (int i = 0; i < 2; i++)
         {
-            Assert.Throws<NullReferenceException>(() => FolderConfigs.WriteFunc(folder!, i));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => FolderConfigs.WriteFunc(folder!, i));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
         }
     }
 }

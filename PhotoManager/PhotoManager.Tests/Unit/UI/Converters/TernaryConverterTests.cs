@@ -55,6 +55,8 @@ public class TernaryConverterTests
         Type[]? targetTypes = null;
         object? parameter = null;
 
-        Assert.Throws<NotImplementedException>(() => ternaryConverter.ConvertBack(value!, targetTypes!, parameter!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => ternaryConverter.ConvertBack(value!, targetTypes!, parameter!, CultureInfo.InvariantCulture));
+
+        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
     }
 }

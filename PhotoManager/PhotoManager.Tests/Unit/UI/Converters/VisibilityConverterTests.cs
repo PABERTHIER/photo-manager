@@ -44,7 +44,9 @@ public class VisibilityConverterTests
         VisibilityConverter visibilityConverter = new();
         object? parameter = null;
 
-        Assert.Throws<NotImplementedException>(() => visibilityConverter.ConvertBack(Visibility.Visible, typeof(Visibility), parameter!, CultureInfo.InvariantCulture));
+        NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => visibilityConverter.ConvertBack(Visibility.Visible, typeof(Visibility), parameter!, CultureInfo.InvariantCulture));
+
+        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
     }
 
     private class NamedObject
