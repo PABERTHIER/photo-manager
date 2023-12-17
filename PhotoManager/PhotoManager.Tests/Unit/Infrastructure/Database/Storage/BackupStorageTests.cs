@@ -148,18 +148,22 @@ public class BackupStorageTests
     [Test]
     public void DeleteBackupFile_FileExists_FileDeleted()
     {
-        string tempFilePath = Path.Combine(dataDirectory!, "fileToDelete.txt");
-        File.WriteAllText(tempFilePath, "Test content");
+        string sourceDirectoryName = Path.Combine(dataDirectory!, "TestFolder");
+        string destinationArchiveFileName = Path.Combine(dataDirectory!, "TestFolder.zip");
 
-        _backupStorage!.DeleteBackupFile(tempFilePath);
+        _backupStorage!.WriteFolderToZipFile(sourceDirectoryName, destinationArchiveFileName);
 
-        Assert.IsFalse(File.Exists(tempFilePath));
+        Assert.IsTrue(File.Exists(destinationArchiveFileName));
+
+        _backupStorage!.DeleteBackupFile(destinationArchiveFileName);
+
+        Assert.IsFalse(File.Exists(destinationArchiveFileName));
     }
 
     [Test]
     public void DeleteBackupFile_FileDoesNotExist_NoExceptionThrown()
     {
-        string tempFilePath = Path.Combine(dataDirectory!, "nonExistentFileToDelete.txt");
+        string tempFilePath = Path.Combine(dataDirectory!, "nonExistentFileToDelete.zip");
 
         Assert.DoesNotThrow(() => _backupStorage!.DeleteBackupFile(tempFilePath));
     }
