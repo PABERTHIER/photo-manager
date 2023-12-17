@@ -89,19 +89,24 @@ public class StorageServiceTests
     [Test]
     public void DeleteFile_FileExists_DeletesFile()
     {
-        string testFileName = "TestFile.txt";
-        string testFilePath = Path.Combine(dataDirectory!, testFileName);
-        File.WriteAllText(testFilePath, "Test content");
+        string fileName = "Image 1.jpg";
+        string newFileName = "ImageToDelete.jpg";
+        string sourceFilePath = Path.Combine(dataDirectory!, fileName);
+        string destinationFilePath = Path.Combine(dataDirectory!, newFileName);
 
-        _storageService!.DeleteFile(dataDirectory!, testFileName);
+        File.Copy(sourceFilePath, destinationFilePath);
 
-        Assert.IsFalse(File.Exists(testFilePath));
+        Assert.IsTrue(File.Exists(destinationFilePath));
+
+        _storageService!.DeleteFile(dataDirectory!, newFileName);
+
+        Assert.IsFalse(File.Exists(destinationFilePath));
     }
 
     [Test]
     public void DeleteFile_FileDoesNotExist_NoActionTaken()
     {
-        string testFileName = "NonExistentFile.txt";
+        string testFileName = "NonExistentImage.jpg";
         string testFilePath = Path.Combine(dataDirectory!, testFileName);
 
         Assert.DoesNotThrow(() => _storageService!.DeleteFile(dataDirectory!, testFileName));
@@ -503,7 +508,7 @@ public class StorageServiceTests
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
         Folder folder = new() { Path = dataDirectory! };
-        Asset asset = new() { FileName = "nonexistent.txt" };
+        Asset asset = new() { FileName = "NonExistent.jpg" };
 
         bool exists = _storageService!.FileExists(folder, asset);
 
@@ -536,7 +541,7 @@ public class StorageServiceTests
     [Test]
     public void FileExistsFullPath_FileDoesNotExist_ReturnsFalse()
     {
-        string fullPath = Path.Combine(dataDirectory!, "nonexistent.txt");
+        string fullPath = Path.Combine(dataDirectory!, "NonExistent.jpg");
 
         bool exists = _storageService!.FileExists(fullPath);
 
