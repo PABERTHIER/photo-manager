@@ -29,6 +29,7 @@ public class ObjectListStorageTests
             TableName = AssetConstants.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         List<Folder> result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
@@ -59,6 +60,7 @@ public class ObjectListStorageTests
             TableName = AssetConstants.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         List<Asset> result = _objectListStorage!.ReadObjectList(dataFilePath, AssetConfigs.ReadFunc, new Diagnostics());
@@ -93,6 +95,7 @@ public class ObjectListStorageTests
             TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         List<SyncAssetsDirectoriesDefinition> result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
@@ -123,6 +126,7 @@ public class ObjectListStorageTests
             TableName = AssetConstants.RecentTargetPathsTableName,
             ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
@@ -142,6 +146,7 @@ public class ObjectListStorageTests
             TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         List<SyncAssetsDirectoriesDefinition> result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
@@ -197,6 +202,7 @@ public class ObjectListStorageTests
             TableName = AssetConstants.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         Assert.Throws<FormatException>(() =>
@@ -217,6 +223,7 @@ public class ObjectListStorageTests
                 new ColumnProperties { ColumnName = "NonExistent" }
             }
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
@@ -225,7 +232,26 @@ public class ObjectListStorageTests
     }
 
     [Test]
-    public void ReadObjectList_PathDoesNotExist_ReturnsEmptyList()
+    public void ReadObjectList_FilePathIsInvalid_ReturnsEmptyList()
+    {
+        DataTableProperties dataTableProperties = new()
+        {
+            TableName = "NonExistent",
+            ColumnProperties = new ColumnProperties[]
+            {
+                new ColumnProperties { ColumnName = "NonExistent" }
+            }
+        };
+
+        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+
+        List<string> result = _objectListStorage!.ReadObjectList(dataDirectory!, RecentPathsConfigs.ReadFunc, new Diagnostics());
+
+        Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void ReadObjectList_FilePathDoesNotExist_ReturnsEmptyList()
     {
         string dataFilePath = Path.Combine(dataDirectory!, "Toto\\nonExistent.db");
         DataTableProperties dataTableProperties = new()
@@ -236,6 +262,7 @@ public class ObjectListStorageTests
                 new ColumnProperties { ColumnName = "NonExistent" }
             }
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
@@ -244,7 +271,7 @@ public class ObjectListStorageTests
     }
 
     [Test]
-    public void ReadObjectList_PathIsNull_ReturnsEmptyList()
+    public void ReadObjectList_FilePathIsNull_ReturnsEmptyList()
     {
         string? dataFilePath = null;
         DataTableProperties dataTableProperties = new()
@@ -255,6 +282,7 @@ public class ObjectListStorageTests
                 new ColumnProperties { ColumnName = "NonExistent" }
             }
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath!, RecentPathsConfigs.ReadFunc, new Diagnostics());
@@ -271,6 +299,7 @@ public class ObjectListStorageTests
             TableName = AssetConstants.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         Func<string[], object>? f = null;
@@ -507,14 +536,13 @@ public class ObjectListStorageTests
 
         Exception? exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
 
-
         Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
 
         Assert.IsFalse(File.Exists(dataFilePath));
     }
 
     [Test]
-    public void WriteObjectList_PathDoesNotExist_ThrowsDirectoryNotFoundException()
+    public void WriteObjectList_FilePathDoesNotExist_ThrowsDirectoryNotFoundException()
     {
         string dataFilePath = Path.Combine(dataDirectory!, "nonExistent", "nonExistent.db");
         List<string> nonExistents = new()
@@ -530,6 +558,7 @@ public class ObjectListStorageTests
                 new ColumnProperties { ColumnName = "NonExistent" }
             }
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         Assert.Throws<DirectoryNotFoundException>(() => _objectListStorage!.WriteObjectList(dataFilePath, nonExistents, RecentPathsConfigs.WriteFunc, new Diagnostics()));
@@ -538,7 +567,34 @@ public class ObjectListStorageTests
     }
 
     [Test]
-    public void WriteObjectList_PathIsNull_ThrowsArgumentNullException()
+    public void WriteObjectList_FilePathIsInvalid_ThrowsUnauthorizedAccessException()
+    {
+        List<string> nonExistents = new()
+        {
+            "D:\\Workspace\\PhotoManager\\Test"
+        };
+
+        DataTableProperties dataTableProperties = new()
+        {
+            TableName = "NonExistent",
+            ColumnProperties = new ColumnProperties[]
+            {
+                new ColumnProperties { ColumnName = "NonExistent" }
+            }
+        };
+
+        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+
+        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() =>
+        {
+            _objectListStorage!.WriteObjectList(dataDirectory!, nonExistents, RecentPathsConfigs.WriteFunc, new Diagnostics());
+        });
+
+        Assert.AreEqual($"Access to the path '{dataDirectory!}' is denied.", exception?.Message);
+    }
+
+    [Test]
+    public void WriteObjectList_FilePathIsNull_ThrowsArgumentNullException()
     {
         string? dataFilePath = null;
         List<string> nonExistents = new()
@@ -554,6 +610,7 @@ public class ObjectListStorageTests
                 new ColumnProperties { ColumnName = "NonExistent" }
             }
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         Assert.Throws<ArgumentNullException>(() => _objectListStorage!.WriteObjectList(dataFilePath!, nonExistents, RecentPathsConfigs.WriteFunc, new Diagnostics()));
@@ -575,6 +632,7 @@ public class ObjectListStorageTests
                 new ColumnProperties { ColumnName = "NonExistent" }
             }
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
 
         Assert.Throws<NullReferenceException>(() =>
@@ -611,6 +669,7 @@ public class ObjectListStorageTests
                 new ColumnProperties { ColumnName = "NonExistent" }
             }
         };
+
         _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
         Func<string, int, object>? f = null;
 

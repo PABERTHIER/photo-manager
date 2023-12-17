@@ -44,6 +44,24 @@ public class BlobStorageTests
     }
 
     [Test]
+    public void ReadFromBinaryFile_FilePathIsInvalid_ReturnsNull()
+    {
+        Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(dataDirectory!);
+
+        Assert.IsNull(result);
+    }
+
+    [Test]
+    public void ReadFromBinaryFile_FilePathIsNull_ReturnsNull()
+    {
+        string? blobFilePath = null;
+
+        Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(blobFilePath!);
+
+        Assert.IsNull(result);
+    }
+
+    [Test]
     public void WriteToBinaryFile_DataIsCorrect_WritesDataToFile()
     {
         string binaryFilePath = Path.Combine(dataDirectory!, "abcd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
@@ -114,7 +132,20 @@ public class BlobStorageTests
     }
 
     [Test]
-    public void WriteToBinaryFile_PathIsNull_ThrowsArgumentNullException()
+    public void WriteToBinaryFile_FilePathIsInvalid_ThrowsUnauthorizedAccessException()
+    {
+        Dictionary<string, byte[]> data = new()
+        {
+            { "Image1.jpg", new byte[] { 1, 2, 3 } },
+            { "Image2.png", new byte[] { 4, 5, 6 } }
+        };
+
+        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _blobStorage!.WriteToBinaryFile(data, dataDirectory!));
+        Assert.AreEqual($"Access to the path '{dataDirectory!}' is denied.", exception?.Message);
+    }
+
+    [Test]
+    public void WriteToBinaryFile_FilePathIsNull_ThrowsArgumentNullException()
     {
         string? binaryFilePath = null;
 

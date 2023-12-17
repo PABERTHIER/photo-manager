@@ -1553,6 +1553,49 @@ public class MoveAssetsServiceTests
     }
 
     [Test]
+    public void CopyAsset_SourceFilePathIsADirectory_DoesNotCopyAndReturnFalse()
+    {
+        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+
+        try
+        {
+            Directory.CreateDirectory(destinationDirectory);
+
+            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+
+            bool hasBeenCopied = _moveAssetsService!.CopyAsset(dataDirectory!, destinationFilePath); // Access denied when source file path is a directory -> UnauthorizedAccessException
+
+            Assert.IsFalse(hasBeenCopied);
+            Assert.IsFalse(File.Exists(destinationFilePath));
+        }
+        finally
+        {
+            Directory.Delete(databasePath!, true);
+            Directory.Delete(destinationDirectory, true);
+        }
+    }
+
+    [Test]
+    public void CopyAsset_DestinationFilePathIsADirectory_DoesNotCopyAndThrowsIOException()
+    {
+        string sourceDirectory = Path.Combine(dataDirectory!, "Duplicates\\NewFolder2");
+        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToSync");
+
+        try
+        {
+            Directory.CreateDirectory(destinationDirectory);
+
+            IOException? exception = Assert.Throws<IOException>(() => _moveAssetsService!.CopyAsset(sourceDirectory, destinationDirectory));
+            Assert.AreEqual($"The target file '{destinationDirectory}' is a directory, not a file.", exception?.Message);
+        }
+        finally
+        {
+            Directory.Delete(databasePath!, true);
+            Directory.Delete(destinationDirectory, true);
+        }
+    }
+
+    [Test]
     public void CopyAsset_SameSourceAndDestination_DoesNotCopyFileAndReturnsTrue()
     {
         string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");

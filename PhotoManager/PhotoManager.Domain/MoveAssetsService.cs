@@ -156,6 +156,10 @@ public class MoveAssetsService : IMoveAssetsService
         {
             throw new DirectoryNotFoundException($"Could not find a part of the path '{sourceFilePath}'.");
         }
+        catch (IOException)
+        {
+            throw new IOException($"The target file '{destinationFilePath}' is a directory, not a file.");
+        }
         catch (ArgumentNullException)
         {
             throw new ArgumentNullException(nameof(sourceFilePath), "Value cannot be null.");
@@ -166,7 +170,7 @@ public class MoveAssetsService : IMoveAssetsService
         }
         catch
         {
-            // TODO: Log the file could not be copied: insufficient permissions, disk space issues, or file locking problems ?
+            // TODO: Log the file could not be copied: source file path invalid (path to directory and not file), insufficient permissions, disk space issues, or file locking problems ?
             return false;
         }
     }

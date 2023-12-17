@@ -11,7 +11,6 @@ public class AssetHashCalculatorServiceTests
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
-    // The cases for imageBytes null, empty or invalid and filePath null or invalid are already handled in the HashingHelperTests
     [Test]
     [TestCase("Image 1.jpg")]
     [TestCase("Image 1_90_deg.jpg")]
@@ -32,4 +31,6 @@ public class AssetHashCalculatorServiceTests
         Assert.IsInstanceOf<string>(hash);
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
     }
+
+    // TODO: Add the cases for imageBytes null, empty or invalid and filePath null or invalid... when AssetHashCalculatorService would have been reworked
 }

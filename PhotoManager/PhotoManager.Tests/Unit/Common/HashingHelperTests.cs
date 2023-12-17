@@ -52,7 +52,8 @@ public class HashingHelperTests
     {
         byte[]? imageBytes = null;
 
-        Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateHash(imageBytes!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateHash(imageBytes!));
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]
@@ -76,19 +77,28 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculatePHash_InvalidImagePath_ThrowsMagickBlobErrorException()
+    public void CalculatePHash_ImageDoesNotExist_ThrowsMagickBlobErrorException()
     {
-        string filePath = Path.Combine(dataDirectory!, "invalid_path.png");
+        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.png");
 
-        Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(filePath!));
+        MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(filePath));
+        Assert.AreEqual($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3573", exception?.Message);
     }
 
     [Test]
-    public void CalculatePHash_NullImagePath_ThrowsArgumentNullException()
+    public void CalculatePHash_ImagePathIsInvalid_ThrowsMagickBlobErrorException()
+    {
+        MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(dataDirectory!));
+        Assert.AreEqual($"unable to open image '{dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3573", exception?.Message);
+    }
+
+    [Test]
+    public void CalculatePHash_ImagePathIsNull_ThrowsArgumentNullException()
     {
         string? filePath = null;
 
-        Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculatePHash(filePath!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculatePHash(filePath!));
+        Assert.AreEqual("Value cannot be null or empty. (Parameter 'fileName')", exception?.Message);
     }
 
     [Test]
@@ -136,19 +146,28 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateDHash_InvalidImagePath_ThrowsArgumentException()
+    public void CalculateDHash_ImageDoesNotExist_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "invalid_path.png");
+        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.png");
 
-        Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(filePath));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(filePath));
+        Assert.AreEqual("Parameter is not valid.", exception?.Message);
     }
 
     [Test]
-    public void CalculateDHash_NullImagePath_ThrowsArgumentNullException()
+    public void CalculateDHash_ImagePathIsInvalid_ThrowsArgumentException()
+    {
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(dataDirectory!));
+        Assert.AreEqual("Parameter is not valid.", exception?.Message);
+    }
+
+    [Test]
+    public void CalculateDHash_ImagePathIsNull_ThrowsArgumentNullException()
     {
         string? filePath = null;
 
-        Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateDHash(filePath!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateDHash(filePath!));
+        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
     }
 
     [Test]

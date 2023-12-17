@@ -406,9 +406,9 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
-    public void LoadBitmapImageFromPath_FileNotExists_ReturnsDefaultBitmapImage()
+    public void LoadBitmapImageFromPath_ImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
-        string filePath = Path.Combine(dataDirectory!, "Invalid.jpg");
+        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.jpg");
         Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
@@ -422,7 +422,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
-    public void LoadBitmapImageFromPath_NullFilePath_ReturnsDefaultBitmapImage()
+    public void LoadBitmapImageFromPath_FilePathIsNull_ReturnsDefaultBitmapImage()
     {
         string? filePath = null;
         Rotation rotation = Rotation.Rotate90;
@@ -480,7 +480,7 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    public void LoadBitmapHeicImageFromPathViewerUserControl_NullFilePath_ReturnsBitmapImage()
+    public void LoadBitmapHeicImageFromPathViewerUserControl_FilePathIsNull_ReturnsBitmapImage()
     {
         string? filePath = null;
         Rotation rotation = Rotation.Rotate90;
@@ -496,9 +496,9 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    public void LoadBitmapHeicImageFromPathViewerUserControl_FileNotExists_ReturnsDefaultBitmapImage()
+    public void LoadBitmapHeicImageFromPathViewerUserControl_ImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
-        string filePath = Path.Combine(dataDirectory!, "invalid_path.heic");
+        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.heic");
         Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation);
@@ -620,9 +620,9 @@ public class BitmapHelperTests
     }
 
     [Test]
-    public void LoadBitmapFromPath_InvalidImagePath_ReturnsNull()
+    public void LoadBitmapFromPath_ImageDoesNotExist_ReturnsNull()
     {
-        string filePath = Path.Combine(dataDirectory!, "invalid_path.png");
+        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.png");
 
         Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(filePath!);
 
@@ -630,7 +630,15 @@ public class BitmapHelperTests
     }
 
     [Test]
-    public void LoadBitmapFromPath_NullImagePath_ReturnsNull()
+    public void LoadBitmapFromPath_ImagePathIsInvalid_ReturnsNull()
+    {
+        Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(dataDirectory!);
+
+        Assert.IsNull(bitmap);
+    }
+
+    [Test]
+    public void LoadBitmapFromPath_ImagePathIsNull_ReturnsNull()
     {
         string? imagePath = null;
 

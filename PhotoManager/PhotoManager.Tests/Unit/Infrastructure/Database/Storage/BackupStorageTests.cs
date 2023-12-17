@@ -155,6 +155,13 @@ public class BackupStorageTests
     }
 
     [Test]
+    public void DeleteBackupFile_FilePathIsInvalid_ThrowsUnauthorizedAccessException()
+    {
+        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _backupStorage!.DeleteBackupFile(dataDirectory!));
+        Assert.AreEqual($"Access to the path '{dataDirectory!}' is denied.", exception?.Message);
+    }
+
+    [Test]
     public void DeleteBackupFile_PathIsNull_ThrowsArgumentNullException()
     {
         string? tempFilePath = null;

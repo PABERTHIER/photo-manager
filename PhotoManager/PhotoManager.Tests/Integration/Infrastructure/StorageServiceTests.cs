@@ -114,7 +114,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void GetFileBytes_ExistentFile_ReturnsFileBytes()
+    public void GetFileBytes_FileExists_ReturnsFileBytes()
     {
         string testFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
 
@@ -125,11 +125,18 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void GetFileBytes_NonExistentFile_ThrowsFileNotFoundException()
+    public void GetFileBytes_FileDoesNotExist_ThrowsFileNotFoundException()
     {
-        string nonExistentFilePath = Path.Combine(dataDirectory!, "NonExistentFile.txt");
+        string nonExistentFilePath = Path.Combine(dataDirectory!, "NonExistentFile.jpg");
 
         Assert.Throws<FileNotFoundException>(() => _storageService!.GetFileBytes(nonExistentFilePath));
+    }
+
+    [Test]
+    public void GetFileBytes_FilePathIsInvalid_ThrowsUnauthorizedAccessException()
+    {
+        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _storageService!.GetFileBytes(dataDirectory!));
+        Assert.AreEqual($"Access to the path '{dataDirectory!}' is denied.", exception?.Message);
     }
 
     [Test]
@@ -471,7 +478,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void FileExists_NonExistentFile_ReturnsFalse()
+    public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
         Asset asset = new() { FileName = "nonexistent.txt" };
         Folder folder = new() { Path = dataDirectory! };
@@ -503,7 +510,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void FileExistsFullPath_NonExistentFile_ReturnsFalse()
+    public void FileExistsFullPath_FileDoesNotExist_ReturnsFalse()
     {
         string fullPath = Path.Combine(dataDirectory!, "nonexistent.txt");
 
@@ -615,7 +622,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFileInformation_NullFilePath_ThrowsArgumentNullException()
+    public void LoadFileInformation_FilePathIsNull_ThrowsArgumentNullException()
     {
         string fileName = "Image 1.jpg";
         string? path = null;
