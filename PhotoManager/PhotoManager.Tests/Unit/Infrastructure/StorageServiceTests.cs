@@ -146,21 +146,21 @@ public class StorageServiceTests
 
     [Test]
     [Category("From AssetRepository")]
-    [TestCase(100, 100)]
-    [TestCase(10000, 100)]
-    [TestCase(100, 10000)]
-    [TestCase(0, 10000)]
-    [TestCase(100, 0)]
-    [TestCase(0, 0)]
-    [TestCase(-100, 100)]
-    [TestCase(100, -100)]
-    [TestCase(-100, -100)]
-    [TestCase(1000000, 100)]
-    [TestCase(100, 1000000)]
-    [TestCase(100, null)]
-    [TestCase(null, 100)]
-    [TestCase(null, null)]
-    public void LoadBitmapThumbnailImageAssetRepository_ValidBufferAndWidthAndHeight_ReturnsBitmapImage(int width, int height)
+    [TestCase(100, 100, 100, 100)]
+    [TestCase(10000, 100, 10000, 100)]
+    [TestCase(100, 10000, 100, 10000)]
+    [TestCase(0, 10000, 17777, 10000)]
+    [TestCase(100, 0, 100, 56)]
+    [TestCase(0, 0, 1280, 720)]
+    [TestCase(-100, 100, 100, 100)]
+    [TestCase(100, -100, 100, 100)]
+    [TestCase(-100, -100, 100, 100)]
+    [TestCase(1000000, 100, 1000000, 100)]
+    [TestCase(100, 1000000, 100, 1000000)]
+    [TestCase(100, null, 100, 56)]
+    [TestCase(null, 100, 177, 100)]
+    [TestCase(null, null, 1280, 720)]
+    public void LoadBitmapThumbnailImageAssetRepository_ValidBufferAndWidthAndHeight_ReturnsBitmapImage(int width, int height, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -172,6 +172,10 @@ public class StorageServiceTests
         Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.AreEqual(width, image.DecodePixelWidth);
         Assert.AreEqual(height, image.DecodePixelHeight);
+        Assert.AreEqual(expectedWidth, image.PixelWidth);
+        Assert.AreEqual(expectedHeight, image.PixelHeight);
+        Assert.AreEqual(expectedWidth, image.Width);
+        Assert.AreEqual(expectedHeight, image.Height);
     }
 
     [Test]
@@ -248,10 +252,12 @@ public class StorageServiceTests
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
         Assert.AreEqual(rotation, image.Rotation);
-        Assert.IsNotNull(image.Width);
-        Assert.IsNotNull(image.Height);
-        Assert.AreEqual(image.PixelWidth, expectedPixelWidth);
-        Assert.AreEqual(image.PixelHeight, expectedPixelHeight);
+        Assert.AreEqual(expectedPixelWidth, image.Width);
+        Assert.AreEqual(expectedPixelHeight, image.Height);
+        Assert.AreEqual(expectedPixelWidth, image.PixelWidth);
+        Assert.AreEqual(expectedPixelHeight, image.PixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
@@ -318,12 +324,12 @@ public class StorageServiceTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
-    [TestCase(Rotation.Rotate0)]
-    [TestCase(Rotation.Rotate90)]
-    [TestCase(Rotation.Rotate180)]
-    [TestCase(Rotation.Rotate270)]
-    [TestCase(null)]
-    public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation)
+    [TestCase(Rotation.Rotate0, 1280, 720)]
+    [TestCase(Rotation.Rotate90, 720, 1280)]
+    [TestCase(Rotation.Rotate180, 1280, 720)]
+    [TestCase(Rotation.Rotate270, 720, 1280)]
+    [TestCase(null, 1280, 720)]
+    public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith, int expectedHeight)
     {
         string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
 
@@ -332,8 +338,12 @@ public class StorageServiceTests
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
         Assert.AreEqual(rotation, image.Rotation);
-        Assert.IsNotNull(image.Width);
-        Assert.IsNotNull(image.Height);
+        Assert.AreEqual(expectedWith, image.Width);
+        Assert.AreEqual(expectedHeight, image.Height);
+        Assert.AreEqual(expectedWith, image.PixelWidth);
+        Assert.AreEqual(expectedHeight, image.PixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
@@ -348,8 +358,8 @@ public class StorageServiceTests
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
         Assert.AreEqual(Rotation.Rotate0, image.Rotation);
-        Assert.IsNotNull(image.DecodePixelWidth);
-        Assert.IsNotNull(image.DecodePixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
@@ -364,8 +374,8 @@ public class StorageServiceTests
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
         Assert.AreEqual(Rotation.Rotate0, image.Rotation);
-        Assert.IsNotNull(image.DecodePixelWidth);
-        Assert.IsNotNull(image.DecodePixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
@@ -409,12 +419,12 @@ public class StorageServiceTests
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
         Assert.AreEqual(Rotation.Rotate0, image.Rotation); // Rotate0 because the BitmapImage (default rotation 0) is created from a MagickImage (containing the right rotation)
-        Assert.IsNotNull(image.Width);
-        Assert.IsNotNull(image.Height);
-        Assert.IsNotNull(image.DecodePixelWidth);
-        Assert.IsNotNull(image.DecodePixelHeight);
-        Assert.AreEqual(image.PixelWidth, expectedPixelWidth);
-        Assert.AreEqual(image.PixelHeight, expectedPixelHeight);
+        Assert.AreEqual(expectedPixelWidth, image.Width);
+        Assert.AreEqual(expectedPixelHeight, image.Height);
+        Assert.AreEqual(expectedPixelWidth, image.PixelWidth);
+        Assert.AreEqual(expectedPixelHeight, image.PixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
@@ -452,9 +462,9 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
@@ -469,33 +479,32 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    [TestCase(Rotation.Rotate0, 100, 100)]
-    [TestCase(Rotation.Rotate90, 100, 100)]
-    [TestCase(Rotation.Rotate180, 100, 100)]
-    [TestCase(Rotation.Rotate270, 100, 100)]
-    [TestCase(null, 100, 100)]
-    [TestCase(Rotation.Rotate90, 10000, 100)]
-    [TestCase(Rotation.Rotate90, 100, 10000)]
-    [TestCase(Rotation.Rotate90, 0, 10000)]
-    [TestCase(Rotation.Rotate90, 100, 0)]
-    [TestCase(Rotation.Rotate90, 0, 0)]
-    [TestCase(null, 100, 100)]
-    [TestCase(Rotation.Rotate90, null, 100)]
-    [TestCase(Rotation.Rotate90, 100, null)]
-    [TestCase(Rotation.Rotate90, null, null)]
-    [TestCase(Rotation.Rotate0, 1000000, 100)]
-    [TestCase(Rotation.Rotate0, 100, 1000000)]
-    [TestCase(null, 100, null)]
-    [TestCase(null, null, 100)]
-    [TestCase(null, null, null)]
-    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int width, int height)
+    [TestCase(Rotation.Rotate0, 100, 100, 75, 100)]
+    [TestCase(Rotation.Rotate90, 100, 100, 100, 75)]
+    [TestCase(Rotation.Rotate180, 100, 100, 75, 100)]
+    [TestCase(Rotation.Rotate270, 100, 100, 100, 75)]
+    [TestCase(Rotation.Rotate90, 10000, 100, 133, 100)]
+    [TestCase(Rotation.Rotate90, 100, 10000, 100, 75)]
+    [TestCase(Rotation.Rotate90, 0, 10000, 13333, 10000)]
+    [TestCase(Rotation.Rotate90, 100, 0, 100, 75)]
+    [TestCase(Rotation.Rotate90, 0, 0, 1, 1)]
+    [TestCase(null, 100, 100, 75, 100)]
+    [TestCase(Rotation.Rotate90, null, 100, 133, 100)]
+    [TestCase(Rotation.Rotate90, 100, null, 100, 75)]
+    [TestCase(Rotation.Rotate90, null, null, 1, 1)]
+    [TestCase(Rotation.Rotate0, 1000000, 100, 75, 100)]
+    [TestCase(Rotation.Rotate0, 100, 1000000, 100, 133)]
+    [TestCase(null, 100, null, 100, 133)]
+    [TestCase(null, null, 100, 75, 100)]
+    [TestCase(null, null, null, 1, 1)]
+    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int width, int height, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -505,10 +514,12 @@ public class StorageServiceTests
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
         Assert.AreEqual(Rotation.Rotate0, image.Rotation); // Rotate0 because the BitmapImage (default rotation 0) is created from a MagickImage (containing the right rotation)
-        Assert.IsNotNull(image.Width);
-        Assert.IsNotNull(image.Height);
-        Assert.IsNotNull(image.DecodePixelWidth);
-        Assert.IsNotNull(image.DecodePixelHeight);
+        Assert.AreEqual(expectedWidth, image.Width);
+        Assert.AreEqual(expectedHeight, image.Height);
+        Assert.AreEqual(expectedWidth, image.PixelWidth);
+        Assert.AreEqual(expectedHeight, image.PixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
@@ -539,9 +550,9 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
@@ -579,9 +590,9 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
@@ -596,19 +607,19 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    [TestCase(Rotation.Rotate0)]
-    [TestCase(Rotation.Rotate90)]
-    [TestCase(Rotation.Rotate180)]
-    [TestCase(Rotation.Rotate270)]
-    [TestCase(null)]
-    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotation_ReturnsBitmapImage(Rotation rotation)
+    [TestCase(Rotation.Rotate0, 3024, 4032)]
+    [TestCase(Rotation.Rotate90, 3024, 4032)]
+    [TestCase(Rotation.Rotate180, 3024, 4032)]
+    [TestCase(Rotation.Rotate270, 3024, 4032)]
+    [TestCase(null, 3024, 4032)]
+    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
 
@@ -617,10 +628,12 @@ public class StorageServiceTests
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
         Assert.AreEqual(rotation, image.Rotation);
-        Assert.IsNotNull(image.Width);
-        Assert.IsNotNull(image.Height);
-        Assert.IsNotNull(image.DecodePixelWidth);
-        Assert.IsNotNull(image.DecodePixelHeight);
+        Assert.AreEqual(expectedWidth, image.Width);
+        Assert.AreEqual(expectedHeight, image.Height);
+        Assert.AreEqual(expectedWidth, image.PixelWidth);
+        Assert.AreEqual(expectedHeight, image.PixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
@@ -635,8 +648,8 @@ public class StorageServiceTests
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
         Assert.AreEqual(Rotation.Rotate0, image.Rotation);
-        Assert.IsNotNull(image.DecodePixelWidth);
-        Assert.IsNotNull(image.DecodePixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
@@ -650,9 +663,9 @@ public class StorageServiceTests
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
+        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
     }
 
     [Test]
