@@ -494,7 +494,7 @@ public class AssetRepository : IAssetRepository
         folders = ReadFolders();
         syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
         recentTargetPaths = ReadRecentTargetPaths();
-        assets.ForEach(a => a.Folder = GetFolderById(a.FolderId) ?? new Folder());
+        assets.ForEach(a => a.Folder = GetFolderById(a.FolderId) ?? new() { Path = Path.Combine("FolderNotFound", a.FolderId.ToString(), a.FileName) });
     }
 
     private List<Folder> ReadFolders()

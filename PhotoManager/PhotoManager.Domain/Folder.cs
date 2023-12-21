@@ -3,8 +3,8 @@
 public class Folder
 {
     // TODO: FolderId not null -> when a new -> new guid
-    public Guid FolderId { get; set; }
-    public string Path { get; set; }
+    public Guid FolderId { get; set; } // TODO: Rename to Id
+    public required string Path { get; set; }
     public string ThumbnailsFilename => FolderId + ".bin"; // TODO: BlobFileName instead -> rename all methods like this
 
     public string Name
@@ -12,7 +12,7 @@ public class Folder
         get
         {
             string[] pathParts = Path.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            string result = pathParts[pathParts.Length - 1];
+            string result = pathParts[^1];
 
             return result;
         }

@@ -95,7 +95,7 @@ public class FolderConfigsTests
     {
         Folder folder = new()
         {
-            FolderId = folderId
+            Path = "Path\\SubPath"
         };
 
         object[] result = new object[2];
@@ -104,8 +104,8 @@ public class FolderConfigsTests
             result[i] = FolderConfigs.WriteFunc(folder, i);
         }
 
-        Assert.AreEqual(folderId, result[0]);
-        Assert.AreEqual(null, result[1]);
+        Assert.AreEqual(Guid.Empty, result[0]);
+        Assert.AreEqual("Path\\SubPath", result[1]);
     }
 
     [Test]

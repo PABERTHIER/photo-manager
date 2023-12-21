@@ -46,7 +46,7 @@ public class FolderTests
     [Test]
     public void IsParentOf_PathIsNull_ReturnsFalse()
     {
-        Folder folder = new();
+        Folder folder = new() { Path = null! };
         Folder childFolder = new() { Path = Path.Combine(dataDirectory!, "TestFolder") };
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);
@@ -55,10 +55,10 @@ public class FolderTests
     }
 
     [Test]
-    public void IsParentOf_ParentPathIsNull_ReturnsFalse()
+    public void IsParentOf_ChildPathIsNull_ReturnsFalse()
     {
         Folder folder = new() { Path = dataDirectory! };
-        Folder childFolder = new();
+        Folder childFolder = new() { Path = null! };
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);
 

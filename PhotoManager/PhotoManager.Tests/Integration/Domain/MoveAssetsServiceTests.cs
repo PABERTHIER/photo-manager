@@ -1277,7 +1277,7 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset[] assets = new Asset[] { new Asset { Folder = new() } };
+            Asset[] assets = new Asset[] { new() { Folder = new() { Path = dataDirectory! } } };
 
             Folder? destinationFolder = null;
 

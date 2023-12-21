@@ -142,8 +142,8 @@ public class AssetRepositoryAddFolderTests
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
             string folderPath2 = Path.Combine(dataDirectory!, "TestFolder2");
 
-            Folder addedFolder1 = new();
-            Folder addedFolder2 = new();
+            Folder addedFolder1 = new() { Path = dataDirectory! };
+            Folder addedFolder2 = new() { Path = dataDirectory! };
 
             // Simulate concurrent access
             Parallel.Invoke(
