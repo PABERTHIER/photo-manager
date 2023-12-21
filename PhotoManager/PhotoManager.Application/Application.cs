@@ -70,7 +70,9 @@ public class Application : IApplication
 
     public void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration)
     {
-        syncConfiguration.Validate();
+        // TODO: transform to fluent to have syncConfiguration.Validate().Normalize(); -> Needs SyncAssetsConfiguration : ISyncAssetsConfiguration
+        // When tested here, update SyncAssetsConfiguration and Create ISyncAssetsConfiguration
+        syncConfiguration.Validate(); // syncConfiguration.Validate().Normalize();
         syncConfiguration.Normalize();
         _assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
         _assetRepository.SaveCatalog(null);

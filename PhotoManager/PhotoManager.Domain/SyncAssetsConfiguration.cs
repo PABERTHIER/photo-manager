@@ -4,20 +4,23 @@ public class SyncAssetsConfiguration
 {
     public SyncAssetsConfiguration()
     {
-        Definitions = new List<SyncAssetsDirectoriesDefinition>();
+        Definitions = [];
     }
 
     public List<SyncAssetsDirectoriesDefinition> Definitions { get; }
 
-    public void Validate()
+    // TODO: transform to fluent to have syncConfiguration.Validate().Normalize()
+    public void Validate() // ISyncAssetsConfiguration Validate();
     {
-        var validDefinitions = Definitions.Where(d => d.IsValid()).ToList();
-        Definitions.Clear();
-        Definitions.AddRange(validDefinitions);
+        Definitions.RemoveAll(d => !d.IsValid());
+
+        // return this;
     }
 
-    public void Normalize()
+    public void Normalize() // ISyncAssetsConfiguration Normalize()
     {
         Definitions.ForEach(d => d.Normalize());
+
+        // return this;
     }
 }

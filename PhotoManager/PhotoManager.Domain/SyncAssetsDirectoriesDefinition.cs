@@ -2,13 +2,10 @@
 
 namespace PhotoManager.Domain;
 
-public class SyncAssetsDirectoriesDefinition
+public partial class SyncAssetsDirectoriesDefinition
 {
-    private const string LOCAL_PATH_PATTERN = "^([A-Za-z])(:)(\\[A-Za-z0-9]*)*";
-    private const string REMOTE_PATH_PATTERN = "^(\\\\)(\\[A-Za-z0-9]*)*";
-
-    public string SourceDirectory { get; set; }
-    public string DestinationDirectory { get; set; }
+    public required string SourceDirectory { get; set; }
+    public required string DestinationDirectory { get; set; }
     public bool IncludeSubFolders { get; set; }
     public bool DeleteAssetsNotInSource { get; set; }
 
@@ -18,28 +15,37 @@ public class SyncAssetsDirectoriesDefinition
             && (IsValidLocalPath(DestinationDirectory) || IsValidRemotePath(DestinationDirectory));
     }
 
-    private bool IsValidLocalPath(string directory)
-    {
-        Regex regex = new(LOCAL_PATH_PATTERN);
-        return regex.IsMatch(directory);
-    }
-
-    private bool IsValidRemotePath(string directory)
-    {
-        Regex regex = new(REMOTE_PATH_PATTERN);
-        return regex.IsMatch(directory);
-    }
-
     internal void Normalize()
     {
-        bool isRemote = IsValidRemotePath(SourceDirectory);
-        string[] parts = SourceDirectory.Split('\\', StringSplitOptions.RemoveEmptyEntries);
-        SourceDirectory = string.Join('\\', parts);
-        SourceDirectory = isRemote ? @"\\" + SourceDirectory : SourceDirectory;
-
-        isRemote = IsValidRemotePath(DestinationDirectory);
-        parts = DestinationDirectory.Split('\\', StringSplitOptions.RemoveEmptyEntries);
-        DestinationDirectory = string.Join('\\', parts);
-        DestinationDirectory = isRemote ? @"\\" + DestinationDirectory : DestinationDirectory;
+        SourceDirectory = NormalizeDirectory(SourceDirectory);
+        DestinationDirectory = NormalizeDirectory(DestinationDirectory);
     }
+
+    private string NormalizeDirectory(string directory)
+    {
+        bool isRemote = IsValidRemotePath(directory);
+        string[] parts = directory.Split('\\', StringSplitOptions.RemoveEmptyEntries);
+        string normalizedDirectory = Path.Combine(parts);
+        normalizedDirectory = isRemote ? "\\" + normalizedDirectory : normalizedDirectory;
+
+        return normalizedDirectory;
+    }
+
+    private static bool IsValidLocalPath(string directory)
+    {
+        Regex regex = LocalPathRegex();
+        return regex.IsMatch(directory);
+    }
+
+    private static bool IsValidRemotePath(string directory)
+    {
+        Regex regex = RemotePathRegex();
+        return regex.IsMatch(directory);
+    }
+
+    [GeneratedRegex("^([A-Za-z])(:)(\\[A-Za-z0-9]*)*")]
+    private static partial Regex LocalPathRegex();
+
+    [GeneratedRegex("^(\\\\)(\\[A-Za-z0-9]*)*")]
+    private static partial Regex RemotePathRegex();
 }

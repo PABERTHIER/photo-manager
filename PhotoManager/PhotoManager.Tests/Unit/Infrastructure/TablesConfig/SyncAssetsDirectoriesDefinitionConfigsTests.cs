@@ -124,6 +124,7 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
         SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = new()
         {
             SourceDirectory = "D:\\source\\newFolder",
+            DestinationDirectory = "D:\\destination\\newFolder",
             DeleteAssetsNotInSource = false
         };
 
@@ -134,7 +135,7 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
         }
 
         Assert.AreEqual("D:\\source\\newFolder", result[0]);
-        Assert.AreEqual(null, result[1]);
+        Assert.AreEqual("D:\\destination\\newFolder", result[1]);
         Assert.AreEqual(false, result[2]);
         Assert.AreEqual(false, result[3]);
     }
