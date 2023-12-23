@@ -23,16 +23,16 @@ public static class VideoHelper
     {
         return fileName.ToLowerInvariant() switch
         {
-            string s when s.EndsWith(".mov") => true,
-            string s when s.EndsWith(".avi") => true,
-            string s when s.EndsWith(".av1") => true,
-            string s when s.EndsWith(".mp4") => true,
             string s when s.EndsWith(".3g2") => true,
             string s when s.EndsWith(".3gp") => true,
             string s when s.EndsWith(".asf") => true,
+            string s when s.EndsWith(".av1") => true,
+            string s when s.EndsWith(".avi") => true,
             string s when s.EndsWith(".flv") => true,
             string s when s.EndsWith(".m4v") => true,
             string s when s.EndsWith(".mkv") => true,
+            string s when s.EndsWith(".mov") => true,
+            string s when s.EndsWith(".mp4") => true,
             string s when s.EndsWith(".mpeg") => true,
             string s when s.EndsWith(".mpg") => true,
             string s when s.EndsWith(".ogv") => true,
