@@ -13,11 +13,7 @@ public class DirectoryComparerTests
     public void OneTimeSetup()
     {
         _configurationRootMock = new Mock<IConfigurationRoot>();
-        _configurationRootMock
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "5")
-            .MockGetValue("appsettings:BackupsToKeep", "2")
-            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
+        _configurationRootMock.GetDefaultMockConfig();
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         _storageService = new StorageService(userConfigurationService);

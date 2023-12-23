@@ -67,9 +67,10 @@ public partial class App : System.Windows.Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        IConfigurationBuilder builder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+        string? baseDirectory = AppDomain.CurrentDomain.BaseDirectory; // TODO: Needed ?
+        string configFilePath = Path.Combine(baseDirectory, "appsettings.json");
 
+        IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile(configFilePath, optional: false, reloadOnChange: true);
         IConfigurationRoot configuration = builder.Build();
 
         // TODO: group by module
@@ -94,7 +95,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<ApplicationViewModel>();
     }
 
-    // TODO: if needeed to test the regiters: here is the sample for database, need to be completed
+    // TODO: if needeed to test the registers: here is the sample for database, need to be completed
     //[TestMethod]
     //public void AddDatabaseServices_AddsAllRequiredServices()
     //{

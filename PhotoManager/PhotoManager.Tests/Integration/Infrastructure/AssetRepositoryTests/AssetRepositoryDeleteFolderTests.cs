@@ -11,8 +11,8 @@ public class AssetRepositoryDeleteFolderTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
 
-    private Mock<IStorageService>? _storageService;
-    private Mock<IConfigurationRoot>? _configurationRoot;
+    private Mock<IStorageService>? _storageServiceMock;
+    private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? asset1;
 
@@ -22,23 +22,19 @@ public class AssetRepositoryDeleteFolderTests
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
 
-        _configurationRoot = new Mock<IConfigurationRoot>();
-        _configurationRoot
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "5")
-            .MockGetValue("appsettings:BackupsToKeep", "2")
-            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
+        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock.GetDefaultMockConfig();
 
-        _storageService = new Mock<IStorageService>();
-        _storageService!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);
+        _storageServiceMock = new Mock<IStorageService>();
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);
     }
 
     [SetUp]
     public void Setup()
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRoot!.Object);
-        _testableAssetRepository = new(_database, _storageService!.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _testableAssetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
 
         asset1 = new()
         {

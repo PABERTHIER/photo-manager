@@ -11,8 +11,8 @@ public class AssetRepositoryGetAssetsByPathTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
 
-    private Mock<IStorageService>? _storageService;
-    private Mock<IConfigurationRoot>? _configurationRoot;
+    private Mock<IStorageService>? _storageServiceMock;
+    private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? asset1;
     private Asset? asset2;
@@ -24,25 +24,21 @@ public class AssetRepositoryGetAssetsByPathTests
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
 
-        _configurationRoot = new Mock<IConfigurationRoot>();
-        _configurationRoot
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "5")
-            .MockGetValue("appsettings:BackupsToKeep", "2")
-            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
+        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock.GetDefaultMockConfig();
     }
 
     [SetUp]
     public void Setup()
     {
-        _storageService = new Mock<IStorageService>();
-        _storageService!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
-        _storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
-        _storageService.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
+        _storageServiceMock = new Mock<IStorageService>();
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
+        _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        _storageServiceMock.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRoot!.Object);
-        _testableAssetRepository = new TestableAssetRepository(_database, _storageService!.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _testableAssetRepository = new TestableAssetRepository(_database, _storageServiceMock!.Object, userConfigurationService);
 
         asset1 = new()
         {
@@ -159,8 +155,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(asset2!.FileName, assets1[1].FileName);
             Assert.AreEqual(asset3!.FileName, assets2[0].FileName);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Exactly(3));
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Exactly(3));
         }
         finally
         {
@@ -177,7 +173,7 @@ public class AssetRepositoryGetAssetsByPathTests
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
         storageService.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
 
-        UserConfigurationService userConfigurationService = new(_configurationRoot!.Object);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         TestableAssetRepository testableAssetRepository = new(_database!, storageService!.Object, userConfigurationService);
 
         try
@@ -272,8 +268,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(1, assets1.Length);
             Assert.AreEqual(asset1.FileName, assets1[0].FileName);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Once);
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Once);
         }
         finally
         {
@@ -318,8 +314,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(1, assets1.Length);
             Assert.AreEqual(asset1.FileName, assets1[0].FileName);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Once);
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Once);
         }
         finally
         {
@@ -349,8 +345,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(thumbnails);
             Assert.IsEmpty(assets);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
         }
         finally
         {
@@ -393,8 +389,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.IsEmpty(assets);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
         }
         finally
         {
@@ -426,8 +422,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.IsEmpty(assets);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
         }
         finally
         {
@@ -471,8 +467,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.IsEmpty(assets);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
         }
         finally
         {
@@ -499,8 +495,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(thumbnails);
             Assert.IsEmpty(assets);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
         }
         finally
         {
@@ -542,8 +538,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
             Assert.IsEmpty(assets1);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
         }
         finally
         {
@@ -559,7 +555,7 @@ public class AssetRepositoryGetAssetsByPathTests
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
         storageService.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
 
-        UserConfigurationService userConfigurationService = new(_configurationRoot!.Object);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         TestableAssetRepository testableAssetRepository = new(_database!, storageService!.Object, userConfigurationService);
 
         try
@@ -682,8 +678,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(asset2!.FileName, assets1[1].FileName);
             Assert.AreEqual(asset3!.FileName, assets2[0].FileName);
 
-            _storageService!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
-            _storageService!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Exactly(3));
+            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
+            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Exactly(3));
         }
         finally
         {

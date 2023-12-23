@@ -14,7 +14,7 @@ public class StorageServiceTests
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock.MockGetValue("appsettings:CatalogBatchSize", "100");
+        configurationMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, "100");
 
         _storageService = new StorageService(new UserConfigurationService(configurationMock.Object));
     }

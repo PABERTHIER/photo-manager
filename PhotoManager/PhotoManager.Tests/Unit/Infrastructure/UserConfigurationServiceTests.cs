@@ -16,12 +16,15 @@ public class UserConfigurationServiceTests
 
         Mock<IConfigurationRoot> configurationMock = new();
         configurationMock
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "5")
-            .MockGetValue("appsettings:BackupsToKeep", "2")
-            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
+            .MockGetValue(UserConfigurationKeys.ANALYZE_VIDEOS, "false")
+            .MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, "100")
+            .MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES, "5")
+            .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "2")
+            .MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "5");
 
         _userConfigurationService = new UserConfigurationService(configurationMock.Object);
+
+        // TODO: Do not mock, add the file in the Test files and read it !!
     }
 
     [Test]
@@ -68,6 +71,14 @@ public class UserConfigurationServiceTests
 
         Assert.AreNotEqual("PhotoManager", aboutInformation.Product);
         Assert.AreEqual("v1.0.0", aboutInformation.Version);
+    }
+
+    [Test]
+    public void GetAnalyseVideos_CorrectValue_ReturnsAnalyseVideos()
+    {
+        bool analyseVideos = _userConfigurationService!.GetAnalyseVideos();
+
+        Assert.IsFalse(analyseVideos);
     }
 
     [Test]

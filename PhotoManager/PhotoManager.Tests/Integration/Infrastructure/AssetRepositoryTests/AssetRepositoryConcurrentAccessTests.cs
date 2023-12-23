@@ -11,8 +11,8 @@ public class AssetRepositoryConcurrentAccessTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
 
-    private Mock<IStorageService>? _storageService;
-    private Mock<IConfigurationRoot>? _configurationRoot;
+    private Mock<IStorageService>? _storageServiceMock;
+    private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? asset1;
     private Asset? asset2;
@@ -24,25 +24,21 @@ public class AssetRepositoryConcurrentAccessTests
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
 
-        _configurationRoot = new Mock<IConfigurationRoot>();
-        _configurationRoot
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "5")
-            .MockGetValue("appsettings:BackupsToKeep", "2")
-            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
+        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock.GetDefaultMockConfig();
 
-        _storageService = new Mock<IStorageService>();
-        _storageService!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);
-        _storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
-        _storageService.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
+        _storageServiceMock = new Mock<IStorageService>();
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);
+        _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        _storageServiceMock.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
     }
 
     [SetUp]
     public void Setup()
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRoot!.Object);
-        _testableAssetRepository = new TestableAssetRepository(_database, _storageService!.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _testableAssetRepository = new TestableAssetRepository(_database, _storageServiceMock!.Object, userConfigurationService);
 
         asset1 = new()
         {

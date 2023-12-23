@@ -10,20 +10,20 @@ public class ConfigurationMockExtensionsTests
     {
         Mock<IConfigurationRoot> configurationMock = new();
         configurationMock
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "2")
-            .MockGetValue("appsettings:BackupsToKeep", "2")
-            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5")
-            .MockGetValue("appsettings:Repository.Owner", "toto")
-            .MockGetValue("appsettings:Repository.Name", "photo-manager");
+            .MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, "100")
+            .MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES, "2")
+            .MockGetValue(UserConfigurationKeys.PROJECT_NAME, "photo-manager")
+            .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, "toto")
+            .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "2")
+            .MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "5");
 
         IConfigurationRoot configuration = configurationMock.Object;
 
-        Assert.AreEqual("100", configuration.GetValue<string>("appsettings:CatalogBatchSize"));
-        Assert.AreEqual("2", configuration.GetValue<string>("appsettings:CatalogCooldownMinutes"));
-        Assert.AreEqual("2", configuration.GetValue<string>("appsettings:BackupsToKeep"));
-        Assert.AreEqual("5", configuration.GetValue<string>("appsettings:ThumbnailsDictionaryEntriesToKeep"));
-        Assert.AreEqual("toto", configuration.GetValue<string>("appsettings:Repository.Owner"));
-        Assert.AreEqual("photo-manager", configuration.GetValue<string>("appsettings:Repository.Name"));
+        Assert.AreEqual(100, configuration.GetValue<int>(UserConfigurationKeys.CATALOG_BATCH_SIZE));
+        Assert.AreEqual(2, configuration.GetValue<int>(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES));
+        Assert.AreEqual("photo-manager", configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME));
+        Assert.AreEqual("toto", configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER));
+        Assert.AreEqual(2, configuration.GetValue<int>(UserConfigurationKeys.BACKUPS_TO_KEEP));
+        Assert.AreEqual(5, configuration.GetValue<int>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP));
     }
 }

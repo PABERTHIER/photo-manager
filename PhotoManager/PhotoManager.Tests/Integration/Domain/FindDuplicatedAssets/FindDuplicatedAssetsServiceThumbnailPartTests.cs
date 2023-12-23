@@ -78,11 +78,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         backupPath = Path.Combine(dataDirectory, backupEndPath);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
-        _configurationRootMock
-            .MockGetValue("appsettings:CatalogBatchSize", "100")
-            .MockGetValue("appsettings:CatalogCooldownMinutes", "5")
-            .MockGetValue("appsettings:BackupsToKeep", "2")
-            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
+        _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);

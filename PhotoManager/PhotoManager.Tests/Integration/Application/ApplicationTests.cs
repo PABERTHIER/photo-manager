@@ -11,19 +11,20 @@
 //    private readonly string dataDirectory;
 //    private readonly IConfigurationRoot _configuration;
 
-//    public ApplicationTests()
-//    {
-//        dataDirectory = Path.GetDirectoryName(typeof(ApplicationTests).Assembly.Location);
-//        dataDirectory = Path.Combine(dataDirectory, "TestFiles");
+//public ApplicationTests()
+//{
+//    dataDirectory = Path.GetDirectoryName(typeof(ApplicationTests).Assembly.Location);
+//    dataDirectory = Path.Combine(dataDirectory, "TestFiles");
 
-//        Mock<IConfigurationRoot> configurationMock = new();
-//        configurationMock
-//            .MockGetValue("appsettings:CatalogBatchSize", "100")
-//            .MockGetValue("appsettings:BackupsToKeep", "2")
-//            .MockGetValue("appsettings:ThumbnailsDictionaryEntriesToKeep", "5");
+//    Mock<IConfigurationRoot> configurationMock = new();
+//    configurationMock
+//        .MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, "100")
+//        .MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES, "5")
+//        .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "2")
+//        .MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "5");
 
-//        _configuration = configurationMock.Object;
-//    }
+//    _configuration = configurationMock.Object;
+//}
 
 //    [Test]
 //    public void GetDuplicatedAssets_WithDuplicates_ReturnArray()

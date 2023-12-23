@@ -11,10 +11,6 @@ public class UserConfigurationService : IUserConfigurationService
     private const int SPI_SETDESKWALLPAPER = 20;
     private const int SPIF_UPDATEINIFILE = 0x01;
     private const int SPIF_SENDWININICHANGE = 0x02;
-    private const string CATALOG_BATCH_SIZE_KEY = "appsettings:CatalogBatchSize";
-    private const string CATALOG_COOLDOWN_MINUTES = "appsettings:CatalogCooldownMinutes";
-    private const string BACKUPS_TO_KEEP = "appsettings:BackupsToKeep";
-    private const string THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP = "appsettings:ThumbnailsDictionaryEntriesToKeep";
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
@@ -95,6 +91,13 @@ public class UserConfigurationService : IUserConfigurationService
         return aboutInformation;
     }
 
+    // TODO: Reorder
+
+    public bool GetAnalyseVideos()
+    {
+        return _configuration.GetValue<bool>(UserConfigurationKeys.ANALYZE_VIDEOS);
+    }
+
     public string GetPicturesDirectory()
     {
         return PathConstants.PathLocation; // old appsettings:InitialDirectory
@@ -107,22 +110,22 @@ public class UserConfigurationService : IUserConfigurationService
 
     public int GetCatalogBatchSize()
     {
-        return _configuration.GetValue<int>(CATALOG_BATCH_SIZE_KEY);
+        return _configuration.GetValue<int>(UserConfigurationKeys.CATALOG_BATCH_SIZE);
     }
 
     public int GetCatalogCooldownMinutes()
     {
-        return _configuration.GetValue<int>(CATALOG_COOLDOWN_MINUTES);
+        return _configuration.GetValue<int>(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES);
     }
 
     public int GetBackupsToKeep()
     {
-        return _configuration.GetValue<int>(BACKUPS_TO_KEEP);
+        return _configuration.GetValue<int>(UserConfigurationKeys.BACKUPS_TO_KEEP);
     }
 
     public int GetThumbnailsDictionaryEntriesToKeep()
     {
-        return _configuration.GetValue<int>(THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
+        return _configuration.GetValue<int>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
     }
 
     public string[] GetRootCatalogFolderPaths()
