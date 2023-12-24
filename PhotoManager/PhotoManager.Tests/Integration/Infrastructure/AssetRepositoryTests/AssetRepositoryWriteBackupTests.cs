@@ -65,11 +65,8 @@ public class AssetRepositoryWriteBackupTests
         try
         {
             Mock<IConfigurationRoot> configurationRoot = new();
-            configurationRoot
-                .MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, "100")
-                .MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES, "5")
-                .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "0") // 0 backups, so that, the new created is directly deleted 
-                .MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "5");
+            configurationRoot.GetDefaultMockConfig();
+            configurationRoot.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "0"); // 0 backups, so that, the new created is directly deleted
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
             UserConfigurationService userConfigurationService = new(configurationRoot.Object);

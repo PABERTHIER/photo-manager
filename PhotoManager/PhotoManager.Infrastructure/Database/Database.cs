@@ -155,7 +155,7 @@ public class Database : IDatabase
         return File.Exists(backupFilePath);
     }
 
-    public void DeleteOldBackups(int backupsToKeep)
+    public void DeleteOldBackups(ushort backupsToKeep)
     {
         string[] filesPaths = _backupStorage.GetBackupFilesPaths(BackupsDirectory);
         filesPaths = filesPaths.OrderBy(f => f).ToArray();

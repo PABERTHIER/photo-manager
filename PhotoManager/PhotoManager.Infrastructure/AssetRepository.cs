@@ -216,7 +216,7 @@ public class AssetRepository : IAssetRepository
         {
             if (_database.WriteBackup(DateTime.Now.Date))
             {
-                _database.DeleteOldBackups(_userConfigurationService.GetBackupsToKeep());
+                _database.DeleteOldBackups(_userConfigurationService.StorageSettings.BackupsToKeep);
             }
         }
     }
@@ -460,7 +460,7 @@ public class AssetRepository : IAssetRepository
 
     private void InitializeDatabase()
     {
-        char separatorChar = AssetConstants.Separator.ToCharArray().First();
+        char separatorChar = AssetConstants.Separator.ToCharArray().First(); // (char)_userConfigurationService.StorageSettings.Separator!;
         _database.Initialize(dataDirectory, separatorChar);
 
         _database.SetDataTableProperties(new DataTableProperties
@@ -565,7 +565,7 @@ public class AssetRepository : IAssetRepository
             return;
         }
 
-        int entriesToKeep = _userConfigurationService.GetThumbnailsDictionaryEntriesToKeep();
+        ushort entriesToKeep = _userConfigurationService.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
 
         if (!recentThumbnailsQueue.Contains(folder.Path))
         {

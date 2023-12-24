@@ -12,6 +12,7 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="appsettings.json" />
     <None Remove="TestFiles\Homer.gif" />
     <None Remove="TestFiles\Homer.mp4" />
     <None Remove="TestFiles\Homer1s.mp4" />
@@ -81,6 +82,9 @@
     <None Remove="TestFiles\TestFolder\TestSubFolder2\TestSubFolder3\EmptyFile.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TestFiles\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestFiles\Homer.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

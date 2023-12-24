@@ -35,6 +35,7 @@ public partial class MainWindow : Window
 
     public static MainWindow Current { get; private set; }
 
+    // TODO: Refacto about to get it only once
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
     {
         try
@@ -45,7 +46,7 @@ public partial class MainWindow : Window
 
             _application = application;
             var aboutInformation = application.GetAboutInformation(GetType().Assembly);
-            viewModel.Product = aboutInformation.Product;
+            viewModel.Product = aboutInformation.Product; // TODO: Add Author here and above
             viewModel.Version = aboutInformation.Version;
             DataContext = viewModel;
         }
@@ -299,7 +300,7 @@ public partial class MainWindow : Window
         try
         {
             var about = _application.GetAboutInformation(GetType().Assembly);
-            AboutWindow duplicatedAssetsWindow = new(about);
+            AboutWindow duplicatedAssetsWindow = new(about);  // TODO: Add Author above
             duplicatedAssetsWindow.ShowDialog();
         }
         catch (Exception ex)
@@ -470,7 +471,7 @@ public partial class MainWindow : Window
         // Disabling infinite loop to prevent reduced perfs
         if (AssetConstants.SyncAssetsEveryXMinutes)
         {
-            int minutes = ViewModel.GetCatalogCooldownMinutes();
+            ushort minutes = ViewModel.GetCatalogCooldownMinutes();
 
             while (true)
             {

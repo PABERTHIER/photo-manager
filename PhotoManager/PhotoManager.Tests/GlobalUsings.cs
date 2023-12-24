@@ -10,6 +10,7 @@ global using PhotoManager.Common;
 global using PhotoManager.Constants;
 global using PhotoManager.Domain;
 global using PhotoManager.Domain.Interfaces;
+global using PhotoManager.Domain.UserConfigurationSettings;
 global using PhotoManager.Infrastructure;
 global using PhotoManager.Infrastructure.Database;
 global using PhotoManager.Infrastructure.Database.Storage;

@@ -15,5 +15,5 @@ public interface IDatabase
     void DeleteThumbnails(string blobName);
     bool WriteBackup(DateTime backupDate);
     bool BackupExists(DateTime backupDate);
-    void DeleteOldBackups(int backupsToKeep);
+    void DeleteOldBackups(ushort backupsToKeep);
 }

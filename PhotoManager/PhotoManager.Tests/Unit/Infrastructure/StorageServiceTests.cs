@@ -14,7 +14,7 @@ public class StorageServiceTests
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, "100");
+        configurationMock.GetDefaultMockConfig();
 
         _storageService = new StorageService(new UserConfigurationService(configurationMock.Object));
     }
@@ -25,7 +25,7 @@ public class StorageServiceTests
     [TestCase(2.0, "v2.0")]
     public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(double storageVersion, string storageVersionPath)
     {
-        string expected = Path.Combine(PathConstants.PathBackup, storageVersionPath);
+        string expected = Path.Combine(PathConstants.BackupPath, storageVersionPath);
 
         string result = _storageService!.ResolveDataDirectory(storageVersion);
 

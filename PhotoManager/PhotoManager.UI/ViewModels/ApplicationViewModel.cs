@@ -487,7 +487,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) => await Application.CatalogAssetsAsync(callback, token);
 
-    public int GetCatalogCooldownMinutes() => Application.GetCatalogCooldownMinutes();
+    public ushort GetCatalogCooldownMinutes() => Application.GetCatalogCooldownMinutes();
 
     public Folder[] GetRootCatalogFolders() => Application.GetRootCatalogFolders();
 

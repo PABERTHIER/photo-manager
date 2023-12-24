@@ -177,11 +177,8 @@ public class AssetRepositoryContainsThumbnailTests
     public void ContainsThumbnail_FolderDoesNotExistAndThumbnailsDictionaryEntriesToKeepIs0_ReturnsFalse()
     {
         Mock<IConfigurationRoot> configurationRoot = new();
-        configurationRoot
-            .MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, "100")
-            .MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES, "5")
-            .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "2")
-            .MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
+        configurationRoot.GetDefaultMockConfig();
+        configurationRoot.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
         UserConfigurationService userConfigurationService = new(configurationRoot!.Object);
         TestableAssetRepository testableAssetRepository = new (_database!, _storageServiceMock!.Object, userConfigurationService);

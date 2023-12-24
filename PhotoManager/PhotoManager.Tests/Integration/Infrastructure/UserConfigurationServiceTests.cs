@@ -1,20 +1,50 @@
 ﻿using Microsoft.Extensions.Configuration;
 using PhotoManager.UI;
 
-namespace PhotoManager.Tests.Unit.Infrastructure;
+namespace PhotoManager.Tests.Integration.Infrastructure;
 
 [TestFixture]
 public class UserConfigurationServiceTests
 {
+    private string? dataDirectory;
     private IUserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock.GetDefaultMockConfig();
+        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        string configFilePath = Path.Combine(dataDirectory, "appsettings.json");
 
-        _userConfigurationService = new UserConfigurationService(configurationMock.Object);
+        IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile(configFilePath, optional: false, reloadOnChange: true);
+        IConfigurationRoot configuration = builder.Build();
+
+        _userConfigurationService = new UserConfigurationService(configuration);
+    }
+
+    [Test]
+    [Ignore("Tests ignored to prevent effects on the client computer")]
+    [TestCase(WallpaperStyle.Fit, "6", "0")]
+    [TestCase(WallpaperStyle.Stretch, "2", "0")]
+    [TestCase(WallpaperStyle.Tile, "0", "1")]
+    [TestCase(WallpaperStyle.Center, "0", "0")]
+    [TestCase(WallpaperStyle.Span, "22", "0")]
+    [TestCase(WallpaperStyle.Fill, "10", "0")]
+    public void SetAsWallpaper_ValidStyleAndTile_RegistersExpectedValues(WallpaperStyle style, string expectedStyleValue, string expectedTileValue)
+    {
+        Folder folder = new() { Path = dataDirectory! };
+        Asset asset = new() { Folder = folder, FileName = "NonExistentFile.jpg" }; // Not giving an existing file to prevent the wallpaper to be changed
+
+        // Set up a StringWriter to capture console output
+        StringWriter stringWriter = new();
+        Console.SetOut(stringWriter);
+
+        _userConfigurationService!.SetAsWallpaper(asset, style);
+
+        // Get the captured console output
+        string consoleOutput = stringWriter.ToString();
+
+        // Assert that the expected error message was printed to the console
+        Assert.IsTrue(consoleOutput.Contains($"Wallpaper set for style {expectedStyleValue} and tile {expectedTileValue}"));
     }
 
     [Test]
@@ -70,7 +100,7 @@ public class UserConfigurationServiceTests
     {
         int catalogBatchSize = _userConfigurationService!.AssetSettings.CatalogBatchSize;
 
-        Assert.AreEqual(100, catalogBatchSize);
+        Assert.AreEqual(100000, catalogBatchSize);
     }
 
     [Test]
@@ -78,7 +108,7 @@ public class UserConfigurationServiceTests
     {
         ushort catalogCooldownMinutes = _userConfigurationService!.AssetSettings.CatalogCooldownMinutes;
 
-        Assert.AreEqual(5, catalogCooldownMinutes);
+        Assert.AreEqual(2, catalogCooldownMinutes);
     }
 
     [Test]
@@ -167,7 +197,7 @@ public class UserConfigurationServiceTests
         string? assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
 
         Assert.IsNotNull(assetsDirectory);
-        Assert.AreEqual("C:\\Path", assetsDirectory);
+        Assert.AreEqual("E:\\Workspace\\PhotoManager\\Test", assetsDirectory);
     }
 
     [Test]
@@ -176,7 +206,7 @@ public class UserConfigurationServiceTests
         string? backupPath = _userConfigurationService!.PathSettings.BackupPath;
 
         Assert.IsNotNull(backupPath);
-        Assert.AreEqual("C:\\Path\\To\\Backup", backupPath);
+        Assert.AreEqual("E:\\Workspace\\PhotoManager\\Backup", backupPath);
     }
 
     [Test]
@@ -185,7 +215,7 @@ public class UserConfigurationServiceTests
         string? exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
 
         Assert.IsNotNull(exemptedFolderPath);
-        Assert.AreEqual("C:\\Path\\To\\FolderExempted", exemptedFolderPath);
+        Assert.AreEqual("E:\\Workspace\\PhotoManager\\Test\\test1", exemptedFolderPath);
     }
 
     [Test]
@@ -194,7 +224,7 @@ public class UserConfigurationServiceTests
         string? ffmpegPath = _userConfigurationService!.PathSettings.FfmpegPath;
 
         Assert.IsNotNull(ffmpegPath);
-        Assert.AreEqual("C:\\Path\\To\\Ffmpeg", ffmpegPath);
+        Assert.AreEqual("E:\\ffmpeg\\bin\\ffmpeg.exe", ffmpegPath);
     }
 
     [Test]
@@ -207,7 +237,7 @@ public class UserConfigurationServiceTests
         Assert.IsNotNull(firstFrameVideosPath);
 
         Assert.AreEqual(Path.Combine(assetsDirectory!, "OutputVideoFirstFrame"), firstFrameVideosPath);
-        Assert.AreEqual(Path.Combine("C:\\Path\\OutputVideoFirstFrame"), firstFrameVideosPath);
+        Assert.AreEqual(Path.Combine("E:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"), firstFrameVideosPath);
     }
 
     [Test]
@@ -322,6 +352,7 @@ public class UserConfigurationServiceTests
         string[] paths = _userConfigurationService!.GetRootCatalogFolderPaths();
 
         Assert.AreEqual(1, paths.Length);
-        Assert.AreEqual("C:\\Path", paths[0]);
+        Assert.AreEqual("E:\\Workspace\\PhotoManager\\Test", paths[0]);
     }
 }
+

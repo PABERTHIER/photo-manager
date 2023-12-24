@@ -23,7 +23,7 @@ public class DatabaseDeleteOldBackupsTests
     [Test]
     public void DeleteOldBackups_DeletesExcessBackups_SuccessfullyDeletesBackups()
     {
-        int backupsToKeep = 3;
+        ushort backupsToKeep = 3;
         string path1 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230404.zip");
         string path2 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230304.zip");
         string path3 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230204.zip");
@@ -71,7 +71,7 @@ public class DatabaseDeleteOldBackupsTests
     [Test]
     public void DeleteOldBackups_NoExcessBackups_NothingDeleted()
     {
-        int backupsToKeep = 3;
+        ushort backupsToKeep = 3;
         string path1 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230404.zip");
         string path2 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230304.zip");
         string path3 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230204.zip");

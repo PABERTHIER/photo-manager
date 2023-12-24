@@ -23,7 +23,7 @@
 //     private readonly DuplicatedAssetViewModel _duplicatedAssetViewModel5;
 //     private readonly DuplicatedAssetViewModel _duplicatedAssetViewModel6;
 
-//     private const string pathLocationToExemptTheFolder = "D:\\Inexistent Folder1";
+//     private const string exemptedFolderPath = "D:\\Inexistent Folder1";
 
 //     public FindDuplicatedAssetsTests()
 //     {
@@ -235,7 +235,7 @@
 //         };
 
 //         var isContainingDuplicatesFromExemptFolder = false;
-//         var duplicatedAssetsFiltered = _duplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != pathLocationToExemptTheFolder).ToList();
+//         var duplicatedAssetsFiltered = _duplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != exemptedFolderPath).ToList();
 
 //         var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
 //             x => x.Asset.Hash,
@@ -243,7 +243,7 @@
 //             (x, y) => x)
 //             .ToList();
 
-//         isContainingDuplicatesFromExemptFolder = assetsToDelete.Any(x => x.Asset.Folder.Path == pathLocationToExemptTheFolder);
+//         isContainingDuplicatesFromExemptFolder = assetsToDelete.Any(x => x.Asset.Folder.Path == exemptedFolderPath);
 //         isContainingDuplicatesFromExemptFolder.Should().BeFalse();
 //         assetsToDelete.Should().Contain(_duplicatedAssetViewModel2);
 //         assetsToDelete.Should().Contain(_duplicatedAssetViewModel4);
@@ -260,7 +260,7 @@
 //         };
 
 //         var isContainingDuplicatesFromExemptFolder = false;
-//         var duplicatedAssetsFiltered = _duplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != pathLocationToExemptTheFolder).ToList();
+//         var duplicatedAssetsFiltered = _duplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != exemptedFolderPath).ToList();
 
 //         var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
 //             x => x.Asset.Hash,
@@ -268,7 +268,7 @@
 //             (x, y) => x)
 //             .ToList();
 
-//         isContainingDuplicatesFromExemptFolder = assetsToDelete.Any(x => x.Asset.Folder.Path == pathLocationToExemptTheFolder);
+//         isContainingDuplicatesFromExemptFolder = assetsToDelete.Any(x => x.Asset.Folder.Path == exemptedFolderPath);
 //         isContainingDuplicatesFromExemptFolder.Should().BeFalse();
 //         assetsToDelete.Should().NotContain(_duplicatedAssetViewModel5);
 //         assetsToDelete.Should().NotContain(_duplicatedAssetViewModel6);

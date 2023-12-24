@@ -46,8 +46,8 @@ public class CatalogAssetsService : ICatalogAssetsService
                     // TODO: For the tests: check the content like this:
                     //    ZipFile.ExtractToDirectory(filePath, "TestData_Backups_Test");
 
-                    //    var sourceDirectories = Directory.GetDirectories("TestData");
-                    //    var backupDirectories = Directory.GetDirectories("TestData_Backups_Test");
+                    //    var sourceDirectories = Directory.GetDirectories("TestData"); // Not var
+                    //    var backupDirectories = Directory.GetDirectories("TestData_Backups_Test"); // Not var
 
                     //    sourceDirectories.Should().HaveSameCount(backupDirectories);
                     //    sourceDirectories[0].Should().Be(@"TestData\"AssetConstants.Blobs);
@@ -100,7 +100,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (isVideo)
         {
-            firstFrameVideoPath = VideoHelper.GetFirstFramePath(directoryName, fileName, PathConstants.PathFirstFrameVideos); // Create an asset from the video file
+            firstFrameVideoPath = VideoHelper.GetFirstFramePath(directoryName, fileName, PathConstants.FirstFrameVideosPath); // Create an asset from the video file
         }
 
         if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
@@ -155,7 +155,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 //rotation = Rotation.Rotate0; ?
             }
 
-            BitmapImage originalImage = _storageService.LoadBitmapOriginalImage(imageBytes, Rotation.Rotate0); // before was rotation
+            BitmapImage originalImage = _storageService.LoadBitmapOriginalImage(imageBytes, Rotation.Rotate0); // TODO: before was rotation
 
             double originalDecodeWidth = originalImage.PixelWidth;
             double originalDecodeHeight = originalImage.PixelHeight;
@@ -178,10 +178,11 @@ public class CatalogAssetsService : ICatalogAssetsService
             }
 
             BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
-                Rotation.Rotate0, // before was rotation
+                Rotation.Rotate0,  // TODO: before was rotation
                 Convert.ToInt32(thumbnailDecodeWidth),
                 Convert.ToInt32(thumbnailDecodeHeight));
 
+            // TODO: Test if buffer not null and not empty
             byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) :
                 (isGif ? _storageService.GetGifBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage));
 
@@ -238,7 +239,7 @@ public class CatalogAssetsService : ICatalogAssetsService
         if (!visitedFolders.Contains(directory))
         {
             currentFolderPath = directory;
-            int batchSize = _userConfigurationService.GetCatalogBatchSize();
+            int batchSize = _userConfigurationService.AssetSettings.CatalogBatchSize;
 
             if (_storageService.FolderExists(directory))
             {
@@ -481,6 +482,7 @@ public class CatalogAssetsService : ICatalogAssetsService
             Convert.ToInt32(thumbnailDecodeWidth),
             Convert.ToInt32(thumbnailDecodeHeight));
 
+        // TODO: Test if buffer not null and not empty
         byte[] thumbnailBuffer = _storageService.GetJpegBitmapImage(thumbnailImage);
 
         Folder folder = _assetRepository.GetFolderByPath(directoryName);

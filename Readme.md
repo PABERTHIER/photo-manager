@@ -48,6 +48,7 @@ Open the solution file `PhotoManager/PhotoManager.sln` and run the `PhotoManager
 - .gif - Graphics Interchange Format
 - .heic - Apple Format
 - .ico - Icon file
+- .jfif - JPEG File Interchange Format
 - .jpeg, .jpg - Joint Photographic Experts Group
 - .png - Portable Network Graphics
 - .tiff, .tif - Tagged Image File Format
@@ -94,18 +95,18 @@ Between Original and Thumbnail:
 
 To run the application, you will need to set some settings first, for the path:
 
-- `PathLocation = "";`: The path where PhotoManager will scan your assets.
-- `PathLocationToExemptTheFolder = "";`: The path where PhotoManager will protect your assets and if there are duplicates in others path, you will be able to delete all of them except the asset in this exempted path.
+- `AssetsDirectory = "";`: The path where PhotoManager will scan your assets.
+- `ExemptedFolderPath = "";`: The path where PhotoManager will protect your assets and if there are duplicates in others path, you will be able to delete all of them except the asset in this exempted path.
 - `FfmpegPath = "Path\\ffmpeg.exe";`: The path where your ffmpeg.exe is located (Needed to be installed first, used if you activate the switch `AnalyseVideos`).
-- `PathBackup = "";`: The path to store your backup (The backup must be upper than the location to prevent bugs like "Process is already used").
-- `PathFirstFrameVideos = "";`: The path to save the first frame for each video file (Used if you activate the switch `AnalyseVideos`), the path should be lower than `PathLocation` (Ex "`PathLocation`\\your_folder").
+- `BackupPath = "";`: The path to store your backup (The backup must be upper than the location to prevent bugs like "Process is already used").
+- `FirstFrameVideosPath = "";`: The path to save the first frame for each video file (Used if you activate the switch `AnalyseVideos`), the path should be lower than `AssetsDirectory` (Ex "`AssetsDirectory`\\your_folder").
 
 ## Deletion modes
 
 There are 3 ways to delete duplicates:
 The button `Delete` => This will delete the selected duplicate.
 The button `DeleteAllButThis` => This will delete all duplicates associated to this asset and keep the selected duplicate.
-The button `Delete Every Duplicates Linked To Exempt Folder` => This will delete all duplicates found everywhere that has a duplicate linked in the `PathLocationToExemptTheFolder`, but all duplicates in the `PathLocationToExemptTheFolder` will be protected.
+The button `Delete Every Duplicates Linked To Exempt Folder` => This will delete all duplicates found everywhere that has a duplicate linked in the `ExemptedFolderPath`, but all duplicates in the `ExemptedFolderPath` will be protected.
 
 ## How to use it for videos ?
 

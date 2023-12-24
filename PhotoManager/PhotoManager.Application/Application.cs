@@ -105,7 +105,7 @@ public class Application : IApplication
 
     public string GetInitialFolder() => _userConfigurationService.GetPicturesDirectory();
 
-    public int GetCatalogCooldownMinutes() => _userConfigurationService.GetCatalogCooldownMinutes();
+    public ushort GetCatalogCooldownMinutes() => _userConfigurationService.AssetSettings.CatalogCooldownMinutes;
 
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => _moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
 

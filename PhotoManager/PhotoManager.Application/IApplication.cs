@@ -20,7 +20,7 @@ public interface IApplication
     AboutInformation GetAboutInformation(Assembly assembly);
     Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
     string GetInitialFolder();
-    int GetCatalogCooldownMinutes();
+    ushort GetCatalogCooldownMinutes();
     bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles);
     BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation);
     BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation);

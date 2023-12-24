@@ -5,3 +5,4 @@ global using System.Windows.Media.Imaging;
 global using PhotoManager.Common;
 global using PhotoManager.Constants;
 global using PhotoManager.Domain.Interfaces;
+global using PhotoManager.Domain.UserConfigurationSettings;
