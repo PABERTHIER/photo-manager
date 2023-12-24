@@ -250,11 +250,11 @@ public class AssetRepositoryAddAssetTests
     [Test]
     public void AddAsset_ThumbnailsDictionaryEntriesToKeepIs0_AssetIsNotAdded()
     {
-        Mock<IConfigurationRoot> configurationRoot = new();
-        configurationRoot.GetDefaultMockConfig();
-        configurationRoot.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
-        UserConfigurationService userConfigurationService = new(configurationRoot!.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock!.Object);
         TestableAssetRepository testableAssetRepository = new(_database!, _storageServiceMock!.Object, userConfigurationService);
 
         try

@@ -11,10 +11,10 @@ public class UserConfigurationServiceTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock.GetDefaultMockConfig();
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new UserConfigurationService(configurationMock.Object);
+        _userConfigurationService = new UserConfigurationService(configurationRootMock.Object);
     }
 
     [Test]

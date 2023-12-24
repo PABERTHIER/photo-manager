@@ -16,10 +16,10 @@
 //    dataDirectory = Path.GetDirectoryName(typeof(ApplicationTests).Assembly.Location);
 //    dataDirectory = Path.Combine(dataDirectory, "TestFiles");
 
-//    Mock<IConfigurationRoot> configurationMock = new();
-//    configurationMock.GetDefaultMockConfig();
+//    Mock<IConfigurationRoot> configurationRootMock = new();
+//    configurationRootMock.GetDefaultMockConfig();
 
-//    _configuration = configurationMock.Object;
+//    _configuration = configurationRootMock.Object;
 //}
 
 //    [Test]

@@ -13,10 +13,10 @@ public class StorageServiceTests
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
-        Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock.GetDefaultMockConfig();
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
 
-        _storageService = new StorageService(new UserConfigurationService(configurationMock.Object));
+        _storageService = new StorageService(new UserConfigurationService(configurationRootMock.Object));
     }
 
     [Test]

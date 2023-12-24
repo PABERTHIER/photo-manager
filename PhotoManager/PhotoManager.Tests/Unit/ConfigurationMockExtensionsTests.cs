@@ -8,10 +8,10 @@ public class ConfigurationMockExtensionsTests
     [Test]
     public void ConfigurationMockTest()
     {
-        Mock<IConfigurationRoot> configurationMock = new();
-        configurationMock.GetDefaultMockConfig();
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
 
-        IConfigurationRoot configuration = configurationMock.Object;
+        IConfigurationRoot configuration = configurationRootMock.Object;
 
         Assert.AreEqual(false, configuration.GetValue<bool>(UserConfigurationKeys.ANALYSE_VIDEOS));
         Assert.AreEqual("The asset is corrupted", configuration.GetValue<string>(UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE));
