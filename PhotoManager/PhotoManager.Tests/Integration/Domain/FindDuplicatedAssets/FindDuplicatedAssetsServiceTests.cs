@@ -35,8 +35,8 @@ public class FindDuplicatedAssetsServiceTests
     [SetUp]
     public void Setup()
     {
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
         _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
         _storageService = new (userConfigurationService);
         _findDuplicatedAssetsService = new (_assetRepository, _storageService, userConfigurationService);

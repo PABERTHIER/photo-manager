@@ -7,7 +7,6 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     private const string backupEndPath = "DatabaseTests\\v1.0";
     private string? backupPath;
 
-    private TestableFindDuplicatedAssetsService? _testableFindDuplicatedAssetsService;
     private AssetRepository? _assetRepository;
     private StorageService? _storageService;
     private Mock<IStorageService>? _storageServiceMock;
@@ -77,6 +76,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
+        _configurationRootMock.MockGetValue(UserConfigurationKeys.DETECT_THUMBNAILS, "true");
+        _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);
@@ -85,11 +86,10 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     [SetUp]
     public void Setup()
     {
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
         _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
         _storageService = new (userConfigurationService);
-        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!, userConfigurationService);
 
         asset1 = new()
         {
@@ -266,17 +266,21 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     // The hamming distance is about 113/124 between these hashes
     [Test]
     [Category("Part folder, basic hashing method")] // SHA-512 generates a 128-character long hash in hexadecimal representation
-    [TestCase((ushort)20, 0, new string[] { })]
-    [TestCase((ushort)40, 0, new string[] { })]
-    [TestCase((ushort)60, 0, new string[] { })]
-    [TestCase((ushort)80, 0, new string[] { })]
-    [TestCase((ushort)100, 0, new string[] { })]
-    [TestCase((ushort)110, 0, new string[] { })]
-    [TestCase((ushort)128, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartBasicHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
+    [TestCase("20", 0, new string[] { })]
+    [TestCase("40", 0, new string[] { })]
+    [TestCase("60", 0, new string[] { })]
+    [TestCase("80", 0, new string[] { })]
+    [TestCase("100", 0, new string[] { })]
+    [TestCase("110", 0, new string[] { })]
+    [TestCase("128", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartBasicHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
+            _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
+            UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
+
             string folderPath1 = Path.Combine(dataDirectory!, "Duplicates\\Part");
             string folderPath2 = Path.Combine(dataDirectory!, "Duplicates\\NewFolder1");
 
@@ -304,7 +308,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             asset10!.Folder = folder2;
             asset10.Hash = miscAssetHash; // If this asset is in the set, then the treshold is not good
 
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
+            byte[] assetData1 = [1, 2, 3];
 
             _assetRepository!.AddAsset(asset1, assetData1);
             _assetRepository.AddAsset(asset2, assetData1);
@@ -317,9 +321,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             _assetRepository.AddAsset(asset9, assetData1);
             _assetRepository.AddAsset(asset10, assetData1);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, threshold);
+            List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
             Assert.AreEqual(expected, duplicatedAssets.Count);
 
@@ -338,16 +340,20 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     // The hamming distance is about 30 between these hashes
     [Test]
     [Category("Part folder, MD5Hash")] // The MD5Hash is a 32-character hexadecimal string
-    [TestCase((ushort)5, 0, new string[] { })]
-    [TestCase((ushort)10, 0, new string[] { })]
-    [TestCase((ushort)15, 0, new string[] { })]
-    [TestCase((ushort)20, 0, new string[] { })]
-    [TestCase((ushort)25, 0, new string[] { })]
-    [TestCase((ushort)32, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartMD5HashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
+    [TestCase("5", 0, new string[] { })]
+    [TestCase("10", 0, new string[] { })]
+    [TestCase("15", 0, new string[] { })]
+    [TestCase("20", 0, new string[] { })]
+    [TestCase("25", 0, new string[] { })]
+    [TestCase("32", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartMD5HashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
+            _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
+            UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
+
             string folderPath1 = Path.Combine(dataDirectory!, "Duplicates\\Part");
             string folderPath2 = Path.Combine(dataDirectory!, "Duplicates\\NewFolder1");
 
@@ -375,7 +381,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             asset10!.Folder = folder2;
             asset10.Hash = miscAssetMD5Hash; // If this asset is in the set, then the treshold is not good
 
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
+            byte[] assetData1 = [1, 2, 3];
 
             _assetRepository!.AddAsset(asset1, assetData1);
             _assetRepository.AddAsset(asset2, assetData1);
@@ -388,9 +394,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             _assetRepository.AddAsset(asset9, assetData1);
             _assetRepository.AddAsset(asset10, assetData1);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, threshold);
+            List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
             Assert.AreEqual(expected, duplicatedAssets.Count);
 
@@ -409,16 +413,20 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     // The hamming distance is about 14 between these hashes (for some, 0)
     [Test]
     [Category("Part folder, DHash")] // The DHash is a 17-character number
-    [TestCase((ushort)3, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
-    [TestCase((ushort)5, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
-    [TestCase((ushort)9, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
-    [TestCase((ushort)11, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
-    [TestCase((ushort)14, 2, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" }, new string[] { })]
-    [TestCase((ushort)17, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
+    [TestCase("3", 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
+    [TestCase("5", 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
+    [TestCase("9", 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
+    [TestCase("11", 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
+    [TestCase("14", 2, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" }, new string[] { })]
+    [TestCase("17", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
         try
         {
+            _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
+            UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
+
             string folderPath1 = Path.Combine(dataDirectory!, "Duplicates\\Part");
             string folderPath2 = Path.Combine(dataDirectory!, "Duplicates\\NewFolder1");
 
@@ -446,7 +454,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             asset10!.Folder = folder2;
             asset10.Hash = miscAssetDHash; // If this asset is in the set, then the treshold is not good
 
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
+            byte[] assetData1 = [1, 2, 3];
 
             _assetRepository!.AddAsset(asset1, assetData1);
             _assetRepository.AddAsset(asset2, assetData1);
@@ -459,9 +467,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             _assetRepository.AddAsset(asset9, assetData1);
             _assetRepository.AddAsset(asset10, assetData1);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, threshold);
+            List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
             Assert.AreEqual(expected, duplicatedAssets.Count);
 
@@ -490,24 +496,28 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     // The hamming distance is about 80/100 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("Part folder, PHash")] // The PHash is a 210-character hexadecimal string
-    [TestCase((ushort)10, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase((ushort)20, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase((ushort)30, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase((ushort)40, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase((ushort)50, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase((ushort)60, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase((ushort)80, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG" }, new string[] { }, new string[] { })]
-    [TestCase((ushort)90, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG" }, new string[] { }, new string[] { })]
-    [TestCase((ushort)100, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopRightPart.JPG" }, new string[] { "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_RightPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_TopPart.JPG" })]
-    [TestCase((ushort)120, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase((ushort)140, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase((ushort)160, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase((ushort)180, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase((ushort)210, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartPHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
+    [TestCase("10", 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase("20", 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase("30", 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase("40", 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase("50", 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase("60", 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase("80", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG" }, new string[] { }, new string[] { })]
+    [TestCase("90", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG" }, new string[] { }, new string[] { })]
+    [TestCase("100", 3, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopRightPart.JPG" }, new string[] { "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_RightPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_TopPart.JPG" })]
+    [TestCase("120", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase("140", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase("160", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase("180", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase("210", 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartPHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
         try
         {
+            _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
+            UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+            FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
+
             string folderPath1 = Path.Combine(dataDirectory!, "Duplicates\\Part");
             string folderPath2 = Path.Combine(dataDirectory!, "Duplicates\\NewFolder1");
 
@@ -535,7 +545,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             asset10!.Folder = folder2;
             asset10.Hash = miscAssetPHash; // If this asset is in the set, then the treshold is not good
 
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
+            byte[] assetData1 = [1, 2, 3];
 
             _assetRepository!.AddAsset(asset1, assetData1);
             _assetRepository.AddAsset(asset2, assetData1);
@@ -548,9 +558,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             _assetRepository.AddAsset(asset9, assetData1);
             _assetRepository.AddAsset(asset10, assetData1);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, threshold);
+            List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
             Assert.AreEqual(expected, duplicatedAssets.Count);
 

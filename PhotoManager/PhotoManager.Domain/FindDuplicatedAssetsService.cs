@@ -13,8 +13,8 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
     /// where each item is a list of duplicated assets.</returns>
     public List<List<Asset>> GetDuplicatedAssets()
     {
-        List<List<Asset>> duplicatedAssetsSets = new();
-        List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
+        List<List<Asset>> duplicatedAssetsSets = [];
+        List<Asset> assets = new (_assetRepository.GetCataloguedAssets());
 
         if (_userConfigurationService.AssetSettings.DetectThumbnails && _userConfigurationService.HashSettings.UsingPHash)
         {
@@ -25,7 +25,7 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
 
         foreach (var group in assetGroups)
         {
-            List<Asset> duplicatedSet = group.ToList();
+            List<Asset> duplicatedSet = [.. group];
             duplicatedSet.RemoveAll(asset => !_storageService.FileExists(asset.FullPath));
 
             if (duplicatedSet.Count > 1)
@@ -43,12 +43,12 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
     // DHash the hammingDistance is 16/17
     // MD5Hash the hammingDistance is 32/32
     // SHA512 the hammingDistance is 118/128
-    protected List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(List<Asset> assets, ushort threshold)
+    private List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(List<Asset> assets, ushort threshold)
     {
-        List<List<Asset>> duplicatedAssetsSets = new();
+        List<List<Asset>> duplicatedAssetsSets = [];
 
         // Create a dictionary to store assets by their Hash values
-        Dictionary<string, List<Asset>> assetDictionary = new();
+        Dictionary<string, List<Asset>> assetDictionary = [];
 
         assets.RemoveAll(asset => !_storageService.FileExists(asset.FullPath));
 
@@ -82,7 +82,7 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
             // If the asset is not in the dictionary and hasn't been added to any set, create a new entry
             if (!assetDictionary.ContainsKey(hash1) && !addedToSet)
             {
-                assetDictionary[hash1] = new List<Asset> { asset1 };
+                assetDictionary[hash1] = [asset1];
             }
         }
 

@@ -6,12 +6,10 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     private string? dataDirectory;
     private const string backupEndPath = "DatabaseTests\\v1.0";
     private string? backupPath;
-    private ushort? pHashThreshold;
 
-    private TestableFindDuplicatedAssetsService? _testableFindDuplicatedAssetsService;
+    private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
     private AssetRepository? _assetRepository;
     private StorageService? _storageService;
-    private UserConfigurationService? _userConfigurationService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -29,6 +27,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
+        _configurationRootMock.MockGetValue(UserConfigurationKeys.DETECT_THUMBNAILS, "true");
+        _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);
@@ -37,13 +37,11 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     [SetUp]
     public void Setup()
     {
-        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new (database, _storageServiceMock!.Object, _userConfigurationService);
-        _storageService = new (_userConfigurationService);
-        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!, _userConfigurationService);
-
-        pHashThreshold = _userConfigurationService.HashSettings.PHashThreshold;
+        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
+        _storageService = new (userConfigurationService);
+        _findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
 
         asset1 = new()
         {
@@ -181,8 +179,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             asset5!.Folder = folder2;
             asset5.Hash = "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056";
 
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
-            byte[] assetData2 = Array.Empty<byte>();
+            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData2 = [];
 
             _assetRepository!.AddAsset(asset1!, assetData1);
             _assetRepository.AddAsset(asset2!, assetData2);
@@ -190,9 +188,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             _assetRepository.AddAsset(asset4!, assetData2);
             _assetRepository.AddAsset(asset5!, assetData1);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
+            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
             Assert.IsNotEmpty(duplicatedAssets);
             Assert.AreEqual(2, duplicatedAssets.Count);
@@ -279,7 +275,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             asset5!.Folder = folder;
             asset5.Hash = hash;
 
-            byte[] assetData = new byte[] { 1, 2, 3 };
+            byte[] assetData = [1, 2, 3];
 
             _assetRepository!.AddAsset(asset1!, assetData);
             _assetRepository.AddAsset(asset2!, assetData);
@@ -287,9 +283,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             _assetRepository.AddAsset(asset4!, assetData);
             _assetRepository.AddAsset(asset5!, assetData);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
+            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
             Assert.IsNotEmpty(duplicatedAssets);
             Assert.AreEqual(1, duplicatedAssets.Count);
@@ -349,14 +343,12 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             asset3!.Folder = folder2;
             asset3.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
 
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
+            byte[] assetData1 = [1, 2, 3];
 
             _assetRepository!.AddAsset(asset1!, assetData1);
             _assetRepository.AddAsset(asset3!, assetData1);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
+            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
             Assert.IsEmpty(duplicatedAssets);
         }
@@ -388,8 +380,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             asset5!.Folder = folder2;
             asset5.Hash = "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056";
 
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
-            byte[] assetData2 = Array.Empty<byte>();
+            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData2 = [];
 
             _assetRepository!.AddAsset(asset1!, assetData1);
             _assetRepository.AddAsset(asset2!, assetData2);
@@ -397,9 +389,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             _assetRepository.AddAsset(asset4!, assetData2);
             _assetRepository.AddAsset(asset5!, assetData1);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
+            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
             Assert.IsEmpty(duplicatedAssets);
         }
@@ -414,9 +404,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     {
         try
         {
-            List<Asset> assets = _assetRepository!.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
+            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
             Assert.IsEmpty(duplicatedAssets);
         }
@@ -440,15 +428,13 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             asset2!.Folder = folder;
             asset2.Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
 
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
-            byte[] assetData2 = Array.Empty<byte>();
+            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData2 = [];
 
             _assetRepository!.AddAsset(asset1!, assetData1);
             _assetRepository.AddAsset(asset2!, assetData2);
 
-            List<Asset> assets = _assetRepository.GetCataloguedAssets();
-
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
+            List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
             Assert.IsEmpty(duplicatedAssets);
         }
