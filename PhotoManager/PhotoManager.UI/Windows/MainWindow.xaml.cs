@@ -1,6 +1,5 @@
 ﻿using log4net;
 using PhotoManager.Application;
-using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
@@ -413,6 +412,11 @@ public partial class MainWindow : Window
         ViewModel.CalculateGlobaleAssetsCounter();
     }
 
+    public string GetExemptedFolderPath()
+    {
+        return ViewModel.GetExemptedFolderPath();
+    }
+
     private void DeleteAssets_Click(object sender, RoutedEventArgs e)
     {
         DeleteAssets();
@@ -467,9 +471,7 @@ public partial class MainWindow : Window
 
         ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
 
-#pragma warning disable CS0162 // Unreachable code detected
-        // Disabling infinite loop to prevent reduced perfs
-        if (AssetConstants.SyncAssetsEveryXMinutes)
+        if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perfs
         {
             ushort minutes = ViewModel.GetCatalogCooldownMinutes();
 
@@ -481,7 +483,6 @@ public partial class MainWindow : Window
         }
 
         await Initialization(stopwatch);
-#pragma warning restore CS0162 // Unreachable code detected
     }
 
     private async Task Initialization(Stopwatch stopwatch)

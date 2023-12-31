@@ -4,22 +4,27 @@
 public class DatabaseSetDataTablePropertiesTests
 {
     private string? dataDirectory;
+
     private PhotoManager.Infrastructure.Database.Database? _database;
     private TestableDatabase? _testableDatabase;
-
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
+    private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _testableDatabase = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testableDatabase = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
     [Test]
@@ -28,22 +33,26 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = AssetConstants.FoldersTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
         try
         {
-            _testableDatabase!.Initialize(directoryPath, pipeSeparator);
+            _testableDatabase!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             _testableDatabase!.SetDataTableProperties(properties);
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.FoldersTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.FoldersTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.FoldersTableName].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].ColumnProperties);
         }
         finally
         {
@@ -58,22 +67,26 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = AssetConstants.AssetsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
 
         try
         {
-            _testableDatabase!.Initialize(directoryPath, pipeSeparator);
+            _testableDatabase!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             _testableDatabase!.SetDataTableProperties(properties);
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.AssetsTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.AssetsTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.AssetsTableName].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].ColumnProperties);
         }
         finally
         {
@@ -88,22 +101,26 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
 
         try
         {
-            _testableDatabase!.Initialize(directoryPath, pipeSeparator);
+            _testableDatabase!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             _testableDatabase!.SetDataTableProperties(properties);
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.SyncAssetsDirectoriesDefinitionsTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.SyncAssetsDirectoriesDefinitionsTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.SyncAssetsDirectoriesDefinitionsTableName].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].ColumnProperties);
         }
         finally
         {
@@ -118,22 +135,26 @@ public class DatabaseSetDataTablePropertiesTests
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
         DataTableProperties properties = new()
         {
-            TableName = AssetConstants.RecentTargetPathsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName,
             ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         };
 
         try
         {
-            _testableDatabase!.Initialize(directoryPath, pipeSeparator);
+            _testableDatabase!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             _testableDatabase!.SetDataTableProperties(properties);
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
             Assert.IsNotNull(dataTablePropertiesDictionary);
             Assert.IsNotEmpty(dataTablePropertiesDictionary);
             Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(AssetConstants.RecentTargetPathsTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[AssetConstants.RecentTargetPathsTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[AssetConstants.RecentTargetPathsTableName].ColumnProperties);
+            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName));
+            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].TableName);
+            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].ColumnProperties);
         }
         finally
         {

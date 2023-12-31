@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryDeleteFolderTests
@@ -8,9 +6,10 @@ public class AssetRepositoryDeleteFolderTests
     private string? dataDirectory;
     private const string backupEndPath = "DatabaseTests\\v1.0";
     private string? backupPath;
+
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
-
+    private UserConfigurationService? _userConfigurationService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -33,8 +32,8 @@ public class AssetRepositoryDeleteFolderTests
     public void Setup()
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
+        _userConfigurationService = new(_configurationRootMock!.Object);
+        _testableAssetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
 
         asset1 = new()
         {
@@ -220,11 +219,11 @@ public class AssetRepositoryDeleteFolderTests
 
             _database!.WriteBlob(new Dictionary<string, byte[]>(), asset1!.Folder.ThumbnailsFilename);
 
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Blobs, asset1.Folder.ThumbnailsFilename)));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, asset1.Folder.ThumbnailsFilename)));
 
             _testableAssetRepository!.DeleteFolder(asset1!.Folder);
 
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Blobs, asset1.Folder.ThumbnailsFilename)));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, asset1.Folder.ThumbnailsFilename)));
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
 

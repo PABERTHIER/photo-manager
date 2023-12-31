@@ -80,7 +80,7 @@ There are many switches, enable or disable it as you wish:
 - `UsingPHash = false;`: Enable it to detect duplicates between rotated assets (improve detection) PHash = Perceptual Hash. Performances are decreased with PHash by 6 times (for ex: 0.17s for 140 pictures with SHA512 and 1.11s with PHash).
 - `UsingDHash = false;`: Enable it to Hash in DHash (Difference Hash). This hashing method always returns "0" for Gif file.
 - `DetectThumbnails = false;`: Enable it to detect duplicates between a thumbnail and the original.
-- `AnalyseVideos = false;`: Enable it to extract thumbnail from each videos.
+- `AnalyseVideos = false;`: Enable it to extract the first frame from each videos, that will be stored in the folder `FirstFrameVideosFolderName`.
 - `SyncAssetsEveryXMinutes = false;`: Enable it to sync your assets every X minutes (CATALOG_COOLDOWN_MINUTES).
 
 About `DetectThumbnails`, you will need to activate the `UsingPHash` switch as well because:
@@ -91,15 +91,21 @@ Between Original and Thumbnail:
 - MD5Hash the hammingDistance is 32/32.
 - SHA512 the hammingDistance is 118/128.
 
+Moreover, there is a parameter that you can adjust following the need, it is `PHashThreshold`.
+The max advised is less than 90 (for example 68 can detect false positives).
+The default value is `40`, because it can detect a Thumbnail and an original with low quality as duplicates.
+But 5 or 6 is often used as a default value in image comparison libraries.
+If the hammingDistance is lower or equal to the `PHashThreshold` value, then it is a duplicate.
+
 ## Path settings
 
 To run the application, you will need to set some settings first, for the path:
 
 - `AssetsDirectory = "";`: The path where PhotoManager will scan your assets.
-- `ExemptedFolderPath = "";`: The path where PhotoManager will protect your assets and if there are duplicates in others path, you will be able to delete all of them except the asset in this exempted path.
+- `ExemptedFolderPath = "";`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the asset in this exempted path.
 - `FfmpegPath = "Path\\ffmpeg.exe";`: The path where your ffmpeg.exe is located (Needed to be installed first, used if you activate the switch `AnalyseVideos`).
 - `BackupPath = "";`: The path to store your backup (The backup must be upper than the location to prevent bugs like "Process is already used").
-- `FirstFrameVideosPath = "";`: The path to save the first frame for each video file (Used if you activate the switch `AnalyseVideos`), the path should be lower than `AssetsDirectory` (Ex "`AssetsDirectory`\\your_folder").
+- `FirstFrameVideosFolderName = "";`: The folder to save the first frame for each video file (Used if you activate the switch `AnalyseVideos`), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
 
 ## Deletion modes
 

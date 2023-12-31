@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Unit.Infrastructure;
+﻿namespace PhotoManager.Tests.Unit.Infrastructure;
 
 [TestFixture]
 public class StorageServiceTests
 {
     private string? dataDirectory;
-    private IStorageService? _storageService;
+
+    private StorageService? _storageService;
+    private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
@@ -16,7 +16,8 @@ public class StorageServiceTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _storageService = new StorageService(new UserConfigurationService(configurationRootMock.Object));
+        _userConfigurationService = new(configurationRootMock.Object);
+        _storageService = new (_userConfigurationService);
     }
 
     [Test]
@@ -25,7 +26,7 @@ public class StorageServiceTests
     [TestCase(2.0, "v2.0")]
     public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(double storageVersion, string storageVersionPath)
     {
-        string expected = Path.Combine(PathConstants.BackupPath, storageVersionPath);
+        string expected = Path.Combine(_userConfigurationService!.PathSettings.BackupPath!, storageVersionPath);
 
         string result = _storageService!.ResolveDataDirectory(storageVersion);
 

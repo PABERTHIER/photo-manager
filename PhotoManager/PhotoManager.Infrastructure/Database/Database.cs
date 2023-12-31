@@ -29,11 +29,11 @@ public class Database : IDatabase
         DataTablePropertiesDictionary = new();
     }
 
-    public void Initialize(string dataDirectory, char separator)
+    public void Initialize(string dataDirectory, char separator, string tablesFolderName, string blobsFolderName)
     {
         DataDirectory = dataDirectory;
-        TablesDirectory = GetTablesDirectory();
-        BlobsDirectory = GetBlobsDirectory();
+        TablesDirectory = GetTablesDirectory(tablesFolderName);
+        BlobsDirectory = GetBlobsDirectory(blobsFolderName);
         BackupsDirectory = GetBackupsDirectory();
         Separator = separator;
         DataTablePropertiesDictionary = new Dictionary<string, DataTableProperties>();
@@ -184,14 +184,14 @@ public class Database : IDatabase
             DataTablePropertiesDictionary[tableName] : null;
     }
 
-    private string GetTablesDirectory()
+    private string GetTablesDirectory(string tablesFolderName)
     {
-        return Path.Combine(DataDirectory, AssetConstants.Tables);
+        return Path.Combine(DataDirectory, tablesFolderName);
     }
 
-    private string GetBlobsDirectory()
+    private string GetBlobsDirectory(string blobsFolderName)
     {
-        return Path.Combine(DataDirectory, AssetConstants.Blobs);
+        return Path.Combine(DataDirectory, blobsFolderName);
     }
 
     private string GetBackupsDirectory()

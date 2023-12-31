@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
+﻿namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 
 [TestFixture]
 public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
@@ -10,8 +8,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     private string? backupPath;
 
     private TestableFindDuplicatedAssetsService? _testableFindDuplicatedAssetsService;
-    private IAssetRepository? _assetRepository;
-    private IStorageService? _storageService;
+    private AssetRepository? _assetRepository;
+    private StorageService? _storageService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -79,9 +77,9 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     {
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new StorageService(userConfigurationService);
-        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
+        _storageService = new (userConfigurationService);
+        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!, userConfigurationService);
 
         // TODO: Update the assets !!
         asset1 = new()
@@ -225,14 +223,14 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     // The hamming distance is about 121 between these hashes
     [Test]
     [Category("NotDuplicate folder, basic hashing method")] // SHA-512 generates a 128-character long hash in hexadecimal representation
-    [TestCase(20, 0, new string[] { })]
-    [TestCase(40, 0, new string[] { })]
-    [TestCase(60, 0, new string[] { })]
-    [TestCase(80, 0, new string[] { })]
-    [TestCase(100, 0, new string[] { })]
-    [TestCase(110, 0, new string[] { })]
-    [TestCase(128, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateBasicHashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
+    [TestCase((ushort)20, 0, new string[] { })]
+    [TestCase((ushort)40, 0, new string[] { })]
+    [TestCase((ushort)60, 0, new string[] { })]
+    [TestCase((ushort)80, 0, new string[] { })]
+    [TestCase((ushort)100, 0, new string[] { })]
+    [TestCase((ushort)110, 0, new string[] { })]
+    [TestCase((ushort)128, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateBasicHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
     {
         try
         {
@@ -295,13 +293,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     // The hamming distance is about 26/32 between these hashes
     [Test]
     [Category("NotDuplicate folder, MD5Hash")] // The MD5Hash is a 32-character hexadecimal string
-    [TestCase(5, 0, new string[] { })]
-    [TestCase(10, 0, new string[] { })]
-    [TestCase(15, 0, new string[] { })]
-    [TestCase(20, 0, new string[] { })]
-    [TestCase(25, 0, new string[] { })]
-    [TestCase(32, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateMD5HashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
+    [TestCase((ushort)5, 0, new string[] { })]
+    [TestCase((ushort)10, 0, new string[] { })]
+    [TestCase((ushort)15, 0, new string[] { })]
+    [TestCase((ushort)20, 0, new string[] { })]
+    [TestCase((ushort)25, 0, new string[] { })]
+    [TestCase((ushort)32, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateMD5HashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
     {
         try
         {
@@ -364,13 +362,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     // The hamming distance cannot be computed for this hashing method because it has not the same length
     [Test]
     [Category("NotDuplicate folder, DHash")] // The DHash is a 17-character number
-    [TestCase(3)]
-    [TestCase(5)]
-    [TestCase(9)]
-    [TestCase(11)]
-    [TestCase(14)]
-    [TestCase(17)]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample1DHashDifferentThresholdValues(int threshold)
+    [TestCase((ushort)3)]
+    [TestCase((ushort)5)]
+    [TestCase((ushort)9)]
+    [TestCase((ushort)11)]
+    [TestCase((ushort)14)]
+    [TestCase((ushort)17)]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample1DHashDifferentThresholdValues(ushort threshold)
     {
         try
         {
@@ -408,13 +406,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     // The hamming distance is about 15 between these hashes
     [Test]
     [Category("NotDuplicate folder, DHash")] // The DHash is a 17-character number
-    [TestCase(3, 0, new string[] { })]
-    [TestCase(5, 0, new string[] { })]
-    [TestCase(9, 0, new string[] { })]
-    [TestCase(11, 0, new string[] { })]
-    [TestCase(14, 1, new string[] { "1349.JPG", "Image 1.jpg" })]
-    [TestCase(17, 1, new string[] { "1349.JPG", "1350.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample2DHashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
+    [TestCase((ushort)3, 0, new string[] { })]
+    [TestCase((ushort)5, 0, new string[] { })]
+    [TestCase((ushort)9, 0, new string[] { })]
+    [TestCase((ushort)11, 0, new string[] { })]
+    [TestCase((ushort)14, 1, new string[] { "1349.JPG", "Image 1.jpg" })]
+    [TestCase((ushort)17, 1, new string[] { "1349.JPG", "1350.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample2DHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
     {
         try
         {
@@ -458,13 +456,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     // The hamming distance is about 15 between these hashes
     [Test]
     [Category("NotDuplicate folder, DHash")] // The DHash is a 17-character number
-    [TestCase(3, 0, new string[] { }, new string[] { })]
-    [TestCase(5, 0, new string[] { }, new string[] { })]
-    [TestCase(9, 0, new string[] { }, new string[] { })]
-    [TestCase(11, 0, new string[] { }, new string[] { })]
-    [TestCase(14, 2, new string[] { "1413.JPG", "Image 1.jpg" }, new string[] { "1415.JPG", "Image 1.jpg" })] // Weird result
-    [TestCase(17, 1, new string[] { "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample3DHashDifferentThresholdValues(int threshold, int expected, string[] assetsName1, string[] assetsName2)
+    [TestCase((ushort)3, 0, new string[] { }, new string[] { })]
+    [TestCase((ushort)5, 0, new string[] { }, new string[] { })]
+    [TestCase((ushort)9, 0, new string[] { }, new string[] { })]
+    [TestCase((ushort)11, 0, new string[] { }, new string[] { })]
+    [TestCase((ushort)14, 2, new string[] { "1413.JPG", "Image 1.jpg" }, new string[] { "1415.JPG", "Image 1.jpg" })] // Weird result
+    [TestCase((ushort)17, 1, new string[] { "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample3DHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName1, string[] assetsName2)
     {
         try
         {
@@ -516,21 +514,21 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     // The hamming distance is about 76/88 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("NotDuplicate folder, PHash")] // The PHash is a 210-character hexadecimal string
-    [TestCase(10, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(20, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(30, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(40, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(50, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(60, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(80, 3, new string[] { "1336.JPG", "1349.JPG" }, new string[] { "1337.JPG", "1349.JPG" }, new string[] { "1413.JPG", "1414.JPG" })]  // Weird result
-    [TestCase(90, 2, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG" }, new string[] { "1413.JPG", "1414.JPG" }, new string[] { })]  // Weird result
-    [TestCase(100, 2, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG" }, new string[] { "1413.JPG", "1414.JPG" }, new string[] { })]  // Weird result
-    [TestCase(120, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase(140, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase(160, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase(180, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase(210, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicatePHashDifferentThresholdValues(int threshold, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
+    [TestCase((ushort)10, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)20, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)30, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)40, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)50, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)60, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)80, 3, new string[] { "1336.JPG", "1349.JPG" }, new string[] { "1337.JPG", "1349.JPG" }, new string[] { "1413.JPG", "1414.JPG" })]  // Weird result
+    [TestCase((ushort)90, 2, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG" }, new string[] { "1413.JPG", "1414.JPG" }, new string[] { })]  // Weird result
+    [TestCase((ushort)100, 2, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG" }, new string[] { "1413.JPG", "1414.JPG" }, new string[] { })]  // Weird result
+    [TestCase((ushort)120, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)140, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)160, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)180, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)210, 1, new string[] { "1336.JPG", "1337.JPG", "1349.JPG", "1350.JPG", "1413.JPG", "1414.JPG", "1415.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicatePHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
         try
         {

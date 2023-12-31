@@ -21,6 +21,8 @@ public interface IApplication
     Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
     string GetInitialFolder();
     ushort GetCatalogCooldownMinutes();
+    bool GetSyncAssetsEveryXMinutes();
+    string GetExemptedFolderPath();
     bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles);
     BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation);
     BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation);

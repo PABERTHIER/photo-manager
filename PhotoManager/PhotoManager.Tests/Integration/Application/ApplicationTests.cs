@@ -1,7 +1,6 @@
 ﻿//using Autofac;
 //using Autofac.Extras.Moq;
 //using FluentAssertions;
-//using Microsoft.Extensions.Configuration;
 //using Xunit;
 
 //namespace PhotoManager.Tests.Integration.Application;

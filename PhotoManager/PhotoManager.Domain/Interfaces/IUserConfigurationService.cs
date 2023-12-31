@@ -12,7 +12,5 @@ public interface IUserConfigurationService
 
     void SetAsWallpaper(Asset asset, WallpaperStyle style);
     AboutInformation GetAboutInformation(Assembly assembly);
-    string GetPicturesDirectory();
-    string GetApplicationBackupFolderPath();
     string[] GetRootCatalogFolderPaths();
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
+﻿namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 
 [TestFixture]
 public class FindDuplicatedAssetsServiceThumbnailResolutionTests
@@ -10,8 +8,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     private string? backupPath;
 
     private TestableFindDuplicatedAssetsService? _testableFindDuplicatedAssetsService;
-    private IAssetRepository? _assetRepository;
-    private IStorageService? _storageService;
+    private AssetRepository? _assetRepository;
+    private StorageService? _storageService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -74,9 +72,9 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     {
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new StorageService(userConfigurationService);
-        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
+        _storageService = new (userConfigurationService);
+        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!, userConfigurationService);
 
         asset1 = new()
         {
@@ -202,14 +200,14 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     // The hamming distance is about 117 between these hashes
     [Test]
     [Category("Resolution folder, basic hashing method")] // SHA-512 generates a 128-character long hash in hexadecimal representation
-    [TestCase(20, 0, new string[] { })]
-    [TestCase(40, 0, new string[] { })]
-    [TestCase(60, 0, new string[] { })]
-    [TestCase(80, 0, new string[] { })]
-    [TestCase(100, 0, new string[] { })]
-    [TestCase(110, 0, new string[] { })]
-    [TestCase(128, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionBasicHashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
+    [TestCase((ushort)20, 0, new string[] { })]
+    [TestCase((ushort)40, 0, new string[] { })]
+    [TestCase((ushort)60, 0, new string[] { })]
+    [TestCase((ushort)80, 0, new string[] { })]
+    [TestCase((ushort)100, 0, new string[] { })]
+    [TestCase((ushort)110, 0, new string[] { })]
+    [TestCase((ushort)128, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionBasicHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
     {
         try
         {
@@ -265,13 +263,13 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     // The hamming distance is about 30 between these hashes
     [Test]
     [Category("Resolution folder, MD5Hash")] // The MD5Hash is a 32-character hexadecimal string
-    [TestCase(5, 0, new string[] { })]
-    [TestCase(10, 0, new string[] { })]
-    [TestCase(15, 0, new string[] { })]
-    [TestCase(20, 0, new string[] { })]
-    [TestCase(25, 0, new string[] { })]
-    [TestCase(32, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionMD5HashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
+    [TestCase((ushort)5, 0, new string[] { })]
+    [TestCase((ushort)10, 0, new string[] { })]
+    [TestCase((ushort)15, 0, new string[] { })]
+    [TestCase((ushort)20, 0, new string[] { })]
+    [TestCase((ushort)25, 0, new string[] { })]
+    [TestCase((ushort)32, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionMD5HashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
     {
         try
         {
@@ -327,13 +325,13 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     // The hamming distance cannot be computed for this hashing method because it has not the same length
     [Test]
     [Category("Resolution folder, DHash")] // The DHash is a 17-character number
-    [TestCase(3)]
-    [TestCase(5)]
-    [TestCase(9)]
-    [TestCase(11)]
-    [TestCase(14)]
-    [TestCase(17)]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(int threshold)
+    [TestCase((ushort)3)]
+    [TestCase((ushort)5)]
+    [TestCase((ushort)9)]
+    [TestCase((ushort)11)]
+    [TestCase((ushort)14)]
+    [TestCase((ushort)17)]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(ushort threshold)
     {
         try
         {
@@ -383,21 +381,21 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     // The hamming distance is about 36/74 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("Resolution folder, PHash")] // The PHash is a 210-character hexadecimal string
-    [TestCase(10, 0, new string[] { })]
-    [TestCase(20, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG" })]
-    [TestCase(30, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG" })]
-    [TestCase(40, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_Thumbnail.JPG" })]
-    [TestCase(50, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
-    [TestCase(60, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
-    [TestCase(80, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
-    [TestCase(90, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
-    [TestCase(100, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
-    [TestCase(120, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
-    [TestCase(140, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
-    [TestCase(160, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
-    [TestCase(180, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
-    [TestCase(210, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionPHashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
+    [TestCase((ushort)10, 0, new string[] { })]
+    [TestCase((ushort)20, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG" })]
+    [TestCase((ushort)30, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG" })]
+    [TestCase((ushort)40, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_Thumbnail.JPG" })]
+    [TestCase((ushort)50, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
+    [TestCase((ushort)60, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
+    [TestCase((ushort)80, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
+    [TestCase((ushort)90, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
+    [TestCase((ushort)100, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG" })]
+    [TestCase((ushort)120, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
+    [TestCase((ushort)140, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
+    [TestCase((ushort)160, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
+    [TestCase((ushort)180, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
+    [TestCase((ushort)210, 1, new string[] { "1336_1K.JPG", "1336_2K.JPG", "1336_3K.JPG", "1336_4K_Original.JPG", "1336_8K.JPG", "1336_Thumbnail.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionPHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
     {
         try
         {

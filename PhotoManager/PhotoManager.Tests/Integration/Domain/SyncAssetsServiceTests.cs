@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Domain;
+﻿namespace PhotoManager.Tests.Integration.Domain;
 
 [TestFixture]
 public class SyncAssetsServiceTests
@@ -11,6 +9,7 @@ public class SyncAssetsServiceTests
     private string? backupPath;
 
     private SyncAssetsService? _syncAssetsService;
+    private UserConfigurationService? _userConfigurationService;
     private AssetRepository? _assetRepository;
     private Database? _database;
     private StorageService? _storageService;
@@ -39,10 +38,12 @@ public class SyncAssetsServiceTests
     public void Setup()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new (userConfigurationService);
-        _catalogAssetsService = new (_assetRepository, new AssetHashCalculatorService(), _storageService, userConfigurationService, new DirectoryComparer(_storageService));
+        _userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
+        _storageService = new (_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        DirectoryComparer directoryComparer = new(_storageService);
+        _catalogAssetsService = new (_assetRepository, assetHashCalculatorService, _storageService, _userConfigurationService, directoryComparer);
         _moveAssetsService = new (_assetRepository, _storageService, _catalogAssetsService);
         _directoryComparer = new (_storageService);
         _syncAssetsService = new (_assetRepository, _storageService, _directoryComparer, _moveAssetsService);

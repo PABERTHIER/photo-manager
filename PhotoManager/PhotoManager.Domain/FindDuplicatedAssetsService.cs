@@ -1,15 +1,10 @@
 ﻿namespace PhotoManager.Domain;
 
-public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
+public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStorageService storageService, IUserConfigurationService userConfigurationService) : IFindDuplicatedAssetsService
 {
-    private readonly IAssetRepository _assetRepository;
-    private readonly IStorageService _storageService;
-
-    public FindDuplicatedAssetsService(IAssetRepository assetRepository, IStorageService storageService)
-    {
-        _assetRepository = assetRepository;
-        _storageService = storageService;
-    }
+    private readonly IAssetRepository _assetRepository = assetRepository;
+    private readonly IStorageService _storageService = storageService;
+    private readonly IUserConfigurationService _userConfigurationService = userConfigurationService;
 
     /// <summary>
     /// Detects duplicated assets in the catalog.
@@ -18,13 +13,12 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
     /// where each item is a list of duplicated assets.</returns>
     public List<List<Asset>> GetDuplicatedAssets()
     {
-#pragma warning disable CS0162 // Unreachable code detected
         List<List<Asset>> duplicatedAssetsSets = new();
         List<Asset> assets = new(_assetRepository.GetCataloguedAssets());
 
-        if (AssetConstants.DetectThumbnails && AssetConstants.UsingPHash)
+        if (_userConfigurationService.AssetSettings.DetectThumbnails && _userConfigurationService.HashSettings.UsingPHash)
         {
-            return GetDuplicatesBetweenOriginalAndThumbnail(assets, AssetConstants.PHashThreshold);
+            return GetDuplicatesBetweenOriginalAndThumbnail(assets, _userConfigurationService.HashSettings.PHashThreshold);
         }
 
         var assetGroups = assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1).ToList();
@@ -42,7 +36,6 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
         }
 
         return duplicatedAssetsSets;
-#pragma warning restore CS0162 // Unreachable code detected
     }
 
     // Between Original and Thumbnail:
@@ -50,7 +43,7 @@ public class FindDuplicatedAssetsService : IFindDuplicatedAssetsService
     // DHash the hammingDistance is 16/17
     // MD5Hash the hammingDistance is 32/32
     // SHA512 the hammingDistance is 118/128
-    protected List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(List<Asset> assets, int threshold)
+    protected List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(List<Asset> assets, ushort threshold)
     {
         List<List<Asset>> duplicatedAssetsSets = new();
 

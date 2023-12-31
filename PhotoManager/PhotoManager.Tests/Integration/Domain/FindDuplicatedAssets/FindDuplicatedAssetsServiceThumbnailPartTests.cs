@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
+﻿namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 
 [TestFixture]
 public class FindDuplicatedAssetsServiceThumbnailPartTests
@@ -10,8 +8,8 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     private string? backupPath;
 
     private TestableFindDuplicatedAssetsService? _testableFindDuplicatedAssetsService;
-    private IAssetRepository? _assetRepository;
-    private IStorageService? _storageService;
+    private AssetRepository? _assetRepository;
+    private StorageService? _storageService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -89,9 +87,9 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     {
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new StorageService(userConfigurationService);
-        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
+        _storageService = new (userConfigurationService);
+        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!, userConfigurationService);
 
         asset1 = new()
         {
@@ -268,14 +266,14 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     // The hamming distance is about 113/124 between these hashes
     [Test]
     [Category("Part folder, basic hashing method")] // SHA-512 generates a 128-character long hash in hexadecimal representation
-    [TestCase(20, 0, new string[] { })]
-    [TestCase(40, 0, new string[] { })]
-    [TestCase(60, 0, new string[] { })]
-    [TestCase(80, 0, new string[] { })]
-    [TestCase(100, 0, new string[] { })]
-    [TestCase(110, 0, new string[] { })]
-    [TestCase(128, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartBasicHashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
+    [TestCase((ushort)20, 0, new string[] { })]
+    [TestCase((ushort)40, 0, new string[] { })]
+    [TestCase((ushort)60, 0, new string[] { })]
+    [TestCase((ushort)80, 0, new string[] { })]
+    [TestCase((ushort)100, 0, new string[] { })]
+    [TestCase((ushort)110, 0, new string[] { })]
+    [TestCase((ushort)128, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartBasicHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
     {
         try
         {
@@ -340,13 +338,13 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     // The hamming distance is about 30 between these hashes
     [Test]
     [Category("Part folder, MD5Hash")] // The MD5Hash is a 32-character hexadecimal string
-    [TestCase(5, 0, new string[] { })]
-    [TestCase(10, 0, new string[] { })]
-    [TestCase(15, 0, new string[] { })]
-    [TestCase(20, 0, new string[] { })]
-    [TestCase(25, 0, new string[] { })]
-    [TestCase(32, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartMD5HashDifferentThresholdValues(int threshold, int expected, string[] assetsName)
+    [TestCase((ushort)5, 0, new string[] { })]
+    [TestCase((ushort)10, 0, new string[] { })]
+    [TestCase((ushort)15, 0, new string[] { })]
+    [TestCase((ushort)20, 0, new string[] { })]
+    [TestCase((ushort)25, 0, new string[] { })]
+    [TestCase((ushort)32, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartMD5HashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName)
     {
         try
         {
@@ -411,13 +409,13 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     // The hamming distance is about 14 between these hashes (for some, 0)
     [Test]
     [Category("Part folder, DHash")] // The DHash is a 17-character number
-    [TestCase(3, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
-    [TestCase(5, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
-    [TestCase(9, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
-    [TestCase(11, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
-    [TestCase(14, 2, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" }, new string[] { })]
-    [TestCase(17, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(int threshold, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
+    [TestCase((ushort)3, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
+    [TestCase((ushort)5, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
+    [TestCase((ushort)9, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
+    [TestCase((ushort)11, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" })]
+    [TestCase((ushort)14, 2, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG" }, new string[] { "1336_RightPart.JPG", "1336_TopRightPart.JPG" }, new string[] { })]
+    [TestCase((ushort)17, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
         try
         {
@@ -492,21 +490,21 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
     // The hamming distance is about 80/100 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("Part folder, PHash")] // The PHash is a 210-character hexadecimal string
-    [TestCase(10, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(20, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(30, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(40, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(50, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(60, 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase(80, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG" }, new string[] { }, new string[] { })]
-    [TestCase(90, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG" }, new string[] { }, new string[] { })]
-    [TestCase(100, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopRightPart.JPG" }, new string[] { "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_RightPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_TopPart.JPG" })]
-    [TestCase(120, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase(140, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase(160, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase(180, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    [TestCase(210, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartPHashDifferentThresholdValues(int threshold, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
+    [TestCase((ushort)10, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)20, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)30, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)40, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)50, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)60, 0, new string[] { }, new string[] { }, new string[] { })]
+    [TestCase((ushort)80, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)90, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)100, 3, new string[] { "1336_BottomLeftPart.JPG", "1336_Original.JPG", "1336_TopLeftPart.JPG", "1336_TopRightPart.JPG" }, new string[] { "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_RightPart.JPG" }, new string[] { "1336_LeftPart.JPG", "1336_TopPart.JPG" })]
+    [TestCase((ushort)120, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)140, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)160, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)180, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    [TestCase((ushort)210, 1, new string[] { "1336_BottomLeftPart.JPG", "1336_BottomPart.JPG", "1336_BottomRightPart.JPG", "1336_LeftPart.JPG", "1336_Original.JPG", "1336_RightPart.JPG", "1336_TopLeftPart.JPG", "1336_TopPart.JPG", "1336_TopRightPart.JPG", "Image 1.jpg" }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartPHashDifferentThresholdValues(ushort threshold, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
     {
         try
         {

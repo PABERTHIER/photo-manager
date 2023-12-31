@@ -50,10 +50,10 @@ public class CatalogAssetsService : ICatalogAssetsService
                     //    var backupDirectories = Directory.GetDirectories("TestData_Backups_Test"); // Not var
 
                     //    sourceDirectories.Should().HaveSameCount(backupDirectories);
-                    //    sourceDirectories[0].Should().Be(@"TestData\"AssetConstants.Blobs);
-                    //    sourceDirectories[1].Should().Be(@"TestData\"AssetConstants.Tables);
-                    //    backupDirectories[0].Should().Be(@"TestData_Backups_Test\"AssetConstants.Blobs);
-                    //    backupDirectories[1].Should().Be(@"TestData_Backups_Test\"AssetConstants.Tables);
+                    //    sourceDirectories[0].Should().Be(@"TestData\"_userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
+                    //    sourceDirectories[1].Should().Be(@"TestData\"_userConfigurationService.StorageSettings.FoldersNameSettings.Tables);
+                    //    backupDirectories[0].Should().Be(@"TestData_Backups_Test\"_userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
+                    //    backupDirectories[1].Should().Be(@"TestData_Backups_Test\"_userConfigurationService.StorageSettings.FoldersNameSettings.Tables);
                     _assetRepository.WriteBackup();
                     callback?.Invoke(new CatalogChangeCallbackEventArgs() { Message = string.Empty });
                 }
@@ -100,7 +100,11 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (isVideo)
         {
-            firstFrameVideoPath = VideoHelper.GetFirstFramePath(directoryName, fileName, PathConstants.FirstFrameVideosPath); // Create an asset from the video file
+            firstFrameVideoPath = VideoHelper.GetFirstFramePath(
+                directoryName,
+                fileName,
+                _userConfigurationService.PathSettings.FirstFrameVideosPath,
+                _userConfigurationService.PathSettings.FfmpegPath); // Create an asset from the video file
         }
 
         if (!_assetRepository.IsAssetCatalogued(directoryName, fileName))
@@ -138,13 +142,20 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             bool isPng = imagePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
             bool isGif = imagePath.EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
-            ushort exifOrientation = (isPng || isGif ) ? AssetConstants.DefaultExifOrientation : _storageService.GetExifOrientation(imageBytes); // GetExifOrientation is not handled by Gif and PNG
+
+            ushort exifOrientation = (isPng || isGif )
+                ? _userConfigurationService.AssetSettings.DefaultExifOrientation
+                : _storageService.GetExifOrientation(
+                    imageBytes,
+                    _userConfigurationService.AssetSettings.DefaultExifOrientation,
+                    _userConfigurationService.AssetSettings.CorruptedImageOrientation); // GetExifOrientation is not handled by Gif and PNG
+
             Rotation rotation = _storageService.GetImageRotation(exifOrientation);
 
             bool assetCorrupted = false;
             bool assetRotated =  false;
 
-            if (exifOrientation == AssetConstants.OrientationCorruptedImage)
+            if (exifOrientation == _userConfigurationService.AssetSettings.CorruptedImageOrientation)
             {
                 assetCorrupted = true;
             }
@@ -166,14 +177,16 @@ public class CatalogAssetsService : ICatalogAssetsService
             // If the original image is landscape
             if (originalDecodeWidth > originalDecodeHeight)
             {
-                thumbnailDecodeWidth = AssetConstants.ThumbnailMaxWidth;
-                percentage = (AssetConstants.ThumbnailMaxWidth * 100d / originalDecodeWidth);
+                double thumbnailMaxWidth = _userConfigurationService.AssetSettings.ThumbnailMaxWidth;
+                thumbnailDecodeWidth = thumbnailMaxWidth;
+                percentage = (thumbnailMaxWidth * 100d / originalDecodeWidth);
                 thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
             }
             else // If the original image is portrait
             {
-                thumbnailDecodeHeight = AssetConstants.ThumbnailMaxHeight;
-                percentage = (AssetConstants.ThumbnailMaxHeight * 100d / originalDecodeHeight);
+                double thumbnailMaxHeight = _userConfigurationService.AssetSettings.ThumbnailMaxHeight;
+                thumbnailDecodeHeight = thumbnailMaxHeight;
+                percentage = (thumbnailMaxHeight * 100d / originalDecodeHeight);
                 thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
             }
 
@@ -202,9 +215,9 @@ public class CatalogAssetsService : ICatalogAssetsService
                 ThumbnailCreationDateTime = DateTime.Now,
                 Hash = _assetHashCalculatorService.CalculateHash(imageBytes, imagePath),
                 IsAssetCorrupted = assetCorrupted,
-                AssetCorruptedMessage = assetCorrupted ? AssetConstants.AssetCorruptedMessage : null,
+                AssetCorruptedMessage = assetCorrupted ? _userConfigurationService.AssetSettings.AssetCorruptedMessage : null,
                 IsAssetRotated = assetRotated,
-                AssetRotatedMessage = assetRotated ? AssetConstants.AssetRotatedMessage : null,
+                AssetRotatedMessage = assetRotated ? _userConfigurationService.AssetSettings.AssetRotatedMessage : null,
             };
 
             _assetRepository.AddAsset(asset, thumbnailBuffer);
@@ -213,6 +226,7 @@ public class CatalogAssetsService : ICatalogAssetsService
         return asset;
     }
 
+    // TODO: Remove the method and expose the Property
     public int GetTotalFilesNumber()
     {
         return totalFilesNumber;
@@ -382,14 +396,12 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         cataloguedAssetsBatchCount += CreateAssets(newImageFileNames, false, directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
 
-#pragma warning disable CS0162 // Unreachable code detected
-        if (AssetConstants.AnalyseVideos)
+        if (_userConfigurationService.AssetSettings.AnalyseVideos)
         {
             cataloguedAssetsBatchCount += CreateAssets(newVideoFileNames, true, directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
         }
 
         return cataloguedAssetsBatchCount;
-#pragma warning restore CS0162 // Unreachable code detected
     }
 
     private int CreateAssets(string[] fileNames, bool isAssetVideo, string directory, CatalogChangeCallback callback, int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
@@ -438,13 +450,13 @@ public class CatalogAssetsService : ICatalogAssetsService
             return asset;
         }
 
-        ushort exifOrientation = _storageService.GetHeicExifOrientation(imageBytes);
+        ushort exifOrientation = _storageService.GetHeicExifOrientation(imageBytes, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         Rotation rotation = _storageService.GetImageRotation(exifOrientation);
 
         bool assetCorrupted = false;
         bool assetRotated = false;
 
-        if (exifOrientation == AssetConstants.OrientationCorruptedImage)
+        if (exifOrientation == _userConfigurationService.AssetSettings.CorruptedImageOrientation)
         {
             assetCorrupted = true;
         }
@@ -466,14 +478,16 @@ public class CatalogAssetsService : ICatalogAssetsService
         // If the original image is landscape
         if (originalDecodeWidth > originalDecodeHeight)
         {
-            thumbnailDecodeWidth = AssetConstants.ThumbnailMaxWidth;
-            percentage = (AssetConstants.ThumbnailMaxWidth * 100d / originalDecodeWidth);
+            double thumbnailMaxWidth = _userConfigurationService.AssetSettings.ThumbnailMaxWidth;
+            thumbnailDecodeWidth = thumbnailMaxWidth;
+            percentage = (thumbnailMaxWidth * 100d / originalDecodeWidth);
             thumbnailDecodeHeight = (percentage * originalDecodeHeight) / 100d;
         }
         else // If the original image is portrait
         {
-            thumbnailDecodeHeight = AssetConstants.ThumbnailMaxHeight;
-            percentage = (AssetConstants.ThumbnailMaxHeight * 100d / originalDecodeHeight);
+            double thumbnailMaxHeight = _userConfigurationService.AssetSettings.ThumbnailMaxHeight;
+            thumbnailDecodeHeight = thumbnailMaxHeight;
+            percentage = (thumbnailMaxHeight * 100d / originalDecodeHeight);
             thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
         }
 
@@ -501,9 +515,9 @@ public class CatalogAssetsService : ICatalogAssetsService
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = _assetHashCalculatorService.CalculateHash(imageBytes, imagePath),
             IsAssetCorrupted = assetCorrupted,
-            AssetCorruptedMessage = assetCorrupted ? AssetConstants.AssetCorruptedMessage : null,
+            AssetCorruptedMessage = assetCorrupted ? _userConfigurationService.AssetSettings.AssetCorruptedMessage : null,
             IsAssetRotated = assetRotated,
-            AssetRotatedMessage = assetRotated ? AssetConstants.AssetRotatedMessage : null,
+            AssetRotatedMessage = assetRotated ? _userConfigurationService.AssetSettings.AssetRotatedMessage : null,
         };
 
         _assetRepository.AddAsset(asset, thumbnailBuffer);

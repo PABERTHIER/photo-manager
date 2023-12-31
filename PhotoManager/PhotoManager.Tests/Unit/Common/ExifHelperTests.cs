@@ -5,10 +5,17 @@ public class ExifHelperTests
 {
     private string? dataDirectory;
 
+    private UserConfigurationService? _userConfigurationService;
+
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new (configurationRootMock.Object);
     }
 
     [Test]
@@ -22,25 +29,31 @@ public class ExifHelperTests
         string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        ushort orientation = ExifHelper.GetExifOrientation(buffer);
+        ushort orientation = ExifHelper.GetExifOrientation(
+            buffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
         Assert.AreEqual(expectedOriention, orientation);
     }
 
     [Test]
-    [TestCase("Image 10 portrait.png", AssetConstants.OrientationCorruptedImage)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase("Homer.gif", AssetConstants.OrientationCorruptedImage)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase("Image_11.heic", AssetConstants.OrientationCorruptedImage)] // Error on BitmapFrame.Create(stream)
-    public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsOrientationCorruptedImage(string fileName, int expectedOriention)
+    [TestCase("Image 10 portrait.png")] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
+    [TestCase("Homer.gif")] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
+    [TestCase("Image_11.heic")] // Error on BitmapFrame.Create(stream)
+    public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
         string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        ushort orientation = ExifHelper.GetExifOrientation(buffer);
+        ushort orientation = ExifHelper.GetExifOrientation(
+            buffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOriention, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -48,9 +61,12 @@ public class ExifHelperTests
     {
         byte[] invalidImageBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
 
-        ushort orientation = ExifHelper.GetExifOrientation(invalidImageBuffer);
+        ushort orientation = ExifHelper.GetExifOrientation(
+            invalidImageBuffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -58,9 +74,12 @@ public class ExifHelperTests
     {
         byte[]? nullBuffer = null;
 
-        ushort orientation = ExifHelper.GetExifOrientation(nullBuffer!);
+        ushort orientation = ExifHelper.GetExifOrientation(
+            nullBuffer!,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -68,9 +87,12 @@ public class ExifHelperTests
     {
         byte[] emptyBuffer = Array.Empty<byte>();
 
-        ushort orientation = ExifHelper.GetExifOrientation(emptyBuffer);
+        ushort orientation = ExifHelper.GetExifOrientation(
+            emptyBuffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -84,7 +106,7 @@ public class ExifHelperTests
         byte[] buffer = File.ReadAllBytes(filePath);
         //byte[] bufferRotated = GetHeicRotatedBuffer(buffer, degrees);
 
-        ushort orientation = ExifHelper.GetHeicExifOrientation(buffer);
+        ushort orientation = ExifHelper.GetHeicExifOrientation(buffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
         Assert.AreEqual(expectedOriention, orientation);
@@ -95,9 +117,9 @@ public class ExifHelperTests
     {
         byte[] invalidHeicBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
 
-        ushort orientation = ExifHelper.GetHeicExifOrientation(invalidHeicBuffer);
+        ushort orientation = ExifHelper.GetHeicExifOrientation(invalidHeicBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -105,7 +127,10 @@ public class ExifHelperTests
     {
         byte[]? nullBuffer = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => ExifHelper.GetHeicExifOrientation(nullBuffer!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        {
+            ExifHelper.GetHeicExifOrientation(nullBuffer!, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        });
 
         Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
@@ -115,7 +140,10 @@ public class ExifHelperTests
     {
         byte[] emptyBuffer = Array.Empty<byte>();
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => ExifHelper.GetHeicExifOrientation(emptyBuffer));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+        {
+            ExifHelper.GetHeicExifOrientation(emptyBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        });
 
         Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }

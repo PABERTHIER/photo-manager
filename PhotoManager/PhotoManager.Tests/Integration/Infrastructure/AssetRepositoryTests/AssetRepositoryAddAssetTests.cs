@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryAddAssetTests

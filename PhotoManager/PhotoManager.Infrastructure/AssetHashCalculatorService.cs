@@ -1,26 +1,26 @@
 ﻿namespace PhotoManager.Infrastructure;
 
-public class AssetHashCalculatorService : IAssetHashCalculatorService
+public class AssetHashCalculatorService(IUserConfigurationService userConfigurationService) : IAssetHashCalculatorService
 {
+    private readonly IUserConfigurationService _userConfigurationService = userConfigurationService;
+
     public string CalculateHash(byte[] imageBytes, string filePath)
     {
-#pragma warning disable CS0162 // Unreachable code detected
-        if (AssetConstants.UsingPHash)
+        if (_userConfigurationService.HashSettings.UsingPHash)
         {
             return HashingHelper.CalculatePHash(filePath) ?? HashingHelper.CalculateHash(imageBytes);
         }
 
-        if (AssetConstants.UsingDHash)
+        if (_userConfigurationService.HashSettings.UsingDHash)
         {
             return HashingHelper.CalculateDHash(filePath) ?? HashingHelper.CalculateHash(imageBytes);
         }
 
-        if (AssetConstants.UsingMD5Hash)
+        if (_userConfigurationService.HashSettings.UsingMD5Hash)
         {
             return HashingHelper.CalculateMD5Hash(imageBytes) ?? HashingHelper.CalculateHash(imageBytes);
         }
 
         return HashingHelper.CalculateHash(imageBytes);
-#pragma warning restore CS0162 // Unreachable code detected
     }
 }

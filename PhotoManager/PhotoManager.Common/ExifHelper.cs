@@ -13,7 +13,7 @@ public static class ExifHelper
     // 3: Upside-down (180 deg rotation)
     // 6: Rotated 90 deg counterclockwise (270 deg clockwise)
     // 8: Rotated 90 deg clockwise (270 deg counterclockwise)
-    public static ushort GetExifOrientation(byte[] buffer)
+    public static ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation, ushort corruptedImageOrientation)
     {
         try
         {
@@ -28,7 +28,7 @@ public static class ExifHelper
 
                     if (orientation == null)
                     {
-                        return AssetConstants.DefaultExifOrientation;
+                        return defaultExifOrientation;
                     }
 
                     return (ushort)orientation;
@@ -48,10 +48,10 @@ public static class ExifHelper
             }
         }
 
-        return AssetConstants.OrientationCorruptedImage;
+        return corruptedImageOrientation;
     }
 
-    public static ushort GetHeicExifOrientation(byte[] buffer)
+    public static ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation)
     {
         try
         {
@@ -73,7 +73,7 @@ public static class ExifHelper
                     }
                     else
                     {
-                        return GetMagickHeicOrientation(image.Orientation);
+                        return GetMagickHeicOrientation(image.Orientation, corruptedImageOrientation);
                     }
                 }
             }
@@ -83,7 +83,7 @@ public static class ExifHelper
             log.Error("The image is not valid or in an unsupported format");
         }
 
-        return AssetConstants.OrientationCorruptedImage;
+        return corruptedImageOrientation;
     }
 
     public static Rotation GetImageRotation(ushort exifOrientation)
@@ -147,7 +147,7 @@ public static class ExifHelper
     // 3: Upside-down (180 deg rotation)
     // 6: Rotated 90 deg counterclockwise (270 deg clockwise)
     // 8: Rotated 90 deg clockwise (270 deg counterclockwise)
-    private static ushort GetMagickHeicOrientation(OrientationType orientationType)
+    private static ushort GetMagickHeicOrientation(OrientationType orientationType, ushort corruptedImageOrientation)
     {
         ushort result = orientationType
         switch
@@ -156,8 +156,8 @@ public static class ExifHelper
             (OrientationType.BottomLeft or OrientationType.LeftBotom) => 8,
             (OrientationType.BottomRight or OrientationType.RightBottom) => 3,
             (OrientationType.TopRight or OrientationType.RightTop) => 6,
-            OrientationType.Undefined => AssetConstants.OrientationCorruptedImage,
-            _ => AssetConstants.OrientationCorruptedImage
+            OrientationType.Undefined => corruptedImageOrientation,
+            _ => corruptedImageOrientation
         };
 
         return result;

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using PhotoManager.UI;
+﻿using PhotoManager.UI;
 
 namespace PhotoManager.Tests.Integration.Infrastructure;
 
@@ -7,7 +6,7 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 public class UserConfigurationServiceTests
 {
     private string? dataDirectory;
-    private IUserConfigurationService? _userConfigurationService;
+    private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
@@ -80,7 +79,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void AssetCorruptedMessage_CorrectValue_ReturnsAssetCorruptedMessageValue()
     {
-        string? assetCorruptedMessage = _userConfigurationService!.AssetSettings.AssetCorruptedMessage;
+        string assetCorruptedMessage = _userConfigurationService!.AssetSettings.AssetCorruptedMessage;
 
         Assert.IsNotNull(assetCorruptedMessage);
         Assert.AreEqual("The asset is corrupted", assetCorruptedMessage);
@@ -89,7 +88,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void AssetRotatedMessage_CorrectValue_ReturnsAssetRotatedMessageValue()
     {
-        string? assetRotatedMessage = _userConfigurationService!.AssetSettings.AssetRotatedMessage;
+        string assetRotatedMessage = _userConfigurationService!.AssetSettings.AssetRotatedMessage;
 
         Assert.IsNotNull(assetRotatedMessage);
         Assert.AreEqual("The asset has been rotated", assetRotatedMessage);
@@ -112,6 +111,14 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
+    public void CorruptedImageOrientation_CorrectValue_ReturnsCorruptedImageOrientationValue()
+    {
+        ushort corruptedImageOrientation = _userConfigurationService!.AssetSettings.CorruptedImageOrientation;
+
+        Assert.AreEqual(10000, corruptedImageOrientation);
+    }
+
+    [Test]
     public void DefaultExifOrientation_CorrectValue_ReturnsDefaultExifOrientationValue()
     {
         ushort defaultExifOrientation = _userConfigurationService!.AssetSettings.DefaultExifOrientation;
@@ -125,14 +132,6 @@ public class UserConfigurationServiceTests
         bool detectThumbnails = _userConfigurationService!.AssetSettings.DetectThumbnails;
 
         Assert.IsFalse(detectThumbnails);
-    }
-
-    [Test]
-    public void OrientationCorruptedImage_CorrectValue_ReturnsOrientationCorruptedImageValue()
-    {
-        ushort orientationCorruptedImage = _userConfigurationService!.AssetSettings.OrientationCorruptedImage;
-
-        Assert.AreEqual(10000, orientationCorruptedImage);
     }
 
     [Test]
@@ -194,7 +193,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void AssetsDirectory_CorrectValue_ReturnsAssetsDirectoryValue()
     {
-        string? assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
+        string assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
 
         Assert.IsNotNull(assetsDirectory);
         Assert.AreEqual("E:\\Workspace\\PhotoManager\\Test", assetsDirectory);
@@ -203,7 +202,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void BackupPath_CorrectValue_ReturnsBackupPathValue()
     {
-        string? backupPath = _userConfigurationService!.PathSettings.BackupPath;
+        string backupPath = _userConfigurationService!.PathSettings.BackupPath;
 
         Assert.IsNotNull(backupPath);
         Assert.AreEqual("E:\\Workspace\\PhotoManager\\Backup", backupPath);
@@ -212,7 +211,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void ExemptedFolderPath_CorrectValue_ReturnsExemptedFolderPathValue()
     {
-        string? exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
+        string exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
 
         Assert.IsNotNull(exemptedFolderPath);
         Assert.AreEqual("E:\\Workspace\\PhotoManager\\Test\\test1", exemptedFolderPath);
@@ -221,7 +220,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void FfmpegPath_CorrectValue_ReturnsFfmpegPathValue()
     {
-        string? ffmpegPath = _userConfigurationService!.PathSettings.FfmpegPath;
+        string ffmpegPath = _userConfigurationService!.PathSettings.FfmpegPath;
 
         Assert.IsNotNull(ffmpegPath);
         Assert.AreEqual("E:\\ffmpeg\\bin\\ffmpeg.exe", ffmpegPath);
@@ -230,8 +229,8 @@ public class UserConfigurationServiceTests
     [Test]
     public void FirstFrameVideosPath_CorrectValue_ReturnsFirstFrameVideosPathValue()
     {
-        string? assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
-        string? firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
+        string assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
+        string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
         Assert.IsNotNull(assetsDirectory);
         Assert.IsNotNull(firstFrameVideosPath);
@@ -243,7 +242,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void ProjectName_CorrectValue_ReturnsProjectNameValue()
     {
-        string? projectName = _userConfigurationService!.ProjectSettings.Name;
+        string projectName = _userConfigurationService!.ProjectSettings.Name;
 
         Assert.IsNotNull(projectName);
         Assert.AreEqual("Photo Manager", projectName);
@@ -252,7 +251,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void ProjectOwner_CorrectValue_ReturnsProjectOwnerValue()
     {
-        string? projectOwner = _userConfigurationService!.ProjectSettings.Owner;
+        string projectOwner = _userConfigurationService!.ProjectSettings.Owner;
 
         Assert.IsNotNull(projectOwner);
         Assert.AreEqual("Toto", projectOwner);
@@ -269,7 +268,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void FoldersNameBlobs_CorrectValue_ReturnsFoldersNameBlobsValue()
     {
-        string? folderNameBlobs = _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs;
+        string folderNameBlobs = _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs;
 
         Assert.IsNotNull(folderNameBlobs);
         Assert.AreEqual("Blobs", folderNameBlobs);
@@ -278,7 +277,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void FoldersNameTables_CorrectValue_ReturnsFoldersNameTablesValue()
     {
-        string? foldersNameTables = _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables;
+        string foldersNameTables = _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables;
 
         Assert.IsNotNull(foldersNameTables);
         Assert.AreEqual("Tables", foldersNameTables);
@@ -287,7 +286,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void Separator_CorrectValue_ReturnsSeparatorValue()
     {
-        char? separator = _userConfigurationService!.StorageSettings.Separator;
+        char separator = _userConfigurationService!.StorageSettings.Separator;
 
         Assert.IsNotNull(separator);
         Assert.AreEqual('|', separator);
@@ -296,16 +295,16 @@ public class UserConfigurationServiceTests
     [Test]
     public void StorageVersion_CorrectValue_ReturnsStorageVersionValue()
     {
-        string? storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
+        double storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
 
         Assert.IsNotNull(storageVersion);
-        Assert.AreEqual("1.0", storageVersion);
+        Assert.AreEqual(1.0, storageVersion);
     }
 
     [Test]
     public void TablesSettingsAssetsTableName_CorrectValue_ReturnsTablesSettingsAssetsTableNameValue()
     {
-        string? tablesSettingsAssetsTableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName;
+        string tablesSettingsAssetsTableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName;
 
         Assert.IsNotNull(tablesSettingsAssetsTableName);
         Assert.AreEqual("Assets", tablesSettingsAssetsTableName);
@@ -314,7 +313,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void TablesSettingsFoldersTableName_CorrectValue_ReturnsTablesSettingsFoldersTableNameValue()
     {
-        string? tablesSettingsFoldersTableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName;
+        string tablesSettingsFoldersTableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName;
 
         Assert.IsNotNull(tablesSettingsFoldersTableName);
         Assert.AreEqual("Folders", tablesSettingsFoldersTableName);
@@ -323,7 +322,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void TablesSettingsRecentTargetPathsTableName_CorrectValue_ReturnsTablesSettingsRecentTargetPathsTableNameValue()
     {
-        string? tablesSettingsRecentTargetPathsTableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName;
+        string tablesSettingsRecentTargetPathsTableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName;
 
         Assert.IsNotNull(tablesSettingsRecentTargetPathsTableName);
         Assert.AreEqual("RecentTargetPaths", tablesSettingsRecentTargetPathsTableName);
@@ -332,7 +331,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void TablesSettingsSyncAssetsDirectoriesDefinitionsTableName_CorrectValue_ReturnsTablesSettingsSyncAssetsDirectoriesDefinitionsTableNameValue()
     {
-        string? tablesSettingsSyncAssetsDirectoriesDefinitionsTableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
+        string tablesSettingsSyncAssetsDirectoriesDefinitionsTableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
 
         Assert.IsNotNull(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName);
         Assert.AreEqual("SyncAssetsDirectoriesDefinitions", tablesSettingsSyncAssetsDirectoriesDefinitionsTableName);

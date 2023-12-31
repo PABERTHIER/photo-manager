@@ -4,7 +4,9 @@
 public class DatabaseReadObjectListTests
 {
     private string? dataDirectory;
+
     private PhotoManager.Infrastructure.Database.Database? _database;
+    private UserConfigurationService? _userConfigurationService;
 
     private string? csvEscapedTextWithSemicolon;
     private string? csvUnescapedTextWithSemicolon;
@@ -12,13 +14,17 @@ public class DatabaseReadObjectListTests
     private string? csvUnescapedTextWithPipe;
     private string? csvSomeUnescapedTextWithPipe;
     private string? csvInvalid;
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
     private readonly char semicolonSeparator = ';';
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
 
         csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"FileSize\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"AssetCorruptedMessage\";\"IsAssetCorrupted\";\"AssetRotatedMessage\";\"IsAssetRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"363888\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\";\"\";\"false\";\"\";\"false\"\r\n" +
@@ -46,7 +52,7 @@ public class DatabaseReadObjectListTests
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
     [Test]
@@ -67,7 +73,7 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -100,11 +106,11 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, pipeSeparator, filePath, csv, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
 
             Asserts(assets, filePath, csv!);
         }
@@ -122,16 +128,20 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
-            $"Separator: {pipeSeparator}\n" +
+            $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
             $"LastReadFilePath: {filePath}\n" +
             $"LastReadFileRaw: {csv}";
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             File.WriteAllText(filePath, csv);
 
@@ -152,11 +162,15 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             File.WriteAllText(filePath, csv);
 
@@ -178,11 +192,15 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             File.WriteAllText(filePath, csv);
 
@@ -226,11 +244,15 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             File.WriteAllText(filePath, csv);
 
@@ -276,11 +298,11 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, pipeSeparator, filePath, csv!, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv!, tableName, escapeText);
 
             Assert.IsEmpty(assets);
         }
@@ -300,11 +322,11 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, pipeSeparator, filePath, csv, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
 
             Assert.IsEmpty(assets);
         }
@@ -324,16 +346,20 @@ public class DatabaseReadObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
-            $"Separator: {pipeSeparator}\n" +
+            $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
             $"LastReadFilePath: {filePath}\n" +
             $"LastReadFileRaw: {csv}";
 
         try
         {
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => ReadObjectList(directoryPath, pipeSeparator, filePath, csv, tableName, escapeText));
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+            {
+                ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
+            });
+
             Assert.AreEqual(exceptionMessage, exception?.Message);
         }
         finally
@@ -349,17 +375,21 @@ public class DatabaseReadObjectListTests
         string csv = csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         Func<string[], Asset>? nullFunc = null;
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
-            $"Separator: {pipeSeparator}\n" +
+            $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
             $"LastReadFilePath: {filePath}\n" +
             $"LastReadFileRaw: {csv}";
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             File.WriteAllText(filePath, csv);
 
@@ -385,10 +415,10 @@ public class DatabaseReadObjectListTests
         string csv = csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
-            $"Separator: {pipeSeparator}\n" +
+            $"Separator: {_userConfigurationService!.StorageSettings.Separator}\n" +
             $"LastReadFilePath: {filePath}\n" +
             $"LastReadFileRaw: {null}";
 
@@ -398,7 +428,11 @@ public class DatabaseReadObjectListTests
             objectListStorageMock.Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(), It.IsAny<Diagnostics>())).Throws(new Exception());
             PhotoManager.Infrastructure.Database.Database? database = new(objectListStorageMock.Object, new BlobStorage(), new BackupStorage());
 
-            database!.Initialize(directoryPath, pipeSeparator);
+            database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             File.WriteAllText(filePath, csv);
 
@@ -420,7 +454,11 @@ public class DatabaseReadObjectListTests
 
     private List<Asset> ReadObjectList(string directoryPath, char separator, string filePath, string csv, string tableName, bool escapeText)
     {
-        _database!.Initialize(directoryPath, separator);
+        _database!.Initialize(
+                directoryPath,
+                separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
         File.WriteAllText(filePath, csv);
 

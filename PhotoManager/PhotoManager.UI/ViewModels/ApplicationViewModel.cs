@@ -489,6 +489,10 @@ public class ApplicationViewModel : BaseViewModel
 
     public ushort GetCatalogCooldownMinutes() => Application.GetCatalogCooldownMinutes();
 
+    public bool GetSyncAssetsEveryXMinutes() => Application.GetSyncAssetsEveryXMinutes();
+
+    public string GetExemptedFolderPath() => Application.GetExemptedFolderPath();
+
     public Folder[] GetRootCatalogFolders() => Application.GetRootCatalogFolders();
 
     public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => Application.GetSubFolders(parentFolder, includeHidden);

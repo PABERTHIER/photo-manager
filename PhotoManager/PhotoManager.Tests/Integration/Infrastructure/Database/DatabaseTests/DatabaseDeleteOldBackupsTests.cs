@@ -4,14 +4,19 @@
 public class DatabaseDeleteOldBackupsTests
 {
     private string? dataDirectory;
-    private PhotoManager.Infrastructure.Database.Database? _database;
 
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
+    private PhotoManager.Infrastructure.Database.Database? _database;
+    private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [SetUp]
@@ -34,7 +39,11 @@ public class DatabaseDeleteOldBackupsTests
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             bool backupCreated1 = _database!.WriteBackup(new DateTime(2023, 04, 04));
             bool backupCreated2 = _database!.WriteBackup(new DateTime(2023, 03, 04));
@@ -80,7 +89,11 @@ public class DatabaseDeleteOldBackupsTests
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             bool backupCreated1 = _database!.WriteBackup(new DateTime(2023, 04, 04));
             bool backupCreated2 = _database!.WriteBackup(new DateTime(2023, 03, 04));

@@ -4,14 +4,19 @@
 public class DatabaseFolderHasThumbnailsTests
 {
     private string? dataDirectory;
-    private PhotoManager.Infrastructure.Database.Database? _database;
 
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
+    private PhotoManager.Infrastructure.Database.Database? _database;
+    private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [SetUp]
@@ -33,7 +38,11 @@ public class DatabaseFolderHasThumbnailsTests
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
 
@@ -56,7 +65,11 @@ public class DatabaseFolderHasThumbnailsTests
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             bool folderHasThumbnails = _database!.FolderHasThumbnails(blobName);
 

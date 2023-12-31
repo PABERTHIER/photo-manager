@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Unit;
+﻿namespace PhotoManager.Tests.Unit;
 
 [TestFixture]
 public class ConfigurationMockExtensionsTests
@@ -18,9 +16,9 @@ public class ConfigurationMockExtensionsTests
         Assert.AreEqual("The asset has been rotated", configuration.GetValue<string>(UserConfigurationKeys.ASSET_ROTATED_MESSAGE));
         Assert.AreEqual(100, configuration.GetValue<int>(UserConfigurationKeys.CATALOG_BATCH_SIZE));
         Assert.AreEqual(5, configuration.GetValue<ushort>(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES));
+        Assert.AreEqual(10000, configuration.GetValue<int>(UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION));
         Assert.AreEqual(1, configuration.GetValue<ushort>(UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION));
         Assert.AreEqual(false, configuration.GetValue<bool>(UserConfigurationKeys.DETECT_THUMBNAILS));
-        Assert.AreEqual(10000, configuration.GetValue<int>(UserConfigurationKeys.ORIENTATION_CORRUPTED_IMAGE));
         Assert.AreEqual(false, configuration.GetValue<bool>(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES));
         Assert.AreEqual(150, configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT));
         Assert.AreEqual(200, configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH));
@@ -31,7 +29,7 @@ public class ConfigurationMockExtensionsTests
         Assert.AreEqual("C:\\Path", configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY));
         Assert.AreEqual("C:\\Path\\To\\Backup", configuration.GetValue<string>(UserConfigurationKeys.BACKUP_PATH));
         Assert.AreEqual("C:\\Path\\To\\FolderExempted", configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH));
-        Assert.AreEqual("C:\\Path\\To\\Ffmpeg", configuration.GetValue<string>(UserConfigurationKeys.FFMPEG_PATH));
+        Assert.AreEqual("C:\\Path\\To\\Ffmpeg.exe", configuration.GetValue<string>(UserConfigurationKeys.FFMPEG_PATH));
         Assert.AreEqual("OutputVideoFirstFrame", configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME));
         Assert.AreEqual("Photo Manager", configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME));
         Assert.AreEqual("Toto", configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER));

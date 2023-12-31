@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
+﻿namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 
 [TestFixture]
 public class FindDuplicatedAssetsServiceTests
@@ -9,9 +7,9 @@ public class FindDuplicatedAssetsServiceTests
     private const string backupEndPath = "DatabaseTests\\v1.0";
     private string? backupPath;
 
-    private IFindDuplicatedAssetsService? _findDuplicatedAssetsService;
-    private IAssetRepository? _assetRepository;
-    private IStorageService? _storageService;
+    private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
+    private AssetRepository? _assetRepository;
+    private StorageService? _storageService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -39,9 +37,9 @@ public class FindDuplicatedAssetsServiceTests
     {
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new StorageService(userConfigurationService);
-        _findDuplicatedAssetsService = new FindDuplicatedAssetsService(_assetRepository, _storageService);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
+        _storageService = new (userConfigurationService);
+        _findDuplicatedAssetsService = new (_assetRepository, _storageService, userConfigurationService);
 
         asset1 = new()
         {

@@ -103,9 +103,13 @@ public class Application : IApplication
 
     public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => _assetRepository.GetSubFolders(parentFolder, includeHidden);
 
-    public string GetInitialFolder() => _userConfigurationService.GetPicturesDirectory();
+    public string GetInitialFolder() => _userConfigurationService.PathSettings.AssetsDirectory;
 
     public ushort GetCatalogCooldownMinutes() => _userConfigurationService.AssetSettings.CatalogCooldownMinutes;
+
+    public bool GetSyncAssetsEveryXMinutes() => _userConfigurationService.AssetSettings.SyncAssetsEveryXMinutes;
+
+    public string GetExemptedFolderPath() => _userConfigurationService.PathSettings.ExemptedFolderPath;
 
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => _moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests;
+﻿namespace PhotoManager.Tests;
 
 public static class ConfigurationMockExtensions
 {
@@ -21,9 +19,9 @@ public static class ConfigurationMockExtensions
              .MockGetValue(UserConfigurationKeys.ASSET_ROTATED_MESSAGE, "The asset has been rotated")
              .MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, "100")
              .MockGetValue(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES, "5")
+             .MockGetValue(UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION, "10000")
              .MockGetValue(UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION, "1")
              .MockGetValue(UserConfigurationKeys.DETECT_THUMBNAILS, "false")
-             .MockGetValue(UserConfigurationKeys.ORIENTATION_CORRUPTED_IMAGE, "10000")
              .MockGetValue(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES, "false")
              .MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT, "150")
              .MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH, "200")
@@ -34,7 +32,7 @@ public static class ConfigurationMockExtensions
              .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "C:\\Path")
              .MockGetValue(UserConfigurationKeys.BACKUP_PATH, "C:\\Path\\To\\Backup")
              .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "C:\\Path\\To\\FolderExempted")
-             .MockGetValue(UserConfigurationKeys.FFMPEG_PATH, "C:\\Path\\To\\Ffmpeg")
+             .MockGetValue(UserConfigurationKeys.FFMPEG_PATH, "C:\\Path\\To\\Ffmpeg.exe")
              .MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "OutputVideoFirstFrame")
              .MockGetValue(UserConfigurationKeys.PROJECT_NAME, "Photo Manager")
              .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, "Toto")

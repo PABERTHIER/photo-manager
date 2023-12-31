@@ -7,10 +7,17 @@ public class VideoHelperTests
 {
     private string? dataDirectory;
 
+    private IUserConfigurationService? _userConfigurationService;
+
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new UserConfigurationService(configurationRootMock.Object);
     }
 
     [Test]
@@ -82,7 +89,7 @@ public class VideoHelperTests
 
         try
         {
-            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsTrue(fileSystem.File.Exists(firstFrameVideoPath));
@@ -93,9 +100,8 @@ public class VideoHelperTests
             Assert.IsTrue(consoleOutput.Contains("First frame extracted successfully for:"));
 
             // Verify that ExecuteFFmpegCommand was called with the correct arguments
-            string ffmpegPath = PathConstants.FfmpegPath;
             string expectedArguments = $"-i \"{Path.Combine(dataDirectory!, fileName)}\" -ss 00:00:01 -vframes 1 \"{firstFrameVideoPath}\"";
-            mockProcessExecutor.Verify(x => x.ExecuteFFmpegCommand(ffmpegPath, expectedArguments), Times.Once);
+            mockProcessExecutor.Verify(x => x.ExecuteFFmpegCommand(_userConfigurationService!.PathSettings.FfmpegPath, expectedArguments), Times.Once);
         }
         finally
         {
@@ -123,7 +129,7 @@ public class VideoHelperTests
             StringWriter stringWriter = new();
             Console.SetOut(stringWriter);
 
-            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsFalse(File.Exists(firstFrameVideoPath));
@@ -161,7 +167,7 @@ public class VideoHelperTests
             StringWriter stringWriter = new();
             Console.SetOut(stringWriter);
 
-            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.IsFalse(File.Exists(firstFrameVideoPath));

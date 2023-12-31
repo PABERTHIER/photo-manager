@@ -5,6 +5,8 @@ public class VideoHelperTests
 {
     private string? dataDirectory;
 
+    public const string FfmpegPath = "E:\\ffmpeg\\bin\\ffmpeg.exe"; // TODO: Will be removed when the dll of Ffmpeg would have been generated and stored in the project
+
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
@@ -12,7 +14,7 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void GetFirstFramePath_IntegrationTest()
+    public void GetFirstFramePath_ExistingFile_ExtractsFirstFrame()
     {
         string fileName = "Homer.mp4";
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
@@ -22,7 +24,7 @@ public class VideoHelperTests
 
         try
         {
-            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, FfmpegPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);
@@ -39,7 +41,7 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void NotGetFirstFramePath_IntegrationTest()
+    public void GetFirstFramePath_ExistingFileButLessThanOneSecond_ExtractsFirstFrame()
     {
         string fileName = "Homer1s.mp4"; // Video that has less than 1 second
         string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
@@ -49,7 +51,32 @@ public class VideoHelperTests
             string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath);
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, FfmpegPath);
+
+            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
+            Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);
+
+            // Verify that the first frame file is created in the output directory
+            Assert.IsFalse(File.Exists(expectedFirstFrameVideoPath));
+        }
+        finally
+        {
+            Directory.Delete(destinationPath);
+        }
+    }
+
+    [Test]
+    public void GetFirstFramePath_NonExistingFile_ReturnsPathButNoFileCreated()
+    {
+        string fileName = "toto.mp4";
+        string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
+
+        try
+        {
+            string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
+            string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
+
+            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, FfmpegPath);
 
             Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
             Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);

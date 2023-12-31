@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
+﻿namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 
 [TestFixture]
 public class FindDuplicatedAssetsServiceThumbnailTests
@@ -8,10 +6,12 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     private string? dataDirectory;
     private const string backupEndPath = "DatabaseTests\\v1.0";
     private string? backupPath;
+    private ushort? pHashThreshold;
 
     private TestableFindDuplicatedAssetsService? _testableFindDuplicatedAssetsService;
-    private IAssetRepository? _assetRepository;
-    private IStorageService? _storageService;
+    private AssetRepository? _assetRepository;
+    private StorageService? _storageService;
+    private UserConfigurationService? _userConfigurationService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -38,10 +38,12 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     public void Setup()
     {
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new StorageService(userConfigurationService);
-        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!);
+        _userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new (database, _storageServiceMock!.Object, _userConfigurationService);
+        _storageService = new (_userConfigurationService);
+        _testableFindDuplicatedAssetsService = new(_assetRepository!, _storageService!, _userConfigurationService);
+
+        pHashThreshold = _userConfigurationService.HashSettings.PHashThreshold;
 
         asset1 = new()
         {
@@ -190,7 +192,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<Asset> assets = _assetRepository.GetCataloguedAssets();
 
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
+            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
 
             Assert.IsNotEmpty(duplicatedAssets);
             Assert.AreEqual(2, duplicatedAssets.Count);
@@ -287,7 +289,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<Asset> assets = _assetRepository.GetCataloguedAssets();
 
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
+            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
 
             Assert.IsNotEmpty(duplicatedAssets);
             Assert.AreEqual(1, duplicatedAssets.Count);
@@ -354,7 +356,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<Asset> assets = _assetRepository.GetCataloguedAssets();
 
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
+            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
 
             Assert.IsEmpty(duplicatedAssets);
         }
@@ -397,7 +399,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<Asset> assets = _assetRepository.GetCataloguedAssets();
 
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
+            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
 
             Assert.IsEmpty(duplicatedAssets);
         }
@@ -414,7 +416,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         {
             List<Asset> assets = _assetRepository!.GetCataloguedAssets();
 
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
+            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
 
             Assert.IsEmpty(duplicatedAssets);
         }
@@ -446,7 +448,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<Asset> assets = _assetRepository.GetCataloguedAssets();
 
-            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, AssetConstants.PHashThreshold);
+            List<List<Asset>> duplicatedAssets = _testableFindDuplicatedAssetsService!.GetDuplicatesBetweenOriginalAndThumbnailTestable(assets, (ushort)pHashThreshold!);
 
             Assert.IsEmpty(duplicatedAssets);
         }

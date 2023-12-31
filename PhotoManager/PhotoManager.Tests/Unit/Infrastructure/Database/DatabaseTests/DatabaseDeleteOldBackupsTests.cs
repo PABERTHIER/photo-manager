@@ -5,14 +5,18 @@ public class DatabaseDeleteOldBackupsTests
 {
     private string? dataDirectory;
 
+    private UserConfigurationService? _userConfigurationService;
     private Mock<IBackupStorage>? _backupStorageMock;
-
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [SetUp]
@@ -47,7 +51,11 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), _backupStorageMock.Object);
-            database.Initialize(directoryPath, pipeSeparator);
+            database.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             database.DeleteOldBackups(backupsToKeep);
 
             _backupStorageMock.Verify(bs => bs.DeleteBackupFile(It.IsAny<string>()), Times.Exactly(2));
@@ -87,7 +95,11 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
 
             PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), _backupStorageMock.Object);
-            database.Initialize(directoryPath, pipeSeparator);
+            database.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             database.DeleteOldBackups(backupsToKeep);
 
             _backupStorageMock.Verify(bs => bs.DeleteBackupFile(It.IsAny<string>()), Times.Never);

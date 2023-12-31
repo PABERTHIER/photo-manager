@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Domain;
+﻿namespace PhotoManager.Tests.Integration.Domain;
 
 [TestFixture]
 public class DirectoryComparerTests

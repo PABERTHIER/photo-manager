@@ -16,8 +16,8 @@ public interface IStorageService
     BitmapImage LoadBitmapHeicOriginalImage(byte[] buffer, Rotation rotation);
     BitmapImage LoadBitmapHeicThumbnailImage(byte[] buffer, Rotation rotation, int width, int height);
     BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation);
-    ushort GetExifOrientation(byte[] buffer);
-    ushort GetHeicExifOrientation(byte[] buffer);
+    ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation, ushort corruptedImageOrientation);
+    ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation);
     Rotation GetImageRotation(ushort exifOrientation);
     byte[] GetJpegBitmapImage(BitmapImage thumbnailImage);
     byte[] GetPngBitmapImage(BitmapImage thumbnailImage);

@@ -4,15 +4,21 @@
 public class DatabaseReadBlobTests
 {
     private string? dataDirectory;
-    private PhotoManager.Infrastructure.Database.Database? _database;
 
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
+    private PhotoManager.Infrastructure.Database.Database? _database;
+    private UserConfigurationService? _userConfigurationService;
+
     private readonly char semicolonSeparator = ';';
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [SetUp]
@@ -26,7 +32,7 @@ public class DatabaseReadBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string blobFilePath = Path.Combine(directoryPath, AssetConstants.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
             { "Image1.jpg", new byte[] { 1, 2, 3 } },
@@ -35,7 +41,11 @@ public class DatabaseReadBlobTests
 
         try
         {
-            _database!.Initialize(directoryPath, semicolonSeparator);
+            _database!.Initialize(
+                directoryPath,
+                semicolonSeparator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
             Assert.IsTrue(File.Exists(blobFilePath));
@@ -64,7 +74,7 @@ public class DatabaseReadBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string blobFilePath = Path.Combine(directoryPath, AssetConstants.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
             { "Image1.jpg", new byte[] { 1, 2, 3 } },
@@ -73,7 +83,11 @@ public class DatabaseReadBlobTests
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
             Assert.IsTrue(File.Exists(blobFilePath));
@@ -102,11 +116,15 @@ public class DatabaseReadBlobTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string blobFilePath = Path.Combine(directoryPath, AssetConstants.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 

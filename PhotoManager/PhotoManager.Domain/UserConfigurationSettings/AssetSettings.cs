@@ -2,13 +2,13 @@
 
 public record class AssetSettings(
     bool AnalyseVideos,
-    string? AssetCorruptedMessage,
-    string? AssetRotatedMessage,
+    string AssetCorruptedMessage,
+    string AssetRotatedMessage,
     int CatalogBatchSize,
     ushort CatalogCooldownMinutes,
+    ushort CorruptedImageOrientation,
     ushort DefaultExifOrientation,
     bool DetectThumbnails,
-    ushort OrientationCorruptedImage,
     bool SyncAssetsEveryXMinutes,
     double ThumbnailMaxHeight,
     double ThumbnailMaxWidth);

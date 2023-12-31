@@ -5,11 +5,18 @@ public class BlobStorageTests
 {
     private string? dataDirectory;
     private BlobStorage? _blobStorage;
+    private UserConfigurationService? _userConfigurationService;
+    private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(_configurationRootMock!.Object);
     }
 
     [SetUp]
@@ -23,7 +30,7 @@ public class BlobStorageTests
     [TestCase("f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin", 7, "1336.JPG")]
     public void ReadFromBinaryFile_FileExists_ReturnsDeserializedObject(string blobFileName, int countExpected, string keyContained)
     {
-        string blobFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0", AssetConstants.Blobs, blobFileName);
+        string blobFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0", _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobFileName);
 
         Dictionary<string, byte[]>? deserializedObject = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 

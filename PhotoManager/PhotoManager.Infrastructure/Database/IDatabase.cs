@@ -5,7 +5,7 @@ public interface IDatabase
     string DataDirectory { get; }
     char Separator { get; }
     Diagnostics Diagnostics { get; }
-    void Initialize(string dataDirectory, char separator);
+    void Initialize(string dataDirectory, char separator, string tablesFolderName, string blobsFolderName);
     void SetDataTableProperties(DataTableProperties dataTableProperties);
     List<T> ReadObjectList<T>(string tableName, Func<string[], T> mapObjectFromCsvFields);
     void WriteObjectList<T>(List<T> list, string tableName, Func<T, int, object> mapCsvFieldIndexToCsvField);

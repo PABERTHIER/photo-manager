@@ -5,10 +5,24 @@ public class AssetHashCalculatorServiceTests
 {
     private string? dataDirectory;
 
+    private UserConfigurationService? _userConfigurationService;
+    private AssetHashCalculatorService? _assetHashCalculatorService;
+
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
+    }
+
+    [SetUp]
+    public void Setup()
+    {
+        _assetHashCalculatorService = new (_userConfigurationService!);
     }
 
     [Test]
@@ -24,9 +38,8 @@ public class AssetHashCalculatorServiceTests
     {
         string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
-        AssetHashCalculatorService assetHashCalculatorService = new();
 
-        string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
+        string hash = _assetHashCalculatorService!.CalculateHash(imageBytes, filePath);
 
         Assert.IsInstanceOf<string>(hash);
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));

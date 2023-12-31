@@ -92,23 +92,12 @@ public class UserConfigurationService : IUserConfigurationService
 
         AboutInformation aboutInformation = new()
         {
-            Product = product ?? "",
+            Product = product ?? ProjectSettings.Name,
             Author = ProjectSettings.Owner,
             Version = version
         };
 
         return aboutInformation;
-    }
-
-    // TODO: Migrate to new config and remove it
-    public string GetPicturesDirectory()
-    {
-        return PathConstants.AssetsDirectory;
-    }
-
-    public string GetApplicationBackupFolderPath()
-    {
-        return PathConstants.BackupPath;
     }
 
     public string[] GetRootCatalogFolderPaths()
@@ -128,22 +117,22 @@ public class UserConfigurationService : IUserConfigurationService
         string? assetRotatedMessage = _configuration.GetValue<string>(UserConfigurationKeys.ASSET_ROTATED_MESSAGE);
         int catalogBatchSize = _configuration.GetValue<int>(UserConfigurationKeys.CATALOG_BATCH_SIZE);
         ushort catalogCooldownMinutes = _configuration.GetValue<ushort>(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES);
+        ushort corruptedImageOrientation = _configuration.GetValue<ushort>(UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION);
         ushort defaultExifOrientation = _configuration.GetValue<ushort>(UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION);
         bool detectThumbnails = _configuration.GetValue<bool>(UserConfigurationKeys.DETECT_THUMBNAILS);
-        ushort orientationCorruptedImage = _configuration.GetValue<ushort>(UserConfigurationKeys.ORIENTATION_CORRUPTED_IMAGE);
         bool syncAssetsEveryXMinutes = _configuration.GetValue<bool>(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES);
         double thumbnailMaxHeight = _configuration.GetValue<double>(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT);
         double thumbnailMaxWidth = _configuration.GetValue<double>(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH);
 
         AssetSettings = new (
             analyseVideos,
-            assetCorruptedMessage,
-            assetRotatedMessage,
+            assetCorruptedMessage!,
+            assetRotatedMessage!,
             catalogBatchSize,
             catalogCooldownMinutes,
+            corruptedImageOrientation,
             defaultExifOrientation,
             detectThumbnails,
-            orientationCorruptedImage,
             syncAssetsEveryXMinutes,
             thumbnailMaxHeight,
             thumbnailMaxWidth);
@@ -161,33 +150,33 @@ public class UserConfigurationService : IUserConfigurationService
         string? ffmpegPath = _configuration.GetValue<string>(UserConfigurationKeys.FFMPEG_PATH);
         string? firstFrameVideosFolderName = _configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME);
 
-        string? firstFrameVideosPath = Path.Combine(assetsDirectory!, firstFrameVideosFolderName!);
+        string firstFrameVideosPath = Path.Combine(assetsDirectory!, firstFrameVideosFolderName!);
 
-        PathSettings = new (assetsDirectory, backupPath, exemptedFolderPath, ffmpegPath, firstFrameVideosPath);
+        PathSettings = new (assetsDirectory!, backupPath!, exemptedFolderPath!, ffmpegPath!, firstFrameVideosPath);
 
         string? projectName = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME);
         string? projectOwner = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER);
 
-        ProjectSettings = new (projectName, projectOwner);
+        ProjectSettings = new (projectName!, projectOwner!);
 
         ushort backupsToKeep = _configuration.GetValue<ushort>(UserConfigurationKeys.BACKUPS_TO_KEEP);
 
         string? folderNameBlobs = _configuration.GetValue<string>(UserConfigurationKeys.BLOBS_FOLDER_NAME);
         string? folderNameTables = _configuration.GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME);
-        FoldersNameSettings foldersNameSettings = new(folderNameBlobs, folderNameTables);
+        FoldersNameSettings foldersNameSettings = new(folderNameBlobs!, folderNameTables!);
 
         char? separator = _configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR)?.ToCharArray().First();
-        string? storageVersion = _configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION);
+        double storageVersion = _configuration.GetValue<double>(UserConfigurationKeys.STORAGE_VERSION);
 
         string? assetsTableName = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_TABLE_NAME);
         string? foldersTableName = _configuration.GetValue<string>(UserConfigurationKeys.FOLDERS_TABLE_NAME);
         string? recentTargetPathsTableName = _configuration.GetValue<string>(UserConfigurationKeys.RECENT_TARGET_PATHS_TABLE_NAME);
         string? syncAssetsDirectoriesDefinitionsTableName = _configuration.GetValue<string>(UserConfigurationKeys.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME);
-        TablesSettings tablesSettings = new(assetsTableName, foldersTableName, recentTargetPathsTableName, syncAssetsDirectoriesDefinitionsTableName);
+        TablesSettings tablesSettings = new(assetsTableName!, foldersTableName!, recentTargetPathsTableName!, syncAssetsDirectoriesDefinitionsTableName!);
 
         ushort thumbnailsDictionaryEntriesToKeep = _configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
 
-        StorageSettings = new (backupsToKeep, foldersNameSettings, separator, storageVersion, tablesSettings, thumbnailsDictionaryEntriesToKeep);
+        StorageSettings = new (backupsToKeep, foldersNameSettings, (char)separator!, storageVersion, tablesSettings, thumbnailsDictionaryEntriesToKeep);
     }
 
     private string? GetProductVersion()

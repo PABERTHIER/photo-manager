@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Infrastructure;
+﻿namespace PhotoManager.Tests.Integration.Infrastructure;
 
 [TestFixture]
 public class StorageServiceTests
 {
     private string? dataDirectory;
-    private IStorageService? _storageService;
+
+    private StorageService? _storageService;
+    private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
@@ -16,7 +16,8 @@ public class StorageServiceTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _storageService = new StorageService(new UserConfigurationService(configurationRootMock.Object));
+        _userConfigurationService = new (configurationRootMock.Object);
+        _storageService = new (_userConfigurationService);
     }
 
     [Test]
@@ -161,25 +162,31 @@ public class StorageServiceTests
         string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        ushort orientation = _storageService!.GetExifOrientation(buffer);
+        ushort orientation = _storageService!.GetExifOrientation(
+            buffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
         Assert.AreEqual(expectedOriention, orientation);
     }
 
     [Test]
-    [TestCase("Image 10 portrait.png", AssetConstants.OrientationCorruptedImage)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase("Homer.gif", AssetConstants.OrientationCorruptedImage)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase("Image_11.heic", AssetConstants.OrientationCorruptedImage)] // Error on BitmapFrame.Create(stream)
-    public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsOrientationCorruptedImage(string fileName, int expectedOriention)
+    [TestCase("Image 10 portrait.png")] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
+    [TestCase("Homer.gif")] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
+    [TestCase("Image_11.heic")] // Error on BitmapFrame.Create(stream)
+    public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
         string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        ushort orientation = _storageService!.GetExifOrientation(buffer);
+        ushort orientation = _storageService!.GetExifOrientation(
+            buffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOriention, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -187,9 +194,12 @@ public class StorageServiceTests
     {
         byte[] invalidImageBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
 
-        ushort orientation = _storageService!.GetExifOrientation(invalidImageBuffer);
+        ushort orientation = _storageService!.GetExifOrientation(
+            invalidImageBuffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -197,9 +207,12 @@ public class StorageServiceTests
     {
         byte[]? nullBuffer = null;
 
-        ushort orientation = _storageService!.GetExifOrientation(nullBuffer!);
+        ushort orientation = _storageService!.GetExifOrientation(
+            nullBuffer!,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -207,9 +220,12 @@ public class StorageServiceTests
     {
         byte[] emptyBuffer = Array.Empty<byte>();
 
-        ushort orientation = _storageService!.GetExifOrientation(emptyBuffer);
+        ushort orientation = _storageService!.GetExifOrientation(
+            emptyBuffer,
+            _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+            _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -223,7 +239,7 @@ public class StorageServiceTests
         byte[] buffer = File.ReadAllBytes(filePath);
         //byte[] bufferRotated = GetHeicRotatedBuffer(buffer, degrees);
 
-        ushort orientation = _storageService!.GetHeicExifOrientation(buffer);
+        ushort orientation = _storageService!.GetHeicExifOrientation(buffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
         Assert.AreEqual(expectedOriention, orientation);
@@ -234,9 +250,9 @@ public class StorageServiceTests
     {
         byte[] invalidHeicBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
 
-        ushort orientation = _storageService!.GetHeicExifOrientation(invalidHeicBuffer);
+        ushort orientation = _storageService!.GetHeicExifOrientation(invalidHeicBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(AssetConstants.OrientationCorruptedImage, orientation);
+        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
     }
 
     [Test]
@@ -244,7 +260,10 @@ public class StorageServiceTests
     {
         byte[]? nullBuffer = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.GetHeicExifOrientation(nullBuffer!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+        {
+            _storageService!.GetHeicExifOrientation(nullBuffer!, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        });
         
         Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
     }
@@ -254,7 +273,10 @@ public class StorageServiceTests
     {
         byte[] emptyBuffer = Array.Empty<byte>();
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.GetHeicExifOrientation(emptyBuffer));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+        {
+            _storageService!.GetHeicExifOrientation(emptyBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        });
 
         Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }

@@ -4,14 +4,19 @@
 public class ObjectListStorageTests
 {
     private string? dataDirectory;
-    private ObjectListStorage? _objectListStorage;
 
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
+    private ObjectListStorage? _objectListStorage;
+    private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [SetUp]
@@ -26,11 +31,11 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.FoldersTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<Folder> result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
 
@@ -57,11 +62,11 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\assets.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.AssetsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<Asset> result = _objectListStorage!.ReadObjectList(dataFilePath, AssetConfigs.ReadFunc, new Diagnostics());
 
@@ -92,11 +97,11 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\syncassetsdirectoriesdefinitions.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<SyncAssetsDirectoriesDefinition> result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
 
@@ -123,11 +128,11 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\recenttargetpaths.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.RecentTargetPathsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName,
             ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
@@ -143,11 +148,11 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\syncassetsdirectoriesdefinitions_empty.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<SyncAssetsDirectoriesDefinition> result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
 
@@ -160,7 +165,7 @@ public class ObjectListStorageTests
     {
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
         DataTableProperties? dataTableProperties = null;
-        _objectListStorage!.Initialize(dataTableProperties!, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties!, _userConfigurationService!.StorageSettings.Separator);
 
         List<Folder> result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
 
@@ -202,11 +207,11 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.AssetsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         FormatException? exception = Assert.Throws<FormatException>(() =>
         {
@@ -229,7 +234,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
@@ -248,7 +253,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataDirectory!, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
@@ -268,7 +273,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
@@ -288,7 +293,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath!, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
@@ -301,11 +306,11 @@ public class ObjectListStorageTests
         string dataFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Tables\\folders.db");
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.FoldersTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         Func<string[], object>? func = null;
 
@@ -339,13 +344,13 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.FoldersTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
         try
         {
-            _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+            _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
             _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
@@ -400,13 +405,13 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.AssetsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         };
 
         try
         {
-            _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+            _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
             _objectListStorage!.WriteObjectList(dataFilePath, assets, AssetConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
@@ -432,13 +437,13 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         };
 
         try
         {
-            _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+            _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
             _objectListStorage!.WriteObjectList(dataFilePath, syncAssetsDirectoriesDefinitions, SyncAssetsDirectoriesDefinitionConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
@@ -461,13 +466,13 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.RecentTargetPathsTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName,
             ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         };
 
         try
         {
-            _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+            _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
             _objectListStorage!.WriteObjectList(dataFilePath, recentTargetPaths, RecentPathsConfigs.WriteFunc, new Diagnostics());
 
             Assert.IsTrue(File.Exists(dataFilePath));
@@ -503,7 +508,7 @@ public class ObjectListStorageTests
 
         DataTableProperties? dataTableProperties = null;
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         Exception? exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
 
@@ -537,7 +542,7 @@ public class ObjectListStorageTests
 
         DataTableProperties dataTableProperties = new()
         {
-            TableName = AssetConstants.FoldersTableName,
+            TableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         };
 
@@ -566,7 +571,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() =>
         {
@@ -594,7 +599,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() =>
         {
@@ -622,7 +627,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
         {
@@ -648,7 +653,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
 
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>
             _objectListStorage!.WriteObjectList(
@@ -686,7 +691,7 @@ public class ObjectListStorageTests
             }
         };
 
-        _objectListStorage!.Initialize(dataTableProperties, pipeSeparator);
+        _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
         Func<string, int, object>? f = null;
 
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() =>

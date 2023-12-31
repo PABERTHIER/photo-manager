@@ -4,20 +4,26 @@
 public class DatabaseWriteObjectListTests
 {
     private string? dataDirectory;
+
     private PhotoManager.Infrastructure.Database.Database? _database;
+    private UserConfigurationService? _userConfigurationService;
 
     private string? csvEscapedTextWithSemicolon;
     private string? csvUnescapedTextWithSemicolon;
     private string? csvEscapedTextWithPipe;
     private string? csvUnescapedTextWithPipe;
     private string? csvSomeUnescapedTextWithPipe;
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
     private readonly char semicolonSeparator = ';';
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
 
         csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"FileSize\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"AssetCorruptedMessage\";\"IsAssetCorrupted\";\"AssetRotatedMessage\";\"IsAssetRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"363888\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\";\"\";\"False\";\"\";\"False\"\r\n" +
@@ -64,7 +70,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -97,11 +103,11 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            WriteObjectList(directoryPath, pipeSeparator, tableName, escapeText);
+            WriteObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, tableName, escapeText);
 
             Asserts(filePath, csv);
         }
@@ -130,7 +136,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -172,7 +178,11 @@ public class DatabaseWriteObjectListTests
                 }
             };
 
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             Exception? exception = Assert.Throws<Exception>(() => _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
 
@@ -194,7 +204,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -236,7 +246,11 @@ public class DatabaseWriteObjectListTests
                 }
             };
 
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.SetDataTableProperties(new DataTableProperties
             {
@@ -278,7 +292,7 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -320,7 +334,11 @@ public class DatabaseWriteObjectListTests
                 }
             };
 
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.SetDataTableProperties(new DataTableProperties
             {
@@ -368,13 +386,17 @@ public class DatabaseWriteObjectListTests
 
         string tableName = "assets" + Guid.NewGuid();
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
             List<Asset>? assets = null;
 
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.SetDataTableProperties(new DataTableProperties
             {
@@ -403,7 +425,7 @@ public class DatabaseWriteObjectListTests
         string csv = csvUnescapedTextWithPipe!;
 
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -445,7 +467,11 @@ public class DatabaseWriteObjectListTests
                 }
             };
 
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.SetDataTableProperties(new DataTableProperties
             {
@@ -473,7 +499,7 @@ public class DatabaseWriteObjectListTests
 
         string? tableName = null;
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(directoryPath, AssetConstants.Tables, tableName + ".db");
+        string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
@@ -515,7 +541,11 @@ public class DatabaseWriteObjectListTests
                 }
             };
 
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             ArgumentNullException? exception1 = Assert.Throws<ArgumentNullException>(() =>
                 _database!.SetDataTableProperties(new DataTableProperties
@@ -578,7 +608,11 @@ public class DatabaseWriteObjectListTests
             }
         };
 
-        _database!.Initialize(directoryPath, separator);
+        _database!.Initialize(
+            directoryPath,
+            separator,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
         _database!.SetDataTableProperties(new DataTableProperties
         {

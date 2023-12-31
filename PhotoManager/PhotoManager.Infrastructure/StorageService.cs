@@ -26,7 +26,7 @@ public class StorageService : IStorageService
 
     public string ResolveDataDirectory(double storageVersion)
     {
-        return Path.Combine(_userConfigurationService.GetApplicationBackupFolderPath(), "v" + storageVersion.ToString("0.0", CultureInfo.InvariantCulture));
+        return Path.Combine(_userConfigurationService.PathSettings.BackupPath, "v" + storageVersion.ToString("0.0", CultureInfo.InvariantCulture));
     }
 
     public void CreateDirectory(string directory)
@@ -97,14 +97,14 @@ public class StorageService : IStorageService
         return BitmapHelper.LoadBitmapHeicImageFromPath(imagePath, rotation);
     }
 
-    public ushort GetExifOrientation(byte[] buffer)
+    public ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation, ushort corruptedImageOrientation)
     {
-        return ExifHelper.GetExifOrientation(buffer);
+        return ExifHelper.GetExifOrientation(buffer, defaultExifOrientation, corruptedImageOrientation);
     }
 
-    public ushort GetHeicExifOrientation(byte[] buffer)
+    public ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation)
     {
-        return ExifHelper.GetHeicExifOrientation(buffer);
+        return ExifHelper.GetHeicExifOrientation(buffer, corruptedImageOrientation);
     }
 
     public Rotation GetImageRotation(ushort exifOrientation)

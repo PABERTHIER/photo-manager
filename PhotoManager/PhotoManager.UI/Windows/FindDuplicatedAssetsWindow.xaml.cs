@@ -1,5 +1,4 @@
 ﻿using log4net;
-using PhotoManager.Constants;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
@@ -124,6 +123,7 @@ public partial class DuplicatedAssetsWindow : Window
         MainWindowInstance.RefreshAssetsCounter();
     }
 
+    // TODO: Move the logic to services for both methods (no logic here !)
     private void DeleteAllDuplicatedAssetsByHash(List<DuplicatedSetViewModel> duplicatedAssets, Asset currentAsset)
     {
         if (duplicatedAssets == null || currentAsset == null)
@@ -157,9 +157,9 @@ public partial class DuplicatedAssetsWindow : Window
             return;
         }
 
-        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == PathConstants.ExemptedFolderPath).ToList();
+        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == MainWindowInstance.GetExemptedFolderPath()).ToList();
 
-        var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != PathConstants.ExemptedFolderPath).ToList();
+        var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != MainWindowInstance.GetExemptedFolderPath()).ToList();
 
         var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
             x => x.Asset.Hash,

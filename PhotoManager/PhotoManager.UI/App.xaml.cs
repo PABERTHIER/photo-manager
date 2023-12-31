@@ -74,15 +74,14 @@ public partial class App : System.Windows.Application
         IConfigurationRoot configuration = builder.Build();
 
         // TODO: group by module
-
         services.AddSingleton(configuration);
+        services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
         services.AddSingleton<IObjectListStorage, ObjectListStorage>();
         services.AddSingleton<IBlobStorage, BlobStorage>();
         services.AddSingleton<IBackupStorage, BackupStorage>();
         services.AddSingleton<IDatabase, Database>();
         services.AddSingleton<IDirectoryComparer, DirectoryComparer>();
         services.AddSingleton<IProcessService, ProcessService>();
-        services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
         services.AddSingleton<IStorageService, StorageService>();
         services.AddSingleton<IAssetRepository, AssetRepository>();
         services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();

@@ -4,14 +4,19 @@
 public class DatabaseDeleteThumbnailsTests
 {
     private string? dataDirectory;
-    private PhotoManager.Infrastructure.Database.Database? _database;
 
-    private readonly char pipeSeparator = AssetConstants.Separator.ToCharArray().First();
+    private PhotoManager.Infrastructure.Database.Database? _database;
+    private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [SetUp]
@@ -25,7 +30,7 @@ public class DatabaseDeleteThumbnailsTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string blobFilePath = Path.Combine(directoryPath, AssetConstants.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
             { "Image1.jpg", new byte[] { 1, 2, 3 } },
@@ -34,7 +39,11 @@ public class DatabaseDeleteThumbnailsTests
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
 
@@ -56,11 +65,15 @@ public class DatabaseDeleteThumbnailsTests
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
         string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
-        string blobFilePath = Path.Combine(directoryPath, AssetConstants.Blobs, blobName);
+        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
 
         try
         {
-            _database!.Initialize(directoryPath, pipeSeparator);
+            _database!.Initialize(
+                directoryPath,
+                _userConfigurationService!.StorageSettings.Separator,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             Assert.IsFalse(File.Exists(blobFilePath));
 

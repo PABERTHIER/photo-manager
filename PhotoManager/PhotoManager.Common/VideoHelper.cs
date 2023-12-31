@@ -42,15 +42,12 @@ public static class VideoHelper
         };
     }
 
-    public static string GetFirstFramePath(string directoryName, string fileName, string destinationPath)
+    public static string GetFirstFramePath(string directoryName, string fileName, string destinationPath, string ffmpegPath)
     {
         string videoPath = Path.Combine(directoryName, fileName);
 
         // Create the output directory if it doesn't exist
         Directory.CreateDirectory(destinationPath);
-
-        // Set the FFmpeg executable path
-        string ffmpegPath = PathConstants.FfmpegPath;
 
         // Set the output file name based on the input video file name
         string firstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";

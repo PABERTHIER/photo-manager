@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Security.AccessControl;
+﻿using System.Security.AccessControl;
 using System.Security.Principal;
 
 namespace PhotoManager.Tests.Integration.Domain;
@@ -12,11 +11,12 @@ public class MoveAssetsServiceTests
     private const string backupEndPath = "DatabaseTests\\v1.0";
     private string? backupPath;
 
-    private IMoveAssetsService? _moveAssetsService;
-    private IAssetRepository? _assetRepository;
-    private IDatabase? _database;
-    private IStorageService? _storageService;
-    private ICatalogAssetsService? _catalogAssetsService;
+    private MoveAssetsService? _moveAssetsService;
+    private UserConfigurationService? _userConfigurationService;
+    private AssetRepository? _assetRepository;
+    private Database? _database;
+    private StorageService? _storageService;
+    private CatalogAssetsService? _catalogAssetsService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -38,12 +38,14 @@ public class MoveAssetsServiceTests
     [SetUp]
     public void Setup()
     {
-        _database = new Database(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(_database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new StorageService(userConfigurationService);
-        _catalogAssetsService = new CatalogAssetsService(_assetRepository, new AssetHashCalculatorService(), _storageService, userConfigurationService, new DirectoryComparer(_storageService));
-        _moveAssetsService = new MoveAssetsService(_assetRepository, _storageService, _catalogAssetsService);
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
+        _storageService = new (_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        DirectoryComparer directoryComparer = new (_storageService);
+        _catalogAssetsService = new (_assetRepository, assetHashCalculatorService, _storageService, _userConfigurationService, directoryComparer);
+        _moveAssetsService = new (_assetRepository, _storageService, _catalogAssetsService);
     }
 
     [Test]
@@ -91,7 +93,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -137,7 +139,7 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(4, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -230,7 +232,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -273,7 +275,7 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == destinationFolder.FolderId));
@@ -345,7 +347,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -394,7 +396,7 @@ public class MoveAssetsServiceTests
             Folder? newDestinationFolder = _assetRepository.GetFolderByPath(destinationFolder.Path);
             Assert.IsNotNull(newDestinationFolder);
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(4, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -486,7 +488,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -532,7 +534,7 @@ public class MoveAssetsServiceTests
             Folder? newDestinationFolder = _assetRepository.GetFolderByPath(destinationFolder.Path);
             Assert.IsNotNull(newDestinationFolder);
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == newDestinationFolder!.FolderId));
@@ -601,7 +603,7 @@ public class MoveAssetsServiceTests
 
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -636,7 +638,7 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -725,7 +727,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -772,7 +774,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -847,7 +849,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -896,7 +898,7 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(4, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
@@ -1017,7 +1019,7 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset!.FileName));
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset.FileName && x.FolderId == sourceFolder.FolderId));
@@ -1057,7 +1059,7 @@ public class MoveAssetsServiceTests
             Folder? newDestinationFolder = _assetRepository.GetFolderByPath(destinationFolder.Path);
             Assert.IsNull(newDestinationFolder);
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder!.FolderId));
@@ -1120,7 +1122,7 @@ public class MoveAssetsServiceTests
 
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset.FileName && x.FolderId == sourceFolder.FolderId));
@@ -1150,7 +1152,7 @@ public class MoveAssetsServiceTests
 
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, assetOldFileName));
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder!.FolderId));
@@ -1367,7 +1369,7 @@ public class MoveAssetsServiceTests
 
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset!.FileName));
 
-            List<Asset> assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
             Assert.AreEqual(asset!.FileName, assetsInDb[0].FileName);
@@ -1382,7 +1384,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(File.Exists(destinationFilePath1));
             Assert.IsTrue(File.Exists(destinationFilePath2));
 
-            assetsInDb = _database!.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsEmpty(assetsInDb);
         }
         finally

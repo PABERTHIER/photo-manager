@@ -36,7 +36,7 @@ public class AssetRepository : IAssetRepository
         recentThumbnailsQueue = new Queue<string>();
         Thumbnails = new Dictionary<string, Dictionary<string, byte[]>>();
         syncLock = new object();
-        dataDirectory = _storageService.ResolveDataDirectory(AssetConstants.StorageVersion);
+        dataDirectory = _storageService.ResolveDataDirectory(_userConfigurationService.StorageSettings.StorageVersion);
         Initialize();
     }
 
@@ -460,30 +460,33 @@ public class AssetRepository : IAssetRepository
 
     private void InitializeDatabase()
     {
-        char separatorChar = AssetConstants.Separator.ToCharArray().First(); // (char)_userConfigurationService.StorageSettings.Separator!;
-        _database.Initialize(dataDirectory, separatorChar);
+        _database.Initialize(
+            dataDirectory,
+            _userConfigurationService.StorageSettings.Separator,
+            _userConfigurationService.StorageSettings.FoldersNameSettings.Tables,
+            _userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
 
         _database.SetDataTableProperties(new DataTableProperties
         {
-            TableName = AssetConstants.FoldersTableName,
+            TableName = _userConfigurationService.StorageSettings.TablesSettings.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
         {
-            TableName = AssetConstants.AssetsTableName,
+            TableName = _userConfigurationService.StorageSettings.TablesSettings.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
         {
-            TableName = AssetConstants.SyncAssetsDirectoriesDefinitionsTableName,
+            TableName = _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         });
 
         _database.SetDataTableProperties(new DataTableProperties
         {
-            TableName = AssetConstants.RecentTargetPathsTableName,
+            TableName = _userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName,
             ColumnProperties = RecentPathsConfigs.ConfigureDataTable()
         });
     }
@@ -499,42 +502,46 @@ public class AssetRepository : IAssetRepository
 
     private List<Folder> ReadFolders()
     {
-        return _database.ReadObjectList(AssetConstants.FoldersTableName, FolderConfigs.ReadFunc);
+        return _database.ReadObjectList(_userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
     }
 
     private List<Asset> ReadAssets()
     {
-        return _database.ReadObjectList(AssetConstants.AssetsTableName, AssetConfigs.ReadFunc);
+        return _database.ReadObjectList(_userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
     }
 
     private List<SyncAssetsDirectoriesDefinition> ReadSyncAssetsDirectoriesDefinitions()
     {
-        return _database.ReadObjectList(AssetConstants.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
+        return _database.ReadObjectList(
+            _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
+            SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
     }
 
     private List<string> ReadRecentTargetPaths()
     {
-        return _database.ReadObjectList(AssetConstants.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
+        return _database.ReadObjectList(_userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
     }
 
     private void WriteFolders(List<Folder> folders)
     {
-        _database.WriteObjectList(folders, AssetConstants.FoldersTableName, FolderConfigs.WriteFunc);
+        _database.WriteObjectList(folders, _userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.WriteFunc);
     }
 
     private void WriteAssets(List<Asset> assets)
     {
-        _database.WriteObjectList(assets, AssetConstants.AssetsTableName, AssetConfigs.WriteFunc);
+        _database.WriteObjectList(assets, _userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.WriteFunc);
     }
 
     private void WriteSyncAssetsDirectoriesDefinitions(List<SyncAssetsDirectoriesDefinition> definitions)
     {
-        _database.WriteObjectList(definitions, AssetConstants.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.WriteFunc);
+        _database.WriteObjectList(
+            definitions,
+            _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.WriteFunc);
     }
 
     private void WriteRecentTargetPaths(List<string> recentTargetPaths)
     {
-        _database.WriteObjectList(recentTargetPaths, AssetConstants.RecentTargetPathsTableName, RecentPathsConfigs.WriteFunc);
+        _database.WriteObjectList(recentTargetPaths, _userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.WriteFunc);
     }
 
     private Dictionary<string, byte[]> GetThumbnails(Folder? folder, out bool isNewFile)

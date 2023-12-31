@@ -7,9 +7,9 @@ public static class UserConfigurationKeys
     public const string ASSET_ROTATED_MESSAGE = "appsettings:Asset:AssetRotatedMessage";
     public const string CATALOG_BATCH_SIZE = "appsettings:Asset:CatalogBatchSize";
     public const string CATALOG_COOLDOWN_MINUTES = "appsettings:Asset:CatalogCooldownMinutes";
+    public const string CORRUPTED_IMAGE_ORIENTATION = "appsettings:Asset:CorruptedImageOrientation";
     public const string DEFAULT_EXIF_ORIENTATION = "appsettings:Asset:DefaultExifOrientation";
     public const string DETECT_THUMBNAILS = "appsettings:Asset:DetectThumbnails";
-    public const string ORIENTATION_CORRUPTED_IMAGE = "appsettings:Asset:OrientationCorruptedImage";
     public const string SYNC_ASSETS_EVERY_X_MINUTES = "appsettings:Asset:SyncAssetsEveryXMinutes";
     public const string THUMBNAIL_MAX_HEIGHT = "appsettings:Asset:ThumbnailMaxHeight";
     public const string THUMBNAIL_MAX_WIDTH = "appsettings:Asset:ThumbnailMaxWidth";

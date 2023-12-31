@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryLoadThumbnailTests
@@ -8,9 +6,10 @@ public class AssetRepositoryLoadThumbnailTests
     private string? dataDirectory;
     private const string backupEndPath = "DatabaseTests\\v1.0";
     private string? backupPath;
+
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
-
+    private UserConfigurationService? _userConfigurationService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -33,9 +32,9 @@ public class AssetRepositoryLoadThumbnailTests
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new TestableAssetRepository(_database, _storageServiceMock!.Object, userConfigurationService);
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _userConfigurationService = new (_configurationRootMock!.Object);
+        _testableAssetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
 
         asset1 = new()
         {
@@ -86,12 +85,12 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.IsTrue(thumbnails[asset1!.Folder.Path].ContainsKey(asset1.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[asset1!.Folder.Path][asset1.FileName]);
 
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Blobs, asset1.Folder.ThumbnailsFilename)));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, asset1.Folder.ThumbnailsFilename)));
 
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "recenttargetpaths.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
         }
         finally
         {
@@ -130,12 +129,12 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.IsTrue(thumbnails[dataDirectory!].ContainsKey(asset1.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[dataDirectory!][asset1.FileName]);
 
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Blobs, addedFolder1.ThumbnailsFilename)));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)));
 
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "recenttargetpaths.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
         }
         finally
         {
@@ -177,12 +176,12 @@ public class AssetRepositoryLoadThumbnailTests
 
             Assert.IsEmpty(thumbnails);
 
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Blobs, addedFolder1.ThumbnailsFilename)));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)));
 
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "assets.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "folders.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "recenttargetpaths.db")));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
         }
         finally
         {
@@ -213,12 +212,12 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.IsTrue(thumbnails.ContainsKey(dataDirectory!));
             Assert.IsEmpty(thumbnails[dataDirectory!]);
 
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Blobs, addedFolder1.ThumbnailsFilename)));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)));
 
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "assets.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "folders.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "recenttargetpaths.db")));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
+            Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
         }
         finally
         {
@@ -256,10 +255,10 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.IsTrue(thumbnails[dataDirectory!].ContainsKey(asset1.FileName));
             Assert.AreEqual(Array.Empty<byte>(), thumbnails[dataDirectory!][asset1.FileName]);
 
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "recenttargetpaths.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
         }
         finally
         {
@@ -286,10 +285,10 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.IsTrue(thumbnails.ContainsKey(dataDirectory!));
             Assert.IsEmpty(thumbnails[dataDirectory!]);
 
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "recenttargetpaths.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
         }
         finally
         {
@@ -385,12 +384,12 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.IsTrue(thumbnails[asset1!.Folder.Path].ContainsKey(asset1.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[asset1!.Folder.Path][asset1.FileName]);
 
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Blobs, asset1.Folder.ThumbnailsFilename)));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, asset1.Folder.ThumbnailsFilename)));
 
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, AssetConstants.Tables, "recenttargetpaths.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
+            Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
         }
         finally
         {
