@@ -33,6 +33,7 @@ public static class HashingHelper
 
         // Calculate the PHash of the image
         string? phash = image.PerceptualHash()?.ToString();
+
         return phash;
     }
 
@@ -68,6 +69,7 @@ public static class HashingHelper
     {
         byte[] hashBytes = MD5.HashData(imageBytes);
         string md5Hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+
         return md5Hash;
     }
 

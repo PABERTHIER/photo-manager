@@ -37,7 +37,7 @@ public class HashingHelperTests
     [Test]
     public void CalculateHash_EmptyImageBytes_ReturnsSameHash()
     {
-        byte[] imageBytes = Array.Empty<byte>();
+        byte[] imageBytes = [];
         string expectedHash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e";
 
         string hash = HashingHelper.CalculateHash(imageBytes);
@@ -186,7 +186,7 @@ public class HashingHelperTests
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
     [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
-    public void CalculateMD5Hash_ValidImageBytes_ReturnsCorrectHash(string fileName, string expectedHash)
+    public void CalculateMD5Hash_ValidImageBytes_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         string filePath = Path.Combine(dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -199,9 +199,9 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateMD5Hash_EmptyImageBytes_ReturnsSameHash()
+    public void CalculateMD5Hash_EmptyImageBytes_ReturnsSameMD5Hash()
     {
-        byte[] imageBytes = Array.Empty<byte>();
+        byte[] imageBytes = [];
         string expectedHash = "d41d8cd98f00b204e9800998ecf8427e";
 
         string hash = HashingHelper.CalculateMD5Hash(imageBytes);

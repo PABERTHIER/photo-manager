@@ -13,12 +13,12 @@ public class AssetHashCalculatorService(IUserConfigurationService userConfigurat
 
         if (_userConfigurationService.HashSettings.UsingDHash)
         {
-            return HashingHelper.CalculateDHash(filePath) ?? HashingHelper.CalculateHash(imageBytes);
+            return HashingHelper.CalculateDHash(filePath);
         }
 
         if (_userConfigurationService.HashSettings.UsingMD5Hash)
         {
-            return HashingHelper.CalculateMD5Hash(imageBytes) ?? HashingHelper.CalculateHash(imageBytes);
+            return HashingHelper.CalculateMD5Hash(imageBytes);
         }
 
         return HashingHelper.CalculateHash(imageBytes);
