@@ -245,7 +245,7 @@ public class UserConfigurationServiceTests
         string projectName = _userConfigurationService!.ProjectSettings.Name;
 
         Assert.IsNotNull(projectName);
-        Assert.AreEqual("Photo Manager", projectName);
+        Assert.AreEqual("PhotoManager", projectName);
     }
 
     [Test]
