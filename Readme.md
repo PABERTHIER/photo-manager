@@ -6,42 +6,131 @@
 [![Release](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/release.yaml/badge.svg)](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/release.yaml)
 [![CodeQL](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/codeql-analysis.yml)
 
-## Features
+**I used this [repo](https://github.com/jpablodrexler/jp-photo-manager) as a base to shape my own PhotoManager with optimizations, new features, bugs fix...
+Thank you jpablodrexler for your work :heart:**
+
+## Features :newspaper:
 
 PhotoManager is a desktop application that allows:
 
-- Visualization of image galleries
-- Change Windows wallpaper
-- Find duplicates
-- Copy/move images
-- Know if images are corrupted or rotated
-- Import images from local folders (such as game screenshots folders)
-- Import images from shared folders in the local network
-- Export images to local folders
-- Export images to shared folders in the local network
-- Delete images in local or shared folders that are not present in source folder
-- Detect videos duplicates
+- Visualization of image galleries.
+- Find duplicates.
+- Copy / move images.
+- Know if images are corrupted or rotated.
+- Import / export images from local folders / shared folders in the local network.
+- Delete images in local or shared folders that are not present in source folder.
+- Detect videos duplicates.
+- Change Windows wallpaper.
 
-Soon will allow to:
+**It is a local tool, that does not require an Internet connection to work.
+Your data stay on your computer and nothing is collected from you.
+Even the database is stored in your computer.**
 
-- Add your own metadata to the images
-- Search images
-- Rename images in batches
+## Upcoming :next_track_button:
 
-For the whole roadmap for the application, please take a look at the issues in this repository.
+- 100% of code coverage.
+- Pipelines (once the dll of FFMPEG would have been generated).
+- Progress bar.
+- Multithread.
+- Handling corrupted images and videos.
+- New logs system.
+- Event sourcing.
+- Conversion feature (convert heic to jpg for example).
+- Migration to MAUI for full compatibity on macOs.
 
-## Run the application
+## Run the application :rocket:
 
-Open the solution file `PhotoManager/PhotoManager.sln` and run the `PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj` project.
+Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-id).
 
-## Installation instructions
+**Basic usage**: run the .exe file.
+**Advanced usage**: open the solution file `PhotoManager/PhotoManager.sln`, set `PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj` as the project to launch and run it.
+
+## Installation instructions :man_teacher:
 
 - Download the zip file with the compiled application files (`publish.zip` or `photo-manager-{version}.zip`) for the latest release.
 - Unzip the content of the zip file to a new folder.
+- [Configure the appsettings.json file](#config-id)
 - Run `PhotoManager.UI.exe`.
-- The application saves the catalog files in the following folder: `C:\Users\{username}\AppData\Local\PhotoManager`.
+- The application saves the cataloged files in the following path: `BackupPath` (Path settings).
 
-## Compatible picture formats
+## Config file :card_file_box: {#config-id}
+
+If you use the .exe file, you can find a appsettings.json file in the same directory.
+You can also find it at `PhotoManager\PhotoManager.UI\appsettings.json`.
+
+The aim is to let you configure it as you need.
+
+**The `Asset` part is about settings of asset:** :framed_picture:
+
+- `AnalyseVideos = false`: Enable it to extract the first frame from each videos, that will be stored in the folder `FirstFrameVideosFolderName` (Path settings).
+- `AssetCorruptedMessage = "The asset is corrupted"`: The message to display when the asset is corrupted.
+- `AssetRotatedMessage = "The asset has been rotated"`: The message to display when the asset has been rotated from the original.
+- `CatalogBatchSize = 100000`: The max amount of pictures to analyse, once the number reached, the analyse will stop.
+- `CatalogCooldownMinutes = 2`: The number of minutes before starting a new analysis.
+- `CorruptedImageOrientation = 10000`: The default orientation for a corrupted image, while it's corrupted, the tool cannot determine it.
+- `DefaultExifOrientation = 1`: The default Exif orientation (0 degree) if the `System.Photo.Orientation` value has not been stored in the metadata of the image.
+- `DetectThumbnails = false`: Enable it to detect duplicates between a thumbnail and the original (need `UsingPHash` to be true).
+- `SyncAssetsEveryXMinutes = false`: Enable it to sync your assets every X minutes (`CatalogCooldownMinutes`).
+- `ThumbnailMaxHeight = 150`: The height of the thumbnail.
+- `ThumbnailMaxWidth = 200`: The width of the thumbnail.
+
+**The `Hash` part is about settings of hash (for basic usages, you will not need to modify the settings):** :woman_technologist:
+
+- `PHashThreshold = 40`: The value of the threshold (used when `UsingPHash` is true).
+- `UsingDHash = false`: Enable it to hash in DHash (Difference Hash). This hashing method always returns "0" for Gif file.
+- `UsingMD5Hash = false`: Enable it to hash in MD5.
+- `UsingPHash = false`: Enable it to hash in PHash (Perceptual Hash). It can detect duplicates between rotated assets (improve detection), thumbnails, images part and same images with differents resolutions.
+Performances are decreased with PHash by 6 times (for ex: 0.17s for 140 pictures with SHA512 and 1.11s with PHash).
+
+The HashingService works as follows:
+
+- If `UsingPHash` is :heavy_check_mark:, then all the assets will have a PHash as hash type.
+- If `UsingPHash` is :x: and `UsingDHash` is :heavy_check_mark:, then all the assets will have a DHash as hash type.
+- If `UsingPHash` is :x:, `UsingDHash` is :x: and `UsingMD5Hash` is :heavy_check_mark:, then all the assets will have a MD5Hash as hash type.
+- If `UsingPHash`, `UsingDHash` and `UsingMD5Hash` are :x:, then all the assets will have a basic hash type (SHA512).
+
+About `DetectThumbnails`, you will need to set `UsingPHash` to true as well because:
+Between Original and Thumbnail:
+
+- PHash the hamming distance is 36/210 (the most accurate).
+- DHash the hamming distance is 16/17.
+- MD5Hash the hamming distance is 32/32.
+- SHA512 the hamming distance is 118/128.
+
+Moreover, there is a parameter that you can adjust following the need, it is `PHashThreshold`.
+The max advised is less than 90 (for example 68 can detect false positives).
+The default value is `40`, because it can detect a Thumbnail and an original with low quality as duplicates.
+But 5 or 6 is often used as a default value in image comparison libraries.
+If the hamming distance is lower or equal to the `PHashThreshold` value, then it is a duplicate.
+The lower the value of `PHashThreshold`, the more precise it is.
+
+**The `Paths` part is about settings of paths:** :open_file_folder:
+
+- `AssetsDirectory = "the_directory\\to_your_pictures"`: The directory where your assets are, to analyse them.
+- `BackupPath = "the_directory\\to_your_local_database"`:  The directory where the database will be stored (The backup must be upper than the location to prevent bugs like "Process is already used" **WIP**).
+- `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the asset in this exempted path.
+- `FfmpegPath = "the_directory_to\\ffmpeg.exe"`: The path where your ffmpeg.exe is located **WIP** (Needed to be installed first, used if you set `AnalyseVideos` to true).
+- `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file (Used if you set `AnalyseVideos` to true), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
+
+**The `Project` part is about settings of project (there is no need to update it):** :building_construction:
+
+- `Name = "PhotoManager`: The name of the tool.
+- `Owner = "Toto"`: The name of the owner of the tool.
+
+**The `Storage` part is about settings of storage (update it only for a certain purpose):** :floppy_disk:
+
+- `BackupsToKeep = 2`: The number of backups to keep (the oldest ones are deleted).
+- `FoldersName.Blobs = "Blobs"`: The name of the folder to store the blobs (in the `BackupPath`).
+- `FoldersName.Tables = "Tables"`: The name of the folder to store the tables (in the `BackupPath`).
+- `Separator = "|"`: The separator used to delimit each column (data).
+- `StorageVersion = "1.0"`: The version of the local database.
+- `Tables.AssetsTableName = "Assets"`: The table's name that stores assets data (a `.db` file in `FoldersName.Tables`).
+- `Tables.FoldersTableName = "Folders"`: The table's name that stores folders data (a `.db` file in `FoldersName.Tables`).
+- `Tables.RecentTargetPathsTableName = "RecentTargetPaths"`: The table's name that stores recentTargetPaths data (a `.db` file in `FoldersName.Tables`).
+- `Tables.SyncAssetsDirectoriesDefinitionsTableName = "SyncAssetsDirectoriesDefinitions"`: The table's name that stores syncAssetsDirectoriesDefinitions data (a `.db` file in `FoldersName.Tables`).
+- `ThumbnailsDictionaryEntriesToKeep = 5`: The number of dictionnaries to keep (the key is the path of the current folder and the value is a dictionnary where the key is the asset's name and the value its data).
+
+## Compatible picture formats :camera:
 
 - .bmp - Windows bitmap
 - .dng - RAW Format
@@ -54,7 +143,7 @@ Open the solution file `PhotoManager/PhotoManager.sln` and run the `PhotoManager
 - .tiff, .tif - Tagged Image File Format
 - .webp - WebP image
 
-## Compatible video formats
+## Compatible video formats :video_camera:
 
 - .3g2 - Mobile video
 - .3gp - Mobile video
@@ -72,58 +161,24 @@ Open the solution file `PhotoManager/PhotoManager.sln` and run the `PhotoManager
 - .webm / av1 - WebM video
 - .wmv - Windows Media Video
 
-## Switches usage
+## Deletion modes :x:
 
-There are many switches, enable or disable it as you wish:
+There are three ways to delete duplicates:
+The button `Delete` :arrow_right: This will delete the selected duplicate.
+The button `DeleteAllButThis` :arrow_right: This will delete all duplicates associated to this asset and keep the selected duplicate.
+The button `Delete Every Duplicates Linked To Exempt Folder` :arrow_right: This will delete all duplicates found everywhere that has a duplicate linked in the `ExemptedFolderPath`, but all duplicates in the `ExemptedFolderPath` will be protected.
 
-- `UsingMD5Hash = false;`: Enable it to Hash in MD5.
-- `UsingPHash = false;`: Enable it to detect duplicates between rotated assets (improve detection) PHash = Perceptual Hash. Performances are decreased with PHash by 6 times (for ex: 0.17s for 140 pictures with SHA512 and 1.11s with PHash).
-- `UsingDHash = false;`: Enable it to Hash in DHash (Difference Hash). This hashing method always returns "0" for Gif file.
-- `DetectThumbnails = false;`: Enable it to detect duplicates between a thumbnail and the original.
-- `AnalyseVideos = false;`: Enable it to extract the first frame from each videos, that will be stored in the folder `FirstFrameVideosFolderName`.
-- `SyncAssetsEveryXMinutes = false;`: Enable it to sync your assets every X minutes (CATALOG_COOLDOWN_MINUTES).
+## How to use it for videos ? :clapper:
 
-About `DetectThumbnails`, you will need to activate the `UsingPHash` switch as well because:
-Between Original and Thumbnail:
+PhotoManager is able to detect duplicates between videos.
+To do so, you'll need to set `AnalyseVideos` to true and put all of your videos in a single folder.
+It will create another folder (**it should not exists**), which is `FirstFrameVideosFolderName`, and will store, inside of it, the first frame for each video (with the name of the video file).
+:warning: Be aware that the `FirstFrameVideosFolderName` folder should be deleted before each run to prevent some conflicts. :warning:
+Then, you'll be able to see if there are duplicates between videos and to delete, manually, the videos in question.
+This feature is only here to help you to identify videos duplicates.
+Improvements **WIP**.
 
-- PHash the hammingDistance is 36/210.
-- DHash the hammingDistance is 16/17.
-- MD5Hash the hammingDistance is 32/32.
-- SHA512 the hammingDistance is 118/128.
-
-Moreover, there is a parameter that you can adjust following the need, it is `PHashThreshold`.
-The max advised is less than 90 (for example 68 can detect false positives).
-The default value is `40`, because it can detect a Thumbnail and an original with low quality as duplicates.
-But 5 or 6 is often used as a default value in image comparison libraries.
-If the hammingDistance is lower or equal to the `PHashThreshold` value, then it is a duplicate.
-
-## Path settings
-
-To run the application, you will need to set some settings first, for the path:
-
-- `AssetsDirectory = "";`: The path where PhotoManager will scan your assets.
-- `ExemptedFolderPath = "";`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the asset in this exempted path.
-- `FfmpegPath = "Path\\ffmpeg.exe";`: The path where your ffmpeg.exe is located (Needed to be installed first, used if you activate the switch `AnalyseVideos`).
-- `BackupPath = "";`: The path to store your backup (The backup must be upper than the location to prevent bugs like "Process is already used").
-- `FirstFrameVideosFolderName = "";`: The folder to save the first frame for each video file (Used if you activate the switch `AnalyseVideos`), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
-
-## Deletion modes
-
-There are 3 ways to delete duplicates:
-The button `Delete` => This will delete the selected duplicate.
-The button `DeleteAllButThis` => This will delete all duplicates associated to this asset and keep the selected duplicate.
-The button `Delete Every Duplicates Linked To Exempt Folder` => This will delete all duplicates found everywhere that has a duplicate linked in the `ExemptedFolderPath`, but all duplicates in the `ExemptedFolderPath` will be protected.
-
-## How to use it for videos ?
-
-PhotoManager is able to detect duplicate between many videos.
-To do so, you'll need to activate the switch `AnalyseVideos` and put all of your videos in a single folder.
-It will create another folder (it should not exists), called `outputVideoThumbnails`, and will store inside of it the first frame for each video (with the name of the video file).
-⚠ Be aware that `outputVideoThumbnails` folder should be deleted before each running to prevent some conflicts. ⚠
-Then, you'll be able to see if there are some duplicates between videos and delete, manually, the videos in question.
-This feature is only here to let you to identify if you got some videos duplicates.
-
-## Technologies used
+## Technologies used :man_technologist:
 
 - [.NET 8.0](https://dotnet.microsoft.com/)
 - [Windows Presentation Foundation](https://docs.microsoft.com/en-us/dotnet/framework/wpf/)
