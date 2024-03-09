@@ -80,11 +80,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
             FileName = "1336_1K.JPG",
-            FileSize = 2247285,
+            FileSize = 311067,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 1024,
             PixelHeight = 768,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
@@ -97,11 +97,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
             FileName = "1336_2K.JPG",
-            FileSize = 2247285,
+            FileSize = 1154116,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 2048,
             PixelHeight = 1536,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
@@ -114,11 +114,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
             FileName = "1336_3K.JPG",
-            FileSize = 2247285,
+            FileSize = 2098339,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 2880,
             PixelHeight = 2160,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
@@ -131,11 +131,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
             FileName = "1336_4K_Original.JPG",
-            FileSize = 2247285,
+            FileSize = 4526710,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 4032,
             PixelHeight = 3024,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
@@ -148,11 +148,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
             FileName = "1336_8K.JPG",
-            FileSize = 2247285,
+            FileSize = 8855421,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 7680,
             PixelHeight = 5760,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
@@ -165,11 +165,11 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
             FileName = "1336_Thumbnail.JPG",
-            FileSize = 2247285,
+            FileSize = 19472,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 202,
             PixelHeight = 152,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
@@ -182,12 +182,12 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         {
             FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
             FileName = "Image 1.jpg",
-            FileSize = 2247285,
+            FileSize = 29857,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 1280,
             PixelHeight = 720,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
+            ThumbnailPixelWidth = 200,
+            ThumbnailPixelHeight = 112,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -234,7 +234,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             asset6!.Folder = folder1;
             asset6.Hash = assetThumbnailHash;
             asset7!.Folder = folder2;
-            asset7.Hash = miscAssetHash; // If this asset is in the set, then the treshold is not good
+            asset7.Hash = miscAssetHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -298,7 +298,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             asset6!.Folder = folder1;
             asset6.Hash = assetThumbnailMD5Hash;
             asset7!.Folder = folder2;
-            asset7.Hash = miscAssetMD5Hash; // If this asset is in the set, then the treshold is not good
+            asset7.Hash = miscAssetMD5Hash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -362,7 +362,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             asset6!.Folder = folder1;
             asset6.Hash = assetThumbnailDHash;
             asset7!.Folder = folder2;
-            asset7.Hash = miscAssetDHash; // If this asset is in the set, then the treshold is not good
+            asset7.Hash = miscAssetDHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -428,7 +428,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             asset6!.Folder = folder1;
             asset6.Hash = assetThumbnailPHash;
             asset7!.Folder = folder2;
-            asset7.Hash = miscAssetPHash; // If this asset is in the set, then the treshold is not good
+            asset7.Hash = miscAssetPHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 

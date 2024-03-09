@@ -5,14 +5,14 @@ namespace PhotoManager.Tests.Unit.Common;
 [TestFixture]
 public class VideoHelperTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     private IUserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -63,12 +63,12 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void GetFirstFramePath_ExistingFile_ExtractsFirstFrame()
+    public void GetFirstFramePath_ExistingFile_ReturnsPathAndExtractsFirstFrame()
     {
-        string fileName = "Homer.mp4";
-        string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
+        const string fileName = "Homer.mp4";
+        string destinationPath = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
 
-        string expectedFileName = "Homer.jpg";
+        const string expectedFileName = "Homer.jpg";
         string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
         string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
@@ -89,19 +89,23 @@ public class VideoHelperTests
 
         try
         {
-            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
 
-            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
-            Assert.IsTrue(fileSystem.File.Exists(firstFrameVideoPath));
             // Get the captured console output
             string consoleOutput = stringWriter.ToString();
 
             // Assert that the expected error message was printed to the console
-            Assert.IsTrue(consoleOutput.Contains("First frame extracted successfully for:"));
+            Assert.IsTrue(consoleOutput.Contains($"First frame extracted successfully for: {Path.Combine(_dataDirectory!, fileName)}"));
+            Assert.IsTrue(consoleOutput.Contains($"First frame saved at: {firstFrameVideoPath}"));
+            Assert.IsFalse(consoleOutput.Contains($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}"));
+            Assert.IsFalse(consoleOutput.Contains("Error: FFmpeg failed to generate the first frame."));
 
             // Verify that ExecuteFFmpegCommand was called with the correct arguments
-            string expectedArguments = $"-i \"{Path.Combine(dataDirectory!, fileName)}\" -ss 00:00:01 -vframes 1 \"{firstFrameVideoPath}\"";
+            string expectedArguments = $"-i \"{Path.Combine(_dataDirectory!, fileName)}\" -ss 00:00:01 -vframes 1 \"{firstFrameVideoPath}\"";
             mockProcessExecutor.Verify(x => x.ExecuteFFmpegCommand(_userConfigurationService!.PathSettings.FfmpegPath, expectedArguments), Times.Once);
+
+            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
+            Assert.IsTrue(fileSystem.File.Exists(firstFrameVideoPath));
         }
         finally
         {
@@ -112,10 +116,10 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void GetFirstFramePath_NonExistingFile_ReturnsPathButNoFileCreated()
+    public void GetFirstFramePath_NonExistingFile_ReturnsNullAndDoesNotExtractFirstFrame()
     {
-        string fileName = "non_existing_video.mp4";
-        string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
+        const string fileName = "non_existing_video.mp4";
+        string destinationPath = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
 
         try
         {
@@ -129,15 +133,19 @@ public class VideoHelperTests
             StringWriter stringWriter = new();
             Console.SetOut(stringWriter);
 
-            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
 
-            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
-            Assert.IsFalse(File.Exists(firstFrameVideoPath));
             // Get the captured console output
             string consoleOutput = stringWriter.ToString();
 
             // Assert that the expected error message was printed to the console
-            Assert.IsTrue(consoleOutput.Contains("First frame extracted successfully for:"));
+            Assert.IsFalse(consoleOutput.Contains($"First frame extracted successfully for: {Path.Combine(_dataDirectory!, fileName)}"));
+            Assert.IsFalse(consoleOutput.Contains($"First frame saved at: {firstFrameVideoPath}"));
+            Assert.IsTrue(consoleOutput.Contains($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}"));
+            Assert.IsTrue(consoleOutput.Contains("Error: FFmpeg failed to generate the first frame."));
+
+            Assert.IsTrue(string.IsNullOrEmpty(firstFrameVideoPath));
+            Assert.IsFalse(File.Exists(firstFrameVideoPath));
         }
         finally
         {
@@ -147,10 +155,10 @@ public class VideoHelperTests
     }
 
     [Test]
-    public void GetFirstFramePath_ExecuteFFmpegCommandThrowsException_PrintsErrorMessage()
+    public void GetFirstFramePath_ExecuteFFmpegCommandThrowsException_PrintsErrorMessageAndDoesNotExtractFirstFrame()
     {
-        string fileName = "Homer.mp4";
-        string destinationPath = Path.Combine(dataDirectory!, "OutputVideoFirstFrame");
+        const string fileName = "Homer.mp4";
+        string destinationPath = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
 
         try
         {
@@ -167,16 +175,19 @@ public class VideoHelperTests
             StringWriter stringWriter = new();
             Console.SetOut(stringWriter);
 
-            string firstFrameVideoPath = VideoHelper.GetFirstFramePath(dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
-
-            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
-            Assert.IsFalse(File.Exists(firstFrameVideoPath));
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, _userConfigurationService!.PathSettings.FfmpegPath);
 
             // Get the captured console output
             string consoleOutput = stringWriter.ToString();
 
             // Assert that the expected error message was printed to the console
-            Assert.IsTrue(consoleOutput.Contains("Failed to extract the first frame for:"));
+            Assert.IsFalse(consoleOutput.Contains($"First frame extracted successfully for: {Path.Combine(_dataDirectory!, fileName)}"));
+            Assert.IsFalse(consoleOutput.Contains($"First frame saved at: {firstFrameVideoPath}"));
+            Assert.IsTrue(consoleOutput.Contains($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}"));
+            Assert.IsTrue(consoleOutput.Contains("Error: Error executing FFmpeg command"));
+
+            Assert.IsTrue(string.IsNullOrEmpty(firstFrameVideoPath));
+            Assert.IsFalse(File.Exists(firstFrameVideoPath));
         }
         finally
         {

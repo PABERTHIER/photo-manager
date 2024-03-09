@@ -262,7 +262,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             asset7!.Folder = folder3;
             asset7.Hash = asset1415Hash;
             asset8!.Folder = folder4;
-            asset8.Hash = miscAssetHash; // If this asset is in the set, then the treshold is not good
+            asset8.Hash = miscAssetHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -333,7 +333,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             asset7!.Folder = folder3;
             asset7.Hash = asset1415MD5Hash;
             asset8!.Folder = folder4;
-            asset8.Hash = miscAssetMD5Hash; // If this asset is in the set, then the treshold is not good
+            asset8.Hash = miscAssetMD5Hash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -390,7 +390,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             asset2!.Folder = folder1;
             asset2.Hash = asset1337DHash;
             asset8!.Folder = folder4;
-            asset8.Hash = miscAssetDHash; // If this asset is in the set, then the treshold is not good
+            asset8.Hash = miscAssetDHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -436,7 +436,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             asset4!.Folder = folder1;
             asset4.Hash = asset1350DHash;
             asset8!.Folder = folder2;
-            asset8.Hash = miscAssetDHash; // If this asset is in the set, then the treshold is not good
+            asset8.Hash = miscAssetDHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -490,7 +490,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             asset7!.Folder = folder1;
             asset7.Hash = asset1415DHash;
             asset8!.Folder = folder2;
-            asset8.Hash = miscAssetDHash; // If this asset is in the set, then the treshold is not good
+            asset8.Hash = miscAssetDHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -570,7 +570,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             asset7!.Folder = folder3;
             asset7.Hash = asset1415PHash;
             asset8!.Folder = folder4;
-            asset8.Hash = miscAssetPHash; // If this asset is in the set, then the treshold is not good
+            asset8.Hash = miscAssetPHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 

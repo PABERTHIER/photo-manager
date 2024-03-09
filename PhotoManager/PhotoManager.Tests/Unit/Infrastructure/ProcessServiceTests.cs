@@ -17,7 +17,7 @@ public class ProcessServiceTests
         Assert.IsFalse(result);
     }
 
-    [Test]
+    [Test] // This test can fail if you have a cmd already opened
     public void IsAlreadyRunning_WithUniqueProcessName_ReturnsFalse()
     {
         ProcessService processService = new();
@@ -56,7 +56,7 @@ public class ProcessServiceTests
             bool result = processService.IsAlreadyRunning(uniqueProcessId);
 
             Assert.IsFalse(result);
-        
+
             bool processExited = process?.WaitForExit(1000) ?? true;
 
             // If the process has not exited, it means it has timed out; terminate the process forcefully
@@ -66,7 +66,7 @@ public class ProcessServiceTests
             }
         }
     }
-    
+
     [Test]
     public void IsAlreadyRunning_OtherProcesses_ReturnsTrue()
     {

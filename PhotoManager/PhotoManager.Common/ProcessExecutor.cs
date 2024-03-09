@@ -4,6 +4,7 @@ namespace PhotoManager.Common;
 
 public class ProcessExecutor : IProcessExecutor
 {
+    // TODO: When using the dll, need to know if success or not to return this bool
     public void ExecuteFFmpegCommand(string ffmpegPath, string arguments)
     {
         using (Process process = new())

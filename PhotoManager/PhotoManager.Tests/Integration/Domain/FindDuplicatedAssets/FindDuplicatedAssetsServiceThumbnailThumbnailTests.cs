@@ -70,12 +70,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             FileName = "Image_1336_Mini.JPG",
-            FileSize = 363888,
+            FileSize = 1586,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 43,
             PixelHeight = 32,
             ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            ThumbnailPixelHeight = 149,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -87,11 +87,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             FileName = "Image_1336_Original.JPG",
-            FileSize = 4602393,
+            FileSize = 4526710,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 4032,
             PixelHeight = 3024,
-            ThumbnailPixelWidth = 147,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 10),
             Hash = "", // Set in each test
@@ -104,12 +104,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             FileName = "Image_1336_ShitQuality.JPG",
-            FileSize = 363888,
+            FileSize = 370819,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 4032,
             PixelHeight = 3024,
             ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -121,11 +121,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             FileName = "Image_1336_Small.JPG",
-            FileSize = 4602393,
+            FileSize = 53227,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 591,
             PixelHeight = 443,
-            ThumbnailPixelWidth = 147,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 10),
             Hash = "", // Set in each test
@@ -138,12 +138,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         {
             FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
             FileName = "Image 1.jpg",
-            FileSize = 2247285,
+            FileSize = 29857,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 1280,
             PixelHeight = 720,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
+            ThumbnailPixelWidth = 200,
+            ThumbnailPixelHeight = 112,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -186,7 +186,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             asset4!.Folder = folder1;
             asset4.Hash = smallAssetHash;
             asset5!.Folder = folder2;
-            asset5.Hash = miscAssetHash; // If this asset is in the set, then the treshold is not good
+            asset5.Hash = miscAssetHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -244,7 +244,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             asset4!.Folder = folder1;
             asset4.Hash = smallAssetMD5Hash;
             asset5!.Folder = folder2;
-            asset5.Hash = miscAssetMD5Hash; // If this asset is in the set, then the treshold is not good
+            asset5.Hash = miscAssetMD5Hash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -302,7 +302,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             asset4!.Folder = folder1;
             asset4.Hash = smallAssetDHash;
             asset5!.Folder = folder2;
-            asset5.Hash = miscAssetDHash; // If this asset is in the set, then the treshold is not good
+            asset5.Hash = miscAssetDHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -362,7 +362,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             asset4!.Folder = folder1;
             asset4.Hash = smallAssetPHash;
             asset5!.Folder = folder2;
-            asset5.Hash = miscAssetPHash; // If this asset is in the set, then the treshold is not good
+            asset5.Hash = miscAssetPHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 

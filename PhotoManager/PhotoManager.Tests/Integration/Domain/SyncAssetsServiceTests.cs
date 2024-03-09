@@ -23,8 +23,8 @@ public class SyncAssetsServiceTests
     public void OneTimeSetup()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        backupPath = Path.Combine(dataDirectory, backupEndPath);
         databasePath = Path.Combine(dataDirectory, "DatabaseTests");
+        backupPath = Path.Combine(dataDirectory, backupEndPath);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();

@@ -96,9 +96,9 @@ public class CatalogAssetsService : ICatalogAssetsService
     public Asset? CreateAsset(string directoryName, string fileName, bool isVideo = false)
     {
         Asset? asset = null;
-        string firstFrameVideoPath = "";
+        string? firstFrameVideoPath = null;
 
-        if (isVideo)
+        if (isVideo && _userConfigurationService.AssetSettings.AnalyseVideos)
         {
             firstFrameVideoPath = VideoHelper.GetFirstFramePath(
                 directoryName,
@@ -111,7 +111,8 @@ public class CatalogAssetsService : ICatalogAssetsService
         {
             string imagePath;
 
-            if (isVideo && !string.IsNullOrWhiteSpace(firstFrameVideoPath))
+            // TODO: Rework this part
+            if (!string.IsNullOrWhiteSpace(firstFrameVideoPath))
             {
                 imagePath = firstFrameVideoPath;
                 DirectoryInfo directoryInfo = new (imagePath);
@@ -148,7 +149,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 : _storageService.GetExifOrientation(
                     imageBytes,
                     _userConfigurationService.AssetSettings.DefaultExifOrientation,
-                    _userConfigurationService.AssetSettings.CorruptedImageOrientation); // GetExifOrientation is not handled by Gif and PNG
+                    _userConfigurationService.AssetSettings.CorruptedImageOrientation); // GetExifOrientation is not handled by Gif and Png
 
             Rotation rotation = _storageService.GetImageRotation(exifOrientation);
 
@@ -163,10 +164,9 @@ public class CatalogAssetsService : ICatalogAssetsService
             if (rotation != Rotation.Rotate0)
             {
                 assetRotated = true;
-                //rotation = Rotation.Rotate0; ?
             }
 
-            BitmapImage originalImage = _storageService.LoadBitmapOriginalImage(imageBytes, Rotation.Rotate0); // TODO: before was rotation
+            BitmapImage originalImage = _storageService.LoadBitmapOriginalImage(imageBytes, rotation);
 
             double originalDecodeWidth = originalImage.PixelWidth;
             double originalDecodeHeight = originalImage.PixelHeight;
@@ -189,13 +189,13 @@ public class CatalogAssetsService : ICatalogAssetsService
                 percentage = (thumbnailMaxHeight * 100d / originalDecodeHeight);
                 thumbnailDecodeWidth = (percentage * originalDecodeWidth) / 100d;
             }
-
-            BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(imageBytes,
-                Rotation.Rotate0,  // TODO: before was rotation
+            
+            BitmapImage thumbnailImage = _storageService.LoadBitmapThumbnailImage(
+                imageBytes,
+                rotation,
                 Convert.ToInt32(thumbnailDecodeWidth),
                 Convert.ToInt32(thumbnailDecodeHeight));
 
-            // TODO: Test if buffer not null and not empty
             byte[] thumbnailBuffer = isPng ? _storageService.GetPngBitmapImage(thumbnailImage) :
                 (isGif ? _storageService.GetGifBitmapImage(thumbnailImage) : _storageService.GetJpegBitmapImage(thumbnailImage));
 
@@ -450,7 +450,7 @@ public class CatalogAssetsService : ICatalogAssetsService
             return asset;
         }
 
-        ushort exifOrientation = _storageService.GetHeicExifOrientation(imageBytes, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+        ushort exifOrientation = _storageService.GetHeicExifOrientation(imageBytes, _userConfigurationService.AssetSettings.CorruptedImageOrientation);
         Rotation rotation = _storageService.GetImageRotation(exifOrientation);
 
         bool assetCorrupted = false;
@@ -461,13 +461,13 @@ public class CatalogAssetsService : ICatalogAssetsService
             assetCorrupted = true;
         }
 
-        if (rotation != Rotation.Rotate0)
-        {
-            assetRotated = true;
-            //rotation = Rotation.Rotate0; ?
-        }
+        // MagickImage always returns "TopLeft", it is not able to detect the right orientation for a heic file -_-
+        // if (rotation != Rotation.Rotate0)
+        // {
+        //     assetRotated = true;
+        // }
 
-        BitmapImage originalImage = _storageService.LoadBitmapHeicOriginalImage(imageBytes, Rotation.Rotate0); // before was rotation
+        BitmapImage originalImage = _storageService.LoadBitmapHeicOriginalImage(imageBytes, rotation);
 
         double originalDecodeWidth = originalImage.PixelWidth;
         double originalDecodeHeight = originalImage.PixelHeight;
@@ -492,11 +492,10 @@ public class CatalogAssetsService : ICatalogAssetsService
         }
 
         BitmapImage thumbnailImage = _storageService.LoadBitmapHeicThumbnailImage(imageBytes,
-            Rotation.Rotate0, // before was rotation
+            rotation,
             Convert.ToInt32(thumbnailDecodeWidth),
             Convert.ToInt32(thumbnailDecodeHeight));
 
-        // TODO: Test if buffer not null and not empty
         byte[] thumbnailBuffer = _storageService.GetJpegBitmapImage(thumbnailImage);
 
         Folder folder = _assetRepository.GetFolderByPath(directoryName);

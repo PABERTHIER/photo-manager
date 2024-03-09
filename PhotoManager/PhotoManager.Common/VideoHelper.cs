@@ -42,7 +42,7 @@ public static class VideoHelper
         };
     }
 
-    public static string GetFirstFramePath(string directoryName, string fileName, string destinationPath, string ffmpegPath)
+    public static string? GetFirstFramePath(string directoryName, string fileName, string destinationPath, string ffmpegPath)
     {
         string videoPath = Path.Combine(directoryName, fileName);
 
@@ -51,23 +51,31 @@ public static class VideoHelper
 
         // Set the output file name based on the input video file name
         string firstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
-        string firstFrameVideoPath = Path.Combine(destinationPath, firstFrameVideoName);
 
         try
         {
+            string firstFrameVideoPath = Path.Combine(destinationPath, firstFrameVideoName);
             // Execute FFmpeg command to extract the first frame
             string arguments = $"-i \"{videoPath}\" -ss 00:00:01 -vframes 1 \"{firstFrameVideoPath}\"";
             ProcessExecutor.ExecuteFFmpegCommand(ffmpegPath, arguments);
 
+            // TODO: Remove this code when using dll -> getting if success or not instead
+            if (!File.Exists(firstFrameVideoPath))
+            {
+                throw new FileNotFoundException("FFmpeg failed to generate the first frame.");
+            }
+
             Console.WriteLine($"First frame extracted successfully for: {videoPath}");
             Console.WriteLine($"First frame saved at: {firstFrameVideoPath}");
+            
+            return firstFrameVideoPath;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to extract the first frame for: {videoPath}");
             Console.WriteLine($"Error: {ex.Message}");
-        }
 
-        return firstFrameVideoPath;
+            return null;
+        }
     }
 }

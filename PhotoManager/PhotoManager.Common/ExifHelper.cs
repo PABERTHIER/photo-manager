@@ -17,13 +17,12 @@ public static class ExifHelper
     {
         try
         {
-            using (MemoryStream stream = new(buffer))
+            using (MemoryStream stream = new (buffer))
             {
                 BitmapFrame bitmapFrame = BitmapFrame.Create(stream);
 
                 if (bitmapFrame.Metadata is BitmapMetadata bitmapMetadata)
                 {
-                
                     object orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
 
                     if (orientation == null)
@@ -32,7 +31,6 @@ public static class ExifHelper
                     }
 
                     return (ushort)orientation;
-                
                 }
             }
         }
@@ -55,14 +53,14 @@ public static class ExifHelper
     {
         try
         {
-            using (MemoryStream stream = new(buffer))
+            using (MemoryStream stream = new (buffer))
             {
                 // https://github.com/dlemstra/Magick.NET/issues/836
                 //MagickReadSettings settings = new();
                 //settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
 
                 //using (MagickImage image = new(stream, settings))
-                using (MagickImage image = new(stream))
+                using (MagickImage image = new (stream))
                 {
                     string? orientation = image.GetAttribute("exif:Orientation");
                     //image.AutoOrient();
@@ -71,10 +69,8 @@ public static class ExifHelper
                     {
                         return orientationValue;
                     }
-                    else
-                    {
-                        return GetMagickHeicOrientation(image.Orientation, corruptedImageOrientation);
-                    }
+
+                    return GetMagickHeicOrientation(image.Orientation, corruptedImageOrientation);
                 }
             }
         }
@@ -113,6 +109,7 @@ public static class ExifHelper
                 BitmapFrame bitmapFrame = BitmapFrame.Create(ms);
                 BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
             }
+
             return true;
         }
         catch (Exception e)
@@ -126,9 +123,9 @@ public static class ExifHelper
     {
         try
         {
-            using (MemoryStream ms = new(imageData))
+            using (MemoryStream ms = new (imageData))
             {
-                using (MagickImage image = new(ms))
+                using (MagickImage image = new (ms))
                 {
                     // Image is valid
                 }

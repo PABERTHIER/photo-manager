@@ -95,11 +95,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_BottomLeftPart.JPG",
-            FileSize = 2247285,
+            FileSize = 1119873,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 2016,
             PixelHeight = 1512,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
@@ -112,12 +112,12 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_BottomPart.JPG",
-            FileSize = 2247285,
+            FileSize = 2172866,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 4032,
             PixelHeight = 1512,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
+            ThumbnailPixelWidth = 200,
+            ThumbnailPixelHeight = 75,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -129,11 +129,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_BottomRightPart.JPG",
-            FileSize = 2247285,
+            FileSize = 1061673,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 2016,
             PixelHeight = 1512,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
@@ -146,11 +146,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_LeftPart.JPG",
-            FileSize = 2247285,
+            FileSize = 1475892,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 2016,
             PixelHeight = 3024,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 100,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
@@ -163,11 +163,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_Original.JPG",
-            FileSize = 2247285,
+            FileSize = 4526710,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 4032,
             PixelHeight = 3024,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
@@ -180,11 +180,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_RightPart.JPG",
-            FileSize = 2247285,
+            FileSize = 1437903,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 2016,
             PixelHeight = 3024,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 100,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
@@ -197,11 +197,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_TopLeftPart.JPG",
-            FileSize = 2247285,
+            FileSize = 362012,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 2016,
             PixelHeight = 1512,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
@@ -214,12 +214,12 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_TopPart.JPG",
-            FileSize = 2247285,
+            FileSize = 737269,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 4032,
             PixelHeight = 1512,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
+            ThumbnailPixelWidth = 200,
+            ThumbnailPixelHeight = 75,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -231,11 +231,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
             FileName = "1336_TopRightPart.JPG",
-            FileSize = 2247285,
+            FileSize = 383508,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 2016,
             PixelHeight = 1512,
-            ThumbnailPixelWidth = 112,
+            ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
             ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
             Hash = "", // Set in each test
@@ -248,12 +248,12 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         {
             FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
             FileName = "Image 1.jpg",
-            FileSize = 2247285,
+            FileSize = 29857,
             ImageRotation = Rotation.Rotate0,
             PixelWidth = 1280,
             PixelHeight = 720,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
+            ThumbnailPixelWidth = 200,
+            ThumbnailPixelHeight = 112,
             ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -306,7 +306,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             asset9!.Folder = folder1;
             asset9!.Hash = asset1336_TopRightPartHash;
             asset10!.Folder = folder2;
-            asset10.Hash = miscAssetHash; // If this asset is in the set, then the treshold is not good
+            asset10.Hash = miscAssetHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -379,7 +379,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             asset9!.Folder = folder1;
             asset9!.Hash = asset1336_TopRightPartMD5Hash;
             asset10!.Folder = folder2;
-            asset10.Hash = miscAssetMD5Hash; // If this asset is in the set, then the treshold is not good
+            asset10.Hash = miscAssetMD5Hash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -452,7 +452,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             asset9!.Folder = folder1;
             asset9!.Hash = asset1336_TopRightPartDHash;
             asset10!.Folder = folder2;
-            asset10.Hash = miscAssetDHash; // If this asset is in the set, then the treshold is not good
+            asset10.Hash = miscAssetDHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -543,7 +543,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             asset9!.Folder = folder1;
             asset9!.Hash = asset1336_TopRightPartPHash;
             asset10!.Folder = folder2;
-            asset10.Hash = miscAssetPHash; // If this asset is in the set, then the treshold is not good
+            asset10.Hash = miscAssetPHash; // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 

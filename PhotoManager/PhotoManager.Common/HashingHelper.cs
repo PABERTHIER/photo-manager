@@ -37,7 +37,7 @@ public static class HashingHelper
         return phash;
     }
 
-    // For Gif file it returns "0"
+    // For Gif or some heic file it returns "0"
     public static string CalculateDHash(string filePath)
     {
         Bitmap? image;

@@ -77,7 +77,7 @@ The aim is to let you configure it as you need.
 **The `Hash` part is about settings of hash (for basic usages, you will not need to modify the settings):** :woman_technologist:
 
 - `PHashThreshold = 40`: The value of the threshold (used when `UsingPHash` is true).
-- `UsingDHash = false`: Enable it to hash in DHash (Difference Hash). This hashing method always returns "0" for Gif file.
+- `UsingDHash = false`: Enable it to hash in DHash (Difference Hash). This hashing method returns "0" for Gif or some heic files.
 - `UsingMD5Hash = false`: Enable it to hash in MD5.
 - `UsingPHash = false`: Enable it to hash in PHash (Perceptual Hash). It can detect duplicates between rotated assets (improve detection), thumbnails, images part and same images with differents resolutions.
 Performances are decreased with PHash by 6 times (for ex: 0.17s for 140 pictures with SHA512 and 1.11s with PHash).
