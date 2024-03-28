@@ -16,7 +16,7 @@ public class CatalogAssetsServiceCreateAssetTests
     private UserConfigurationService? _userConfigurationService;
     private TestableAssetRepository? _testableAssetRepository;
     private Mock<IStorageService>? _storageServiceMock;
-    
+
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
@@ -26,10 +26,10 @@ public class CatalogAssetsServiceCreateAssetTests
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(_databasePath);
-        
+
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
-    
+
     private void ConfigureCatalogAssetService(int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
@@ -61,10 +61,10 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Image 8.jpeg", 30514, 720, 1280, 200, 112, Rotation.Rotate0, "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3", false, null, false, null, 2112, "")]
     [TestCase("Image 9.png", 126277, 720, 1280, 200, 112, Rotation.Rotate0, "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20", false, null, false, null, 11002, "")]
     [TestCase("Image 10 portrait.png", 153318, 1280, 720, 84, 150, Rotation.Rotate0, "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94", false, null, false, null, 6076, "")]
-    [TestCase("Image_11.heic", 670318, 4032, 3024, 112, 150, Rotation.Rotate0, "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931", false, null, false, null, 5832, "")]
-    [TestCase("Image_11_90.heic", 683653, 3024, 4032, 200, 150, Rotation.Rotate0, "87b3ed76c4b82ccd19bdaff484ba79aa0914dda1f2c3c7aa3d6e802c83ae41fbd1abb65884c9bbf32e2853cd20688736dcce0a9ef0916d6815b71bb77188cc0a", false, null, false, null, 9345, "")]
-    [TestCase("Image_11_180.heic", 594927, 4032, 3024, 112, 150, Rotation.Rotate0, "92ab5910d7aea5e909b7dbec901eace79972ac2eca5d334325a6bdbd00a805c51f504070730d6030996b3ffbab4d7e5d59a387aa1ddb6c9f80954dc234cd6e12", false, null, false, null, 5690, "")]
-    [TestCase("Image_11_270.heic", 610139, 3024, 4032, 200, 150, Rotation.Rotate0, "90f8d91792072b868226b481975858e5ac542a779abb4018aa8b5f04f61b61304294dd2bab69eeb5b9532c490d44ba2309edda3a2186e38fa37bed241cbf9cfe", false, null, false, null, 9653, "")]
+    [TestCase("Image_11.heic", 1411940, 4032, 3024, 112, 150, Rotation.Rotate0, "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d", false, null, false, null, 5831, "")]
+    [TestCase("Image_11_90.heic", 1411940, 3024, 4032, 200, 150, Rotation.Rotate90, "b75df4942de1efa7d4326fedd721e99cc43959a1c22098a8cfcf6861aea099741d9c98fa1615e54d53838c22b9c6ff3b328c4ee3c0875d2b4ac7f7dee8d61bcf", false, null, true, "The asset has been rotated", 5868, "")]
+    [TestCase("Image_11_180.heic", 1423616, 4032, 3024, 112, 150, Rotation.Rotate180, "a2ad3ac9d51f74230b9f1d554172781d9cc214d01f8344354e2e56dc3daecb5a0021d4d2814eba0cde6fd681f3a8e8b8b55fbfad7184740e3518190e05dca77f", false, null, true, "The asset has been rotated", 5694, "")]
+    [TestCase("Image_11_270.heic", 1423616, 3024, 4032, 200, 150, Rotation.Rotate270, "d4d7342a783f0f1b5e10ad9b493b71dd688dbc31b8ddd5534c9fff9c5fdbfa8bee32ef4e4258f7514a1b57f9a12b571454c8b66172b1a66bf1b53953b66227d5", false, null, true, "The asset has been rotated", 6038, "")]
     [TestCase("IMAGE_WITH_UPPERCASE_NAME.JPG", 40937, 720, 1280, 200, 112, Rotation.Rotate0, "0465fc2af396e003a3f45bf71e951b905ca7d19c21c36d47cd7b2524190862e38cb4c0da6fdd1dbd89b5b7050d837be664bc45693657ec7681e4d9b648044c91", false, null, false, null, 3013, "")]
     [TestCase("Homer.gif", 64123, 320, 320, 150, 150, Rotation.Rotate0, "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1", false, null, false, null, 8594, "")]
     [TestCase("1336_BottomLeftPart.JPG", 1119873, 1512, 2016, 200, 150, Rotation.Rotate0, "c50e17cee9a52c0235afb410c361d094daf7330c20e4b3f3cb3e3e18683793355e903f84d49bf1db4af7e094980204cc005aa3c503829d14c9e6cd19826e284f", false, null, false, null, 13124, "Duplicates\\Part")]
@@ -111,17 +111,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(folderPath, fileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 fileName,
@@ -147,7 +147,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     [TestCase("Image 1.jpg", 29857, 720, 1280, 200, 112, Rotation.Rotate0, "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0", false, null, false, null, 2097, "")]
     [TestCase("Image 1_90_deg.jpg", 31535, 1280, 720, 84, 150, Rotation.Rotate90, "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0", false, null, true, "The asset has been rotated", 1728, "")]
@@ -158,10 +158,10 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Image 8.jpeg", 30514, 720, 1280, 200, 112, Rotation.Rotate0, "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0", false, null, false, null, 2112, "")]
     [TestCase("Image 9.png", 126277, 720, 1280, 200, 112, Rotation.Rotate0, "afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee0afb2d849b98fd038dc1062da9619b162ee0", false, null, false, null, 11002, "")]
     [TestCase("Image 10 portrait.png", 153318, 1280, 720, 84, 150, Rotation.Rotate0, "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0", false, null, false, null, 6076, "")]
-    [TestCase("Image_11.heic", 670318, 4032, 3024, 112, 150, Rotation.Rotate0, "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056", false, null, false, null, 5832, "")]
-    [TestCase("Image_11_90.heic", 683653, 3024, 4032, 200, 150, Rotation.Rotate0, "a927584a9188108894b561cc58d7fe6205a62ee062ee062ee062ee062ee062ee062ee0a927584a9188108894b561cc58d7fe6205a62ee062ee062ee062ee062ee062ee062ee0a927584a9188108894b561cc58d7fe6205aa927584a9188108894b561cc58d7fe6205a", false, null, false, null, 9345, "")]
-    [TestCase("Image_11_180.heic", 594927, 4032, 3024, 112, 150, Rotation.Rotate0, "a927084a8f8810c894aa61cc38d78c6207062ee062ee062ee062ee062ee062ee062ee0a927084a8f8810c894aa61cc38d78c6207062ee062ee062ee062ee062ee062ee062ee0a927084a8f8810c894aa61cc38d78c62070a927084a8f8810c894aa61cc38d78c62070", false, null, false, null, 5690, "")]
-    [TestCase("Image_11_270.heic", 610139, 3024, 4032, 200, 150, Rotation.Rotate0, "a927484a8f88104894a061cc18d7976206962ee062ee062ee062ee062ee062ee062ee0a927484a8f88104894a061cc18d7976206962ee062ee062ee062ee062ee062ee062ee0a927484a8f88104894a061cc18d79762069a927484a8f88104894a061cc18d79762069", false, null, false, null, 9653, "")]
+    [TestCase("Image_11.heic", 1411940, 4032, 3024, 112, 150, Rotation.Rotate0, "a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d63662071a928c84a96881408945461cb98d63662071", false, null, false, null, 5831, "")]
+    [TestCase("Image_11_90.heic", 1411940, 3024, 4032, 200, 150, Rotation.Rotate90, "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a", false, null, true, "The asset has been rotated", 5868, "")]
+    [TestCase("Image_11_180.heic", 1423616, 4032, 3024, 112, 150, Rotation.Rotate180, "a928e84a97881448945561cb98d6386206f62ee062ee062ee062ee062ee062ee062ee0a928e84a97881448945561cb98d6386206f62ee062ee062ee062ee062ee062ee062ee0a928e84a97881448945561cb98d6386206fa928e84a97881448945561cb98d6386206f", false, null, true, "The asset has been rotated", 5694, "")]
+    [TestCase("Image_11_270.heic", 1423616, 3024, 4032, 200, 150, Rotation.Rotate270, "a929184a99881458946061cbb8d6606206962ee062ee062ee062ee062ee062ee062ee0a929184a99881458946061cbb8d6606206962ee062ee062ee062ee062ee062ee062ee0a929184a99881458946061cbb8d66062069a929184a99881458946061cbb8d66062069", false, null, true, "The asset has been rotated", 6038, "")]
     [TestCase("IMAGE_WITH_UPPERCASE_NAME.JPG", 40937, 720, 1280, 200, 112, Rotation.Rotate0, "af946849858fab58dc6b62d9a619b962ee062ee062ee062ee062ee062ee062ee062ee0af946849858fab58dc6b62d9a619b962ee062ee062ee062ee062ee062ee062ee062ee0af946849858fab58dc6b62d9a619b962ee0af946849858fab58dc6b62d9a619b962ee0", false, null, false, null, 3013, "")]
     [TestCase("Homer.gif", 64123, 320, 320, 150, 150, Rotation.Rotate0, "af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225daf783881028a11d8ad696231b8ee326225d", false, null, false, null, 8594, "")]
     [TestCase("1336_BottomLeftPart.JPG", 1119873, 1512, 2016, 200, 150, Rotation.Rotate0, "a939484b35885058815f61a1f8a70361c4562ee062ee062ee062ee062ee062ee062ee0a939484b35885058815f61a1f8a70361c4562ee062ee062ee062ee062ee062ee062ee0a939484b35885058815f61a1f8a70361c45a939484b35885058815f61a1f8a70361c45", false, null, false, null, 13124, "Duplicates\\Part")]
@@ -208,17 +208,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(folderPath, fileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 fileName,
@@ -244,7 +244,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     [TestCase("Image 1.jpg", 29857, 720, 1280, 200, 112, Rotation.Rotate0, "23831507941108244", false, null, false, null, 2097, "")]
     [TestCase("Image 1_90_deg.jpg", 31535, 1280, 720, 84, 150, Rotation.Rotate90, "23831507941108244", false, null, true, "The asset has been rotated", 1728, "")]
@@ -255,10 +255,10 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Image 8.jpeg", 30514, 720, 1280, 200, 112, Rotation.Rotate0, "23831507941108244", false, null, false, null, 2112, "")]
     [TestCase("Image 9.png", 126277, 720, 1280, 200, 112, Rotation.Rotate0, "9346989754624", false, null, false, null, 11002, "")]
     [TestCase("Image 10 portrait.png", 153318, 1280, 720, 84, 150, Rotation.Rotate0, "36116814863094786", false, null, false, null, 6076, "")]
-    [TestCase("Image_11.heic", 670318, 4032, 3024, 112, 150, Rotation.Rotate0, "9077567998918656", false, null, false, null, 5832, "")]
-    [TestCase("Image_11_90.heic", 683653, 3024, 4032, 200, 150, Rotation.Rotate0, "14766640480181721", false, null, false, null, 9345, "")]
-    [TestCase("Image_11_180.heic", 594927, 4032, 3024, 112, 150, Rotation.Rotate0, "0", false, null, false, null, 5690, "")]
-    [TestCase("Image_11_270.heic", 610139, 3024, 4032, 200, 150, Rotation.Rotate0, "0", false, null, false, null, 9653, "")]
+    [TestCase("Image_11.heic", 1411940, 4032, 3024, 112, 150, Rotation.Rotate0, "0", false, null, false, null, 5831, "")]
+    [TestCase("Image_11_90.heic", 1411940, 3024, 4032, 200, 150, Rotation.Rotate90, "14766675108600273", false, null, true, "The asset has been rotated", 5868, "")]
+    [TestCase("Image_11_180.heic", 1423616, 4032, 3024, 112, 150, Rotation.Rotate180, "53334510583489094", false, null, true, "The asset has been rotated", 5694, "")]
+    [TestCase("Image_11_270.heic", 1423616, 3024, 4032, 200, 150, Rotation.Rotate270, "0", false, null, true, "The asset has been rotated", 6038, "")]
     [TestCase("IMAGE_WITH_UPPERCASE_NAME.JPG", 40937, 720, 1280, 200, 112, Rotation.Rotate0, "23831507941108244", false, null, false, null, 3013, "")]
     [TestCase("Homer.gif", 64123, 320, 320, 150, 150, Rotation.Rotate0, "0", false, null, false, null, 8594, "")]
     [TestCase("1336_BottomLeftPart.JPG", 1119873, 1512, 2016, 200, 150, Rotation.Rotate0, "27162885008392837", false, null, false, null, 13124, "Duplicates\\Part")]
@@ -305,17 +305,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(folderPath, fileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 fileName,
@@ -341,7 +341,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     [TestCase("Image 1.jpg", 29857, 720, 1280, 200, 112, Rotation.Rotate0, "a886f237e1cf6da03fb793588fd79b64", false, null, false, null, 2097, "")]
     [TestCase("Image 1_90_deg.jpg", 31535, 1280, 720, 84, 150, Rotation.Rotate90, "e740c5b99b0c87d86b9b1b3f322dec7e", false, null, true, "The asset has been rotated", 1728, "")]
@@ -352,10 +352,10 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Image 8.jpeg", 30514, 720, 1280, 200, 112, Rotation.Rotate0, "4194e88c247b5bbc7a1c6294cc795466", false, null, false, null, 2112, "")]
     [TestCase("Image 9.png", 126277, 720, 1280, 200, 112, Rotation.Rotate0, "05d29088572bd5a5970fc370c0ca8751", false, null, false, null, 11002, "")]
     [TestCase("Image 10 portrait.png", 153318, 1280, 720, 84, 150, Rotation.Rotate0, "02b09a63d382bc1a1f88afa125f3adb3", false, null, false, null, 6076, "")]
-    [TestCase("Image_11.heic", 670318, 4032, 3024, 112, 150, Rotation.Rotate0, "24cee7da517186279bafac45072fe622", false, null, false, null, 5832, "")]
-    [TestCase("Image_11_90.heic", 683653, 3024, 4032, 200, 150, Rotation.Rotate0, "68188f7fae14032fff73a9ebe4783f56", false, null, false, null, 9345, "")]
-    [TestCase("Image_11_180.heic", 594927, 4032, 3024, 112, 150, Rotation.Rotate0, "b405fdac8ae19f136802d73dfb92b79f", false, null, false, null, 5690, "")]
-    [TestCase("Image_11_270.heic", 610139, 3024, 4032, 200, 150, Rotation.Rotate0, "2400d93ef5a14475d720c4ae1b413ebd", false, null, false, null, 9653, "")]
+    [TestCase("Image_11.heic", 1411940, 4032, 3024, 112, 150, Rotation.Rotate0, "d9aa281b55316e10c767877dee265732", false, null, false, null, 5831, "")]
+    [TestCase("Image_11_90.heic", 1411940, 3024, 4032, 200, 150, Rotation.Rotate90, "e3aeca5fc781bd52470f9186653d3a3f", false, null, true, "The asset has been rotated", 5868, "")]
+    [TestCase("Image_11_180.heic", 1423616, 4032, 3024, 112, 150, Rotation.Rotate180, "9bf6a1a37331ba6f391b885b6dcc67a1", false, null, true, "The asset has been rotated", 5694, "")]
+    [TestCase("Image_11_270.heic", 1423616, 3024, 4032, 200, 150, Rotation.Rotate270, "35d24aaf7f6fc8b9872f069a8c28ab78", false, null, true, "The asset has been rotated", 6038, "")]
     [TestCase("IMAGE_WITH_UPPERCASE_NAME.JPG", 40937, 720, 1280, 200, 112, Rotation.Rotate0, "b70782c592e3e88f16291acf31d1b133", false, null, false, null, 3013, "")]
     [TestCase("Homer.gif", 64123, 320, 320, 150, 150, Rotation.Rotate0, "a409ce713de9334117791b15a586dd0e", false, null, false, null, 8594, "")]
     [TestCase("1336_BottomLeftPart.JPG", 1119873, 1512, 2016, 200, 150, Rotation.Rotate0, "1691eb898f26c38b8b5d66b5d5ed71c6", false, null, false, null, 13124, "Duplicates\\Part")]
@@ -402,17 +402,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(folderPath, fileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 fileName,
@@ -438,7 +438,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [TestCase("1415.JPG", 2264917, 4032, 3024, 112, 150, Rotation.Rotate270, "5f122c429a160e0eb1df1a6b77cea6ee4c13b731ebff02c79646314d5bf57070d4fae13a1a8821927d7954f83ae706c937affb452ed32a38dc800e00ef0f6176", false, null, true, "The asset has been rotated", 5022, "Duplicates\\NotDuplicate\\Sample3")]
     public void CreateAsset_PreviouslyRotatedPictureAndBasicHashType_ReturnsAsset(
         string fileName,
@@ -465,17 +465,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(folderPath, fileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 fileName,
@@ -519,7 +519,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int expectedImageByteSize)
     {
         ConfigureCatalogAssetService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
-        
+
         Asset expectedAsset = new()
         {
             FileName = "Image 1.jpg",
@@ -542,17 +542,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 expectedAsset.FileName,
@@ -578,7 +578,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     [TestCase(150, 150, 84, 150, 6076)]
     [TestCase(200, 150, 84, 150, 6076)]
@@ -619,17 +619,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 expectedAsset.FileName,
@@ -655,15 +655,15 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
-    [TestCase(150, 150, 112, 150, 5832)]
-    [TestCase(200, 150, 112, 150, 5832)]
-    [TestCase(150, 200, 150, 200, 9567)]
+    [TestCase(150, 150, 112, 150, 5831)]
+    [TestCase(200, 150, 112, 150, 5831)]
+    [TestCase(150, 200, 150, 200, 9535)]
     [TestCase(0, 0, 0, 0, 634)]
     [TestCase(1000, 10, 8, 10, 704)]
-    [TestCase(10, 10000, 7500, 10000, 7316870)]
-    [TestCase(100000, 100, 75, 100, 3171)]
+    [TestCase(10, 10000, 7500, 10000, 7144043)]
+    [TestCase(100000, 100, 75, 100, 3173)]
     public void CreateAsset_HeicPictureAndBasicHashTypeAndDifferentThumbnailSettings_ReturnsAsset(
         int thumbnailMaxWidth,
         int thumbnailMaxHeight,
@@ -672,17 +672,17 @@ public class CatalogAssetsServiceCreateAssetTests
         int expectedImageByteSize)
     {
         ConfigureCatalogAssetService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
-        
+
         Asset expectedAsset = new()
         {
             FileName = "Image_11.heic",
-            FileSize = 670318,
+            FileSize = 1411940,
             PixelHeight = 4032,
             PixelWidth = 3024,
             ThumbnailPixelWidth = expectedThumbnailPixelWidth,
             ThumbnailPixelHeight = expectedThumbnailPixelHeight,
             ImageRotation = Rotation.Rotate0,
-            Hash = "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931",
+            Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
             IsAssetCorrupted = false,
             AssetCorruptedMessage = null,
             IsAssetRotated = false,
@@ -695,17 +695,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 expectedAsset.FileName,
@@ -731,12 +731,12 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndCreatingTwiceSameImageInDifferentLocations_ReturnsAssetAndCreatesBothAssets()
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, false);
-        
+
         Asset expectedAsset = new()
         {
             FileName = "Image 1.jpg",
@@ -752,26 +752,26 @@ public class CatalogAssetsServiceCreateAssetTests
             IsAssetRotated = false,
             AssetRotatedMessage = null
         };
-        
+
         const int imageByteSize = 2097;
 
         try
         {
             Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-            
+
             string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-            
+
             Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 expectedAsset.FileName,
@@ -792,14 +792,14 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string newSameAssetFolderPath = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder1");
             Folder newSameAssetFolder = _testableAssetRepository!.AddFolder(newSameAssetFolderPath); // Set above, not in this method
-            
+
             string newSameImagePath = Path.Combine(newSameAssetFolderPath, expectedAsset.FileName);
             Assert.IsTrue(File.Exists(imagePath));
 
             Asset? newSameAsset = _catalogAssetsService!.CreateAsset(newSameAssetFolderPath, expectedAsset.FileName);
-            
+
             Assert.IsNotNull(newSameAsset);
-            
+
             AssertAssetPropertyValidity(
                 newSameAsset!,
                 expectedAsset.FileName,
@@ -817,24 +817,24 @@ public class CatalogAssetsServiceCreateAssetTests
                 expectedAsset.AssetCorruptedMessage,
                 expectedAsset.IsAssetRotated,
                 expectedAsset.AssetRotatedMessage);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(2, assetsFromRepository.Count);
 
             Asset firstAssetFromRepository = assetsFromRepository[0];
-            
+
             Assert.AreEqual(asset!.FileName, firstAssetFromRepository.FileName);
             Assert.AreEqual(asset.FolderId, firstAssetFromRepository.FolderId);
             Assert.AreEqual(asset.Hash, firstAssetFromRepository.Hash);
             Assert.IsNull(firstAssetFromRepository.ImageData);
-            
+
             Asset secondAssetFromRepository = assetsFromRepository[1];
 
             Assert.AreEqual(newSameAsset!.FileName, secondAssetFromRepository.FileName);
             Assert.AreEqual(newSameAsset.FolderId, secondAssetFromRepository.FolderId);
             Assert.AreEqual(newSameAsset.Hash, secondAssetFromRepository.Hash);
             Assert.IsNull(secondAssetFromRepository.ImageData);
-            
+
             Assert.AreEqual(2, thumbnails.Count);
             Assert.IsTrue(thumbnails.ContainsKey(asset.Folder.Path));
             Assert.IsTrue(thumbnails.ContainsKey(newSameAsset.Folder.Path));
@@ -859,7 +859,7 @@ public class CatalogAssetsServiceCreateAssetTests
     public void CreateAsset_PictureAndBasicHashTypeAndCreatingTwiceSameImage_DoesNotAddTheSecondOneAndReturnsNull()
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, false);
-        
+
         Asset expectedAsset = new()
         {
             FileName = "Image 1.jpg",
@@ -875,26 +875,26 @@ public class CatalogAssetsServiceCreateAssetTests
             IsAssetRotated = false,
             AssetRotatedMessage = null
         };
-        
+
         const int imageByteSize = 2097;
 
         try
         {
             Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-            
+
             string imagePath = Path.Combine(_dataDirectory!, expectedAsset.FileName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-            
+
             Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 expectedAsset.FileName,
@@ -914,9 +914,9 @@ public class CatalogAssetsServiceCreateAssetTests
                 expectedAsset.AssetRotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
-            
+
             Asset? newSameAsset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
-            
+
             Assert.IsNull(newSameAsset);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
@@ -926,7 +926,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     [TestCase("Image 1.jpg", "Invalid_Image_1.jpg")]
     [TestCase("Image_11.heic", "Invalid_Image_11.heic")]
@@ -934,7 +934,7 @@ public class CatalogAssetsServiceCreateAssetTests
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, false);
         string tempDirectory = Path.Combine(_dataDirectory!, "InvalidImage");
-    
+
         try
         {
             string imagePath = Path.Combine(_dataDirectory!, fileName);
@@ -945,24 +945,24 @@ public class CatalogAssetsServiceCreateAssetTests
             Assert.IsFalse(File.Exists(invalidImagePath));
 
             ImageHelpers.CreateInvalidImage(imagePath, invalidImagePath);
-            
+
             Assert.IsTrue(File.Exists(invalidImagePath));
 
             _testableAssetRepository!.AddFolder(tempDirectory); // Set above, not in this method
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-            
+
             Asset? asset = _catalogAssetsService!.CreateAsset(tempDirectory, invalidFileName);
-            
+
             Assert.IsNull(asset);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Assert.IsEmpty(thumbnails);
         }
         finally
@@ -989,7 +989,7 @@ public class CatalogAssetsServiceCreateAssetTests
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, false);
         string tempDirectory = Path.Combine(_dataDirectory!, "CorruptedImage");
-    
+
         try
         {
             Asset expectedAsset = new()
@@ -1007,7 +1007,7 @@ public class CatalogAssetsServiceCreateAssetTests
                 IsAssetRotated = false,
                 AssetRotatedMessage = null
             };
-        
+
             string imagePath = Path.Combine(_dataDirectory!, initialFileName);
             Assert.IsTrue(File.Exists(imagePath));
 
@@ -1016,21 +1016,21 @@ public class CatalogAssetsServiceCreateAssetTests
             Assert.IsFalse(File.Exists(corruptedImagePath));
 
             File.Copy(imagePath, corruptedImagePath, overwrite: true);
-            
+
             Assert.IsTrue(File.Exists(corruptedImagePath));
-            
+
             Folder folder = _testableAssetRepository!.AddFolder(tempDirectory); // Set above, not in this method
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-            
+
             Asset? asset = _catalogAssetsService!.CreateAsset(tempDirectory, corruptedAssetFileName);
-            
+
             Assert.IsNotNull(asset);
-            
+
             AssertAssetPropertyValidity(
                 asset!,
                 expectedAsset.FileName,
@@ -1062,24 +1062,24 @@ public class CatalogAssetsServiceCreateAssetTests
     public void CreateAsset_PictureAndBasicHashTypeAndFolderNotAdded_ThrowsNullReferenceExceptionAndAssetIsNotCreated()
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, false);
-    
+
         try
         {
             const string assetName = "Image 1.jpg";
             string imagePath = Path.Combine(_dataDirectory!, assetName);
 
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-    
+
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
-            
+
             Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1089,7 +1089,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     [TestCase("Image 1.jpg", 100000, 100)] // Width > Height
     [TestCase("Image 10 portrait.png", 100, 100000)] // Height > Width
@@ -1104,17 +1104,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             OverflowException? exception = Assert.Throws<OverflowException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
 
             Assert.AreEqual("The image data generated an overflow during processing.", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1124,7 +1124,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     public void CreateAsset_HeicPictureAndBasicHashTypeAndThumbnailSettingsTooBig_ThrowsInvalidOperationExceptionAndAssetIsNotCreated()
     {
@@ -1160,7 +1160,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     public void CreateAsset_HeicPictureAndBasicHashTypeAndNegativeThumbnailSettings_ThrowsArgumentExceptionAndAssetIsNotCreated()
     {
@@ -1209,17 +1209,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _catalogAssetsService!.CreateAsset(null!, assetName));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1229,7 +1229,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndDirectoryNameIsEmpty_ThrowsFileNotFoundExceptionAndAssetIsNotCreated()
     {
@@ -1244,17 +1244,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _catalogAssetsService!.CreateAsset(directoryName, assetName));
 
             Assert.AreEqual($"Could not find file '{Path.Combine(directoryName, assetName)}'.", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1309,17 +1309,17 @@ public class CatalogAssetsServiceCreateAssetTests
         {
             string assetName = null!;
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path2')", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1343,17 +1343,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsFalse(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
 
             Assert.AreEqual($"Could not find file '{Path.Combine(_dataDirectory!, assetName)}'.", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1617,7 +1617,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Directory.Delete(firstFrameVideosPath, true);
         }
     }
-    
+
     [TestCase("Homer.mp4", "Homer.jpg", 6599, 180, 320, 200, 112, Rotation.Rotate0, "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66", false, null, false, null, 4779)]
     public void CreateAsset_VideoAndBasicHashTypeAndAddSameVideoTwice_ReturnsAsset(
         string fileName,
@@ -1643,38 +1643,38 @@ public class CatalogAssetsServiceCreateAssetTests
         {
             string videoPath = Path.Combine(_dataDirectory!, fileName);
             Assert.IsTrue(File.Exists(videoPath));
-            
+
             string imagePath = Path.Combine(firstFrameVideosPath, firstFrameFileName);
             Assert.IsFalse(File.Exists(imagePath));
 
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-            
+
             Asset? asset1 = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
-            
+
             Assert.IsNull(asset1);
-            
+
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Assert.IsEmpty(thumbnails);
-            
+
             Folder folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
-            
+
             Asset? asset2 = _catalogAssetsService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
-            
+
             Assert.IsNotNull(asset2);
-            
+
             Assert.IsTrue(File.Exists(videoPath));
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             AssertAssetPropertyValidity(
                 asset2!,
                 firstFrameFileName,
@@ -1696,23 +1696,23 @@ public class CatalogAssetsServiceCreateAssetTests
             AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, imageByteSize);
 
             Asset? asset3 = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
-            
+
             Assert.IsNull(asset3);
-            
+
             Assert.IsTrue(File.Exists(videoPath));
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, imageByteSize);
 
             folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
-            
+
             Asset? asset4 = _catalogAssetsService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
-            
+
             Assert.IsNull(asset4);
-            
+
             Assert.IsTrue(File.Exists(videoPath));
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             Assert.AreEqual(firstFrameFileName, asset2!.FileName);
 
             AssertCataloguedAssetAndThumbnailValidity(asset2, folder, thumbnails, imageByteSize);
@@ -1731,7 +1731,7 @@ public class CatalogAssetsServiceCreateAssetTests
     public void CreateAsset_VideoAndIsVideoAndAnalyseVideos_ReturnsNullAndDoesNotCreateAsset(string fileName, string firstFrameFileName, bool analyseVideos, bool isVideo)
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, analyseVideos);
-    
+
         try
         {
             string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -1846,17 +1846,17 @@ public class CatalogAssetsServiceCreateAssetTests
 
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _catalogAssetsService!.CreateAsset(null!, assetName, true));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1871,27 +1871,27 @@ public class CatalogAssetsServiceCreateAssetTests
     public void CreateAsset_VideoAndBasicHashTypeAndDirectoryNameIsEmpty_ThrowsFileNotFoundExceptionAndAssetIsNotCreated()
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, true);
-    
+
         try
         {
             const string assetName = "Homer.mp4";
             string directoryName = Path.Combine(_dataDirectory!, "TestFolder\\TestHiddenSubFolder");
-    
+
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-    
+
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsTrue(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-    
+
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _catalogAssetsService!.CreateAsset(directoryName, assetName, true));
-    
+
             Assert.AreEqual($"Could not find file '{Path.Combine(directoryName, assetName)}'.", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1907,27 +1907,27 @@ public class CatalogAssetsServiceCreateAssetTests
     public void CreateAsset_VideoAndBasicHashTypeAndDirectoryNamePointingToAFile_ThrowsDirectoryNotFoundExceptionAndAssetIsNotCreated()
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, true);
-    
+
         try
         {
             const string assetName = "Homer.mp4";
             string directoryName = Path.Combine(_dataDirectory!, assetName);
-    
+
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-    
+
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsTrue(File.Exists(imagePath));
-    
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-    
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-    
+
             DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _catalogAssetsService!.CreateAsset(directoryName, assetName, true));
-    
+
             Assert.AreEqual($"Could not find a part of the path '{Path.Combine(directoryName, assetName)}'.", exception?.Message);
-    
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1943,22 +1943,22 @@ public class CatalogAssetsServiceCreateAssetTests
     public void CreateAsset_VideoAndBasicHashTypeAndFileNameIsNull_ThrowsArgumentNullExceptionAndAssetIsNotCreated()
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, true);
-    
+
         try
         {
             string assetName = null!;
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-    
+
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName, true));
-    
+
             Assert.AreEqual("Value cannot be null. (Parameter 'path2')", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -1973,26 +1973,26 @@ public class CatalogAssetsServiceCreateAssetTests
     public void CreateAsset_VideoAndBasicHashTypeAndFileNameDoesNotExist_ThrowsFileNotFoundExceptionAndAssetIsNotCreated()
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, true);
-    
+
         try
         {
             const string assetName = "Toto.mp4";
-    
+
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-    
+
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsFalse(File.Exists(imagePath));
-            
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-            
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-    
+
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName, true));
-    
+
             Assert.AreEqual($"Could not find file '{Path.Combine(_dataDirectory!, assetName)}'.", exception?.Message);
-            
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -2008,26 +2008,26 @@ public class CatalogAssetsServiceCreateAssetTests
     public void CreateAsset_VideoAndBasicHashTypeAndFileNameIsADirectory_ThrowsUnauthorizedAccessExceptionAndAssetIsNotCreated()
     {
         ConfigureCatalogAssetService(200, 150, false, false, false, true);
-    
+
         try
         {
             const string assetName = "Homer.mp4";
-    
+
             _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
-    
+
             string imagePath = Path.Combine(_dataDirectory!, assetName);
             Assert.IsTrue(File.Exists(imagePath));
-    
+
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
-    
+
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
-    
+
             UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, _dataDirectory!, true));
-    
+
             Assert.AreEqual($"Access to the path '{_dataDirectory!}' is denied.", exception?.Message);
-    
+
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.IsEmpty(assetsFromRepository);
             Assert.IsEmpty(thumbnails);
@@ -2081,19 +2081,19 @@ public class CatalogAssetsServiceCreateAssetTests
         Assert.AreEqual(minDate, asset.FileCreationDateTime);
         Assert.AreEqual(minDate, asset.FileModificationDateTime);
     }
-    
+
     private void AssertCataloguedAssetAndThumbnailValidity(Asset asset, Folder folder, IReadOnlyDictionary<string, Dictionary<string, byte[]>> thumbnails, int imageByteSize)
     {
         List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
         Assert.AreEqual(1, assetsFromRepository.Count);
-            
+
         Asset assetFromRepository = assetsFromRepository[0];
-            
+
         Assert.AreEqual(asset.FileName, assetFromRepository.FileName);
         Assert.AreEqual(asset.FolderId, assetFromRepository.FolderId);
         Assert.AreEqual(asset.Hash, assetFromRepository.Hash);
         Assert.IsNull(assetFromRepository.ImageData);
-            
+
         Assert.AreEqual(1, thumbnails.Count);
         Assert.IsTrue(thumbnails.ContainsKey(asset.Folder.Path));
         Assert.AreEqual(1, thumbnails[folder.Path].Count);

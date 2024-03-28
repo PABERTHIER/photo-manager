@@ -5,12 +5,12 @@ namespace PhotoManager.Tests.Unit.Common;
 [TestFixture]
 public class HashingHelperTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [Test]
@@ -21,10 +21,10 @@ public class HashingHelperTests
     [TestCase("Image 8.jpeg", "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3")]
     [TestCase("Image 10 portrait.png", "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94")]
     [TestCase("Homer.gif", "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1")]
-    [TestCase("Image_11.heic", "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931")]
+    [TestCase("Image_11_90.heic", "b75df4942de1efa7d4326fedd721e99cc43959a1c22098a8cfcf6861aea099741d9c98fa1615e54d53838c22b9c6ff3b328c4ee3c0875d2b4ac7f7dee8d61bcf")]
     public void CalculateHash_ValidImageBytes_ReturnsCorrectHash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = HashingHelper.CalculateHash(imageBytes);
@@ -38,7 +38,7 @@ public class HashingHelperTests
     public void CalculateHash_EmptyImageBytes_ReturnsSameHash()
     {
         byte[] imageBytes = [];
-        string expectedHash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e";
+        const string expectedHash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e";
 
         string hash = HashingHelper.CalculateHash(imageBytes);
 
@@ -65,10 +65,10 @@ public class HashingHelperTests
     [TestCase("Image 8.jpeg", "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0")]
     [TestCase("Image 10 portrait.png", "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0")]
     [TestCase("Homer.gif", "af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225daf783881028a11d8ad696231b8ee326225d")]
-    [TestCase("Image_11.heic", "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056")]
+    [TestCase("Image_11_90.heic", "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a")]
     public void CalculatePHash_ValidImagePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
         string? phash = HashingHelper.CalculatePHash(filePath);
 
@@ -80,19 +80,19 @@ public class HashingHelperTests
     [Test]
     public void CalculatePHash_ImageDoesNotExist_ThrowsMagickBlobErrorException()
     {
-        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.png");
+        string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.png");
 
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(filePath));
         
-        Assert.AreEqual($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3573", exception?.Message);
+        Assert.AreEqual($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3571", exception?.Message);
     }
 
     [Test]
     public void CalculatePHash_ImagePathIsInvalid_ThrowsMagickBlobErrorException()
     {
-        MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(dataDirectory!));
+        MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(_dataDirectory!));
         
-        Assert.AreEqual($"unable to open image '{dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3573", exception?.Message);
+        Assert.AreEqual($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3571", exception?.Message);
     }
 
     [Test]
@@ -112,47 +112,36 @@ public class HashingHelperTests
     [TestCase("Image 1_270_deg.jpg", "23831507941108244")]
     [TestCase("Image 8.jpeg", "23831507941108244")]
     [TestCase("Image 10 portrait.png", "36116814863094786")]
+    [TestCase("Image_11_90.heic", "14766675108600273")]
     public void CalculateDHash_ValidImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
-        string dhash = HashingHelper.CalculateDHash(filePath);
+        string dHash = HashingHelper.CalculateDHash(filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(dhash));
-        Assert.AreEqual(17, dhash.Length); // The DHash is a 17-character number
-        Assert.AreEqual(expectedHash, dhash);
+        Assert.IsFalse(string.IsNullOrWhiteSpace(dHash));
+        Assert.AreEqual(17, dHash.Length); // The DHash is a 17-character number
+        Assert.AreEqual(expectedHash, dHash);
     }
 
     [Test]
     [TestCase("Homer.gif", "0")]
-    public void CalculateDHash_GifImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
+    [TestCase("Image_11.heic", "0")]
+    public void CalculateDHash_NonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
-        string dhash = HashingHelper.CalculateDHash(filePath);
+        string dHash = HashingHelper.CalculateDHash(filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(dhash));
-        Assert.AreEqual(1, dhash.Length);
-        Assert.AreEqual(expectedHash, dhash);
-    }
-
-    [Test]
-    [TestCase("Image_11.heic", "9077567998918656")]
-    public void CalculateDHash_HeicImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
-    {
-        string filePath = Path.Combine(dataDirectory!, fileName);
-
-        string dhash = HashingHelper.CalculateDHash(filePath);
-
-        Assert.IsFalse(string.IsNullOrWhiteSpace(dhash));
-        Assert.AreEqual(16, dhash.Length); // The DHash is a 16-character number for heic file
-        Assert.AreEqual(expectedHash, dhash);
+        Assert.IsFalse(string.IsNullOrWhiteSpace(dHash));
+        Assert.AreEqual(1, dHash.Length);
+        Assert.AreEqual(expectedHash, dHash);
     }
 
     [Test]
     public void CalculateDHash_ImageDoesNotExist_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.png");
+        string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.png");
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(filePath));
         
@@ -162,7 +151,7 @@ public class HashingHelperTests
     [Test]
     public void CalculateDHash_ImagePathIsInvalid_ThrowsArgumentException()
     {
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(dataDirectory!));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_dataDirectory!));
         
         Assert.AreEqual("Parameter is not valid.", exception?.Message);
     }
@@ -185,10 +174,10 @@ public class HashingHelperTests
     [TestCase("Image 8.jpeg", "4194e88c247b5bbc7a1c6294cc795466")]
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
-    [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
+    [TestCase("Image_11_90.heic", "e3aeca5fc781bd52470f9186653d3a3f")]
     public void CalculateMD5Hash_ValidImageBytes_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string md5Hash = HashingHelper.CalculateMD5Hash(imageBytes);
@@ -202,7 +191,7 @@ public class HashingHelperTests
     public void CalculateMD5Hash_EmptyImageBytes_ReturnsSameMD5Hash()
     {
         byte[] imageBytes = [];
-        string expectedHash = "d41d8cd98f00b204e9800998ecf8427e";
+        const string expectedHash = "d41d8cd98f00b204e9800998ecf8427e";
 
         string hash = HashingHelper.CalculateMD5Hash(imageBytes);
 

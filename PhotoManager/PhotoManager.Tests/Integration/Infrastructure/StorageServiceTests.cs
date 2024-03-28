@@ -1,9 +1,11 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure;
+﻿using System.Drawing.Imaging;
+
+namespace PhotoManager.Tests.Integration.Infrastructure;
 
 [TestFixture]
 public class StorageServiceTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     private StorageService? _storageService;
     private UserConfigurationService? _userConfigurationService;
@@ -11,7 +13,7 @@ public class StorageServiceTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -23,7 +25,7 @@ public class StorageServiceTests
     [Test]
     public void GetSubDirectories_ValidDirectory_ReturnsListOfSubDirectories()
     {
-        string directoryPath = Path.Combine(dataDirectory!, "TestFolder");
+        string directoryPath = Path.Combine(_dataDirectory!, "TestFolder");
 
         List<DirectoryInfo> subDirectories = _storageService!.GetSubDirectories(directoryPath);
 
@@ -40,7 +42,7 @@ public class StorageServiceTests
     [Test]
     public void GetSubDirectories_InvalidDirectory_ThrowsDirectoryNotFoundException()
     {
-        string directoryPath = Path.Combine(dataDirectory!, "NonExistentDirectory");
+        string directoryPath = Path.Combine(_dataDirectory!, "NonExistentDirectory");
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetSubDirectories(directoryPath));
 
@@ -50,7 +52,7 @@ public class StorageServiceTests
     [Test]
     public void GetRecursiveSubDirectories_ValidDirectory_ReturnsListOfRecursiveSubDirectories()
     {
-        string directoryPath = Path.Combine(dataDirectory!, "TestFolder");
+        string directoryPath = Path.Combine(_dataDirectory!, "TestFolder");
 
         List<DirectoryInfo> recursiveSubDirectories = _storageService!.GetRecursiveSubDirectories(directoryPath);
 
@@ -68,7 +70,7 @@ public class StorageServiceTests
     [Test]
     public void GetRecursiveSubDirectories_InvalidDirectory_ReturnsEmptyList()
     {
-        string directoryPath = Path.Combine(dataDirectory!, "NonExistentDirectory");
+        string directoryPath = Path.Combine(_dataDirectory!, "NonExistentDirectory");
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetRecursiveSubDirectories(directoryPath));
 
@@ -78,7 +80,7 @@ public class StorageServiceTests
     [Test]
     public void CreateDirectory_ValidDirectory_CreatesDirectory()
     {
-        string testDirectory = Path.Combine(dataDirectory!, "TestDirectory");
+        string testDirectory = Path.Combine(_dataDirectory!, "TestDirectory");
 
         _storageService!.CreateDirectory(testDirectory);
 
@@ -90,16 +92,16 @@ public class StorageServiceTests
     [Test]
     public void DeleteFile_FileExists_DeletesFile()
     {
-        string fileName = "Image 1.jpg";
-        string newFileName = "ImageToDelete.jpg";
-        string sourceFilePath = Path.Combine(dataDirectory!, fileName);
-        string destinationFilePath = Path.Combine(dataDirectory!, newFileName);
+        const string fileName = "Image 1.jpg";
+        const string newFileName = "ImageToDelete.jpg";
+        string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
+        string destinationFilePath = Path.Combine(_dataDirectory!, newFileName);
 
         File.Copy(sourceFilePath, destinationFilePath);
 
         Assert.IsTrue(File.Exists(destinationFilePath));
 
-        _storageService!.DeleteFile(dataDirectory!, newFileName);
+        _storageService!.DeleteFile(_dataDirectory!, newFileName);
 
         Assert.IsFalse(File.Exists(destinationFilePath));
     }
@@ -107,16 +109,18 @@ public class StorageServiceTests
     [Test]
     public void DeleteFile_FileDoesNotExist_NoActionTaken()
     {
-        string testFileName = "NonExistentImage.jpg";
-        string testFilePath = Path.Combine(dataDirectory!, testFileName);
+        const string testFileName = "NonExistentImage.jpg";
+        string testFilePath = Path.Combine(_dataDirectory!, testFileName);
 
-        Assert.DoesNotThrow(() => _storageService!.DeleteFile(dataDirectory!, testFileName));
+        Assert.IsFalse(File.Exists(testFilePath));
+
+        Assert.DoesNotThrow(() => _storageService!.DeleteFile(_dataDirectory!, testFileName));
     }
 
     [Test]
     public void GetFileNames_ReturnsFileNames()
     {
-        string[] fileNames = _storageService!.GetFileNames(dataDirectory!);
+        string[] fileNames = _storageService!.GetFileNames(_dataDirectory!);
 
         Assert.GreaterOrEqual(fileNames.Length, 2);
         Assert.Contains("Image 2.jpg", fileNames);
@@ -126,7 +130,7 @@ public class StorageServiceTests
     [Test]
     public void GetFileBytes_FileExists_ReturnsFileBytes()
     {
-        string testFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string testFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
 
         byte[] actualBytes = _storageService!.GetFileBytes(testFilePath);
 
@@ -137,7 +141,7 @@ public class StorageServiceTests
     [Test]
     public void GetFileBytes_FileDoesNotExist_ThrowsFileNotFoundException()
     {
-        string nonExistentFilePath = Path.Combine(dataDirectory!, "NonExistentFile.jpg");
+        string nonExistentFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
 
         FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _storageService!.GetFileBytes(nonExistentFilePath));
 
@@ -147,8 +151,8 @@ public class StorageServiceTests
     [Test]
     public void GetFileBytes_FilePathIsInvalid_ThrowsUnauthorizedAccessException()
     {
-        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _storageService!.GetFileBytes(dataDirectory!));
-        Assert.AreEqual($"Access to the path '{dataDirectory!}' is denied.", exception?.Message);
+        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _storageService!.GetFileBytes(_dataDirectory!));
+        Assert.AreEqual($"Access to the path '{_dataDirectory!}' is denied.", exception?.Message);
     }
 
     [Test]
@@ -157,9 +161,9 @@ public class StorageServiceTests
     [TestCase("Image 1_180_deg.jpg", 3)]
     [TestCase("Image 1_270_deg.jpg", 8)]
     [TestCase("Image 8.jpeg", 1)]
-    public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOriention)
+    public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = _storageService!.GetExifOrientation(
@@ -168,7 +172,7 @@ public class StorageServiceTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOriention, orientation);
+        Assert.AreEqual(expectedOrientation, orientation);
     }
 
     [Test]
@@ -177,7 +181,7 @@ public class StorageServiceTests
     [TestCase("Image_11.heic")] // Error on BitmapFrame.Create(stream)
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = _storageService!.GetExifOrientation(
@@ -192,7 +196,7 @@ public class StorageServiceTests
     [Test]
     public void GetExifOrientation_InvalidImageBuffer_ReturnsCorruptedOrientationValue()
     {
-        byte[] invalidImageBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
+        byte[] invalidImageBuffer = [0x00, 0x01, 0x02, 0x03];
 
         ushort orientation = _storageService!.GetExifOrientation(
             invalidImageBuffer,
@@ -218,7 +222,7 @@ public class StorageServiceTests
     [Test]
     public void GetExifOrientation_EmptyBuffer_ReturnsCorruptedOrientationValue()
     {
-        byte[] emptyBuffer = Array.Empty<byte>();
+        byte[] emptyBuffer = [];
 
         ushort orientation = _storageService!.GetExifOrientation(
             emptyBuffer,
@@ -229,26 +233,44 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase("Image_11.heic", 0, 1)]
-    //[TestCase("Image_11_90.heic", 90, 8)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
-    //[TestCase("Image_11_180.heic", 180, 3)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
-    //[TestCase("Image_11_270.heic", 270, 6)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
-    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int degrees, int expectedOriention)
+    public void GetExifOrientation_InvalidFormat_ReturnsCorruptedOrientationValue()
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        Bitmap image = new (10, 10);
+
+        using (MemoryStream ms = new())
+        {
+            image.Save(ms, ImageFormat.Bmp); // Save as BMP to create an invalid format for JPEG
+            byte[] buffer = ms.ToArray(); // Buffer with invalid Exif Metadata (Metadata null)
+
+            ushort orientation = _storageService!.GetExifOrientation(
+                buffer,
+                _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+                _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+
+            Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        }
+    }
+
+    [Test]
+    [TestCase("Image_11.heic", 1)]
+    [TestCase("Image_11_90.heic", 6)]
+    [TestCase("Image_11_180.heic", 3)]
+    [TestCase("Image_11_270.heic", 8)]
+    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
+    {
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
-        //byte[] bufferRotated = GetHeicRotatedBuffer(buffer, degrees);
 
         ushort orientation = _storageService!.GetHeicExifOrientation(buffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOriention, orientation);
+        Assert.AreEqual(expectedOrientation, orientation);
     }
 
     [Test]
     public void GetHeicExifOrientation_InvalidImageBuffer_ReturnsCorruptedOrientationValue()
     {
-        byte[] invalidHeicBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
+        byte[] invalidHeicBuffer = [0x00, 0x01, 0x02, 0x03];
 
         ushort orientation = _storageService!.GetHeicExifOrientation(invalidHeicBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
@@ -271,7 +293,7 @@ public class StorageServiceTests
     [Test]
     public void GetHeicExifOrientation_EmptyBuffer_ThrowsArgumentException()
     {
-        byte[] emptyBuffer = Array.Empty<byte>();
+        byte[] emptyBuffer = [];
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
         {
@@ -286,7 +308,7 @@ public class StorageServiceTests
     [TestCase("Image 1.jpg")]
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetJpegBitmapImage(image);
@@ -294,7 +316,7 @@ public class StorageServiceTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -313,7 +335,7 @@ public class StorageServiceTests
     [Test]
     public void GetJpegBitmapImage_HeicValidImage_ReturnsJpegByteArray()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -323,7 +345,7 @@ public class StorageServiceTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -364,7 +386,7 @@ public class StorageServiceTests
     [TestCase("Image 1.jpg")]
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetPngBitmapImage(image);
@@ -372,7 +394,7 @@ public class StorageServiceTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -391,7 +413,7 @@ public class StorageServiceTests
     [Test]
     public void GetPngBitmapImage_HeicValidImage_ReturnsPngByteArray()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -401,7 +423,7 @@ public class StorageServiceTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -442,7 +464,7 @@ public class StorageServiceTests
     [TestCase("Image 1.jpg")]
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetGifBitmapImage(image);
@@ -450,7 +472,7 @@ public class StorageServiceTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -469,7 +491,7 @@ public class StorageServiceTests
     [Test]
     public void GetGifBitmapImage_HeicValidImage_ReturnsGifByteArray()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -479,7 +501,7 @@ public class StorageServiceTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -518,7 +540,7 @@ public class StorageServiceTests
     [Test]
     public void FileExists_ExistingFile_ReturnsTrue()
     {
-        Folder folder = new() { Path = dataDirectory! };
+        Folder folder = new() { Path = _dataDirectory! };
         Asset asset = new() { FileName = "Image 1.jpg" };
 
         bool exists = _storageService!.FileExists(folder, asset);
@@ -529,7 +551,7 @@ public class StorageServiceTests
     [Test]
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
-        Folder folder = new() { Path = dataDirectory! };
+        Folder folder = new() { Path = _dataDirectory! };
         Asset asset = new() { FileName = "NonExistent.jpg" };
 
         bool exists = _storageService!.FileExists(folder, asset);
@@ -553,7 +575,7 @@ public class StorageServiceTests
     [Test]
     public void FileExistsFullPath_ExistingFile_ReturnsTrue()
     {
-        string fullPath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string fullPath = Path.Combine(_dataDirectory!, "Image 1.jpg");
 
         bool exists = _storageService!.FileExists(fullPath);
 
@@ -563,7 +585,7 @@ public class StorageServiceTests
     [Test]
     public void FileExistsFullPath_FileDoesNotExist_ReturnsFalse()
     {
-        string fullPath = Path.Combine(dataDirectory!, "NonExistent.jpg");
+        string fullPath = Path.Combine(_dataDirectory!, "NonExistent.jpg");
 
         bool exists = _storageService!.FileExists(fullPath);
 
@@ -583,7 +605,7 @@ public class StorageServiceTests
     [Test]
     public void FolderExists_ExistingFolder_ReturnsTrue()
     {
-        bool exists = _storageService!.FolderExists(dataDirectory!);
+        bool exists = _storageService!.FolderExists(_dataDirectory!);
 
         Assert.IsTrue(exists);
     }
@@ -609,15 +631,15 @@ public class StorageServiceTests
     [Test]
     public void LoadFileInformation_FileExists_PopulatesAssetDates()
     {
-        string destinationPath = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
             Directory.CreateDirectory(destinationPath);
 
-            string fileName = "Image 1.jpg";
+            const string fileName = "Image 1.jpg";
 
-            string sourceFilePath = Path.Combine(dataDirectory!, fileName);
+            string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
             string destinationFilePath = Path.Combine(destinationPath, fileName);
 
             File.Copy(sourceFilePath, destinationFilePath);
@@ -645,8 +667,8 @@ public class StorageServiceTests
     [Test]
     public void LoadFileInformation_FileDoesNotExist_DoesNotPopulateAssetDates()
     {
-        string fileName = "nonexistent.jpg";
-        Folder folder = new() { Path = dataDirectory! };
+        const string fileName = "nonexistent.jpg";
+        Folder folder = new() { Path = _dataDirectory! };
         Asset asset = new() { Folder = folder, FileName = fileName };
         DateTime creationTime = default;
         DateTime modificationTime = default;
@@ -660,7 +682,7 @@ public class StorageServiceTests
     [Test]
     public void LoadFileInformation_NullFolder_DoesNotPopulateAssetDates()
     {
-        string fileName = "Image 1.jpg";
+        const string fileName = "Image 1.jpg";
         Folder? folder = null;
         Asset asset = new() { Folder = folder!, FileName = fileName };
         DateTime creationTime = default;
@@ -675,12 +697,12 @@ public class StorageServiceTests
     [Test]
     public void LoadFileInformation_FilePathIsNull_ThrowsArgumentNullException()
     {
-        string fileName = "Image 1.jpg";
+        const string fileName = "Image 1.jpg";
         string? path = null;
         Folder folder = new() { Path = path! };
         Asset asset = new() { Folder = folder, FileName = fileName };
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFileInformation(asset!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFileInformation(asset));
 
         Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
     }
@@ -702,7 +724,7 @@ public class StorageServiceTests
     [TestCase("Homer.gif")]
     public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
         bool result = _storageService!.IsValidGDIPlusImage(validImageData);
@@ -713,7 +735,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidGDIPlusImage_InvalidImageData_ReturnsFalse()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] invalidImageData = File.ReadAllBytes(filePath);
 
         bool result = _storageService!.IsValidGDIPlusImage(invalidImageData);
@@ -724,7 +746,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidGDIPlusImage_EmptyImageData_ReturnsFalse()
     {
-        byte[] emptyHeicData = Array.Empty<byte>();
+        byte[] emptyHeicData = [];
 
         bool result = _storageService!.IsValidGDIPlusImage(emptyHeicData);
 
@@ -734,7 +756,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidHeic_ValidImageData_ReturnsTrue()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] validHeicData = File.ReadAllBytes(filePath);
 
         bool result = _storageService!.IsValidHeic(validHeicData);
@@ -745,7 +767,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidHeic_InvalidImageData_ReturnsFalse()
     {
-        byte[] invalidHeicData = new byte[] { 0x00, 0x01, 0x02, 0x03 };
+        byte[] invalidHeicData = [0x00, 0x01, 0x02, 0x03];
 
         bool result = _storageService!.IsValidHeic(invalidHeicData);
 
@@ -755,7 +777,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidHeic_EmptyImageData_ThrowsArgumentException()
     {
-        byte[] emptyHeicData = Array.Empty<byte>();
+        byte[] emptyHeicData = [];
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.IsValidHeic(emptyHeicData));
 
@@ -766,7 +788,7 @@ public class StorageServiceTests
     {
         try
         {
-            using (var image = Image.FromFile(filePath))
+            using (Image.FromFile(filePath))
             {
                 // The image is successfully loaded; consider it valid
                 return true;

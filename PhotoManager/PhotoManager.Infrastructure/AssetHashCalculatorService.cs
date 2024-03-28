@@ -2,21 +2,19 @@
 
 public class AssetHashCalculatorService(IUserConfigurationService userConfigurationService) : IAssetHashCalculatorService
 {
-    private readonly IUserConfigurationService _userConfigurationService = userConfigurationService;
-
     public string CalculateHash(byte[] imageBytes, string filePath)
     {
-        if (_userConfigurationService.HashSettings.UsingPHash)
+        if (userConfigurationService.HashSettings.UsingPHash)
         {
             return HashingHelper.CalculatePHash(filePath) ?? HashingHelper.CalculateHash(imageBytes);
         }
 
-        if (_userConfigurationService.HashSettings.UsingDHash)
+        if (userConfigurationService.HashSettings.UsingDHash)
         {
             return HashingHelper.CalculateDHash(filePath);
         }
 
-        if (_userConfigurationService.HashSettings.UsingMD5Hash)
+        if (userConfigurationService.HashSettings.UsingMD5Hash)
         {
             return HashingHelper.CalculateMD5Hash(imageBytes);
         }

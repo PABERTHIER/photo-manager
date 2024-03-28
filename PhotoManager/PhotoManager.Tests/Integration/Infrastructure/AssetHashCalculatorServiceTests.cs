@@ -5,12 +5,12 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 [TestFixture]
 public class AssetHashCalculatorServiceTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [Test]
@@ -21,13 +21,13 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3")]
     [TestCase("Image 10 portrait.png", "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94")]
     [TestCase("Homer.gif", "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1")]
-    [TestCase("Image_11.heic", "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931")]
+    [TestCase("Image_11_90.heic", "b75df4942de1efa7d4326fedd721e99cc43959a1c22098a8cfcf6861aea099741d9c98fa1615e54d53838c22b9c6ff3b328c4ee3c0875d2b4ac7f7dee8d61bcf")]
     public void CalculateHash_DefaultHashAndValidImageBytesAndFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
@@ -45,7 +45,7 @@ public class AssetHashCalculatorServiceTests
 
         byte[] imageBytes = [];
         string? filePath = null;
-        string expectedHash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e";
+        const string expectedHash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e";
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath!);
 
@@ -76,13 +76,13 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3")]
     [TestCase("Image 10 portrait.png", "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94")]
     [TestCase("Homer.gif", "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1")]
-    [TestCase("Image_11.heic", "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931")]
+    [TestCase("Image_11_90.heic", "b75df4942de1efa7d4326fedd721e99cc43959a1c22098a8cfcf6861aea099741d9c98fa1615e54d53838c22b9c6ff3b328c4ee3c0875d2b4ac7f7dee8d61bcf")]
     public void CalculateHash_DefaultHashAndValidImageBytesAndNullFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, null!);
@@ -100,13 +100,13 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3")]
     [TestCase("Image 10 portrait.png", "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94")]
     [TestCase("Homer.gif", "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1")]
-    [TestCase("Image_11.heic", "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931")]
+    [TestCase("Image_11_90.heic", "b75df4942de1efa7d4326fedd721e99cc43959a1c22098a8cfcf6861aea099741d9c98fa1615e54d53838c22b9c6ff3b328c4ee3c0875d2b4ac7f7dee8d61bcf")]
     public void CalculateHash_DefaultHashAndValidImageBytesAndInvalidFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, "invalid_path/nonexistent.jpg");
@@ -124,16 +124,16 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3")]
     [TestCase("Image 10 portrait.png", "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94")]
     [TestCase("Homer.gif", "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1")]
-    [TestCase("Image_11.heic", "df43c6dffbb9bd64c7b3b609f656e57a63e50e8d1784c72bb09c7b1df362fe239a68ddb85822f5afb7d7ef35a60ffa58904c2b32dd8a3a1fe7cae23030f00931")]
+    [TestCase("Image_11_90.heic", "b75df4942de1efa7d4326fedd721e99cc43959a1c22098a8cfcf6861aea099741d9c98fa1615e54d53838c22b9c6ff3b328c4ee3c0875d2b4ac7f7dee8d61bcf")]
     public void CalculateHash_DefaultHashAndValidImageBytesAndDirectoryFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
-        string hash = assetHashCalculatorService.CalculateHash(imageBytes, dataDirectory!);
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes, _dataDirectory!);
 
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
         Assert.AreEqual(128, hash.Length); // SHA-512 generates a 128-character long hash in hexadecimal representation
@@ -148,20 +148,20 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0")]
     [TestCase("Image 10 portrait.png", "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0")]
     [TestCase("Homer.gif", "af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225daf783881028a11d8ad696231b8ee326225d")]
-    [TestCase("Image_11.heic", "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056")]
+    [TestCase("Image_11_90.heic", "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a")]
     public void CalculateHash_PHashAndValidImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
-        string? hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(210, hash?.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash?.ToLower());
+        Assert.AreEqual(210, hash.Length); // The PHash is a 210-character hexadecimal string
+        Assert.AreEqual(expectedHash, hash.ToLower());
     }
 
     [Test]
@@ -172,20 +172,20 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0")]
     [TestCase("Image 10 portrait.png", "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0")]
     [TestCase("Homer.gif", "af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225daf783881028a11d8ad696231b8ee326225d")]
-    [TestCase("Image_11.heic", "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056")]
+    [TestCase("Image_11_90.heic", "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a")]
     public void CalculateHash_PHashAndEmptyImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[] imageBytes = [];
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
-        string? hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(210, hash?.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash?.ToLower());
+        Assert.AreEqual(210, hash.Length); // The PHash is a 210-character hexadecimal string
+        Assert.AreEqual(expectedHash, hash.ToLower());
     }
 
     [Test]
@@ -196,20 +196,20 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0")]
     [TestCase("Image 10 portrait.png", "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0")]
     [TestCase("Homer.gif", "af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225daf783881028a11d8ad696231b8ee326225d")]
-    [TestCase("Image_11.heic", "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056")]
+    [TestCase("Image_11_90.heic", "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a")]
     public void CalculateHash_PHashAndNullImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[]? imageBytes = null;
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
-        string? hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
 
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(210, hash?.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash?.ToLower());
+        Assert.AreEqual(210, hash.Length); // The PHash is a 210-character hexadecimal string
+        Assert.AreEqual(expectedHash, hash.ToLower());
     }
 
     [Test]
@@ -219,11 +219,11 @@ public class AssetHashCalculatorServiceTests
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[]? imageBytes = null;
-        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.png");
+        string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.png");
 
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath));
 
-        Assert.AreEqual($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3573", exception?.Message);
+        Assert.AreEqual($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3571", exception?.Message);
     }
 
     [Test]
@@ -234,9 +234,9 @@ public class AssetHashCalculatorServiceTests
 
         byte[]? imageBytes = null;
 
-        MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, dataDirectory!));
+        MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
 
-        Assert.AreEqual($"unable to open image '{dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3573", exception?.Message);
+        Assert.AreEqual($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3571", exception?.Message);
     }
 
     [Test]
@@ -260,12 +260,13 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 1_270_deg.jpg", "23831507941108244")]
     [TestCase("Image 8.jpeg", "23831507941108244")]
     [TestCase("Image 10 portrait.png", "36116814863094786")]
+    [TestCase("Image_11_90.heic", "14766675108600273")]
     public void CalculateHash_DHashAndValidImageBytesAndFilePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
@@ -277,12 +278,13 @@ public class AssetHashCalculatorServiceTests
 
     [Test]
     [TestCase("Homer.gif", "0")]
-    public void CalculateHash_DHashAndGifImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
+    [TestCase("Image_11.heic", "0")]
+    public void CalculateHash_NonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
@@ -293,36 +295,20 @@ public class AssetHashCalculatorServiceTests
     }
 
     [Test]
-    [TestCase("Image_11.heic", "9077567998918656")]
-    public void CalculateHash_DHashAndHeicImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
-    {
-        UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-
-        string filePath = Path.Combine(dataDirectory!, fileName);
-        byte[] imageBytes = File.ReadAllBytes(filePath);
-
-        string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
-
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(16, hash.Length); // The DHash is a 16-character number for heic file
-        Assert.AreEqual(expectedHash, hash);
-    }
-
-    [Test]
     [TestCase("Image 1.jpg", "23831507941108244")]
     [TestCase("Image 1_90_deg.jpg", "23831507941108244")]
     [TestCase("Image 1_180_deg.jpg", "23831507941108244")]
     [TestCase("Image 1_270_deg.jpg", "23831507941108244")]
     [TestCase("Image 8.jpeg", "23831507941108244")]
     [TestCase("Image 10 portrait.png", "36116814863094786")]
+    [TestCase("Image_11_90.heic", "14766675108600273")]
     public void CalculateHash_DHashAndEmptyImageBytesAndFilePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[] imageBytes = [];
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
@@ -333,35 +319,19 @@ public class AssetHashCalculatorServiceTests
 
     [Test]
     [TestCase("Homer.gif", "0")]
-    public void CalculateHash_DHashAndEmptyImageBytesAndGifImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
+    [TestCase("Image_11.heic", "0")]
+    public void CalculateHash_DHashAndEmptyImageBytesAndNonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[] imageBytes = [];
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
         Assert.AreEqual(1, hash.Length);
-        Assert.AreEqual(expectedHash, hash);
-    }
-
-    [Test]
-    [TestCase("Image_11.heic", "9077567998918656")]
-    public void CalculateHash_DHashAndEmptyImageBytesAndHeicImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
-    {
-        UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-
-        byte[] imageBytes = [];
-        string filePath = Path.Combine(dataDirectory!, fileName);
-
-        string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
-
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(16, hash.Length); // The DHash is a 16-character number for heic file
         Assert.AreEqual(expectedHash, hash);
     }
 
@@ -372,13 +342,14 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 1_270_deg.jpg", "23831507941108244")]
     [TestCase("Image 8.jpeg", "23831507941108244")]
     [TestCase("Image 10 portrait.png", "36116814863094786")]
+    [TestCase("Image_11_90.heic", "14766675108600273")]
     public void CalculateHash_DHashAndNullImageBytesAndFilePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[]? imageBytes = null;
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
 
@@ -389,35 +360,19 @@ public class AssetHashCalculatorServiceTests
 
     [Test]
     [TestCase("Homer.gif", "0")]
-    public void CalculateHash_DHashAndNullImageBytesAndGifImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
+    [TestCase("Image_11.heic", "0")]
+    public void CalculateHash_DHashAndNullImageBytesAndNonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[]? imageBytes = null;
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
 
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
         Assert.AreEqual(1, hash.Length);
-        Assert.AreEqual(expectedHash, hash);
-    }
-
-    [Test]
-    [TestCase("Image_11.heic", "9077567998918656")]
-    public void CalculateHash_DHashAndNullImageBytesAndHeicImagePath_ReturnsCorrectDHash(string fileName, string expectedHash)
-    {
-        UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-
-        byte[]? imageBytes = null;
-        string filePath = Path.Combine(dataDirectory!, fileName);
-
-        string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
-
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(16, hash.Length); // The DHash is a 16-character number for heic file
         Assert.AreEqual(expectedHash, hash);
     }
 
@@ -428,7 +383,7 @@ public class AssetHashCalculatorServiceTests
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[]? imageBytes = null;
-        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.png");
+        string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.png");
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath));
 
@@ -443,7 +398,7 @@ public class AssetHashCalculatorServiceTests
 
         byte[]? imageBytes = null;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, dataDirectory!));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
 
         Assert.AreEqual("Parameter is not valid.", exception?.Message);
     }
@@ -470,13 +425,13 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "4194e88c247b5bbc7a1c6294cc795466")]
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
-    [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
+    [TestCase("Image_11_90.heic", "e3aeca5fc781bd52470f9186653d3a3f")]
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
@@ -494,7 +449,7 @@ public class AssetHashCalculatorServiceTests
 
         byte[] imageBytes = [];
         string? filePath = null;
-        string expectedHash = "d41d8cd98f00b204e9800998ecf8427e";
+        const string expectedHash = "d41d8cd98f00b204e9800998ecf8427e";
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath!);
 
@@ -525,13 +480,13 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "4194e88c247b5bbc7a1c6294cc795466")]
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
-    [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
+    [TestCase("Image_11_90.heic", "e3aeca5fc781bd52470f9186653d3a3f")]
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndNullFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
@@ -549,13 +504,13 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "4194e88c247b5bbc7a1c6294cc795466")]
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
-    [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
+    [TestCase("Image_11_90.heic", "e3aeca5fc781bd52470f9186653d3a3f")]
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndInvalidFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
@@ -573,13 +528,13 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "4194e88c247b5bbc7a1c6294cc795466")]
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
-    [TestCase("Image_11.heic", "24cee7da517186279bafac45072fe622")]
+    [TestCase("Image_11_90.heic", "e3aeca5fc781bd52470f9186653d3a3f")]
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndDirectoryFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
@@ -597,20 +552,20 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0")]
     [TestCase("Image 10 portrait.png", "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0")]
     [TestCase("Homer.gif", "af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225daf783881028a11d8ad696231b8ee326225d")]
-    [TestCase("Image_11.heic", "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056")]
+    [TestCase("Image_11_90.heic", "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a")]
     public void CalculateHash_AllHashesEnabledAndValidImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, true, true);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
-        string? hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
         Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(210, hash?.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash?.ToLower());
+        Assert.AreEqual(210, hash.Length); // The PHash is a 210-character hexadecimal string
+        Assert.AreEqual(expectedHash, hash.ToLower());
     }
 
     [Test]
@@ -625,7 +580,7 @@ public class AssetHashCalculatorServiceTests
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, true);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);

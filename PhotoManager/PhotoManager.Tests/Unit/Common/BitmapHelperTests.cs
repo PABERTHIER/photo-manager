@@ -3,12 +3,12 @@
 [TestFixture]
 public class BitmapHelperTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [Test]
@@ -20,7 +20,7 @@ public class BitmapHelperTests
     [TestCase(null, 1280, 720)]
     public void LoadBitmapOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedPixelWidth, int expectedPixelHeight)
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = BitmapHelper.LoadBitmapOriginalImage(buffer, rotation);
@@ -41,7 +41,7 @@ public class BitmapHelperTests
     public void LoadBitmapOriginalImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer!, rotation));
 
@@ -52,8 +52,8 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_EmptyBuffer_ThrowsArgumentException()
     {
-        byte[] buffer = Array.Empty<byte>();
-        Rotation rotation = Rotation.Rotate90;
+        byte[] buffer = [];
+        const Rotation rotation = Rotation.Rotate90;
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
 
@@ -64,8 +64,8 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_InvalidBuffer_ThrowsArgumentException()
     {
-        byte[] buffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
-        Rotation rotation = Rotation.Rotate90;
+        byte[] buffer = [0x00, 0x01, 0x02, 0x03];
+        const Rotation rotation = Rotation.Rotate90;
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
 
@@ -76,9 +76,9 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_InvalidRotation_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
-        Rotation rotation = (Rotation)999;
+        const Rotation rotation = (Rotation)999;
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
 
@@ -89,9 +89,9 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
     public void LoadBitmapOriginalImage_InvalidImageFormat_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
 
@@ -123,7 +123,7 @@ public class BitmapHelperTests
     [TestCase(null, null, null)]
     public void LoadBitmapThumbnailImage_ValidBufferAndRotationAndWidthAndHeight_ReturnsBitmapImage(Rotation rotation, int width, int height)
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height);
@@ -139,7 +139,7 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_LargeWidthAndHeight_ThrowsOverflowException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         OverflowException? exception = Assert.Throws<OverflowException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000));
@@ -152,7 +152,7 @@ public class BitmapHelperTests
     public void LoadBitmapThumbnailImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100));
 
@@ -163,8 +163,8 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_EmptyBuffer_ThrowsArgumentException()
     {
-        byte[] buffer = Array.Empty<byte>();
-        Rotation rotation = Rotation.Rotate90;
+        byte[] buffer = [];
+        const Rotation rotation = Rotation.Rotate90;
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
@@ -175,8 +175,8 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_InvalidBuffer_ThrowsArgumentException()
     {
-        byte[] buffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
-        Rotation rotation = Rotation.Rotate90;
+        byte[] buffer = [0x00, 0x01, 0x02, 0x03];
+        const Rotation rotation = Rotation.Rotate90;
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
@@ -187,9 +187,9 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_InvalidRotation_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
-        Rotation rotation = (Rotation)999;
+        const Rotation rotation = (Rotation)999;
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
@@ -200,9 +200,9 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
     public void LoadBitmapThumbnailImage_InvalidImageFormat_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
@@ -211,21 +211,21 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
-    [TestCase(Rotation.Rotate0, 3024, 4032)]
-    [TestCase(Rotation.Rotate90, 4032, 3024)]
-    [TestCase(Rotation.Rotate180, 3024, 4032)]
-    [TestCase(Rotation.Rotate270, 4032, 3024)]
-    [TestCase(null, 3024, 4032)]
-    public void LoadBitmapHeicOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedPixelWidth, int expectedPixelHeight)
+    [TestCase("Image_11.heic", Rotation.Rotate0, Rotation.Rotate0, 3024, 4032)]
+    [TestCase("Image_11_90.heic", Rotation.Rotate90, Rotation.Rotate90, 4032, 3024)]
+    [TestCase("Image_11_180.heic", Rotation.Rotate180, Rotation.Rotate180, 3024, 4032)]
+    [TestCase("Image_11_270.heic", Rotation.Rotate270, Rotation.Rotate270, 4032, 3024)]
+    [TestCase("Image_11.heic", null, Rotation.Rotate0, 3024, 4032)]
+    public void LoadBitmapHeicOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(string fileName, Rotation rotation, Rotation expectedRotation, int expectedPixelWidth, int expectedPixelHeight)
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation);
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation); // Rotate0 because the BitmapImage (default rotation 0) is created from a MagickImage (containing the right rotation)
+        Assert.AreEqual(expectedRotation, image.Rotation);
         Assert.AreEqual(expectedPixelWidth, image.Width);
         Assert.AreEqual(expectedPixelHeight, image.Height);
         Assert.AreEqual(expectedPixelWidth, image.PixelWidth);
@@ -239,7 +239,7 @@ public class BitmapHelperTests
     public void LoadBitmapHeicOriginalImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer!, rotation));
 
@@ -250,8 +250,8 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
     public void LoadBitmapHeicOriginalImage_EmptyBuffer_ThrowsArgumentException()
     {
-        byte[] buffer = Array.Empty<byte>();
-        Rotation rotation = Rotation.Rotate90;
+        byte[] buffer = [];
+        const Rotation rotation = Rotation.Rotate90;
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation));
 
@@ -262,8 +262,8 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
     public void LoadBitmapHeicOriginalImage_InvalidBuffer_ReturnsDefaultBitmapImage()
     {
-        byte[] buffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
-        Rotation rotation = Rotation.Rotate90;
+        byte[] buffer = [0x00, 0x01, 0x02, 0x03];
+        const Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation);
 
@@ -276,51 +276,70 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
-    public void LoadBitmapHeicOriginalImage_InvalidRotation_ReturnsPartialBitmapImage()
+    public void LoadBitmapHeicOriginalImage_InvalidRotation_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
-        Rotation rotation = (Rotation)999;
+        const Rotation rotation = (Rotation)999;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation);
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicOriginalImage(buffer, rotation));
 
+        Assert.AreEqual($"'{rotation}' is not a valid value for property 'Rotation'.", exception?.Message);
+    }
+
+    [Test]
+    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
+    [TestCase(Rotation.Rotate0, 100, 100, Rotation.Rotate0, 75, 100)]
+    [TestCase(Rotation.Rotate90, 100, 100, Rotation.Rotate90, 75, 100)]
+    [TestCase(Rotation.Rotate180, 100, 100, Rotation.Rotate180, 75, 100)]
+    [TestCase(Rotation.Rotate270, 100, 100, Rotation.Rotate270, 75, 100)]
+    [TestCase(Rotation.Rotate90, 10000, 100, Rotation.Rotate90, 100, 133)]
+    [TestCase(Rotation.Rotate90, 100, 10000, Rotation.Rotate90, 75, 100)]
+    [TestCase(Rotation.Rotate90, 0, 10000, Rotation.Rotate90, 10000, 13333)]
+    [TestCase(Rotation.Rotate90, 100, 0, Rotation.Rotate90, 75, 100)]
+    [TestCase(Rotation.Rotate90, 0, 0, Rotation.Rotate90, 1, 1)]
+    [TestCase(null, 100, 100, Rotation.Rotate0, 75, 100)]
+    [TestCase(Rotation.Rotate90, null, 100, Rotation.Rotate90, 100, 133)]
+    [TestCase(Rotation.Rotate90, 100, null, Rotation.Rotate90, 75, 100)]
+    [TestCase(Rotation.Rotate90, null, null, Rotation.Rotate90, 1, 1)]
+    [TestCase(Rotation.Rotate0, 1000000, 100, Rotation.Rotate0, 75, 100)]
+    [TestCase(Rotation.Rotate0, 100, 1000000, Rotation.Rotate0, 100, 133)]
+    [TestCase(null, 100, null, Rotation.Rotate0, 100, 133)]
+    [TestCase(null, null, 100, Rotation.Rotate0, 75, 100)]
+    [TestCase(null, null, null, Rotation.Rotate0, 1, 1)]
+    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotationAndNotRotatedImage_ReturnsBitmapImage(Rotation rotation, int width, int height, Rotation expectedRotation, int expectedWidth, int expectedHeight)
+    {
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        byte[] buffer = File.ReadAllBytes(filePath);
+    
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
+    
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
+        Assert.AreEqual(expectedRotation, image.Rotation);
+        Assert.AreEqual(expectedWidth, image.Width);
+        Assert.AreEqual(expectedHeight, image.Height);
+        Assert.AreEqual(expectedWidth, image.PixelWidth);
+        Assert.AreEqual(expectedHeight, image.PixelHeight);
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
     }
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    [TestCase(Rotation.Rotate0, 100, 100, 75, 100)]
-    [TestCase(Rotation.Rotate90, 100, 100, 100, 75)]
-    [TestCase(Rotation.Rotate180, 100, 100, 75, 100)]
-    [TestCase(Rotation.Rotate270, 100, 100, 100, 75)]
-    [TestCase(Rotation.Rotate90, 10000, 100, 133, 100)]
-    [TestCase(Rotation.Rotate90, 100, 10000, 100, 75)]
-    [TestCase(Rotation.Rotate90, 0, 10000, 13333, 10000)]
-    [TestCase(Rotation.Rotate90, 100, 0, 100, 75)]
-    [TestCase(Rotation.Rotate90, 0, 0, 1, 1)]
-    [TestCase(null, 100, 100, 75, 100)]
-    [TestCase(Rotation.Rotate90, null, 100, 133, 100)]
-    [TestCase(Rotation.Rotate90, 100, null, 100, 75)]
-    [TestCase(Rotation.Rotate90, null, null, 1, 1)]
-    [TestCase(Rotation.Rotate0, 1000000, 100, 75, 100)]
-    [TestCase(Rotation.Rotate0, 100, 1000000, 100, 133)]
-    [TestCase(null, 100, null, 100, 133)]
-    [TestCase(null, null, 100, 75, 100)]
-    [TestCase(null, null, null, 1, 1)]
-    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int width, int height, int expectedWidth, int expectedHeight)
+    [TestCase("Image_11_90.heic", Rotation.Rotate90, 100, 100, Rotation.Rotate90, 100, 75)]
+    [TestCase("Image_11_180.heic", Rotation.Rotate180, 100, 100, Rotation.Rotate180, 75, 100)]
+    [TestCase("Image_11_270.heic", Rotation.Rotate270, 100, 100, Rotation.Rotate270, 100, 75)]
+    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName, Rotation rotation, int width, int height, Rotation expectedRotation, int expectedWidth, int expectedHeight)
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
 
         Assert.IsNotNull(image);
         Assert.IsNotNull(image.StreamSource);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation); // Rotate0 because the BitmapImage (default rotation 0) is created from a MagickImage (containing the right rotation)
+        Assert.AreEqual(expectedRotation, image.Rotation);
         Assert.AreEqual(expectedWidth, image.Width);
         Assert.AreEqual(expectedHeight, image.Height);
         Assert.AreEqual(expectedWidth, image.PixelWidth);
@@ -336,11 +355,11 @@ public class BitmapHelperTests
     [TestCase(-100, -100, "width")]
     public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height, string exceptionParameter)
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, width, height));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height));
 
         Assert.AreEqual($"Value should not be negative. (Parameter '{exceptionParameter}')", exception?.Message);
     }
@@ -349,11 +368,11 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_LargeWidthAndHeight_ReturnsDefaultBitmapImage()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, 1000000, 1000000);
+        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 1000000, 1000000);
 
         Assert.IsNotNull(image);
         Assert.IsNull(image.StreamSource);
@@ -367,7 +386,7 @@ public class BitmapHelperTests
     public void LoadBitmapHeicThumbnailImage_NullBuffer_ThrowsArgumentNullException()
     {
         byte[]? buffer = null;
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer!, rotation, 100, 100));
 
@@ -378,8 +397,8 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_EmptyBuffer_ThrowsArgumentException()
     {
-        byte[] buffer = Array.Empty<byte>();
-        Rotation rotation = Rotation.Rotate90;
+        byte[] buffer = [];
+        const Rotation rotation = Rotation.Rotate90;
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
 
@@ -390,8 +409,8 @@ public class BitmapHelperTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
     public void LoadBitmapHeicThumbnailImage_InvalidBuffer_ReturnsDefaultBitmapImage()
     {
-        byte[] buffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
-        Rotation rotation = Rotation.Rotate90;
+        byte[] buffer = [0x00, 0x01, 0x02, 0x03];
+        const Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100);
 
@@ -404,19 +423,15 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapHeicThumbnailImage_InvalidRotation_ReturnsPartialBitmapImage()
+    public void LoadBitmapHeicThumbnailImage_InvalidRotation_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
-        Rotation rotation = (Rotation)999;
+        const Rotation rotation = (Rotation)999;
 
-        BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100);
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
 
-        Assert.IsNotNull(image);
-        Assert.IsNotNull(image.StreamSource);
-        Assert.AreEqual(Rotation.Rotate0, image.Rotation);
-        Assert.AreEqual(0, image.DecodePixelWidth);
-        Assert.AreEqual(0, image.DecodePixelHeight);
+        Assert.AreEqual($"'{rotation}' is not a valid value for property 'Rotation'.", exception?.Message);
     }
 
     [Test]
@@ -428,7 +443,7 @@ public class BitmapHelperTests
     [TestCase(null, 1280, 720)]
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith, int expectedHeight)
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
 
         BitmapImage image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
 
@@ -447,8 +462,8 @@ public class BitmapHelperTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
     public void LoadBitmapImageFromPath_ImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
-        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.jpg");
-        Rotation rotation = Rotation.Rotate90;
+        string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.jpg");
+        const Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
 
@@ -464,7 +479,7 @@ public class BitmapHelperTests
     public void LoadBitmapImageFromPath_FilePathIsNull_ReturnsDefaultBitmapImage()
     {
         string? filePath = null;
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = BitmapHelper.LoadBitmapImageFromPath(filePath!, rotation);
 
@@ -479,8 +494,8 @@ public class BitmapHelperTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
     public void LoadBitmapImageFromPath_InvalidRotation_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
-        Rotation rotation = (Rotation)999;
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+        const Rotation rotation = (Rotation)999;
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapImageFromPath(filePath, rotation));
 
@@ -491,8 +506,8 @@ public class BitmapHelperTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
     public void LoadBitmapImageFromPath_InvalidImageFormat_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
-        Rotation rotation = Rotation.Rotate90;
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        const Rotation rotation = Rotation.Rotate90;
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapImageFromPath(filePath, rotation));
 
@@ -506,9 +521,31 @@ public class BitmapHelperTests
     [TestCase(Rotation.Rotate180, 3024, 4032)]
     [TestCase(Rotation.Rotate270, 3024, 4032)]
     [TestCase(null, 3024, 4032)]
-    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedWidth, int expectedHeight)
+    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(Rotation rotation, int expectedWidth, int expectedHeight)
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+
+        BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation);
+
+        Assert.IsNotNull(image);
+        Assert.IsNotNull(image.StreamSource);
+        Assert.AreEqual(rotation, image.Rotation);
+        Assert.AreEqual(expectedWidth, image.Width);
+        Assert.AreEqual(expectedHeight, image.Height);
+        Assert.AreEqual(expectedWidth, image.PixelWidth);
+        Assert.AreEqual(expectedHeight, image.PixelHeight);
+        Assert.AreEqual(0, image.DecodePixelWidth);
+        Assert.AreEqual(0, image.DecodePixelHeight);
+    }
+    
+    [Test]
+    [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
+    [TestCase("Image_11_90.heic", Rotation.Rotate90, 4032, 3024)]
+    [TestCase("Image_11_180.heic", Rotation.Rotate180, 3024, 4032)]
+    [TestCase("Image_11_270.heic", Rotation.Rotate270, 4032, 3024)]
+    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName, Rotation rotation, int expectedWidth, int expectedHeight)
+    {
+        string filePath = Path.Combine(_dataDirectory!, fileName);
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation);
 
@@ -528,7 +565,7 @@ public class BitmapHelperTests
     public void LoadBitmapHeicImageFromPathViewerUserControl_FilePathIsNull_ReturnsBitmapImage()
     {
         string? filePath = null;
-        Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath!, rotation);
 
@@ -543,8 +580,8 @@ public class BitmapHelperTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
     public void LoadBitmapHeicImageFromPathViewerUserControl_ImageDoesNotExist_ReturnsDefaultBitmapImage()
     {
-        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.heic");
-        Rotation rotation = Rotation.Rotate90;
+        string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.heic");
+        const Rotation rotation = Rotation.Rotate90;
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation);
 
@@ -559,8 +596,8 @@ public class BitmapHelperTests
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
     public void LoadBitmapHeicImageFromPathViewerUserControl_InvalidRotation_ReturnsPartialBitmapImage()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
-        Rotation rotation = (Rotation)999;
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        const Rotation rotation = (Rotation)999;
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation));
 
@@ -585,7 +622,7 @@ public class BitmapHelperTests
     [TestCase(null, null, 1280, 720)]
     public void LoadBitmapThumbnailImageAssetRepository_ValidBufferAndWidthAndHeight_ReturnsBitmapImage(int width, int height, int expectedWidth, int expectedHeight)
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height);
@@ -605,7 +642,7 @@ public class BitmapHelperTests
     [Category("From AssetRepository")]
     public void LoadBitmapThumbnailImageAssetRepository_LargeWidthAndHeight_ThrowsOverflowException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+        string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         OverflowException? exception = Assert.Throws<OverflowException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 1000000, 1000000));
@@ -628,7 +665,7 @@ public class BitmapHelperTests
     [Category("From AssetRepository")]
     public void LoadBitmapThumbnailImageAssetRepository_EmptyBuffer_ThrowsArgumentException()
     {
-        byte[] buffer = Array.Empty<byte>();
+        byte[] buffer = [];
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
 
@@ -639,7 +676,7 @@ public class BitmapHelperTests
     [Category("From AssetRepository")]
     public void LoadBitmapThumbnailImageAssetRepository_InvalidBuffer_ThrowsArgumentException()
     {
-        byte[] buffer = Array.Empty<byte>();
+        byte[] buffer = [];
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
 
@@ -650,7 +687,7 @@ public class BitmapHelperTests
     [Category("From AssetRepository")]
     public void LoadBitmapThumbnailImageAssetRepository_InvalidImageFormat_ThrowsArgumentException()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
@@ -664,9 +701,10 @@ public class BitmapHelperTests
     [TestCase("Image 10 portrait.png", 720, 1280)]
     [TestCase("Homer.gif", 320, 320)]
     [TestCase("Image_11.heic", 3024, 4032)]
+    [TestCase("Image_11_90.heic", 4032, 3024)]
     public void LoadBitmapFromPath_ValidImagePath_ReturnsNonNullBitmap(string fileName, int expectedWidth, int expectedHeight)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(filePath);
 
         Assert.IsNotNull(bitmap);
@@ -683,9 +721,9 @@ public class BitmapHelperTests
     [Test]
     public void LoadBitmapFromPath_ImageDoesNotExist_ReturnsNull()
     {
-        string filePath = Path.Combine(dataDirectory!, "ImageDoesNotExist.png");
+        string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.png");
 
-        Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(filePath!);
+        Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(filePath);
 
         Assert.IsNull(bitmap);
     }
@@ -693,7 +731,7 @@ public class BitmapHelperTests
     [Test]
     public void LoadBitmapFromPath_ImagePathIsInvalid_ReturnsNull()
     {
-        Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(dataDirectory!);
+        Bitmap? bitmap = BitmapHelper.LoadBitmapFromPath(_dataDirectory!);
 
         Assert.IsNull(bitmap);
     }
@@ -713,7 +751,7 @@ public class BitmapHelperTests
     [TestCase("Image 1.jpg")]
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         BitmapImage image = new (new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
@@ -721,7 +759,7 @@ public class BitmapHelperTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -740,7 +778,7 @@ public class BitmapHelperTests
     [Test]
     public void GetJpegBitmapImage_HeicValidImage_ReturnsJpegByteArray()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -750,7 +788,7 @@ public class BitmapHelperTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -791,7 +829,7 @@ public class BitmapHelperTests
     [TestCase("Image 1.jpg")]
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         BitmapImage image = new (new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
@@ -799,7 +837,7 @@ public class BitmapHelperTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -818,7 +856,7 @@ public class BitmapHelperTests
     [Test]
     public void GetPngBitmapImage_HeicValidImage_ReturnsPngByteArray()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -828,7 +866,7 @@ public class BitmapHelperTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -869,7 +907,7 @@ public class BitmapHelperTests
     [TestCase("Image 1.jpg")]
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         BitmapImage image = new (new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
@@ -877,7 +915,7 @@ public class BitmapHelperTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -896,7 +934,7 @@ public class BitmapHelperTests
     [Test]
     public void GetGifBitmapImage_HeicValidImage_ReturnsGifByteArray()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -906,7 +944,7 @@ public class BitmapHelperTests
         Assert.IsNotNull(imageBuffer);
         Assert.AreNotEqual(0, imageBuffer.Length);
 
-        string destinationNewFileDirectory = Path.Combine(dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
@@ -956,7 +994,7 @@ public class BitmapHelperTests
     {
         try
         {
-            using (var image = Image.FromFile(filePath))
+            using (Image.FromFile(filePath))
             {
                 // The image is successfully loaded; consider it valid
                 return true;

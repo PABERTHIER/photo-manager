@@ -13,7 +13,7 @@ public static class HashingHelper
 
         foreach (byte hashByte in hash)
         {
-            hashBuilder.Append(string.Format("{0:x2}", hashByte));
+            hashBuilder.Append($"{hashByte:x2}");
         }
 
         return hashBuilder.ToString();
@@ -38,12 +38,11 @@ public static class HashingHelper
     }
 
     // For Gif or some heic file it returns "0"
-    public static string CalculateDHash(string filePath)
+    public static string CalculateDHash(string? filePath)
     {
-        Bitmap? image;
         bool isHeicFile = filePath?.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) ?? false;
 
-        image = isHeicFile ? BitmapHelper.LoadBitmapFromPath(filePath!) : new Bitmap(filePath!);
+        Bitmap? image = isHeicFile ? BitmapHelper.LoadBitmapFromPath(filePath!) : new Bitmap(filePath!);
 
         ulong hash = 0UL;
         ulong mask = 1UL;

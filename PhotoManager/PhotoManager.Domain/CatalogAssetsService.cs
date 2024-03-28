@@ -462,10 +462,10 @@ public class CatalogAssetsService : ICatalogAssetsService
         }
 
         // MagickImage always returns "TopLeft", it is not able to detect the right orientation for a heic file -_-
-        // if (rotation != Rotation.Rotate0)
-        // {
-        //     assetRotated = true;
-        // }
+        if (rotation != Rotation.Rotate0)
+        {
+            assetRotated = true;
+        }
 
         BitmapImage originalImage = _storageService.LoadBitmapHeicOriginalImage(imageBytes, rotation);
 

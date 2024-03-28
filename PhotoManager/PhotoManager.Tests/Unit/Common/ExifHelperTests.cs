@@ -1,16 +1,18 @@
-﻿namespace PhotoManager.Tests.Unit.Common;
+﻿using System.Drawing.Imaging;
+
+namespace PhotoManager.Tests.Unit.Common;
 
 [TestFixture]
 public class ExifHelperTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -24,9 +26,9 @@ public class ExifHelperTests
     [TestCase("Image 1_180_deg.jpg", 3)]
     [TestCase("Image 1_270_deg.jpg", 8)]
     [TestCase("Image 8.jpeg", 1)]
-    public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOriention)
+    public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = ExifHelper.GetExifOrientation(
@@ -35,7 +37,7 @@ public class ExifHelperTests
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOriention, orientation);
+        Assert.AreEqual(expectedOrientation, orientation);
     }
 
     [Test]
@@ -44,7 +46,7 @@ public class ExifHelperTests
     [TestCase("Image_11.heic")] // Error on BitmapFrame.Create(stream)
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         ushort orientation = ExifHelper.GetExifOrientation(
@@ -59,7 +61,7 @@ public class ExifHelperTests
     [Test]
     public void GetExifOrientation_InvalidImageBuffer_ReturnsCorruptedOrientationValue()
     {
-        byte[] invalidImageBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
+        byte[] invalidImageBuffer = [0x00, 0x01, 0x02, 0x03];
 
         ushort orientation = ExifHelper.GetExifOrientation(
             invalidImageBuffer,
@@ -85,7 +87,7 @@ public class ExifHelperTests
     [Test]
     public void GetExifOrientation_EmptyBuffer_ReturnsCorruptedOrientationValue()
     {
-        byte[] emptyBuffer = Array.Empty<byte>();
+        byte[] emptyBuffer = [];
 
         ushort orientation = ExifHelper.GetExifOrientation(
             emptyBuffer,
@@ -96,26 +98,44 @@ public class ExifHelperTests
     }
 
     [Test]
-    [TestCase("Image_11.heic", 0, 1)]
-    //[TestCase("Image_11_90.heic", 90, 8)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
-    //[TestCase("Image_11_180.heic", 180, 3)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
-    //[TestCase("Image_11_270.heic", 270, 6)] // MagickImage always returns "TopLeft" it is not able to detect the right orientation for a heic file -_-
-    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int degrees, int expectedOriention)
+    public void GetExifOrientation_InvalidFormat_ReturnsCorruptedOrientationValue()
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        Bitmap image = new (10, 10);
+
+        using (MemoryStream ms = new())
+        {
+            image.Save(ms, ImageFormat.Bmp); // Save as BMP to create an invalid format for JPEG
+            byte[] buffer = ms.ToArray(); // Buffer with invalid Exif Metadata (Metadata null)
+
+            ushort orientation = ExifHelper.GetExifOrientation(
+                buffer,
+                _userConfigurationService!.AssetSettings.DefaultExifOrientation,
+                _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
+
+            Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        }
+    }
+
+    [Test]
+    [TestCase("Image_11.heic", 1)]
+    [TestCase("Image_11_90.heic", 6)]
+    [TestCase("Image_11_180.heic", 3)]
+    [TestCase("Image_11_270.heic", 8)]
+    public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
+    {
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
-        //byte[] bufferRotated = GetHeicRotatedBuffer(buffer, degrees);
 
         ushort orientation = ExifHelper.GetHeicExifOrientation(buffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
         Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOriention, orientation);
+        Assert.AreEqual(expectedOrientation, orientation);
     }
 
     [Test]
     public void GetHeicExifOrientation_InvalidImageBuffer_ReturnsCorruptedOrientationValue()
     {
-        byte[] invalidHeicBuffer = new byte[] { 0x00, 0x01, 0x02, 0x03 };
+        byte[] invalidHeicBuffer = [0x00, 0x01, 0x02, 0x03];
 
         ushort orientation = ExifHelper.GetHeicExifOrientation(invalidHeicBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
@@ -138,7 +158,7 @@ public class ExifHelperTests
     [Test]
     public void GetHeicExifOrientation_EmptyBuffer_ThrowsArgumentException()
     {
-        byte[] emptyBuffer = Array.Empty<byte>();
+        byte[] emptyBuffer = [];
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
         {
@@ -174,7 +194,7 @@ public class ExifHelperTests
     public void GetImageRotation_InvalidExifOrientation_ReturnsCorrectRotationValue()
     {
         int exifOrientation = -10;
-        Rotation rotation = ExifHelper.GetImageRotation((ushort)exifOrientation);
+        Rotation rotation = ExifHelper.GetImageRotation((ushort)(short)exifOrientation);
 
         Assert.AreEqual(Rotation.Rotate0, rotation);
     }
@@ -196,7 +216,7 @@ public class ExifHelperTests
     [TestCase("Homer.gif")]
     public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
-        string filePath = Path.Combine(dataDirectory!, fileName);
+        string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidGDIPlusImage(validImageData);
@@ -207,7 +227,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidGDIPlusImage_InvalidImageData_ReturnsFalse()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] invalidImageData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidGDIPlusImage(invalidImageData);
@@ -218,7 +238,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidGDIPlusImage_EmptyImageData_ReturnsFalse()
     {
-        byte[] emptyHeicData = Array.Empty<byte>();
+        byte[] emptyHeicData = [];
 
         bool result = ExifHelper.IsValidGDIPlusImage(emptyHeicData);
 
@@ -228,7 +248,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidHeic_ValidImageData_ReturnsTrue()
     {
-        string filePath = Path.Combine(dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] validHeicData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidHeic(validHeicData);
@@ -239,7 +259,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidHeic_InvalidImageData_ReturnsFalse()
     {
-        byte[] invalidHeicData = new byte[] { 0x00, 0x01, 0x02, 0x03 };
+        byte[] invalidHeicData = [0x00, 0x01, 0x02, 0x03];
 
         bool result = ExifHelper.IsValidHeic(invalidHeicData);
 
@@ -249,36 +269,10 @@ public class ExifHelperTests
     [Test]
     public void IsValidHeic_EmptyImageData_ThrowsArgumentException()
     {
-        byte[] emptyHeicData = Array.Empty<byte>();
+        byte[] emptyHeicData = [];
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => ExifHelper.IsValidHeic(emptyHeicData));
 
         Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
     }
-
-    //private static byte[] GetHeicRotatedBuffer(byte[] buffer, int degrees)
-    //{
-    //    using (MemoryStream stream = new(buffer))
-    //    {
-    //        using (MagickImage image = new(stream))
-    //        {
-    //            image.Rotate(degrees);
-
-    //            // Convert the rotated image back to a byte array
-    //            //byte[] rotatedImageData = image.ToByteArray(MagickFormat.Heic);
-    //            //
-    //            //MemoryStream newStream = stream;
-    //            //stream.CopyTo(newStream);
-
-    //            //MagickReadSettings readSettings = new() { Format = MagickFormat.Heic };
-    //            //newStream.Seek(0, SeekOrigin.Begin); //THIS IS NEEDED!!!
-    //            //MagickImage newImage = new (newStream, readSettings);
-    //            //newImage.Rotate(degrees);
-    //            byte[] rotatedImageData = image.ToByteArray(MagickFormat.Heic);
-
-    //            // Return the rotated image data
-    //            return rotatedImageData;
-    //        }
-    //    }
-    //}
 }

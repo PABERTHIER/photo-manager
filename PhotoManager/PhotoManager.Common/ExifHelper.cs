@@ -6,13 +6,12 @@ namespace PhotoManager.Common;
 
 public static class ExifHelper
 {
-
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
     // 1: Normal (0 deg rotation)
     // 3: Upside-down (180 deg rotation)
-    // 6: Rotated 90 deg counterclockwise (270 deg clockwise)
-    // 8: Rotated 90 deg clockwise (270 deg counterclockwise)
+    // 6: Rotated 90 deg clockwise (270 deg counterclockwise)
+    // 8: Rotated 90 deg counterclockwise (270 deg clockwise)
     public static ushort GetExifOrientation(byte[] buffer, ushort defaultExifOrientation, ushort corruptedImageOrientation)
     {
         try
@@ -23,7 +22,7 @@ public static class ExifHelper
 
                 if (bitmapFrame.Metadata is BitmapMetadata bitmapMetadata)
                 {
-                    object orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
+                    object? orientation = bitmapMetadata.GetQuery("System.Photo.Orientation");
 
                     if (orientation == null)
                     {
@@ -38,11 +37,11 @@ public static class ExifHelper
         {
             if (e is NotSupportedException && e.InnerException?.HResult == -2003292351)
             {
-                log.Error("The image is corrupted");
+                Log.Error("The image is corrupted");
             }
             else
             {
-                log.Error(e);
+                Log.Error(e);
             }
         }
 
@@ -55,33 +54,32 @@ public static class ExifHelper
         {
             using (MemoryStream stream = new (buffer))
             {
-                // https://github.com/dlemstra/Magick.NET/issues/836
-                //MagickReadSettings settings = new();
-                //settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
+                MagickReadSettings settings = new();
+                settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
 
-                //using (MagickImage image = new(stream, settings))
-                using (MagickImage image = new (stream))
+                using (MagickImage image = new (stream, settings))
                 {
-                    string? orientation = image.GetAttribute("exif:Orientation");
-                    //image.AutoOrient();
-                    //image.GetExifProfile();
-                    if (orientation != null && ushort.TryParse(orientation, out ushort orientationValue))
-                    {
-                        return orientationValue;
-                    }
-
+                    // image.Orientation contain the value from the exif data -> image.GetAttribute("exif:Orientation")
                     return GetMagickHeicOrientation(image.Orientation, corruptedImageOrientation);
                 }
             }
         }
         catch (MagickException)
         {
-            log.Error("The image is not valid or in an unsupported format");
+            Log.Error("The image is not valid or in an unsupported format");
         }
 
         return corruptedImageOrientation;
     }
 
+    // (ushort)1 <=> "Horizontal (normal)"
+    // (ushort)2 <=> "Mirror horizontal"
+    // (ushort)3 <=> "Rotate 180"
+    // (ushort)4 <=> "Mirror vertical"
+    // ushort)5 <=> "Mirror horizontal and rotate 270 CW"
+    // (ushort)6 <=> "Rotate 90 CW"
+    // (ushort)7 <=> "Mirror horizontal and rotate 90 CW"
+    // (ushort)8 <=> "Rotate 270 CW"
     public static Rotation GetImageRotation(ushort exifOrientation)
     {
         Rotation rotation = exifOrientation switch
@@ -106,15 +104,14 @@ public static class ExifHelper
         {
             using (MemoryStream ms = new (imageData))
             {
-                BitmapFrame bitmapFrame = BitmapFrame.Create(ms);
-                BitmapMetadata? bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
+                BitmapFrame.Create(ms);
             }
 
             return true;
         }
         catch (Exception e)
         {
-            log.Error(e);
+            Log.Error(e);
             return false;
         }
     }
@@ -125,7 +122,7 @@ public static class ExifHelper
         {
             using (MemoryStream ms = new (imageData))
             {
-                using (MagickImage image = new (ms))
+                using (new MagickImage(ms))
                 {
                     // Image is valid
                 }
@@ -135,25 +132,24 @@ public static class ExifHelper
         }
         catch (MagickException)
         {
-            log.Error("The image is not valid or in an unsupported format");
+            Log.Error("The image is not valid or in an unsupported format");
             return false;
         }
     }
 
     // 1: Normal (0 deg rotation)
     // 3: Upside-down (180 deg rotation)
-    // 6: Rotated 90 deg counterclockwise (270 deg clockwise)
-    // 8: Rotated 90 deg clockwise (270 deg counterclockwise)
+    // 6: Rotated 90 deg clockwise (270 deg counterclockwise)
+    // 8: Rotated 90 deg counterclockwise (270 deg clockwise)
     private static ushort GetMagickHeicOrientation(OrientationType orientationType, ushort corruptedImageOrientation)
     {
         ushort result = orientationType
         switch
         {
             (OrientationType.TopLeft or OrientationType.LeftTop) => 1,
-            (OrientationType.BottomLeft or OrientationType.LeftBotom) => 8,
+            (OrientationType.BottomLeft or OrientationType.LeftBottom) => 8,
             (OrientationType.BottomRight or OrientationType.RightBottom) => 3,
             (OrientationType.TopRight or OrientationType.RightTop) => 6,
-            OrientationType.Undefined => corruptedImageOrientation,
             _ => corruptedImageOrientation
         };
 
