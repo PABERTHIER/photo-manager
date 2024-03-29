@@ -21,7 +21,10 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3")]
     [TestCase("Image 10 portrait.png", "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94")]
     [TestCase("Homer.gif", "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1")]
+    [TestCase("Image_11.heic", "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d")]
     [TestCase("Image_11_90.heic", "b75df4942de1efa7d4326fedd721e99cc43959a1c22098a8cfcf6861aea099741d9c98fa1615e54d53838c22b9c6ff3b328c4ee3c0875d2b4ac7f7dee8d61bcf")]
+    [TestCase("Image_11_180.heic", "a2ad3ac9d51f74230b9f1d554172781d9cc214d01f8344354e2e56dc3daecb5a0021d4d2814eba0cde6fd681f3a8e8b8b55fbfad7184740e3518190e05dca77f")]
+    [TestCase("Image_11_270.heic", "d4d7342a783f0f1b5e10ad9b493b71dd688dbc31b8ddd5534c9fff9c5fdbfa8bee32ef4e4258f7514a1b57f9a12b571454c8b66172b1a66bf1b53953b66227d5")]
     public void CalculateHash_DefaultHashAndValidImageBytesAndFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
@@ -148,7 +151,10 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0")]
     [TestCase("Image 10 portrait.png", "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0")]
     [TestCase("Homer.gif", "af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225d62ee062ee062ee062ee062ee062ee062ee0af783881028a11d8ad696231b8ee326225daf783881028a11d8ad696231b8ee326225d")]
+    [TestCase("Image_11.heic", "a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d63662071a928c84a96881408945461cb98d63662071")]
     [TestCase("Image_11_90.heic", "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a")]
+    [TestCase("Image_11_180.heic", "a928e84a97881448945561cb98d6386206f62ee062ee062ee062ee062ee062ee062ee0a928e84a97881448945561cb98d6386206f62ee062ee062ee062ee062ee062ee062ee0a928e84a97881448945561cb98d6386206fa928e84a97881448945561cb98d6386206f")]
+    [TestCase("Image_11_270.heic", "a929184a99881458946061cbb8d6606206962ee062ee062ee062ee062ee062ee062ee0a929184a99881458946061cbb8d6606206962ee062ee062ee062ee062ee062ee062ee0a929184a99881458946061cbb8d66062069a929184a99881458946061cbb8d66062069")]
     public void CalculateHash_PHashAndValidImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
@@ -261,6 +267,7 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "23831507941108244")]
     [TestCase("Image 10 portrait.png", "36116814863094786")]
     [TestCase("Image_11_90.heic", "14766675108600273")]
+    [TestCase("Image_11_180.heic", "53334510583489094")]
     public void CalculateHash_DHashAndValidImageBytesAndFilePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
@@ -279,6 +286,7 @@ public class AssetHashCalculatorServiceTests
     [Test]
     [TestCase("Homer.gif", "0")]
     [TestCase("Image_11.heic", "0")]
+    [TestCase("Image_11_270.heic", "0")]
     public void CalculateHash_NonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
@@ -425,7 +433,10 @@ public class AssetHashCalculatorServiceTests
     [TestCase("Image 8.jpeg", "4194e88c247b5bbc7a1c6294cc795466")]
     [TestCase("Image 10 portrait.png", "02b09a63d382bc1a1f88afa125f3adb3")]
     [TestCase("Homer.gif", "a409ce713de9334117791b15a586dd0e")]
+    [TestCase("Image_11.heic", "d9aa281b55316e10c767877dee265732")]
     [TestCase("Image_11_90.heic", "e3aeca5fc781bd52470f9186653d3a3f")]
+    [TestCase("Image_11_180.heic", "9bf6a1a37331ba6f391b885b6dcc67a1")]
+    [TestCase("Image_11_270.heic", "35d24aaf7f6fc8b9872f069a8c28ab78")]
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);

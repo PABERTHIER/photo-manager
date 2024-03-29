@@ -76,7 +76,7 @@ public static class ExifHelper
     // (ushort)2 <=> "Mirror horizontal"
     // (ushort)3 <=> "Rotate 180"
     // (ushort)4 <=> "Mirror vertical"
-    // ushort)5 <=> "Mirror horizontal and rotate 270 CW"
+    // (ushort)5 <=> "Mirror horizontal and rotate 270 CW"
     // (ushort)6 <=> "Rotate 90 CW"
     // (ushort)7 <=> "Mirror horizontal and rotate 90 CW"
     // (ushort)8 <=> "Rotate 270 CW"
