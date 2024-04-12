@@ -104,7 +104,7 @@ public class UserConfigurationService : IUserConfigurationService
     {
         List<string> rootPaths = new()
         {
-            PathSettings.AssetsDirectory!
+            PathSettings.AssetsDirectory
         };
 
         return rootPaths.ToArray();

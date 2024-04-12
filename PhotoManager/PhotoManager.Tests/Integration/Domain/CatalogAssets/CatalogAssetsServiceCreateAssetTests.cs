@@ -2078,8 +2078,8 @@ public class CatalogAssetsServiceCreateAssetTests
         Assert.AreEqual(imagePath, asset.FullPath);
         Assert.AreEqual(folderPath, asset.Folder.Path);
         Assert.IsNull(asset.ImageData); // Set above, not in this method
-        Assert.AreEqual(minDate, asset.FileCreationDateTime);
-        Assert.AreEqual(minDate, asset.FileModificationDateTime);
+        Assert.AreEqual(minDate, asset.FileCreationDateTime); // Set above, not in this method
+        Assert.AreEqual(minDate, asset.FileModificationDateTime); // Set above, not in this method
     }
 
     private void AssertCataloguedAssetAndThumbnailValidity(Asset asset, Folder folder, IReadOnlyDictionary<string, Dictionary<string, byte[]>> thumbnails, int imageByteSize)
