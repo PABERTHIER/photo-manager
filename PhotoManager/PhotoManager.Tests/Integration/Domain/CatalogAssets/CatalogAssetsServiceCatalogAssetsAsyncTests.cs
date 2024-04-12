@@ -1237,11 +1237,13 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_SyncTheFirstAssets()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_SyncTheFirstAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(2, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureCatalogAssetService(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -1363,11 +1365,13 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCallbackIsNull_SyncTheAssetsWithoutEvent()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCallbackIsNull_SyncTheAssetsWithoutEvent(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -1566,15 +1570,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
     // --------------------------------------------------------------------------------------------------------------------------------------------
     // UpdatedAssets
-    // TODO: Same test for a video file
     // TODO: GetTotalFilesNumber is 10 instead of 5 when sync for second time, FIX IT !
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneAssetUpdated_SyncTheAssets()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFileNameToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -1805,16 +1810,286 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         }
     }
 
+    // TODO: It is not able to detect if a video has been updated
+    [Test]
+    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_SyncTheAssets()
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+
+        try
+        {
+            Directory.CreateDirectory(assetsDirectory);
+
+            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
+            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+
+            string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+
+            File.Copy(imagePath1, imagePath1ToCopy);
+            File.Copy(imagePath2, imagePath2ToCopy);
+            File.Copy(videoPath1, videoPath1ToCopy);
+
+            List<string> assetPaths = [imagePath1ToCopy, imagePath2ToCopy, videoPath1ToCopy];
+            List<string> assetPathsAfterSync = [imagePath2ToCopy, imagePath1ToCopy, firstFramePath1];
+            List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!, _asset4Temp!];
+            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET4_TEMP_IMAGE_BYTE_SIZE];
+
+            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
+            Assert.AreEqual(3, assetsInDirectory.Length);
+
+            foreach (string assetPath in assetPaths)
+            {
+                Assert.IsTrue(File.Exists(assetPath));
+            }
+
+            Assert.IsFalse(File.Exists(firstFramePath1));
+
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNull(folder);
+
+            Folder? videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFramefolder);
+
+            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+
+            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+            CheckBackupBefore(backupFilePath);
+
+            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.IsEmpty(assetsFromRepositoryByPath);
+
+            List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
+            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.IsEmpty(assetsFromRepository);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.IsEmpty(thumbnails);
+
+            CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+
+            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNotNull(folder);
+
+            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFramefolder);
+
+            Assert.IsTrue(File.Exists(firstFramePath1));
+
+            _asset3Temp!.Folder = folder!;
+            _asset3Temp!.FolderId = folder!.FolderId;
+            _asset2Temp!.Folder = folder;
+            _asset2Temp!.FolderId = folder.FolderId;
+            _asset4Temp!.Folder = videoFirstFramefolder!;
+            _asset4Temp!.FolderId = videoFirstFramefolder!.FolderId;
+
+            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+
+            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+
+            videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
+            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.AreEqual(3, assetsFromRepository.Count);
+
+            List<Folder> expectedFolders = [folder, folder, videoFirstFramefolder];
+            List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
+
+            for (int i = 0; i < assetsFromRepository.Count; i++)
+            {
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+            }
+
+            List<Folder> folders = [folder, videoFirstFramefolder];
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
+            {
+                { folder, [_asset3Temp!, _asset2Temp!]},
+                { videoFirstFramefolder, [_asset4Temp!]}
+            };
+            Dictionary<string, int> assetNameToByteSizeMapping = new()
+            {
+                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
+                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
+                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE }
+            };
+
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders, thumbnails, assetsImageByteSize);
+            CheckBlobsAndTablesAfterSaveCatalog(
+                blobsPath,
+                tablesPath,
+                false,
+                folders,
+                assetsFromRepository,
+                folderToAssetsMapping,
+                assetNameToByteSizeMapping);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            CheckBackupAfter(
+                backupFilePath,
+                blobsPath,
+                tablesPath,
+                folders,
+                assetsFromRepository,
+                folderToAssetsMapping,
+                assetNameToByteSizeMapping);
+
+            Assert.AreEqual(10, catalogChanges.Count);
+
+            int increment = 0;
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
+
+            foreach (Asset expectedAsset in folderToAssetsMapping[folder])
+            {
+                CheckCatalogChangesAssetAdded(
+                    catalogChanges,
+                    assetsDirectory,
+                    folderToAssetsMapping[folder],
+                    expectedAsset,
+                    folder,
+                    ref increment);
+            }
+
+            CheckCatalogChangesFolderAdded(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesAssetAdded(
+                catalogChanges,
+                firstFrameVideosDirectory,
+                folderToAssetsMapping[videoFirstFramefolder],
+                _asset4Temp!,
+                videoFirstFramefolder,
+                ref increment);
+            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            // Second sync
+
+            File.SetLastWriteTime(videoPath1ToCopy, _asset4Temp.ThumbnailCreationDateTime);
+
+            assetsInDirectory = Directory.GetFiles(assetsDirectory);
+            Assert.AreEqual(3, assetsInDirectory.Length);
+
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+
+            Assert.IsTrue(File.Exists(firstFramePath1));
+
+            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNotNull(folder);
+
+            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFramefolder);
+
+            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+
+            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+
+            videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
+            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.AreEqual(3, assetsFromRepository.Count);
+
+            for (int i = 0; i < assetsFromRepository.Count; i++)
+            {
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+            }
+
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders, thumbnails, assetsImageByteSize);
+            CheckBlobsAndTablesAfterSaveCatalog(
+                blobsPath,
+                tablesPath,
+                false,
+                folders,
+                assetsFromRepository,
+                folderToAssetsMapping,
+                assetNameToByteSizeMapping);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            CheckBackupAfter(
+                backupFilePath,
+                blobsPath,
+                tablesPath,
+                folders,
+                assetsFromRepository,
+                folderToAssetsMapping,
+                assetNameToByteSizeMapping);
+
+            Assert.AreEqual(16, catalogChanges.Count);
+
+            increment = 0;
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
+
+            foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
+            {
+                CheckCatalogChangesAssetAdded(
+                    catalogChanges,
+                    assetsDirectory,
+                    folderToAssetsMapping[folder!],
+                    expectedAsset,
+                    folder!,
+                    ref increment);
+            }
+
+            CheckCatalogChangesFolderAdded(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesAssetAdded(
+                catalogChanges,
+                firstFrameVideosDirectory,
+                folderToAssetsMapping[videoFirstFramefolder!],
+                _asset4Temp!,
+                videoFirstFramefolder!,
+                ref increment);
+
+            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesEnd(catalogChanges, ref increment);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(assetsDirectory, true);
+        }
+    }
+
     // --------------------------------------------------------------------------------------------------------------------------------------------
     // DeletedAssets
     // TODO: Same test for a video file
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneAssetDeleted_SyncTheAssetsAndRemovesDeletedOne()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneAssetDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFileNameToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -2043,12 +2318,14 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
     [Test]
     [Ignore("Need to rework the CancellationRequested")]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneAssetDeletedAndIsCancellationRequested_SyncTheAssetsAndRemovesDeletedOne()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneAssetDeletedAndIsCancellationRequested_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFileNameToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -2940,7 +3217,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
     // BACKUP SECTION ------------------------------------------------------------------------------------------------
 
-    // TODO: Add testCase for AnalyseVideo for each tests + missing test where video present and analyse to false ?
     // TODO next: Same test for a video file (UpdatedAssets, DeletedAssets)
     // TODO: To test cases where !folderHasThumbnails, need to delete BACKUP before second sync (ex for updated, deleted...)
 
@@ -2952,13 +3228,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
     // TODO: Do all the same tests as in the CreatAssetTests !
     // TODO: Add Check for TotalFilesNumber in each tests
+    // TODO: Add testCase for AnalyseVideo for each tests
+    // TODO: Missing cases in CreateAsset about video ? Like calling Create twice for ex
+    // TODO: Add many cases for videos (like adding twice the same video name but not same content -> replace previous image ?)
     // TODO: Verify each ReasonEnum and fix them
 
     // TODO: RAF (+ cases in Notion)
     // Test to Cancel the token for each method (testcase)
     // Adapt PathSettings.AssetsDirectory! for the case where no assets, x assets and co, invalid path  / Can also just Add some folders if needed
+    // Not valid gdiplus image (Create, Update and Delete)
     // Different hash types
-    // Take all tests done in CatalogAssetsServiceCreateAssetTests
     // Hardcore scenario with multiple subdir, images (jpg, png, gif, heic) and videos, updates, deletes
 
     // TODO: Tests the remaining catch in the method to have 100% of coverage.
