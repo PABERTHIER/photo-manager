@@ -770,16 +770,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
 
-            List<string> imagePaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(4, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -831,7 +831,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
@@ -927,9 +927,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(4, assetsInDirectory.Length);
 
-            foreach (string imagePath in assetPaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Assert.IsFalse(File.Exists(firstFramePath1));
@@ -1110,9 +1110,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(4, assetsInDirectory.Length);
 
-            foreach (string imagePath in assetPaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Assert.IsFalse(File.Exists(firstFramePath1));
@@ -1251,16 +1251,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
 
-            List<string> imagePaths = [imagePath1, imagePath2];
+            List<string> assetPaths = [imagePath1, imagePath2];
             List<Asset> expectedAssets = [_asset1!, _asset2!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(4, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -1308,7 +1308,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
@@ -1519,16 +1519,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
 
-            List<string> imagePaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(4, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -1580,7 +1580,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
@@ -1639,14 +1639,14 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
 
-            List<string> imagePaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(4, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -1728,16 +1728,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
             File.Copy(imagePath1, destinationFileNameToCopy);
 
-            List<string> imagePaths = [imagePath1, destinationFileNameToCopy, imagePath2, imagePath3, imagePath4];
+            List<string> assetPaths = [imagePath1, destinationFileNameToCopy, imagePath2, imagePath3, imagePath4];
             List<Asset> expectedAssets = [_asset1!, _asset1Temp!, _asset2!, _asset3!, _asset4!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(5, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -1791,7 +1791,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
@@ -1850,10 +1850,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             _asset1Temp.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
             File.SetLastWriteTime(destinationFileNameToCopy, _asset1Temp.ThumbnailCreationDateTime);
 
-            List<string> imagePathsUpdated = [];
-            imagePaths.ForEach(imagePathsUpdated.Add);
-            imagePathsUpdated.Remove(destinationFileNameToCopy);
-            imagePathsUpdated.Add(destinationFileNameToCopy);
+            List<string> assetPathsUpdated = [];
+            assetPaths.ForEach(assetPathsUpdated.Add);
+            assetPathsUpdated.Remove(destinationFileNameToCopy);
+            assetPathsUpdated.Add(destinationFileNameToCopy);
 
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
@@ -1883,7 +1883,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], imagePathsUpdated[i], assetsDirectory, folder!);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
@@ -2492,9 +2492,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
 
-            foreach (string imagePath in assetPaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -2720,9 +2720,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            foreach (string imagePath in assetPaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -2941,16 +2941,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
             File.Copy(imagePath1, destinationFileNameToCopy);
 
-            List<string> imagePaths = [imagePath1, destinationFileNameToCopy, imagePath2, imagePath3, imagePath4];
+            List<string> assetPaths = [imagePath1, destinationFileNameToCopy, imagePath2, imagePath3, imagePath4];
             List<Asset> expectedAssets = [_asset1!, _asset1Temp!, _asset2!, _asset3!, _asset4!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(5, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -3004,7 +3004,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
@@ -3062,9 +3062,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             File.Delete(destinationFileNameToCopy);
 
-            List<string> imagePathsUpdated = [];
-            imagePaths.ForEach(imagePathsUpdated.Add);
-            imagePathsUpdated.Remove(destinationFileNameToCopy);
+            List<string> assetPathsUpdated = [];
+            assetPaths.ForEach(assetPathsUpdated.Add);
+            assetPathsUpdated.Remove(destinationFileNameToCopy);
 
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
@@ -3094,7 +3094,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], imagePathsUpdated[i], assetsDirectory, folder!);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
@@ -3696,9 +3696,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
 
-            foreach (string imagePath in assetPaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -3912,16 +3912,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
             File.Copy(imagePath1, destinationFileNameToCopy);
 
-            List<string> imagePaths = [imagePath1, destinationFileNameToCopy, imagePath2, imagePath3, imagePath4];
+            List<string> assetPaths = [imagePath1, destinationFileNameToCopy, imagePath2, imagePath3, imagePath4];
             List<Asset> expectedAssets = [_asset1!, _asset1Temp!, _asset2!, _asset3!, _asset4!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(5, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -3975,7 +3975,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
@@ -4033,9 +4033,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             File.Delete(destinationFileNameToCopy);
 
-            List<string> imagePathsUpdated = [];
-            imagePaths.ForEach(imagePathsUpdated.Add);
-            imagePathsUpdated.Remove(destinationFileNameToCopy);
+            List<string> assetPathsUpdated = [];
+            assetPaths.ForEach(assetPathsUpdated.Add);
+            assetPathsUpdated.Remove(destinationFileNameToCopy);
 
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
@@ -4066,7 +4066,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], imagePathsUpdated[i], assetsDirectory, folder!);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
@@ -4376,16 +4376,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
 
-            List<string> imagePaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(4, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -4437,7 +4437,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
@@ -4505,7 +4505,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder!);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
             }
 
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
@@ -4574,16 +4574,16 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
 
-            List<string> imagePaths = [imagePath1, imagePath2, imagePath3, imagePath4];
+            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(4, assetsInDirectory.Length);
 
-            foreach (string imagePath in imagePaths)
+            foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(imagePath));
+                Assert.IsTrue(File.Exists(assetPath));
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -4635,7 +4635,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], imagePaths[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
@@ -4692,9 +4692,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             File.Copy(imagePath1, destinationFileNameToCopy);
 
-            List<string> imagePathsUpdated = [];
-            imagePaths.ForEach(imagePathsUpdated.Add);
-            imagePathsUpdated.Add(destinationFileNameToCopy);
+            List<string> assetPathsUpdated = [];
+            assetPaths.ForEach(assetPathsUpdated.Add);
+            assetPathsUpdated.Add(destinationFileNameToCopy);
 
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
@@ -4726,7 +4726,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], imagePathsUpdated[i], assetsDirectory, folder);
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder, expectedAssetsUpdated} };
@@ -5153,7 +5153,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         CheckBlobsAndTablesAfterSaveCatalogEmpty(backupBlobsDirectory, backupTablesDirectory, hasEmptyTables, hasOneFolder, folder);
     }
 
-    private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string imagePath, string folderPath, Folder folder)
+    private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
     {
         DateTime actualDate = DateTime.Now.Date;
 
@@ -5172,7 +5172,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.AreEqual(expectedAsset.AssetCorruptedMessage, asset.AssetCorruptedMessage);
         Assert.AreEqual(expectedAsset.IsAssetRotated, asset.IsAssetRotated);
         Assert.AreEqual(expectedAsset.AssetRotatedMessage, asset.AssetRotatedMessage);
-        Assert.AreEqual(imagePath, asset.FullPath);
+        Assert.AreEqual(assetPath, asset.FullPath);
         Assert.AreEqual(folderPath, asset.Folder.Path);
         Assert.IsNotNull(asset.ImageData); // Unlike in CatalogAssetsServiceCreateAssetTests it is set here
         Assert.AreEqual(actualDate, asset.FileCreationDateTime.Date); // Because generated by tests (thumbnailCreationDateTime is then the FileModificationDateTime value)  
