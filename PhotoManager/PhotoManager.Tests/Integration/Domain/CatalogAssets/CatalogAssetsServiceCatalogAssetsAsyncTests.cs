@@ -1851,17 +1851,17 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             File.SetLastWriteTime(destinationFileNameToCopy, _asset1Temp.ThumbnailCreationDateTime);
 
             List<string> imagePathsUpdated = [];
-            imagePaths.ForEach(x => imagePathsUpdated.Add(x));
+            imagePaths.ForEach(imagePathsUpdated.Add);
             imagePathsUpdated.Remove(destinationFileNameToCopy);
             imagePathsUpdated.Add(destinationFileNameToCopy);
 
             List<Asset> expectedAssetsUpdated = [];
-            expectedAssets.ForEach(x => expectedAssetsUpdated.Add(x));
+            expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset1Temp);
             expectedAssetsUpdated.Add(_asset1Temp);
 
             List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(x => assetsImageByteSizeUpdated.Add(x));
+            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
             assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
             assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
@@ -3063,15 +3063,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             File.Delete(destinationFileNameToCopy);
 
             List<string> imagePathsUpdated = [];
-            imagePaths.ForEach(x => imagePathsUpdated.Add(x));
+            imagePaths.ForEach(imagePathsUpdated.Add);
             imagePathsUpdated.Remove(destinationFileNameToCopy);
 
             List<Asset> expectedAssetsUpdated = [];
-            expectedAssets.ForEach(x => expectedAssetsUpdated.Add(x));
+            expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset1Temp);
 
             List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(x => assetsImageByteSizeUpdated.Add(x));
+            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
             assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -4034,15 +4034,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             File.Delete(destinationFileNameToCopy);
 
             List<string> imagePathsUpdated = [];
-            imagePaths.ForEach(x => imagePathsUpdated.Add(x));
+            imagePaths.ForEach(imagePathsUpdated.Add);
             imagePathsUpdated.Remove(destinationFileNameToCopy);
 
             List<Asset> expectedAssetsUpdated = [];
-            expectedAssets.ForEach(x => expectedAssetsUpdated.Add(x));
+            expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset1Temp);
 
             List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(x => assetsImageByteSizeUpdated.Add(x));
+            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
             assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -4693,15 +4693,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             File.Copy(imagePath1, destinationFileNameToCopy);
 
             List<string> imagePathsUpdated = [];
-            imagePaths.ForEach(x => imagePathsUpdated.Add(x));
+            imagePaths.ForEach(imagePathsUpdated.Add);
             imagePathsUpdated.Add(destinationFileNameToCopy);
 
             List<Asset> expectedAssetsUpdated = [];
-            expectedAssets.ForEach(x => expectedAssetsUpdated.Add(x));
+            expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Add(_asset1Temp);
 
             List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(x => assetsImageByteSizeUpdated.Add(x));
+            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
             assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
