@@ -42,6 +42,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     private const int ASSET3_TEMP_IMAGE_BYTE_SIZE = 8594;
     private const int ASSET4_TEMP_IMAGE_BYTE_SIZE = 4779;
 
+    private const string CREATING_BACKUP_MESSAGE = "Creating catalog backup...";
+    private const string UPDATING_BACKUP_MESSAGE = "Updating catalog backup...";
+
     // private Asset? asset8;
     // private Asset? asset9;
     // private Asset? asset10;
@@ -881,7 +884,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -1063,7 +1066,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 _asset4Temp!,
                 videoFirstFramefolder,
                 ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -1227,7 +1230,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -1356,7 +1359,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -1493,7 +1496,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -1698,7 +1701,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -1842,7 +1845,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -1934,12 +1937,12 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetUpdated(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -2120,7 +2123,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 _asset4Temp!,
                 videoFirstFramefolder,
                 ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -2182,7 +2185,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.AreEqual(14, catalogChanges.Count);
 
             increment = 0;
 
@@ -2209,12 +2212,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 videoFirstFramefolder!,
                 ref increment);
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
             CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -2375,7 +2377,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -2433,7 +2435,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(12, catalogChanges.Count);
+            Assert.AreEqual(10, catalogChanges.Count);
 
             increment = 0;
 
@@ -2450,11 +2452,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -2584,7 +2585,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -2670,7 +2671,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
@@ -2681,7 +2682,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 _asset3Temp,
                 folder,
                 ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -2818,7 +2819,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -2907,11 +2908,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -3055,7 +3056,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -3144,12 +3145,12 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -3328,7 +3329,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 _asset4Temp!,
                 videoFirstFramefolder,
                 ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -3387,7 +3388,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.AreEqual(14, catalogChanges.Count);
 
             increment = 0;
 
@@ -3414,12 +3415,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 videoFirstFramefolder!,
                 ref increment);
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
             CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -3580,7 +3580,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -3637,7 +3637,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(12, catalogChanges.Count);
+            Assert.AreEqual(10, catalogChanges.Count);
 
             increment = 0;
 
@@ -3654,11 +3654,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -3788,7 +3787,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -3872,7 +3871,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
@@ -3883,7 +3882,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 _asset3Temp,
                 folder,
                 ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -4026,7 +4025,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -4117,12 +4116,12 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -4195,7 +4194,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             int increment = 0;
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], _defaultAssetsDirectory!, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -4263,7 +4262,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             int increment = 0;
 
             CheckCatalogChangesFolderDeleted(catalogChanges, [], _defaultAssetsDirectory!, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -4342,7 +4341,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -4487,8 +4486,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            // Second sync
 
             await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 
@@ -4529,7 +4530,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(14, catalogChanges.Count);
+            Assert.AreEqual(12, catalogChanges.Count);
 
             increment = 0;
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment);
@@ -4545,11 +4546,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -4685,7 +4685,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             // Second sync
@@ -4777,12 +4777,12 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder, ref increment);
-            CheckCatalogChangesBackup(catalogChanges, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -5072,8 +5072,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.IsFalse(Directory.Exists(backupTablesDirectory));
 
         ZipFile.ExtractToDirectory(backupFilePath, _databaseBackupPath!);
-        File.Delete(backupFilePath);
-        Assert.IsFalse(File.Exists(backupFilePath));
+        Assert.IsTrue(File.Exists(backupFilePath));
 
         Assert.IsTrue(Directory.Exists(backupBlobsDirectory));
         Assert.IsTrue(Directory.Exists(backupTablesDirectory));
@@ -5110,6 +5109,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
         Directory.Delete(backupBlobsDirectory, true);
         Directory.Delete(backupTablesDirectory, true);
+
+        Assert.IsFalse(Directory.Exists(backupBlobsDirectory));
+        Assert.IsFalse(Directory.Exists(backupTablesDirectory));
     }
 
     private void CheckDefaultEmptyBackup(string backupFilePath, string blobsPath, string tablesPath, bool hasEmptyTables, bool hasOneFolder, Folder folder)
@@ -5242,14 +5244,14 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.AreEqual(minDate, assetFromDatabase.FileModificationDateTime.Date); // Not saved in Db, loaded at the runtime
     }
 
-    private static void CheckCatalogChangesBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    private static void CheckCatalogChangesBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssets);
         Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
-        Assert.AreEqual("Creating catalog backup...", catalogChange.Message);
+        Assert.AreEqual(expectedMessage, catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
         increment++;
 

@@ -55,7 +55,7 @@ public class DatabaseWriteBackupTests
     }
 
     [Test]
-    public void WriteBackup_BackupExists_DoesNotWriteBackup()
+    public void WriteBackup_BackupExists_OverwritesBackup()
     {
         DateTime backupDate = DateTime.Now;
         string backupName = backupDate.ToString("yyyyMMdd") + ".zip";
@@ -75,7 +75,7 @@ public class DatabaseWriteBackupTests
             bool backupCreated2 = _database!.WriteBackup(backupDate);
 
             Assert.IsTrue(backupCreated1);
-            Assert.IsFalse(backupCreated2);
+            Assert.IsTrue(backupCreated2);
             Assert.AreEqual(filePath, _database!.Diagnostics.LastWriteFilePath);
         }
         finally

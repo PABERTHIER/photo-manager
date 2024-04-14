@@ -136,17 +136,17 @@ public class Database : IDatabase
 
     public bool WriteBackup(DateTime backupDate)
     {
-        bool backupHasBeenWritten = false;
         string backupFilePath = ResolveBackupFilePath(backupDate);
 
-        if (!BackupExists(backupDate))
+        if (BackupExists(backupDate))
         {
-            Diagnostics = new Diagnostics { LastWriteFilePath = backupFilePath };
-            _backupStorage.WriteFolderToZipFile(DataDirectory, backupFilePath);
-            backupHasBeenWritten = true;
+            File.Delete(backupFilePath);
         }
 
-        return backupHasBeenWritten;
+        Diagnostics = new Diagnostics { LastWriteFilePath = backupFilePath };
+        _backupStorage.WriteFolderToZipFile(DataDirectory, backupFilePath);
+
+        return true;
     }
 
     public bool BackupExists(DateTime backupDate)
