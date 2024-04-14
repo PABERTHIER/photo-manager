@@ -251,22 +251,24 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private int CatalogAssets(string directory, CatalogChangeCallback? callback, int cataloguedAssetsBatchCount, List<string> visitedFolders, CancellationToken? token = null)
     {
-        if (!visitedFolders.Contains(directory))
+        if (visitedFolders.Contains(directory))
         {
-            _currentFolderPath = directory;
-            int batchSize = _userConfigurationService.AssetSettings.CatalogBatchSize;
-
-            if (_storageService.FolderExists(directory))
-            {
-                cataloguedAssetsBatchCount = CatalogExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize, visitedFolders, token);
-            }
-            else if (!string.IsNullOrEmpty(directory) && !_storageService.FolderExists(directory))
-            {
-                cataloguedAssetsBatchCount = CatalogNonExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize, token);
-            }
-
-            visitedFolders.Add(directory);
+            return cataloguedAssetsBatchCount;
         }
+
+        _currentFolderPath = directory;
+        int batchSize = _userConfigurationService.AssetSettings.CatalogBatchSize;
+
+        if (_storageService.FolderExists(directory))
+        {
+            cataloguedAssetsBatchCount = CatalogExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize, visitedFolders, token);
+        }
+        else if (!string.IsNullOrEmpty(directory) && !_storageService.FolderExists(directory))
+        {
+            cataloguedAssetsBatchCount = CatalogNonExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize, token);
+        }
+
+        visitedFolders.Add(directory);
 
         return cataloguedAssetsBatchCount;
     }
@@ -309,7 +311,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (!folderHasThumbnails)
         {
-            foreach (var asset in cataloguedAssets)
+            foreach (Asset asset in cataloguedAssets)
             {
                 asset.ImageData = LoadThumbnail(directory, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
             }
@@ -324,14 +326,16 @@ public class CatalogAssetsService : ICatalogAssetsService
             _assetRepository.SaveCatalog(folder);
         }
 
-        if (cataloguedAssetsBatchCount < batchSize && (!token?.IsCancellationRequested ?? true))
+        if (cataloguedAssetsBatchCount >= batchSize || (!(!token?.IsCancellationRequested ?? true)))
         {
-            var subdirectories = new DirectoryInfo(directory).EnumerateDirectories();
+            return cataloguedAssetsBatchCount;
+        }
 
-            foreach (var subdir in subdirectories)
-            {
-                cataloguedAssetsBatchCount = CatalogAssets(subdir.FullName, callback, cataloguedAssetsBatchCount, visitedFolders, token);
-            }
+        IEnumerable<DirectoryInfo> subdirectories = new DirectoryInfo(directory).EnumerateDirectories();
+
+        foreach (DirectoryInfo subdirectory in subdirectories)
+        {
+            cataloguedAssetsBatchCount = CatalogAssets(subdirectory.FullName, callback, cataloguedAssetsBatchCount, visitedFolders, token);
         }
 
         return cataloguedAssetsBatchCount;
