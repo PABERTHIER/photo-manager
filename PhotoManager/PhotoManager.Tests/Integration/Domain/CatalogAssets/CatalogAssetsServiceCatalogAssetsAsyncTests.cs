@@ -837,7 +837,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -1311,7 +1311,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -1451,7 +1451,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
 
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
@@ -1581,7 +1581,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -1790,7 +1790,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -2531,7 +2531,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new() { { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE } };
 
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
@@ -2759,7 +2759,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
@@ -2989,7 +2989,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -3230,7 +3230,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -3962,7 +3962,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new() { { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE } };
 
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
@@ -4190,7 +4190,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -4341,6 +4341,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         }
     }
 
+    // TODO: Rework the CancellationRequested
     [Test]
     [Ignore("Need to rework the CancellationRequested")]
     [TestCase(false)]
@@ -4426,7 +4427,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -4719,6 +4720,75 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     }
 
     [Test]
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task CatalogAssetsAsync_RootCatalogFolderPointsToAFile_DoesNotSyncTheAssets(bool analyseVideos)
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "Image 1.jpg");
+
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        try
+        {
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNull(folder);
+
+            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+
+            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+            CheckBackupBefore(backupFilePath);
+
+            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.IsEmpty(assetsFromRepositoryByPath);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.IsEmpty(assetsFromRepository);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.IsEmpty(thumbnails);
+
+            CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+
+            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNull(folder);
+
+            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+
+            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.IsEmpty(assetsFromRepositoryByPath);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.IsEmpty(assetsFromRepository);
+
+            CheckBlobsAndTablesAfterSaveCatalogEmpty(blobsPath, tablesPath, true, false, folder!);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            CheckDefaultEmptyBackup(backupFilePath, blobsPath, tablesPath, true, false, folder!);
+
+            Assert.AreEqual(5, catalogChanges.Count);
+
+            int increment = 0;
+
+            CheckCatalogChangesFolderDeleted(catalogChanges, [], assetsDirectory, ref increment);
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
+            CheckCatalogChangesEnd(catalogChanges, ref increment);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
     [TestCase(0, true)]
     [TestCase(0, false)]
     [TestCase(2, true)]
@@ -4883,7 +4953,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -5081,7 +5151,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -5314,7 +5384,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -5558,7 +5628,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -5666,7 +5736,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
             }
 
-            folderToAssetsMapping = new() { { folder, expectedAssets} };
+            folderToAssetsMapping = new() { { folder, expectedAssets } };
             assetNameToByteSizeMapping = new() { { _asset2Temp!.FileName, ASSET1_IMAGE_BYTE_SIZE } };
 
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
@@ -5724,16 +5794,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     // TODO next: var subdir in subdirectories in CatalogExistingFolder (need to add many cases with subdir) (what happen if a video is in a subdir ? + video in root and another in subdir) -> Ex CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets + add layer
     // Hardcore scenario with multiple subdir, images (jpg, png, gif, heic) and videos, updates, deletes
 
-    // TODO: Do all the same tests as in the CreatAssetTests !
     // TODO: Add testCase for AnalyseVideo for each tests
-    // TODO: Missing cases in CreateAsset about video ? Like calling Create twice for example
-    // TODO: Add many cases for videos (like adding twice the same video name but not same content -> replace previous image ?)
     // TODO: Verify each ReasonEnum and fix them
 
     // TODO: RAF (+ cases in Notion)
     // Test to Cancel the token for each method (testcase)
-    // Adapt PathSettings.AssetsDirectory! for the case where no assets, x assets and co, invalid path  / Can also just Add some folders if needed
-    // Different hash types
 
     // TODO: Tests the remaining catch in the method to have 100% of coverage.
     [Test]
