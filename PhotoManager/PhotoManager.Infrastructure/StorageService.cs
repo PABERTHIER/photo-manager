@@ -1,16 +1,11 @@
-﻿using System.Globalization;
+﻿using System.Collections.Concurrent;
+using System.Globalization;
 
 namespace PhotoManager.Infrastructure;
 
-public class StorageService : IStorageService
+// TODO: Rename to FileService
+public class StorageService(IUserConfigurationService userConfigurationService) : IStorageService
 {
-    private readonly IUserConfigurationService _userConfigurationService;
-
-    public StorageService(IUserConfigurationService userConfigurationService)
-    {
-        _userConfigurationService = userConfigurationService;
-    }
-
     public List<DirectoryInfo> GetSubDirectories(string directoryPath)
     {
         return new DirectoryInfo(directoryPath).EnumerateDirectories().ToList();
@@ -26,7 +21,7 @@ public class StorageService : IStorageService
 
     public string ResolveDataDirectory(double storageVersion)
     {
-        return Path.Combine(_userConfigurationService.PathSettings.BackupPath, "v" + storageVersion.ToString("0.0", CultureInfo.InvariantCulture));
+        return Path.Combine(userConfigurationService.PathSettings.BackupPath, "v" + storageVersion.ToString("0.0", CultureInfo.InvariantCulture));
     }
 
     public void CreateDirectory(string directory)
@@ -145,12 +140,14 @@ public class StorageService : IStorageService
 
     public void LoadFileInformation(Asset asset)
     {
-        if (FileExists(asset.FullPath))
+        if (!FileExists(asset.FullPath))
         {
-            FileInfo info = new (asset.FullPath);
-            asset.FileCreationDateTime = info.CreationTime;
-            asset.FileModificationDateTime = info.LastWriteTime;
+            return;
         }
+
+        FileInfo info = new (asset.FullPath);
+        asset.FileCreationDateTime = info.CreationTime;
+        asset.FileModificationDateTime = info.LastWriteTime;
     }
 
     public bool IsValidGDIPlusImage(byte[] imageData)
@@ -163,12 +160,35 @@ public class StorageService : IStorageService
         return ExifHelper.IsValidHeic(imageData);
     }
 
+    public int GetTotalFilesCount()
+    {
+        string pathSettingsAssetsDirectory = userConfigurationService.PathSettings.AssetsDirectory;
+        ConcurrentDictionary<string, int> directoryFileCounts = new ();
+
+        int rootFileCount = CountFilesInDirectory(pathSettingsAssetsDirectory, SearchOption.TopDirectoryOnly);
+        directoryFileCounts[pathSettingsAssetsDirectory] = rootFileCount;
+
+        IEnumerable<string> subdirectories = Directory.EnumerateDirectories(pathSettingsAssetsDirectory);
+        Parallel.ForEach(subdirectories, subdirectory =>
+        {
+            int fileCount = CountFilesInDirectory(subdirectory, SearchOption.AllDirectories);
+            directoryFileCounts[subdirectory] = fileCount;
+        });
+
+        return directoryFileCounts.Sum(entry => entry.Value);
+    }
+
+    private static int CountFilesInDirectory(string? directoryPath, SearchOption searchOption)
+    {
+        return directoryPath == null ? 0 : Directory.EnumerateFiles(directoryPath, "*", searchOption).Count();
+    }
+
     private void GetRecursiveSubDirectories(string directoryPath, List<DirectoryInfo> result)
     {
-        List<DirectoryInfo> subdirs = GetSubDirectories(directoryPath);
-        result.AddRange(subdirs);
+        List<DirectoryInfo> subDirectories = GetSubDirectories(directoryPath);
+        result.AddRange(subDirectories);
 
-        foreach (DirectoryInfo dir in subdirs)
+        foreach (DirectoryInfo dir in subDirectories)
         {
             GetRecursiveSubDirectories(dir.FullName, result);
         }

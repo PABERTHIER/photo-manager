@@ -1706,7 +1706,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
     // --------------------------------------------------------------------------------------------------------------------------------------------
     // UpdatedAssets
-    // TODO: GetTotalFilesNumber is 10 instead of 5 when sync for second time, FIX IT !
     [Test]
     [TestCase(false)]
     [TestCase(true)]
@@ -5001,7 +5000,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         }
     }
 
-    // TODO: totalFilesNumber issue here, while sync in the second time (value is 9 instead of 5 → not good)
     [Test]
     [TestCase(false)]
     [TestCase(true)]
@@ -5720,8 +5718,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     }
 
     // BACKUP SECTION ------------------------------------------------------------------------------------------------
-
-    // TODO next: Add Check for TotalFilesNumber in each tests (rework it by calling assetRepo.GetCataloguedAssets ?)
 
     // TODO next: var asset in cataloguedAssets in CatalogNonExistingFolder (one basic sync and before second one add one folder with two assets inside ?)
 

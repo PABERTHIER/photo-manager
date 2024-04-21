@@ -8,7 +8,7 @@ public interface IApplication
 {
     Asset[] GetAssets(string directory);
     int GetAssetsCounter();
-    int GetTotalFilesNumber();
+    int GetTotalFilesCount();
     void LoadThumbnail(Asset asset);
     SyncAssetsConfiguration GetSyncAssetsConfiguration();
     void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration);

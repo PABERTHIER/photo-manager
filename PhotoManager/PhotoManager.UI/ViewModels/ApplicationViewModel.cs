@@ -511,9 +511,10 @@ public class ApplicationViewModel : BaseViewModel
         ExecutionTime = $"Execution time: {executionTime}";
     }
 
+    // TODO: Rename totalFilesNumber to totalFilesCount
     public void CalculateTotalFilesNumber()
     {
-        var totalFilesNumber = Application.GetTotalFilesNumber();
+        var totalFilesNumber = Application.GetTotalFilesCount();
         TotalFilesNumber = $"{totalFilesNumber} files found";
     }
 }

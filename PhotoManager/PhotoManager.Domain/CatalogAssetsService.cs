@@ -13,7 +13,6 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-    private int _totalFilesNumber;
     private bool _backupHasSameContent;
     private string _currentFolderPath;
 
@@ -30,7 +29,6 @@ public class CatalogAssetsService : ICatalogAssetsService
         _userConfigurationService = userConfigurationService;
         _directoryComparer = directoryComparer;
 
-        _totalFilesNumber = 0;
         _backupHasSameContent = true;
         _currentFolderPath = string.Empty;
     }
@@ -227,12 +225,6 @@ public class CatalogAssetsService : ICatalogAssetsService
         return asset;
     }
 
-    // TODO: Remove the method and expose the Property
-    public int GetTotalFilesNumber()
-    {
-        return _totalFilesNumber;
-    }
-
     #region private
     private Folder[] GetFoldersToCatalog()
     {
@@ -302,9 +294,6 @@ public class CatalogAssetsService : ICatalogAssetsService
             Message = $"Inspecting folder {directory}."
         });
 
-        string[] filesName = _storageService.GetFileNames(directory);
-        _totalFilesNumber += filesName.Length; // To compute the total number of files in every folders
-
         List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
 
         bool folderHasThumbnails = folder != null && _assetRepository.FolderHasThumbnails(folder);
@@ -316,6 +305,8 @@ public class CatalogAssetsService : ICatalogAssetsService
                 asset.ImageData = LoadThumbnail(directory, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
             }
         }
+
+        string[] filesName = _storageService.GetFileNames(directory);
 
         cataloguedAssetsBatchCount = CatalogNewAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, filesName, cataloguedAssets, folderHasThumbnails, token);
         cataloguedAssetsBatchCount = CatalogUpdatedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);

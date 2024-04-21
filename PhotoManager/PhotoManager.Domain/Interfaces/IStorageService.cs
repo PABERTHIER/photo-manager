@@ -28,4 +28,5 @@ public interface IStorageService
     void LoadFileInformation(Asset asset);
     bool IsValidGDIPlusImage(byte[] imageData);
     bool IsValidHeic(byte[] imageData);
+    int GetTotalFilesCount();
 }

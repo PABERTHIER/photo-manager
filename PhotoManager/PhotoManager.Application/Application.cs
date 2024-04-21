@@ -16,19 +16,19 @@ public class Application : IApplication
     private readonly IStorageService _storageService;
 
     public Application(
+        IAssetRepository assetRepository,
         ISyncAssetsService syncAssetsService,
         ICatalogAssetsService catalogAssetsService,
         IMoveAssetsService moveAssetsService,
         IFindDuplicatedAssetsService findDuplicatedAssetsService,
-        IAssetRepository assetRepository,
         IUserConfigurationService userConfigurationService,
         IStorageService storageService)
     {
+        _assetRepository = assetRepository;
         _syncAssetsService = syncAssetsService;
         _catalogAssetsService = catalogAssetsService;
         _moveAssetsService = moveAssetsService;
         _findDuplicatedAssetsService = findDuplicatedAssetsService;
-        _assetRepository = assetRepository;
         _userConfigurationService = userConfigurationService;
         _storageService = storageService;
     }
@@ -53,9 +53,9 @@ public class Application : IApplication
         return _assetRepository.GetAssetsCounter();
     }
 
-    public int GetTotalFilesNumber()
+    public int GetTotalFilesCount()
     {
-        return _catalogAssetsService.GetTotalFilesNumber();
+        return _storageService.GetTotalFilesCount();
     }
 
     public void LoadThumbnail(Asset asset)
