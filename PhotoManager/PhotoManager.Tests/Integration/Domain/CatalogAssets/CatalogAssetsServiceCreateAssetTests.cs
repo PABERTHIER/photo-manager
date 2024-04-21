@@ -1724,6 +1724,99 @@ public class CatalogAssetsServiceCreateAssetTests
         }
     }
 
+    [TestCase("Homer.mp4", "Homer.jpg")]
+    public void CreateAsset_VideoAndBasicHashTypeButAnotherImageAlreadyExistsInTheOutputDirectory_DoesNotCreateFirstFrame(string fileName, string firstFrameFileName)
+    {
+        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+
+        string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
+
+        try
+        {
+            Directory.CreateDirectory(firstFrameVideosPath);
+
+            string sourceImagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string imagePath = Path.Combine(firstFrameVideosPath, firstFrameFileName);
+            File.Copy(sourceImagePath, imagePath);
+            Assert.IsTrue(File.Exists(imagePath));
+
+            string videoPath = Path.Combine(_dataDirectory!, fileName);
+            Assert.IsTrue(File.Exists(videoPath));
+
+            _testableAssetRepository!.AddFolder(_dataDirectory!); // Set above, not in this method
+
+            List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
+            Assert.IsEmpty(assetsFromRepository);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.IsEmpty(thumbnails);
+
+            Asset? asset1 = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
+
+            Assert.IsNull(asset1);
+
+            Assert.IsTrue(File.Exists(imagePath));
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.IsEmpty(assetsFromRepository);
+
+            Assert.IsEmpty(thumbnails);
+
+            Folder folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
+
+            Asset? asset2 = _catalogAssetsService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
+
+            Assert.IsNotNull(asset2);
+
+            Assert.IsTrue(File.Exists(videoPath));
+            Assert.IsTrue(File.Exists(imagePath));
+
+            Asset expectedAsset = new()
+            {
+                FileName = firstFrameFileName,
+                FileSize = 29857,
+                PixelHeight = 720,
+                PixelWidth = 1280,
+                ThumbnailPixelWidth = 200,
+                ThumbnailPixelHeight = 112,
+                ThumbnailCreationDateTime = new DateTime(2023, 01, 07, 00, 00, 00),
+                ImageRotation = Rotation.Rotate0,
+                Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+                IsAssetCorrupted = false,
+                AssetCorruptedMessage = null,
+                IsAssetRotated = false,
+                AssetRotatedMessage = null
+            };
+
+            const int expectedImageByteSize = 2097;
+
+            AssertAssetPropertyValidity(
+                asset2!,
+                firstFrameFileName,
+                imagePath,
+                firstFrameVideosPath,
+                folder,
+                expectedAsset.FileSize,
+                expectedAsset.PixelHeight,
+                expectedAsset.PixelWidth,
+                expectedAsset.ThumbnailPixelWidth,
+                expectedAsset.ThumbnailPixelHeight,
+                expectedAsset.ImageRotation,
+                expectedAsset.Hash,
+                expectedAsset.IsAssetCorrupted,
+                expectedAsset.AssetCorruptedMessage,
+                expectedAsset.IsAssetRotated,
+                expectedAsset.AssetRotatedMessage);
+
+            AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, expectedImageByteSize);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(firstFrameVideosPath, true);
+        }
+    }
+
     [Test]
     [TestCase("Homer.mp4", "Homer.jpg", false, false)]
     [TestCase("Homer.mp4", "Homer.jpg", false, true)]
