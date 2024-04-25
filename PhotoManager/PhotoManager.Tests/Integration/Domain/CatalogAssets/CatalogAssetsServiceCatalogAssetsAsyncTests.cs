@@ -870,7 +870,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -1042,7 +1044,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -1055,8 +1059,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesFolderAdded(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 firstFrameVideosDirectory,
@@ -1214,7 +1218,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -1342,7 +1348,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -1478,7 +1486,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -1824,7 +1834,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -1915,7 +1927,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -1931,7 +1945,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetUpdated(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -2091,7 +2105,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -2104,8 +2120,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesFolderAdded(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 firstFrameVideosDirectory,
@@ -2178,7 +2194,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -2191,8 +2209,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesFolderAdded(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 firstFrameVideosDirectory,
@@ -2204,8 +2222,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -2352,7 +2370,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -2426,7 +2446,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -2442,7 +2464,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -2558,7 +2580,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -2643,7 +2667,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -2659,7 +2685,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 assetsDirectory,
@@ -2790,7 +2816,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -2878,7 +2906,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -2894,7 +2924,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
@@ -3023,7 +3053,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -3116,7 +3148,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -3132,7 +3166,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetUpdated(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -3264,7 +3298,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -3352,7 +3388,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -3368,7 +3406,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -3526,7 +3564,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -3539,8 +3579,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesFolderAdded(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 firstFrameVideosDirectory,
@@ -3610,7 +3650,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges,folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -3623,8 +3665,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesFolderAdded(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 firstFrameVideosDirectory,
@@ -3636,8 +3678,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, assetsDirectory, ref increment);
-            CheckCatalogChangesInspectingFolder(catalogChanges, folders, firstFrameVideosDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -3784,7 +3826,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -3857,7 +3901,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -3873,7 +3919,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -3989,7 +4035,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -4072,7 +4120,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -4088,7 +4138,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 assetsDirectory,
@@ -4224,7 +4274,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -4314,7 +4366,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -4330,7 +4384,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -4461,7 +4515,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -4551,7 +4607,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -4567,7 +4625,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -4578,11 +4636,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         }
     }
 
-    // Catalog root where there is One Folder inside (with 2 assets) and one asset, then delete this folder and Catalog again the root
-    // TODO: Remaining to cover -> like CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_SyncTheAssets
     [Test]
     [TestCase(false)]
-    // [TestCase(true)]
+    [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_SyncTheAssetsAndRemovesDeletedOnes(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
@@ -4686,6 +4742,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], expectedDirectories[i], expectedFolders[i]);
             }
 
+            List<Folder> folders = [folder1, folder2];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder1, [_asset1, _asset2, _asset3, _asset4] }, { folder2, [_asset1Temp] } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
@@ -4696,11 +4753,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder1, folder2], thumbnails, assetsImageByteSize);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders, thumbnails, assetsImageByteSize);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
-                [folder1, folder2],
+                folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -4711,7 +4768,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
-                [folder1, folder2],
+                folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -4720,7 +4777,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder1, folder2], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder1])
             {
@@ -4733,8 +4792,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesFolderAdded(catalogChanges, [folder1, folder2], tempDirectory, ref increment);
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder1, folder2], tempDirectory, ref increment);
+            CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder2])
             {
@@ -4822,7 +4881,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder1!], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder1!])
             {
@@ -4835,8 +4896,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                     ref increment);
             }
 
-            CheckCatalogChangesFolderAddedWhenOneFolderDeleted(catalogChanges, 1, folder2, tempDirectory, ref increment);
-            CheckCatalogChangesInspectingFolderWhenOneFolderDeleted(catalogChanges, 1, folder2, tempDirectory, ref increment);
+            CheckCatalogChangesFolderAdded(catalogChanges, 1, [folder2], tempDirectory, ref increment); // Not foldersInRepository because this folder has been deleted
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, [folder2], tempDirectory, ref increment); // Not foldersInRepository because this folder has been deleted
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder2])
             {
@@ -4852,9 +4913,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder1!], assetsDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, assetsFromRepositoryByPath2, _asset1Temp, folder2, ref increment);
-            CheckCatalogChangesFolderDeleted(catalogChanges, [folder2], tempDirectory, ref increment);
+            CheckCatalogChangesFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory, ref increment);
 
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -4862,7 +4923,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
-            // TODO: Remove this part when test is good
+            // If failing, just in case
             if (Directory.Exists(tempDirectory))
             {
                 Directory.Delete(tempDirectory, true);
@@ -4870,6 +4931,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         }
     }
 
+    // Catalog root where there is One Folder inside (with 2 assets) and one asset, then delete this folder and Catalog again the root
+    // TODO: Remaining to cover -> like CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_SyncTheAssets
     // --------------------------------------------------------------------------------------------------------------------------------------------
 
     [Test]
@@ -4934,7 +4997,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], _defaultAssetsDirectory!, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, _defaultAssetsDirectory!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
@@ -5002,7 +5067,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesFolderDeleted(catalogChanges, [], _defaultAssetsDirectory!, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesFolderDeleted(catalogChanges, 0, foldersInRepository.Length, _defaultAssetsDirectory!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
@@ -5071,7 +5138,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesFolderDeleted(catalogChanges, [], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesFolderDeleted(catalogChanges, 0, foldersInRepository.Length, assetsDirectory, ref increment);
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
@@ -5279,7 +5348,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -5338,7 +5409,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Assert.AreEqual(12, catalogChanges.Count);
 
             increment = 0;
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment);
+
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder!])
             {
@@ -5354,7 +5428,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder!], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -5477,7 +5551,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -5568,7 +5644,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -5584,7 +5662,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -5710,7 +5788,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -5808,7 +5888,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -5824,7 +5906,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder, ref increment);
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -5954,7 +6036,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             int increment = 0;
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -6055,7 +6139,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Assert.AreEqual(12, catalogChanges.Count);
 
             increment = 0;
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment);
+
+            foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             foreach (Asset expectedAsset in folderToAssetsMapping[folder])
             {
@@ -6071,7 +6158,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
-            CheckCatalogChangesInspectingFolder(catalogChanges, [folder], assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             CheckCatalogChangesEnd(catalogChanges, ref increment);
         }
         finally
@@ -6081,9 +6168,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     }
 
     // BACKUP SECTION ------------------------------------------------------------------------------------------------
-
-    // TODO: For each Assert where _testableAssetRepository!.GetFolders() -> get In the test method and pass it
-    // TODO: Rework what needs to for the assert
 
     // TODO next: var subdir in subdirectories in CatalogExistingFolder (need to add many cases with subdir) (what happen if a video is in a subdir ? + video in root and another in subdir) -> Ex CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets + add layer
     // Hardcore scenario with multiple subdir, images (jpg, png, gif, heic) and videos, updates, deletes
@@ -6545,12 +6629,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         increment++;
     }
 
-    private void CheckCatalogChangesInspectingFolder(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, IReadOnlyCollection<Folder> expectedFolders, string assetsDirectory, ref int increment)
+    private static void CheckCatalogChangesInspectingFolder(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.IsNull(catalogChange.Asset);
-        Folder[] folders = _testableAssetRepository!.GetFolders();
-        Assert.AreEqual(expectedFolders.Count, folders.Length);
+        Assert.AreEqual(expectedFoldersCount, folders.Count);
         Assert.IsNotNull(catalogChange.Folder);
         Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
@@ -6561,30 +6644,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         increment++;
     }
 
-    // TODO: Merge with above
-    private void CheckCatalogChangesInspectingFolderWhenOneFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, Folder expectedFolder, string assetsDirectory, ref int increment)
+    private static void CheckCatalogChangesFolderAdded(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.IsNull(catalogChange.Asset);
-        Folder[] folders = _testableAssetRepository!.GetFolders();
-        Assert.AreEqual(expectedFoldersCount, folders.Length);
-        Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(expectedFolder, catalogChange.Folder);
-        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
-        Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
-        Assert.AreEqual($"Inspecting folder {assetsDirectory}.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
-        increment++;
-    }
-
-    // TODO: For each Assert where _testableAssetRepository!.GetFolders() -> get In the test method and pass it
-    private void CheckCatalogChangesFolderAdded(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, IReadOnlyCollection<Folder> expectedFolders, string assetsDirectory, ref int increment)
-    {
-        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Folder[] folders = _testableAssetRepository!.GetFolders();
-        Assert.AreEqual(expectedFolders.Count, folders.Length);
+        Assert.AreEqual(expectedFoldersCount, folders.Count);
         Assert.IsNotNull(catalogChange.Folder);
         Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
@@ -6595,29 +6659,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         increment++;
     }
 
-    // TODO: Merge with above
-    private void CheckCatalogChangesFolderAddedWhenOneFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, Folder expectedFolder, string assetsDirectory, ref int increment)
+    private static void CheckCatalogChangesFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.IsNull(catalogChange.Asset);
-        Folder[] folders = _testableAssetRepository!.GetFolders();
-        Assert.AreEqual(expectedFoldersCount, folders.Length);
-        Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(expectedFolder, catalogChange.Folder);
-        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
-        Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
-        Assert.AreEqual(ReasonEnum.FolderCreated, catalogChange.Reason);
-        Assert.AreEqual($"Folder {assetsDirectory} added to catalog.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
-        increment++;
-    }
-
-    private void CheckCatalogChangesFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, IReadOnlyCollection<Folder> expectedFolders, string assetsDirectory, ref int increment)
-    {
-        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Folder[] folders = _testableAssetRepository!.GetFolders();
-        Assert.AreEqual(expectedFolders.Count, folders.Length);
+        Assert.AreEqual(expectedFoldersCount, foldersCount);
         Assert.IsNotNull(catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
