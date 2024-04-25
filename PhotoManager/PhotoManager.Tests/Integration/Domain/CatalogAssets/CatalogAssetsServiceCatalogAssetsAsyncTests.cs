@@ -4577,6 +4577,299 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
+
+    // Catalog root where there is One Folder inside (with 2 assets) and one asset, then delete this folder and Catalog again the root
+    // TODO: Remaining to cover -> like CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_SyncTheAssets
+    [Test]
+    [TestCase(false)]
+    // [TestCase(true)]
+    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_SyncTheAssetsAndRemovesDeletedOnes(bool analyseVideos)
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string tempDirectory = Path.Combine(assetsDirectory, "TempFolder");
+        string destinationFileNameToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
+
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        try
+        {
+            Directory.CreateDirectory(tempDirectory);
+
+            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
+            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
+            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
+            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            File.Copy(imagePath1, destinationFileNameToCopy);
+
+            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4, destinationFileNameToCopy];
+            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset1Temp!];
+            List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE];
+
+            string[] assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
+            Assert.AreEqual(4, assetsInDirectory1.Length);
+
+            string[] assetsInDirectory2 = Directory.GetFiles(tempDirectory);
+            Assert.AreEqual(1, assetsInDirectory2.Length);
+
+            foreach (string assetPath in assetPaths)
+            {
+                Assert.IsTrue(File.Exists(assetPath));
+            }
+
+            Folder? folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNull(folder1);
+
+            Folder? folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
+            Assert.IsNull(folder2);
+
+            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+
+            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+            CheckBackupBefore(backupFilePath);
+
+            List<Asset> assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.IsEmpty(assetsFromRepositoryByPath1);
+
+            List<Asset> assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
+            Assert.IsEmpty(assetsFromRepositoryByPath2);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.IsEmpty(assetsFromRepository);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.IsEmpty(thumbnails);
+
+            CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+
+            folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNotNull(folder1);
+
+            folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
+            Assert.IsNotNull(folder2);
+
+            _asset1!.Folder = folder1!;
+            _asset1!.FolderId = folder1!.FolderId;
+            _asset2!.Folder = folder1;
+            _asset2!.FolderId = folder1.FolderId;
+            _asset3!.Folder = folder1;
+            _asset3!.FolderId = folder1.FolderId;
+            _asset4!.Folder = folder1;
+            _asset4!.FolderId = folder1.FolderId;
+
+            _asset1Temp!.Folder = folder2!;
+            _asset1Temp!.FolderId = folder2!.FolderId;
+
+            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+
+            assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.AreEqual(4, assetsFromRepositoryByPath1.Count);
+
+            assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
+            Assert.AreEqual(1, assetsFromRepositoryByPath2.Count);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.AreEqual(5, assetsFromRepository.Count);
+
+            List<string> expectedDirectories = [assetsDirectory, assetsDirectory, assetsDirectory, assetsDirectory, tempDirectory];
+            List<Folder> expectedFolders = [folder1, folder1, folder1, folder1, folder2];
+
+            for (int i = 0; i < assetsFromRepository.Count; i++)
+            {
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], expectedDirectories[i], expectedFolders[i]);
+            }
+
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder1, [_asset1, _asset2, _asset3, _asset4] }, { folder2, [_asset1Temp] } };
+            Dictionary<string, int> assetNameToByteSizeMapping = new()
+            {
+                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
+                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
+                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
+                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
+                { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
+            };
+
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder1, folder2], thumbnails, assetsImageByteSize);
+            CheckBlobsAndTablesAfterSaveCatalog(
+                blobsPath,
+                tablesPath,
+                [folder1, folder2],
+                assetsFromRepository,
+                folderToAssetsMapping,
+                assetNameToByteSizeMapping);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            CheckBackupAfter(
+                backupFilePath,
+                blobsPath,
+                tablesPath,
+                [folder1, folder2],
+                assetsFromRepository,
+                folderToAssetsMapping,
+                assetNameToByteSizeMapping);
+
+            Assert.AreEqual(12, catalogChanges.Count);
+
+            int increment = 0;
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, [folder1, folder2], assetsDirectory, ref increment);
+
+            foreach (Asset expectedAsset in folderToAssetsMapping[folder1])
+            {
+                CheckCatalogChangesAssetAdded(
+                    catalogChanges,
+                    assetsDirectory,
+                    folderToAssetsMapping[folder1],
+                    expectedAsset,
+                    folder1,
+                    ref increment);
+            }
+
+            CheckCatalogChangesFolderAdded(catalogChanges, [folder1, folder2], tempDirectory, ref increment);
+            CheckCatalogChangesInspectingFolder(catalogChanges, [folder1, folder2], tempDirectory, ref increment);
+
+            foreach (Asset expectedAsset in folderToAssetsMapping[folder2])
+            {
+                CheckCatalogChangesAssetAdded(
+                    catalogChanges,
+                    tempDirectory,
+                    folderToAssetsMapping[folder2],
+                    expectedAsset,
+                    folder2,
+                    ref increment);
+            }
+
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
+            CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            // Second sync
+
+            Directory.Delete(tempDirectory, true);
+
+            List<string> assetPathsUpdated = [];
+            assetPaths.ForEach(assetPathsUpdated.Add);
+            assetPathsUpdated.Remove(destinationFileNameToCopy);
+
+            List<Asset> expectedAssetsUpdated = [];
+            expectedAssets.ForEach(expectedAssetsUpdated.Add);
+            expectedAssetsUpdated.Remove(_asset1Temp);
+
+            List<int> assetsImageByteSizeUpdated = [];
+            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
+            assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
+
+            assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
+            Assert.AreEqual(4, assetsInDirectory1.Length);
+
+            Assert.IsFalse(File.Exists(destinationFileNameToCopy));
+
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+
+            folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNotNull(folder1);
+
+            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+
+            assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.AreEqual(4, assetsFromRepositoryByPath1.Count);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.AreEqual(4, assetsFromRepository.Count);
+
+            for (int i = 0; i < assetsFromRepository.Count; i++)
+            {
+                AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder1!);
+            }
+
+            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder1!, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            {
+                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
+                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
+                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
+                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
+            };
+
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder1], thumbnails, assetsImageByteSizeUpdated);
+            CheckBlobsAndTablesAfterSaveCatalog(
+                blobsPath,
+                tablesPath,
+                [folder1!],
+                assetsFromRepository,
+                folderToAssetsUpdatedMapping,
+                assetNameToByteSizeUpdatedMapping);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            CheckBackupAfter(
+                backupFilePath,
+                blobsPath,
+                tablesPath,
+                [folder1!],
+                assetsFromRepository,
+                folderToAssetsUpdatedMapping,
+                assetNameToByteSizeUpdatedMapping);
+
+            Assert.AreEqual(19, catalogChanges.Count);
+
+            increment = 0;
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, [folder1!], assetsDirectory, ref increment);
+
+            foreach (Asset expectedAsset in folderToAssetsMapping[folder1!])
+            {
+                CheckCatalogChangesAssetAdded(
+                    catalogChanges,
+                    assetsDirectory,
+                    folderToAssetsMapping[folder1!],
+                    expectedAsset,
+                    folder1!,
+                    ref increment);
+            }
+
+            CheckCatalogChangesFolderAddedWhenOneFolderDeleted(catalogChanges, 1, folder2, tempDirectory, ref increment);
+            CheckCatalogChangesInspectingFolderWhenOneFolderDeleted(catalogChanges, 1, folder2, tempDirectory, ref increment);
+
+            foreach (Asset expectedAsset in folderToAssetsMapping[folder2])
+            {
+                CheckCatalogChangesAssetAdded(
+                    catalogChanges,
+                    tempDirectory,
+                    folderToAssetsMapping[folder2],
+                    expectedAsset,
+                    folder2,
+                    ref increment);
+            }
+
+            CheckCatalogChangesBackup(catalogChanges, CREATING_BACKUP_MESSAGE, ref increment);
+            CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, [folder1!], assetsDirectory, ref increment);
+            CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, assetsFromRepositoryByPath2, _asset1Temp, folder2, ref increment);
+            CheckCatalogChangesFolderDeleted(catalogChanges, [folder2], tempDirectory, ref increment);
+
+            CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
+            CheckCatalogChangesEnd(catalogChanges, ref increment);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            // TODO: Remove this part when test is good
+            if (Directory.Exists(tempDirectory))
+            {
+                Directory.Delete(tempDirectory, true);
+            }
+        }
+    }
+
     // --------------------------------------------------------------------------------------------------------------------------------------------
 
     [Test]
@@ -5789,7 +6082,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
     // BACKUP SECTION ------------------------------------------------------------------------------------------------
 
-    // TODO next: var asset in cataloguedAssets in CatalogNonExistingFolder (one basic sync and before second one add one folder with two assets inside ?)
+    // TODO: For each Assert where _testableAssetRepository!.GetFolders() -> get In the test method and pass it
+    // TODO: Rework what needs to for the assert
 
     // TODO next: var subdir in subdirectories in CatalogExistingFolder (need to add many cases with subdir) (what happen if a video is in a subdir ? + video in root and another in subdir) -> Ex CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets + add layer
     // Hardcore scenario with multiple subdir, images (jpg, png, gif, heic) and videos, updates, deletes
@@ -6267,6 +6561,24 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         increment++;
     }
 
+    // TODO: Merge with above
+    private void CheckCatalogChangesInspectingFolderWhenOneFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, Folder expectedFolder, string assetsDirectory, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Folder[] folders = _testableAssetRepository!.GetFolders();
+        Assert.AreEqual(expectedFoldersCount, folders.Length);
+        Assert.IsNotNull(catalogChange.Folder);
+        Assert.AreEqual(expectedFolder, catalogChange.Folder);
+        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
+        Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
+        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
+        Assert.AreEqual($"Inspecting folder {assetsDirectory}.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+        increment++;
+    }
+
+    // TODO: For each Assert where _testableAssetRepository!.GetFolders() -> get In the test method and pass it
     private void CheckCatalogChangesFolderAdded(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, IReadOnlyCollection<Folder> expectedFolders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
@@ -6275,6 +6587,23 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.AreEqual(expectedFolders.Count, folders.Length);
         Assert.IsNotNull(catalogChange.Folder);
         Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
+        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
+        Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
+        Assert.AreEqual(ReasonEnum.FolderCreated, catalogChange.Reason);
+        Assert.AreEqual($"Folder {assetsDirectory} added to catalog.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+        increment++;
+    }
+
+    // TODO: Merge with above
+    private void CheckCatalogChangesFolderAddedWhenOneFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, Folder expectedFolder, string assetsDirectory, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Folder[] folders = _testableAssetRepository!.GetFolders();
+        Assert.AreEqual(expectedFoldersCount, folders.Length);
+        Assert.IsNotNull(catalogChange.Folder);
+        Assert.AreEqual(expectedFolder, catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
         Assert.AreEqual(ReasonEnum.FolderCreated, catalogChange.Reason);

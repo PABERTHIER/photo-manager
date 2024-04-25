@@ -361,6 +361,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
                     Asset = asset,
+                    CataloguedAssets = cataloguedAssets,
                     Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog.",
                     Reason = ReasonEnum.AssetDeleted
                 });
