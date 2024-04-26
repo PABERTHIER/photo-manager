@@ -349,6 +349,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             foreach (var asset in cataloguedAssets)
             {
+                // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
                 if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
                 {
                     break;
