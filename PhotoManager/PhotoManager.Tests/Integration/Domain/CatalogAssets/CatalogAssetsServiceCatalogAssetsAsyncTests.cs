@@ -1925,8 +1925,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
@@ -1935,15 +1935,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -1954,8 +1954,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(16, catalogChanges.Count);
 
@@ -2650,11 +2650,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             List<Asset> expectedAssetsUpdated = [_asset2Temp!, _asset3Temp!];
             List<int> assetsImageByteSizeUpdated = [ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET3_TEMP_IMAGE_BYTE_SIZE];
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new()
             {
                 { folder, [_asset3Temp!, _asset2Temp!]},
             };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE }
@@ -2687,15 +2687,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder],
                 [folder],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -2706,8 +2706,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder],
                 [folder],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(12, catalogChanges.Count);
 
@@ -2735,7 +2735,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 assetsDirectory,
-                folderToAssetsUpdatedMapping[folder],
+                folderToAssetsMappingUpdated[folder],
                 _asset3Temp,
                 folder,
                 ref increment);
@@ -2927,18 +2927,18 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSize);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSize);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -2949,8 +2949,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(12, catalogChanges.Count);
 
@@ -3166,8 +3166,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
@@ -3176,15 +3176,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -3195,8 +3195,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(16, catalogChanges.Count);
 
@@ -3411,8 +3411,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
@@ -3420,15 +3420,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -3439,8 +3439,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(16, catalogChanges.Count);
 
@@ -4127,11 +4127,11 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             List<Asset> expectedAssetsUpdated = [_asset2Temp!, _asset3Temp!];
             List<int> assetsImageByteSizeUpdated = [ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET3_TEMP_IMAGE_BYTE_SIZE];
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new()
             {
                 { folder, [_asset2Temp!, _asset3Temp!] }
             };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE }
@@ -4164,15 +4164,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder],
                 [folder],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -4183,8 +4183,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder],
                 [folder],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(12, catalogChanges.Count);
 
@@ -4212,7 +4212,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesAssetAdded(
                 catalogChanges,
                 assetsDirectory,
-                folderToAssetsUpdatedMapping[folder],
+                folderToAssetsMappingUpdated[folder],
                 _asset3Temp,
                 folder,
                 ref increment);
@@ -4405,8 +4405,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
@@ -4414,15 +4414,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -4433,8 +4433,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(16, catalogChanges.Count);
 
@@ -4649,8 +4649,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder!, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
@@ -4659,15 +4659,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -4678,8 +4678,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder!],
                 [folder!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(16, catalogChanges.Count);
 
@@ -4928,8 +4928,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder1!);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder1!, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder1!, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
@@ -4937,15 +4937,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder1], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder1], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder1!],
                 [folder1!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -4956,8 +4956,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder1!],
                 [folder1!],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(19, catalogChanges.Count);
 
@@ -6065,8 +6065,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
@@ -6075,15 +6075,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder],
                 [folder],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -6094,8 +6094,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder],
                 [folder],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(15, catalogChanges.Count);
 
@@ -6313,8 +6313,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsUpdatedMapping = new() { { folder, expectedAssetsUpdated} };
-            Dictionary<string, int> assetNameToByteSizeUpdatedMapping = new()
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder, expectedAssetsUpdated} };
+            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
@@ -6323,15 +6323,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsUpdatedMapping, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder],
                 [folder],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
@@ -6342,8 +6342,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 [folder],
                 [folder],
                 assetsFromRepository,
-                folderToAssetsUpdatedMapping,
-                assetNameToByteSizeUpdatedMapping);
+                folderToAssetsMappingUpdated,
+                assetNameToByteSizeMappingUpdated);
 
             Assert.AreEqual(15, catalogChanges.Count);
 
@@ -6635,7 +6635,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     // BACKUP SECTION ------------------------------------------------------------------------------------------------
 
     // TODO: ExifTool on Image 9.png in the root to set the right modified date
-    // TODO: Not UpdatedMapping but MappingUpdated
     // TODO: Cf -> Need to rework it, seems to pass each time in the continue
 
     // TODO next: var subdir in subdirectories in CatalogExistingFolder (need to add many cases with subdir) (what happen if a video is in a subdir ? + video in root and another in subdir) -> Ex CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets + add layer
