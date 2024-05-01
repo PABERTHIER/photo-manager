@@ -869,6 +869,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -879,6 +880,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -1043,6 +1045,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
+                folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -1053,6 +1056,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                folders,
                 folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -1217,6 +1221,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -1227,6 +1232,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -1347,6 +1353,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -1357,6 +1364,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -1485,6 +1493,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -1495,6 +1504,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -1623,6 +1633,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -1633,6 +1644,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -1833,6 +1845,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -1843,6 +1856,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -1926,6 +1940,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -1936,6 +1951,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -2104,6 +2120,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
+                folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -2114,6 +2131,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                folders,
                 folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -2193,6 +2211,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
+                folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -2203,6 +2222,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                folders,
                 folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -2369,6 +2389,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -2379,6 +2400,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -2445,6 +2467,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -2455,6 +2478,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -2579,6 +2603,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -2589,6 +2614,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -2666,6 +2692,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -2676,6 +2703,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -2815,6 +2843,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -2825,6 +2854,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -2905,6 +2935,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -2915,6 +2946,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -3052,6 +3084,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -3062,6 +3095,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -3147,6 +3181,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -3157,6 +3192,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -3297,6 +3333,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -3307,6 +3344,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -3387,6 +3425,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -3397,6 +3436,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -3563,6 +3603,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
+                folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -3573,6 +3614,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                folders,
                 folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -3649,6 +3691,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
+                folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -3659,6 +3702,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                folders,
                 folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -3825,6 +3869,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -3835,6 +3880,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -3900,6 +3946,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -3910,6 +3957,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -4034,6 +4082,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -4044,6 +4093,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -4119,6 +4169,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -4129,6 +4180,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -4273,6 +4325,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -4283,6 +4336,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -4365,6 +4419,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -4375,6 +4430,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -4514,6 +4570,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -4524,6 +4581,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -4606,6 +4664,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -4616,6 +4675,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -4776,6 +4836,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
+                folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -4786,6 +4847,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                folders,
                 folders,
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -4880,6 +4942,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder1!],
+                [folder1!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -4890,6 +4953,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder1!],
                 [folder1!],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -5047,7 +5111,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             AssertAssetPropertyValidity(assetsFromRepository[0], _asset2Temp, destinationFilePathToCopy1, tempDirectory, folder2);
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync, [folder2], thumbnails, assetsImageByteSizeFirstSync); // Only folder2 contains assets
-            CheckBlobsAndTablesAfterSaveCatalogV2(
+            CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 folders,
@@ -5058,7 +5122,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
-            CheckBackupAfterV2(
+            CheckBackupAfter(
                 backupFilePath,
                 blobsPath,
                 tablesPath,
@@ -5118,7 +5182,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             }
 
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, [folder2], thumbnails, assetsImageByteSizeSecondSync); // Only folder2 contains assets
-            CheckBlobsAndTablesAfterSaveCatalogV2(
+            CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 folders,
@@ -5129,7 +5193,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
-            CheckBackupAfterV2(
+            CheckBackupAfter(
                 backupFilePath,
                 blobsPath,
                 tablesPath,
@@ -5187,7 +5251,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             AssertAssetPropertyValidity(assetsFromRepository[0], _asset5Temp, destinationFilePathToCopy2, tempDirectory, folder2!);
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingThirdSync, [folder2], thumbnails, assetsImageByteSizeThirdSync); // Only folder2 contains assets
-            CheckBlobsAndTablesAfterSaveCatalogV2(
+            CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 folders,
@@ -5198,7 +5262,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
-            CheckBackupAfterV2(
+            CheckBackupAfter(
                 backupFilePath,
                 blobsPath,
                 tablesPath,
@@ -5260,7 +5324,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Assert.AreEqual(0, assetsFromRepository.Count);
 
             AssertThumbnailsValidity(assetsFromRepository, [], [], thumbnails, []); // No Folders and assets anymore
-            CheckBlobsAndTablesAfterSaveCatalogV2(
+            CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
                 [folder1!],
@@ -5271,7 +5335,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
 
-            CheckBackupAfterV2(
+            CheckBackupAfter(
                 backupFilePath,
                 blobsPath,
                 tablesPath,
@@ -5714,6 +5778,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -5724,6 +5789,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -5776,6 +5842,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -5786,6 +5853,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder!],
                 [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -5917,6 +5985,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -5927,6 +5996,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -6010,6 +6080,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -6020,6 +6091,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -6154,6 +6226,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -6164,6 +6237,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -6254,6 +6328,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
                 assetNameToByteSizeUpdatedMapping);
@@ -6264,6 +6339,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsUpdatedMapping,
@@ -6402,6 +6478,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -6412,6 +6489,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -6506,6 +6584,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 [folder],
+                [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -6516,6 +6595,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
+                [folder],
                 [folder],
                 assetsFromRepository,
                 folderToAssetsMapping,
@@ -6554,7 +6634,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
     // BACKUP SECTION ------------------------------------------------------------------------------------------------
 
-    // TODO: Rework CheckBlobsAndTablesAfterSaveCatalog and CheckBackupAfter (with their V2 version)
     // TODO: ExifTool on Image 9.png in the root to set the right modified date
     // TODO: Not UpdatedMapping but MappingUpdated
     // TODO: Cf -> Need to rework it, seems to pass each time in the continue
@@ -6689,85 +6768,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     private void CheckBlobsAndTablesAfterSaveCatalog(
         string blobsPath,
         string tablesPath,
-        List<Folder> folders,
-        IReadOnlyCollection<Asset> assetsFromRepository,
-        Dictionary<Folder, List<Asset>> folderToAssetsMapping,
-        Dictionary<string, int> assetNameToByteSizeMapping)
-    {
-        string[] blobFiles = Directory.GetFiles(blobsPath);
-        string[] tableFiles = Directory.GetFiles(tablesPath);
-
-        Assert.AreEqual(folders.Count, blobFiles.Length);
-
-        foreach (Folder folder in folders)
-        {
-            string blobFileName = $"{folder.FolderId}.bin";
-            string blobFilePath = Path.Combine(blobsPath, blobFileName);
-
-            Assert.IsTrue(File.Exists(blobFilePath));
-
-            List<Asset> assetsFromRepositoryByFolder = assetsFromRepository.Where(x => x.FolderId == folder.FolderId).ToList();
-
-            Dictionary<string, byte[]>? dataRead = _blobStorage!.ReadFromBinaryFile(blobFilePath);
-            Assert.IsNotNull(dataRead);
-            Assert.AreEqual(assetsFromRepositoryByFolder.Count, dataRead!.Count);
-
-            for (int j = 0; j < dataRead.Count; j++)
-            {
-                Assert.IsTrue(dataRead.ContainsKey(assetsFromRepositoryByFolder[j].FileName));
-                Assert.IsTrue(assetNameToByteSizeMapping.ContainsKey(assetsFromRepositoryByFolder[j].FileName));
-                Assert.AreEqual(assetNameToByteSizeMapping[assetsFromRepositoryByFolder[j].FileName], dataRead[assetsFromRepositoryByFolder[j].FileName].Length);
-            }
-        }
-
-        Assert.AreEqual(4, tableFiles.Length);
-        Assert.IsTrue(File.Exists(Path.Combine(tablesPath, "assets.db")));
-        Assert.IsTrue(File.Exists(Path.Combine(tablesPath, "folders.db")));
-        Assert.IsTrue(File.Exists(Path.Combine(tablesPath, "syncassetsdirectoriesdefinitions.db")));
-        Assert.IsTrue(File.Exists(Path.Combine(tablesPath, "recenttargetpaths.db")));
-
-        List<Asset> assetsFromDatabase = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
-        List<Folder> foldersFromDatabase = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
-        List<SyncAssetsDirectoriesDefinition> syncAssetsDirectoriesDefinitionsFromDatabase =
-            _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc);
-        List<string> recentTargetPathsFromDatabase = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
-
-        Assert.AreEqual(assetsFromRepository.Count, assetsFromDatabase.Count);
-
-        Dictionary<Asset, Folder> assetToFolderMapping = folderToAssetsMapping.SelectMany(kv =>
-            kv.Value.Select(a => (Asset: a, Folder: kv.Key))).ToDictionary(x => x.Asset, x => x.Folder);
-
-        foreach (Asset assetFromDatabase in assetsFromDatabase)
-        {
-            Asset expectedAsset = assetToFolderMapping.Keys.First(a => a.FileName == assetFromDatabase.FileName && a.FolderId == assetFromDatabase.FolderId);
-            Folder expectedFolder = assetToFolderMapping[expectedAsset];
-
-            AssertAssetFromDatabaseValidity(assetFromDatabase, expectedAsset, expectedFolder.FolderId);
-        }
-
-        Assert.AreEqual(folders.Count, foldersFromDatabase.Count);
-
-        Dictionary<Guid, Folder> foldersById = folders.ToDictionary(f => f.FolderId, f => f);
-        Dictionary<Guid, Folder> foldersFromDatabaseById = foldersFromDatabase.ToDictionary(f => f.FolderId, f => f);
-
-        foreach ((Guid folderId, Folder? expectedFolder) in foldersById)
-        {
-            Folder actualFolder = foldersFromDatabaseById[folderId];
-
-            Assert.AreEqual(expectedFolder.FolderId, actualFolder.FolderId);
-            Assert.AreEqual(expectedFolder.Path, actualFolder.Path);
-        }
-
-        Assert.IsEmpty(syncAssetsDirectoriesDefinitionsFromDatabase);
-        Assert.IsEmpty(recentTargetPathsFromDatabase);
-    }
-
-    // TODO: Merge with above
-    private void CheckBlobsAndTablesAfterSaveCatalogV2(
-        string blobsPath,
-        string tablesPath,
-        List<Folder> folders,
-        List<Folder> foldersContainingAssets,
+        IReadOnlyCollection<Folder> folders,
+        IReadOnlyCollection<Folder> foldersContainingAssets,
         IReadOnlyCollection<Asset> assetsFromRepository,
         Dictionary<Folder, List<Asset>> folderToAssetsMapping,
         Dictionary<string, int> assetNameToByteSizeMapping)
@@ -6893,66 +6895,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         string backupFilePath,
         string blobsPath,
         string tablesPath,
-        List<Folder> folders,
-        IReadOnlyCollection<Asset> assetsFromRepository,
-        Dictionary<Folder, List<Asset>> folderToAssetsMapping,
-        Dictionary<string, int> assetNameToByteSizeMapping)
-    {
-        string backupBlobsDirectory = Path.Combine(_databaseBackupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-        string backupTablesDirectory = Path.Combine(_databaseBackupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
-        Assert.IsFalse(Directory.Exists(backupBlobsDirectory));
-        Assert.IsFalse(Directory.Exists(backupTablesDirectory));
-
-        ZipFile.ExtractToDirectory(backupFilePath, _databaseBackupPath!);
-        Assert.IsTrue(File.Exists(backupFilePath));
-
-        Assert.IsTrue(Directory.Exists(backupBlobsDirectory));
-        Assert.IsTrue(Directory.Exists(backupTablesDirectory));
-
-        string[] sourceDirectories = Directory.GetDirectories(_databasePath!);
-        string[] backupDirectories = Directory.GetDirectories(_databaseBackupPath!);
-
-        Assert.AreEqual(sourceDirectories.Length, backupDirectories.Length);
-
-        Assert.AreEqual(sourceDirectories[0], blobsPath);
-        string[] blobs = Directory.GetFiles(blobsPath);
-        Assert.AreEqual(folders.Count, blobs.Length);
-
-        Assert.AreEqual(sourceDirectories[1], tablesPath);
-        string[] tables = Directory.GetFiles(tablesPath);
-        Assert.AreEqual(4, tables.Length);
-
-        Assert.AreEqual(backupDirectories[0], backupBlobsDirectory);
-        string[] blobsBackup = Directory.GetFiles(backupBlobsDirectory);
-        Assert.AreEqual(folders.Count, blobsBackup.Length);
-
-        Assert.AreEqual(backupDirectories[1], backupTablesDirectory);
-        string[] tablesBackup = Directory.GetFiles(backupTablesDirectory);
-        Assert.AreEqual(4, tablesBackup.Length);
-
-        CheckBlobsAndTablesAfterSaveCatalog(
-            backupBlobsDirectory,
-            backupTablesDirectory,
-            folders,
-            assetsFromRepository,
-            folderToAssetsMapping,
-            assetNameToByteSizeMapping);
-
-        Directory.Delete(backupBlobsDirectory, true);
-        Directory.Delete(backupTablesDirectory, true);
-
-        Assert.IsFalse(Directory.Exists(backupBlobsDirectory));
-        Assert.IsFalse(Directory.Exists(backupTablesDirectory));
-    }
-
-    // TODO: Merge with above
-    private void CheckBackupAfterV2(
-        string backupFilePath,
-        string blobsPath,
-        string tablesPath,
-        List<Folder> folders,
-        List<Folder> foldersContainingAssets,
+        IReadOnlyCollection<Folder> folders,
+        IReadOnlyCollection<Folder> foldersContainingAssets,
         IReadOnlyCollection<Asset> assetsFromRepository,
         Dictionary<Folder, List<Asset>> folderToAssetsMapping,
         Dictionary<string, int> assetNameToByteSizeMapping)
@@ -6990,7 +6934,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         string[] tablesBackup = Directory.GetFiles(backupTablesDirectory);
         Assert.AreEqual(4, tablesBackup.Length);
 
-        CheckBlobsAndTablesAfterSaveCatalogV2(
+        CheckBlobsAndTablesAfterSaveCatalog(
             backupBlobsDirectory,
             backupTablesDirectory,
             folders,
