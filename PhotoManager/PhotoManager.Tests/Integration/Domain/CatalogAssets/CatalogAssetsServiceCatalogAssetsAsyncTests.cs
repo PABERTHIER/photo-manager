@@ -1935,7 +1935,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -2462,7 +2462,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -2930,7 +2930,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated} };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSize);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSize);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -3176,7 +3176,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -3420,7 +3420,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -3941,7 +3941,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -4414,7 +4414,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -4659,7 +4659,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset1Temp!.FileName, ASSET1_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -4937,7 +4937,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
             };
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder1], thumbnails, assetsImageByteSizeUpdated);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder1!], thumbnails, assetsImageByteSizeUpdated);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -5250,7 +5250,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Assert.AreEqual(1, assetsFromRepository.Count);
 
             AssertAssetPropertyValidity(assetsFromRepository[0], _asset5Temp, destinationFilePathToCopy2, tempDirectory, folder2!);
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingThirdSync, [folder2], thumbnails, assetsImageByteSizeThirdSync); // Only folder2 contains assets
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingThirdSync, [folder2!], thumbnails, assetsImageByteSizeThirdSync); // Only folder2 contains assets
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
@@ -5837,7 +5837,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
                 AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
             }
 
-            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
+            AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
                 tablesPath,
