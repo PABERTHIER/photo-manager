@@ -31,7 +31,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     private Asset? _asset2Temp;
     private Asset? _asset3Temp;
     private Asset? _asset4Temp;
-    private Asset? _asset5Temp;
 
     private const int ASSET1_IMAGE_BYTE_SIZE = 2097;
     private const int ASSET2_IMAGE_BYTE_SIZE = 11002;
@@ -42,7 +41,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     private const int ASSET2_TEMP_IMAGE_BYTE_SIZE = 2097;
     private const int ASSET3_TEMP_IMAGE_BYTE_SIZE = 8594;
     private const int ASSET4_TEMP_IMAGE_BYTE_SIZE = 4779;
-    private const int ASSET5_TEMP_IMAGE_BYTE_SIZE = 11002;
 
     private const string CREATING_BACKUP_MESSAGE = "Creating catalog backup...";
     private const string UPDATING_BACKUP_MESSAGE = "Updating catalog backup...";
@@ -111,7 +109,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             IsAssetRotated = false,
             AssetRotatedMessage = null
         };
-        _asset2 = new() // Image in Duplicates//Folder2 (not same modified date as the one in the root)
+        _asset2 = new()
         {
             FileName = "Image 9.png",
             FileSize = 126277,
@@ -730,22 +728,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
-        };
-        _asset5Temp = new() // Image in the root (not same modified date as the one in Duplicates//Folder2)
-        {
-            FileName = "Image 9.png",
-            FileSize = 126277,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 03, 29, 00, 00, 00),
-            ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
             IsAssetCorrupted = false,
             AssetCorruptedMessage = null,
             IsAssetRotated = false,
@@ -5031,15 +5013,15 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
             string destinationFilePathToCopy1 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
-            string destinationFilePathToCopy2 = Path.Combine(tempDirectory, _asset5Temp!.FileName);
+            string destinationFilePathToCopy2 = Path.Combine(tempDirectory, _asset2!.FileName);
             File.Copy(imagePath1, destinationFilePathToCopy1);
             File.Copy(imagePath2, destinationFilePathToCopy2);
 
             List<string> assetPaths = [destinationFilePathToCopy1, destinationFilePathToCopy2];
 
             List<int> assetsImageByteSizeFirstSync = [ASSET2_TEMP_IMAGE_BYTE_SIZE];
-            List<int> assetsImageByteSizeSecondSync = [ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET5_TEMP_IMAGE_BYTE_SIZE];
-            List<int> assetsImageByteSizeThirdSync = [ASSET5_TEMP_IMAGE_BYTE_SIZE];
+            List<int> assetsImageByteSizeSecondSync = [ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE];
+            List<int> assetsImageByteSizeThirdSync = [ASSET2_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(0, assetsInDirectory1.Length);
@@ -5155,14 +5137,14 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.IsNotNull(folder2);
 
-            _asset5Temp!.Folder = folder2!;
-            _asset5Temp!.FolderId = folder2!.FolderId;
+            _asset2!.Folder = folder2!;
+            _asset2!.FolderId = folder2!.FolderId;
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new() { { folder2, [_asset2Temp, _asset5Temp] } };
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new() { { folder2, [_asset2Temp, _asset2] } };
             Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
             {
                 { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE },
-                { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE }
+                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE }
             };
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
@@ -5216,7 +5198,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2], _asset5Temp, folder2, ref increment);
+            CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2], _asset2, folder2, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
@@ -5235,8 +5217,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.IsNotNull(folder2);
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingThirdSync = new() { { folder2!, [_asset5Temp] } };
-            Dictionary<string, int> assetNameToByteSizeMappingThirdSync = new() { { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE } };
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingThirdSync = new() { { folder2!, [_asset2] } };
+            Dictionary<string, int> assetNameToByteSizeMappingThirdSync = new() { { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE } };
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -5249,7 +5231,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(1, assetsFromRepository.Count);
 
-            AssertAssetPropertyValidity(assetsFromRepository[0], _asset5Temp, destinationFilePathToCopy2, tempDirectory, folder2!);
+            AssertAssetPropertyValidity(assetsFromRepository[0], _asset2, destinationFilePathToCopy2, tempDirectory, folder2!);
             AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingThirdSync, [folder2!], thumbnails, assetsImageByteSizeThirdSync); // Only folder2 contains assets
             CheckBlobsAndTablesAfterSaveCatalog(
                 blobsPath,
@@ -5287,7 +5269,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2!], _asset5Temp, folder2!, ref increment);
+            CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2!], _asset2, folder2!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
@@ -5360,7 +5342,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
             CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders, assetsDirectory, ref increment);
             CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders, tempDirectory, ref increment);
-            CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2!], _asset5Temp, folder2!, ref increment);
+            CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2!], _asset2, folder2!, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
@@ -5370,7 +5352,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CheckCatalogChangesEnd(catalogChanges, ref increment);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, folderToAssetsMappingThirdSync[folder2!], _asset5Temp, folder2!, ref increment);
+            CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, folderToAssetsMappingThirdSync[folder2!], _asset2, folder2!, ref increment);
             CheckCatalogChangesFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory, ref increment);
             CheckCatalogChangesBackup(catalogChanges, UPDATING_BACKUP_MESSAGE, ref increment);
             CheckCatalogChangesEnd(catalogChanges, ref increment);
@@ -6634,7 +6616,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
 
     // BACKUP SECTION ------------------------------------------------------------------------------------------------
 
-    // TODO: ExifTool on Image 9.png in the root to set the right modified date
     // TODO: Cf -> Need to rework it, seems to pass each time in the continue
 
     // TODO next: var subdir in subdirectories in CatalogExistingFolder (need to add many cases with subdir) (what happen if a video is in a subdir ? + video in root and another in subdir) -> Ex CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets + add layer
