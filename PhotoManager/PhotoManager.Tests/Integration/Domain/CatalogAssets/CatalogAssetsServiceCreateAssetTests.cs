@@ -1499,7 +1499,7 @@ public class CatalogAssetsServiceCreateAssetTests
         string assetRotatedMessage,
         int imageByteSize)
     {
-        Mock<IConfigurationRoot> configurationRootMock = new ();
+        Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory!); // Only needed for videos
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH, "200");

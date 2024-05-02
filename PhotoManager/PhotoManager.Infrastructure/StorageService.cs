@@ -163,7 +163,7 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
     public int GetTotalFilesCount()
     {
         string pathSettingsAssetsDirectory = userConfigurationService.PathSettings.AssetsDirectory;
-        ConcurrentDictionary<string, int> directoryFileCounts = new ();
+        ConcurrentDictionary<string, int> directoryFileCounts = new();
 
         int rootFileCount = CountFilesInDirectory(pathSettingsAssetsDirectory, SearchOption.TopDirectoryOnly);
         directoryFileCounts[pathSettingsAssetsDirectory] = rootFileCount;

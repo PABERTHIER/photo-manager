@@ -6632,7 +6632,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         //
         // try
         // {
-        //     CancellationTokenSource cancellationTokenSource = new ();
+        //     CancellationTokenSource cancellationTokenSource = new();
         //
         //     // Start the task but don't wait for it
         //     Task task = _catalogAssetsService!.CatalogAssetsAsync(null!, cancellationTokenSource.Token);
