@@ -312,6 +312,7 @@ public class CatalogAssetsService : ICatalogAssetsService
         cataloguedAssetsBatchCount = CatalogUpdatedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
         cataloguedAssetsBatchCount = CatalogDeletedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, filesName, folder, cataloguedAssets, token);
 
+        // TODO: SaveCatalog each time ? Better at the end or if cancelled, in the catch
         if (_assetRepository.HasChanges() || !folderHasThumbnails)
         {
             _assetRepository.SaveCatalog(folder);
@@ -429,11 +430,15 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             newAsset.ImageData = LoadThumbnail(directory, newAsset.FileName, newAsset.ThumbnailPixelWidth, newAsset.ThumbnailPixelHeight);
 
-            if (!folderHasThumbnails)
-            {
+            // if (!folderHasThumbnails)
+            // {
                 cataloguedAssets.Add(newAsset);
-            }
+            // }
 
+            // TODO: Refacto the way cataloguedAssets is handled (bad practice to modify it like this above) + need to rework how to update file informations
+            // cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
+
+            // TODO: Reorder each CatalogChangeCallbackEventArgs to match with the class
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
@@ -559,12 +564,18 @@ public class CatalogAssetsService : ICatalogAssetsService
                     continue;
                 }
 
+                // TODO: Move from here and split _directoryComparer.GetUpdatedFileNames usage above !!
+                _storageService.LoadFileInformation(updatedAsset);
+
                 updatedAsset.ImageData = LoadThumbnail(directory, fileName, updatedAsset.ThumbnailPixelWidth, updatedAsset.ThumbnailPixelHeight);
 
-                if (!folderHasThumbnails)
-                {
-                    cataloguedAssets.Add(updatedAsset);
-                }
+                // TODO: Check this condition about folderHasThumbnails (seems to be useless here because already added above)
+                // if (!folderHasThumbnails)
+                // {
+                //     cataloguedAssets.Add(updatedAsset);
+                // }
+
+                cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
 
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
@@ -593,18 +604,15 @@ public class CatalogAssetsService : ICatalogAssetsService
                 break;
             }
 
-            Asset deletedAsset = new()
-            {
-                FileName = fileName,
-                FolderId = folder.FolderId,
-                Folder = folder
-            };
-
             _assetRepository.DeleteAsset(directory, fileName);
+
+            Asset? deletedAsset = cataloguedAssets.FirstOrDefault(x => x.FileName == fileName && x.FolderId == folder.FolderId);
+            cataloguedAssets.Remove(deletedAsset);
 
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Asset = deletedAsset,
+                CataloguedAssets = cataloguedAssets,
                 Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog.",
                 Reason = ReasonEnum.AssetDeleted
             });
