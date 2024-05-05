@@ -53,7 +53,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                 {
                     // ThrowIfCancellationRequested should be in each if below ?
                     // token?.ThrowIfCancellationRequested(); rework all the cancellation
-                    cataloguedAssetsBatchCount = CatalogAssets(folder.Path, callback, cataloguedAssetsBatchCount, visitedFolders, token);
+                    CatalogAssets(folder.Path, callback, ref cataloguedAssetsBatchCount, visitedFolders, token);
                 }
 
                 if (!_assetRepository.BackupExists() || !_backupHasSameContent)
@@ -241,11 +241,11 @@ public class CatalogAssetsService : ICatalogAssetsService
         return _assetRepository.GetFolders();
     }
 
-    private int CatalogAssets(string directory, CatalogChangeCallback? callback, int cataloguedAssetsBatchCount, List<string> visitedFolders, CancellationToken? token = null)
+    private void CatalogAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, List<string> visitedFolders, CancellationToken? token = null)
     {
         if (visitedFolders.Contains(directory))
         {
-            return cataloguedAssetsBatchCount;
+            return;
         }
 
         _currentFolderPath = directory;
@@ -253,25 +253,23 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (_storageService.FolderExists(directory))
         {
-            cataloguedAssetsBatchCount = CatalogExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize, visitedFolders, token);
+            CatalogExistingFolder(directory, callback, ref cataloguedAssetsBatchCount, batchSize, visitedFolders, token);
         }
         else if (!string.IsNullOrEmpty(directory) && !_storageService.FolderExists(directory))
         {
-            cataloguedAssetsBatchCount = CatalogNonExistingFolder(directory, callback, cataloguedAssetsBatchCount, batchSize, token);
+            CatalogNonExistingFolder(directory, callback, ref cataloguedAssetsBatchCount, batchSize, token);
         }
 
         visitedFolders.Add(directory);
-
-        return cataloguedAssetsBatchCount;
     }
 
-    private int CatalogExistingFolder(string directory, CatalogChangeCallback? callback, int cataloguedAssetsBatchCount, int batchSize, List<string> visitedFolders, CancellationToken? token = null)
+    private void CatalogExistingFolder(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<string> visitedFolders, CancellationToken? token = null)
     {
         Folder? folder;
 
         if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
         {
-            return cataloguedAssetsBatchCount;
+            return;
         }
 
         if (!_assetRepository.FolderExists(directory))
@@ -308,9 +306,9 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         string[] filesName = _storageService.GetFileNames(directory);
 
-        cataloguedAssetsBatchCount = CatalogNewAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, filesName, cataloguedAssets, folderHasThumbnails, token);
-        cataloguedAssetsBatchCount = CatalogUpdatedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
-        cataloguedAssetsBatchCount = CatalogDeletedAssets(directory, callback, cataloguedAssetsBatchCount, batchSize, filesName, folder, cataloguedAssets, token);
+        CatalogNewAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, filesName, cataloguedAssets, folderHasThumbnails, token);
+        CatalogUpdatedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
+        CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, filesName, folder, cataloguedAssets, token);
 
         // TODO: SaveCatalog each time ? Better at the end or if cancelled, in the catch
         if (_assetRepository.HasChanges() || !folderHasThumbnails)
@@ -320,24 +318,22 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (cataloguedAssetsBatchCount >= batchSize || (!(!token?.IsCancellationRequested ?? true)))
         {
-            return cataloguedAssetsBatchCount;
+            return;
         }
 
         IEnumerable<DirectoryInfo> subdirectories = new DirectoryInfo(directory).EnumerateDirectories();
 
         foreach (DirectoryInfo subdirectory in subdirectories)
         {
-            cataloguedAssetsBatchCount = CatalogAssets(subdirectory.FullName, callback, cataloguedAssetsBatchCount, visitedFolders, token);
+            CatalogAssets(subdirectory.FullName, callback, ref cataloguedAssetsBatchCount, visitedFolders, token);
         }
-
-        return cataloguedAssetsBatchCount;
     }
 
-    private int CatalogNonExistingFolder(string directory, CatalogChangeCallback? callback, int cataloguedAssetsBatchCount, int batchSize, CancellationToken? token = null)
+    private void CatalogNonExistingFolder(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, CancellationToken? token = null)
     {
         if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
         {
-            return cataloguedAssetsBatchCount;
+            return;
         }
 
         // If the folder doesn't exist anymore, the corresponding entry in the catalog and the thumbnails file are both deleted.
@@ -388,11 +384,9 @@ public class CatalogAssetsService : ICatalogAssetsService
                 _assetRepository.SaveCatalog(folder);
             }
         }
-
-        return cataloguedAssetsBatchCount;
     }
 
-    private int CatalogNewAssets(string directory, CatalogChangeCallback? callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
+    private void CatalogNewAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
     {
         string[] imageNames;
         string[] videoNames;
@@ -402,17 +396,15 @@ public class CatalogAssetsService : ICatalogAssetsService
         string[] newImageFileNames = _directoryComparer.GetNewFileNames(imageNames, cataloguedAssets);
         string[] newVideoFileNames = _directoryComparer.GetNewFileNames(videoNames, cataloguedAssets);
 
-        cataloguedAssetsBatchCount += CreateAssets(newImageFileNames, false, directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
+        CreateAssets(newImageFileNames, false, directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
 
         if (_userConfigurationService.AssetSettings.AnalyseVideos)
         {
-            cataloguedAssetsBatchCount += CreateAssets(newVideoFileNames, true, directory, callback, cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
+            CreateAssets(newVideoFileNames, true, directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
         }
-
-        return cataloguedAssetsBatchCount;
     }
 
-    private int CreateAssets(string[] fileNames, bool isAssetVideo, string directory, CatalogChangeCallback? callback, int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
+    private void CreateAssets(string[] fileNames, bool isAssetVideo, string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
     {
         foreach (string fileName in fileNames)
         {
@@ -450,8 +442,6 @@ public class CatalogAssetsService : ICatalogAssetsService
             _backupHasSameContent = false;
             cataloguedAssetsBatchCount++;
         }
-
-        return cataloguedAssetsBatchCount;
     }
 
     // TODO: Facto with initial method
@@ -538,7 +528,7 @@ public class CatalogAssetsService : ICatalogAssetsService
         return asset;
     }
 
-    private int CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
+    private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
     {
         string[] updatedFileNames = _directoryComparer.GetUpdatedFileNames(cataloguedAssets); // TODO: Should not depend on it to have file info for each files -> break content in separate parts
         //Folder folder = _assetRepository.GetFolderByPath(directory);
@@ -588,11 +578,9 @@ public class CatalogAssetsService : ICatalogAssetsService
                 cataloguedAssetsBatchCount++;
             }
         }
-
-        return cataloguedAssetsBatchCount;
     }
 
-    private int CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, Folder folder, List<Asset> cataloguedAssets, CancellationToken? token = null)
+    private void CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, Folder folder, List<Asset> cataloguedAssets, CancellationToken? token = null)
     {
         string[] deletedFileNames = _directoryComparer.GetDeletedFileNames(fileNames, cataloguedAssets);
 
@@ -620,8 +608,6 @@ public class CatalogAssetsService : ICatalogAssetsService
             _backupHasSameContent = false;
             cataloguedAssetsBatchCount++;
         }
-
-        return cataloguedAssetsBatchCount;
     }
 
     private BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height)
