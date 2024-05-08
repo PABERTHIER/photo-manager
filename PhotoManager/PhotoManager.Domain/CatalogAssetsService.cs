@@ -15,6 +15,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private bool _backupHasSameContent;
     private string _currentFolderPath;
+    private HashSet<string> _directories;
 
     public CatalogAssetsService(
         IAssetRepository assetRepository,
@@ -31,6 +32,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         _backupHasSameContent = true;
         _currentFolderPath = string.Empty;
+        _directories = [];
     }
 
     public async Task CatalogAssetsAsync(CatalogChangeCallback? callback, CancellationToken? token = null)
@@ -39,7 +41,7 @@ public class CatalogAssetsService : ICatalogAssetsService
         await Task.Run(() =>
         {
             int cataloguedAssetsBatchCount = 0;
-            List<string> visitedFolders = new();
+            HashSet<string> visitedDirectories = [];
 
             try
             {
@@ -53,8 +55,10 @@ public class CatalogAssetsService : ICatalogAssetsService
                 {
                     // ThrowIfCancellationRequested should be in each if below ?
                     // token?.ThrowIfCancellationRequested(); rework all the cancellation
-                    CatalogAssets(folder.Path, callback, ref cataloguedAssetsBatchCount, visitedFolders, token);
+                    CatalogAssets(folder.Path, callback, ref cataloguedAssetsBatchCount, visitedDirectories, token);
                 }
+
+                _directories.UnionWith(visitedDirectories);
 
                 if (!_assetRepository.BackupExists() || !_backupHasSameContent)
                 {
@@ -241,9 +245,9 @@ public class CatalogAssetsService : ICatalogAssetsService
         return _assetRepository.GetFolders();
     }
 
-    private void CatalogAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, List<string> visitedFolders, CancellationToken? token = null)
+    private void CatalogAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, HashSet<string> visitedDirectories, CancellationToken? token = null)
     {
-        if (visitedFolders.Contains(directory))
+        if (visitedDirectories.Contains(directory))
         {
             return;
         }
@@ -253,17 +257,17 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (_storageService.FolderExists(directory))
         {
-            CatalogExistingFolder(directory, callback, ref cataloguedAssetsBatchCount, batchSize, visitedFolders, token);
+            CatalogExistingFolder(directory, callback, ref cataloguedAssetsBatchCount, batchSize, visitedDirectories, token);
         }
         else if (!string.IsNullOrEmpty(directory) && !_storageService.FolderExists(directory))
         {
             CatalogNonExistingFolder(directory, callback, ref cataloguedAssetsBatchCount, batchSize, token);
         }
 
-        visitedFolders.Add(directory);
+        visitedDirectories.Add(directory);
     }
 
-    private void CatalogExistingFolder(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<string> visitedFolders, CancellationToken? token = null)
+    private void CatalogExistingFolder(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, HashSet<string> visitedDirectories, CancellationToken? token = null)
     {
         Folder? folder;
 
@@ -325,7 +329,10 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         foreach (DirectoryInfo subdirectory in subdirectories)
         {
-            CatalogAssets(subdirectory.FullName, callback, ref cataloguedAssetsBatchCount, visitedFolders, token);
+            if (!_directories.Contains(subdirectory.FullName))
+            {
+                CatalogAssets(subdirectory.FullName, callback, ref cataloguedAssetsBatchCount, visitedDirectories, token);
+            }
         }
     }
 
@@ -370,6 +377,7 @@ public class CatalogAssetsService : ICatalogAssetsService
             if (cataloguedAssets.Count == 0)
             {
                 _assetRepository.DeleteFolder(folder);
+                _directories.Remove(folder.Path);
 
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {

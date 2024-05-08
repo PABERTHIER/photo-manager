@@ -1924,6 +1924,10 @@ public class CatalogAssetsServiceCreateAssetTests
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
+            if (analyseVideos)
+            {
+                Directory.Delete(firstFrameVideosPath, true);
+            }
         }
     }
 
