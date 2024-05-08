@@ -401,9 +401,9 @@ public class ApplicationViewModel : BaseViewModel
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
                     // If the files list is empty or belongs to other directory
-                    if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssets != null)
+                    if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssetsByPath != null)
                     {
-                        cataloguedAssets = e.CataloguedAssets.Where(a => a.ImageData != null).ToArray();
+                        cataloguedAssets = e.CataloguedAssetsByPath.Where(a => a.ImageData != null).ToArray();
                         SortAssets();
                     }
                     else
@@ -418,9 +418,9 @@ public class ApplicationViewModel : BaseViewModel
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
                     // If the files list is empty or belongs to other directory
-                    if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssets != null)
+                    if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssetsByPath != null)
                     {
-                        cataloguedAssets = e.CataloguedAssets.Where(a => a.ImageData != null).ToArray();
+                        cataloguedAssets = e.CataloguedAssetsByPath.Where(a => a.ImageData != null).ToArray();
                         SortAssets();
                     }
                     else

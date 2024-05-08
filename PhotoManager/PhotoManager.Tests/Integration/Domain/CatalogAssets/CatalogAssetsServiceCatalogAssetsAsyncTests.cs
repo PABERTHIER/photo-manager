@@ -7310,7 +7310,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssets);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
         Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
         Assert.AreEqual(expectedMessage, catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
@@ -7319,7 +7319,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         catalogChange = catalogChanges[increment];
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssets);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
         Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
         Assert.AreEqual(string.Empty, catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
@@ -7334,7 +7334,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.IsNotNull(catalogChange.Folder);
         Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
-        Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
+        Assert.AreEqual(0, catalogChange.CataloguedAssetsByPath.Count);
         Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
         Assert.AreEqual($"Inspecting folder {assetsDirectory}.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
@@ -7349,7 +7349,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.IsNotNull(catalogChange.Folder);
         Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
-        Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
+        Assert.AreEqual(0, catalogChange.CataloguedAssetsByPath.Count);
         Assert.AreEqual(ReasonEnum.FolderCreated, catalogChange.Reason);
         Assert.AreEqual($"Folder {assetsDirectory} added to catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
@@ -7363,7 +7363,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.AreEqual(expectedFoldersCount, foldersCount);
         Assert.IsNotNull(catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
-        Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
+        Assert.AreEqual(0, catalogChange.CataloguedAssetsByPath.Count);
         Assert.AreEqual(ReasonEnum.FolderDeleted, catalogChange.Reason);
         Assert.AreEqual($"Folder {assetsDirectory} deleted from catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
@@ -7382,7 +7382,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.IsNotNull(catalogChange.Asset);
         AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
         Assert.IsNull(catalogChange.Folder);
-        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssets.Count);
+        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
         Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
         Assert.AreEqual($"Image {expectedAsset.FullPath} added to catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
@@ -7401,7 +7401,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.IsNotNull(catalogChange.Asset);
         AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
         Assert.IsNull(catalogChange.Folder);
-        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssets.Count);
+        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
         Assert.AreEqual(ReasonEnum.AssetUpdated, catalogChange.Reason);
         Assert.AreEqual($"Image {expectedAsset.FullPath} updated in catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
@@ -7420,7 +7420,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.IsNotNull(catalogChange.Asset);
         AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
         Assert.IsNull(catalogChange.Folder);
-        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssets.Count);
+        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
         Assert.AreEqual(ReasonEnum.AssetDeleted, catalogChange.Reason);
         Assert.AreEqual($"Image {expectedAsset.FullPath} deleted from catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
@@ -7435,7 +7435,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             CatalogChangeCallbackEventArgs catalogChange = catalogChanges[i];
             Assert.IsNull(catalogChange.Asset);
             Assert.IsNull(catalogChange.Folder);
-            Assert.AreEqual(0, catalogChange.CataloguedAssets.Count);
+            Assert.AreEqual(0, catalogChange.CataloguedAssetsByPath.Count);
             Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
             Assert.AreEqual(string.Empty, catalogChange.Message);
             Assert.IsNull(catalogChange.Exception);

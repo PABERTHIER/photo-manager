@@ -296,13 +296,13 @@ public class CatalogAssetsService : ICatalogAssetsService
             Message = $"Inspecting folder {directory}."
         });
 
-        List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
+        List<Asset> cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(directory);
 
         bool folderHasThumbnails = folder != null && _assetRepository.FolderHasThumbnails(folder);
 
         if (!folderHasThumbnails)
         {
-            foreach (Asset asset in cataloguedAssets)
+            foreach (Asset asset in cataloguedAssetsByPath)
             {
                 asset.ImageData = LoadThumbnail(directory, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
             }
@@ -310,9 +310,9 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         string[] filesName = _storageService.GetFileNames(directory);
 
-        CatalogNewAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, filesName, cataloguedAssets, folderHasThumbnails, token);
-        CatalogUpdatedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
-        CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, filesName, folder, cataloguedAssets, token);
+        CatalogNewAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, filesName, cataloguedAssetsByPath, folderHasThumbnails, token);
+        CatalogUpdatedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssetsByPath, folderHasThumbnails, token);
+        CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, filesName, folder, cataloguedAssetsByPath, token);
 
         // TODO: SaveCatalog each time ? Better at the end or if cancelled, in the catch
         if (_assetRepository.HasChanges() || !folderHasThumbnails)
@@ -349,9 +349,9 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         if (folder != null)
         {
-            List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
+            List<Asset> cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(directory);
 
-            foreach (var asset in cataloguedAssets)
+            foreach (Asset asset in cataloguedAssetsByPath)
             {
                 // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
                 if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
@@ -366,15 +366,15 @@ public class CatalogAssetsService : ICatalogAssetsService
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
                     Asset = asset,
-                    CataloguedAssets = cataloguedAssets,
+                    CataloguedAssetsByPath = cataloguedAssetsByPath,
                     Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog.",
                     Reason = ReasonEnum.AssetDeleted
                 });
             }
 
-            cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
+            cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(directory);
 
-            if (cataloguedAssets.Count == 0)
+            if (cataloguedAssetsByPath.Count == 0)
             {
                 _assetRepository.DeleteFolder(folder);
                 _directories.Remove(folder.Path);
@@ -394,25 +394,25 @@ public class CatalogAssetsService : ICatalogAssetsService
         }
     }
 
-    private void CatalogNewAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
+    private void CatalogNewAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, List<Asset> cataloguedAssetsByPath, bool folderHasThumbnails, CancellationToken? token = null)
     {
         string[] imageNames;
         string[] videoNames;
 
         (imageNames, videoNames) = _directoryComparer.GetImageAndVideoNames(fileNames);
 
-        string[] newImageFileNames = _directoryComparer.GetNewFileNames(imageNames, cataloguedAssets);
-        string[] newVideoFileNames = _directoryComparer.GetNewFileNames(videoNames, cataloguedAssets);
+        string[] newImageFileNames = _directoryComparer.GetNewFileNames(imageNames, cataloguedAssetsByPath);
+        string[] newVideoFileNames = _directoryComparer.GetNewFileNames(videoNames, cataloguedAssetsByPath);
 
-        CreateAssets(newImageFileNames, false, directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
+        CreateAssets(newImageFileNames, false, directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssetsByPath, folderHasThumbnails, token);
 
         if (_userConfigurationService.AssetSettings.AnalyseVideos)
         {
-            CreateAssets(newVideoFileNames, true, directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssets, folderHasThumbnails, token);
+            CreateAssets(newVideoFileNames, true, directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssetsByPath, folderHasThumbnails, token);
         }
     }
 
-    private void CreateAssets(string[] fileNames, bool isAssetVideo, string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
+    private void CreateAssets(string[] fileNames, bool isAssetVideo, string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssetsByPath, bool folderHasThumbnails, CancellationToken? token = null)
     {
         foreach (string fileName in fileNames)
         {
@@ -432,17 +432,17 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             // if (!folderHasThumbnails)
             // {
-                cataloguedAssets.Add(newAsset);
+                cataloguedAssetsByPath.Add(newAsset);
             // }
 
-            // TODO: Refacto the way cataloguedAssets is handled (bad practice to modify it like this above) + need to rework how to update file informations
-            // cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
+            // TODO: Refacto the way cataloguedAssetsByPath is handled (bad practice to modify it like this above) + need to rework how to update file informations
+            // cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(directory);
 
             // TODO: Reorder each CatalogChangeCallbackEventArgs to match with the class
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                CataloguedAssets = cataloguedAssets,
+                CataloguedAssetsByPath = cataloguedAssetsByPath,
                 Message = $"Image {Path.Combine(directory, newAsset.FileName)} added to catalog.",
                 Reason = ReasonEnum.AssetCreated
             });
@@ -536,9 +536,9 @@ public class CatalogAssetsService : ICatalogAssetsService
         return asset;
     }
 
-    private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssets, bool folderHasThumbnails, CancellationToken? token = null)
+    private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssetsByPath, bool folderHasThumbnails, CancellationToken? token = null)
     {
-        string[] updatedFileNames = _directoryComparer.GetUpdatedFileNames(cataloguedAssets); // TODO: Should not depend on it to have file info for each files -> break content in separate parts
+        string[] updatedFileNames = _directoryComparer.GetUpdatedFileNames(cataloguedAssetsByPath); // TODO: Should not depend on it to have file info for each files -> break content in separate parts
         //Folder folder = _assetRepository.GetFolderByPath(directory);
 
         foreach (string fileName in updatedFileNames)
@@ -570,15 +570,15 @@ public class CatalogAssetsService : ICatalogAssetsService
                 // TODO: Check this condition about folderHasThumbnails (seems to be useless here because already added above)
                 // if (!folderHasThumbnails)
                 // {
-                //     cataloguedAssets.Add(updatedAsset);
+                //     cataloguedAssetsByPath.Add(updatedAsset);
                 // }
 
-                cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(directory);
+                cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(directory);
 
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
                     Asset = updatedAsset,
-                    CataloguedAssets = cataloguedAssets,
+                    CataloguedAssetsByPath = cataloguedAssetsByPath,
                     Message = $"Image {fullPath} updated in catalog.",
                     Reason = ReasonEnum.AssetUpdated
                 });
@@ -588,9 +588,9 @@ public class CatalogAssetsService : ICatalogAssetsService
         }
     }
 
-    private void CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, Folder folder, List<Asset> cataloguedAssets, CancellationToken? token = null)
+    private void CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, Folder folder, List<Asset> cataloguedAssetsByPath, CancellationToken? token = null)
     {
-        string[] deletedFileNames = _directoryComparer.GetDeletedFileNames(fileNames, cataloguedAssets);
+        string[] deletedFileNames = _directoryComparer.GetDeletedFileNames(fileNames, cataloguedAssetsByPath);
 
         foreach (string fileName in deletedFileNames)
         {
@@ -602,13 +602,13 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             _assetRepository.DeleteAsset(directory, fileName);
 
-            Asset? deletedAsset = cataloguedAssets.FirstOrDefault(x => x.FileName == fileName && x.FolderId == folder.FolderId);
-            cataloguedAssets.Remove(deletedAsset);
+            Asset? deletedAsset = cataloguedAssetsByPath.FirstOrDefault(x => x.FileName == fileName && x.FolderId == folder.FolderId);
+            cataloguedAssetsByPath.Remove(deletedAsset);
 
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Asset = deletedAsset,
-                CataloguedAssets = cataloguedAssets,
+                CataloguedAssetsByPath = cataloguedAssetsByPath,
                 Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog.",
                 Reason = ReasonEnum.AssetDeleted
             });
