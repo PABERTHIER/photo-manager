@@ -47,34 +47,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     private const string CREATING_BACKUP_MESSAGE = "Creating catalog backup...";
     private const string UPDATING_BACKUP_MESSAGE = "Updating catalog backup...";
 
-    // private Asset? asset8;
-    // private Asset? asset9;
-    // private Asset? asset10;
-    // private Asset? asset11;
-    // private Asset? asset12;
-    // private Asset? asset13;
-    // private Asset? asset14;
-    // private Asset? asset15;
-    // private Asset? asset16;
-    // private Asset? asset17;
-    // private Asset? asset18;
-    // private Asset? asset19;
-    // private Asset? asset20;
-    // private Asset? asset21;
-    // private Asset? asset22;
-    // private Asset? asset23;
-    // private Asset? asset24;
-    // private Asset? asset25;
-    // private Asset? asset26;
-    // private Asset? asset27;
-    // private Asset? asset28;
-    // private Asset? asset29;
-    // private Asset? asset30;
-    // private Asset? asset31;
-    // private Asset? asset32;
-    // private Asset? asset33;
-    // private Asset? asset34;
-
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
@@ -159,518 +131,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             IsAssetRotated = false,
             AssetRotatedMessage = null
         };
-        // TODO: Add ThumbnailCreationDateTime Property if needed below
-        // asset2 = new()
-        // {
-        //     FileName = "Image 1_90_deg.jpg",
-        //     FileSize = 31535,
-        //     PixelHeight = 1280,
-        //     PixelWidth = 720,
-        //     ThumbnailPixelWidth = 84,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate90,
-        //     Hash = "0092081bd0a83e9253f4eb319b4cfab197a09ed3b28b5697c31f17bf2646638dec95bf28d4f454dda8ff3dcdaab33fa002774f13dfe6d7aee82f1a960e3e3aee",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = true,
-        //     AssetRotatedMessage = "The asset has been rotated"
-        // };
-        //
-        // asset3 = new()
-        // {
-        //     FileName = "Image 1_180_deg.jpg",
-        //     FileSize = 31535,
-        //     PixelHeight = 720,
-        //     PixelWidth = 1280,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 112,
-        //     ImageRotation = Rotation.Rotate180,
-        //     Hash = "399383d82d4b7ed8233f714a1d14272b276b80505d7b3a2935b6ec962fd5cf280ccedb3e9380df1a11ee65e5f5fa66278dd2f407b7b6bdfa3093319164c446dd",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = true,
-        //     AssetRotatedMessage = "The asset has been rotated"
-        // };
-        //
-        // asset4 = new()
-        // {
-        //     FileName = "Image 1_270_deg.jpg",
-        //     FileSize = 31535,
-        //     PixelHeight = 1280,
-        //     PixelWidth = 720,
-        //     ThumbnailPixelWidth = 84,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate270,
-        //     Hash = "43950e06cecd509509d868a2064a828aeb6ff6a9a30f296ec9a3621b269742e75dacb40300aa6927c4c8f0879268e1ab3d7eac228b38cade35cc9b7c6adf3449",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = true,
-        //     AssetRotatedMessage = "The asset has been rotated"
-        // };
-        //
-        // asset5 = new()
-        // {
-        //     FileName = "Image 2.jpg",
-        //     FileSize = 30197,
-        //     PixelHeight = 720,
-        //     PixelWidth = 1280,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 112,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset6 = new()
-        // {
-        //     FileName = "Image 2 duplicated.jpg",
-        //     FileSize = 30197,
-        //     PixelHeight = 720,
-        //     PixelWidth = 1280,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 112,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset7 = new()
-        // {
-        //     FileName = "Image 8.jpeg",
-        //     FileSize = 30514,
-        //     PixelHeight = 720,
-        //     PixelWidth = 1280,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 112,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset8 = new()
-        // {
-        //     FileName = "Image 9.png",
-        //     FileSize = 126277,
-        //     PixelHeight = 720,
-        //     PixelWidth = 1280,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 112,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset9 = new()
-        // {
-        //     FileName = "Image 10 portrait.png",
-        //     FileSize = 153318,
-        //     PixelHeight = 1280,
-        //     PixelWidth = 720,
-        //     ThumbnailPixelWidth = 84,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset10 = new()
-        // {
-        //     FileName = "Image_11.heic",
-        //     FileSize = 1411940,
-        //     PixelHeight = 4032,
-        //     PixelWidth = 3024,
-        //     ThumbnailPixelWidth = 112,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset11 = new()
-        // {
-        //     FileName = "Image_11_90.heic",
-        //     FileSize = 1411940,
-        //     PixelHeight = 3024,
-        //     PixelWidth = 4032,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate90,
-        //     Hash = "b75df4942de1efa7d4326fedd721e99cc43959a1c22098a8cfcf6861aea099741d9c98fa1615e54d53838c22b9c6ff3b328c4ee3c0875d2b4ac7f7dee8d61bcf",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = true,
-        //     AssetRotatedMessage = "The asset has been rotated"
-        // };
-        //
-        // asset12 = new()
-        // {
-        //     FileName = "Image_11_180.heic",
-        //     FileSize = 1423616,
-        //     PixelHeight = 4032,
-        //     PixelWidth = 3024,
-        //     ThumbnailPixelWidth = 112,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate180,
-        //     Hash = "a2ad3ac9d51f74230b9f1d554172781d9cc214d01f8344354e2e56dc3daecb5a0021d4d2814eba0cde6fd681f3a8e8b8b55fbfad7184740e3518190e05dca77f",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = true,
-        //     AssetRotatedMessage = "The asset has been rotated"
-        // };
-        //
-        // asset13 = new()
-        // {
-        //     FileName = "Image_11_270.heic",
-        //     FileSize = 1423616,
-        //     PixelHeight = 3024,
-        //     PixelWidth = 4032,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate270,
-        //     Hash = "d4d7342a783f0f1b5e10ad9b493b71dd688dbc31b8ddd5534c9fff9c5fdbfa8bee32ef4e4258f7514a1b57f9a12b571454c8b66172b1a66bf1b53953b66227d5",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = true,
-        //     AssetRotatedMessage = "The asset has been rotated"
-        // };
-        //
-        // asset14 = new()
-        // {
-        //     FileName = "IMAGE_WITH_UPPERCASE_NAME.JPG",
-        //     FileSize = 40937,
-        //     PixelHeight = 720,
-        //     PixelWidth = 1280,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 112,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "0465fc2af396e003a3f45bf71e951b905ca7d19c21c36d47cd7b2524190862e38cb4c0da6fdd1dbd89b5b7050d837be664bc45693657ec7681e4d9b648044c91",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset16 = new()
-        // {
-        //     FileName = "1336_BottomLeftPart.JPG",
-        //     FileSize = 1119873,
-        //     PixelHeight = 1512,
-        //     PixelWidth = 2016,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "c50e17cee9a52c0235afb410c361d094daf7330c20e4b3f3cb3e3e18683793355e903f84d49bf1db4af7e094980204cc005aa3c503829d14c9e6cd19826e284f",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset17 = new()
-        // {
-        //     FileName = "1336_BottomPart.JPG",
-        //     FileSize = 2172866,
-        //     PixelHeight = 1512,
-        //     PixelWidth = 4032,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 75,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "aef59f88b3c54a5fd1bfc098acac1d662bb3799e83220049ee7c3ae5def487a1464112cce7b7384428ee9b69813448d509413a1fc1abcddc272ec2e044c5f876",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset18 = new()
-        // {
-        //     FileName = "1336_BottomRightPart.JPG",
-        //     FileSize = 1061673,
-        //     PixelHeight = 1512,
-        //     PixelWidth = 2016,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "966370f38d7864499453b99934bb51f1654e567033e637b68ded1ec12c338eaa03d42bb4dc74621551c5dfd922180a291f7c58980bf6c94ae114e4d296a484e4",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset19 = new()
-        // {
-        //     FileName = "1336_LeftPart.JPG",
-        //     FileSize = 1475892,
-        //     PixelHeight = 3024,
-        //     PixelWidth = 2016,
-        //     ThumbnailPixelWidth = 100,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "8afa3f673b047d5096ed2a2528b37c7222ab5b44cf780a7920cea35228e93323709b09b1a2ffe1bd2f789061be9bef8ebcb642fc47a2f3b6573a68a8cd5045ee",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset20 = new()
-        // {
-        //     FileName = "1336_Original.JPG",
-        //     FileSize = 4526710,
-        //     PixelHeight = 3024,
-        //     PixelWidth = 4032,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset21 = new()
-        // {
-        //     FileName = "1336_RightPart.JPG",
-        //     FileSize = 1437903,
-        //     PixelHeight = 3024,
-        //     PixelWidth = 2016,
-        //     ThumbnailPixelWidth = 100,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "0e0e12ea70894ad521c8d3da14b92bbd4e7c7c03010502d779f2e485ea30e917ad6a9bc0435520f70c3448fd96cd9ccf88cf95d2a75a6da669b0f41731aabbe7",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset22 = new()
-        // {
-        //     FileName = "1336_TopLeftPart.JPG",
-        //     FileSize = 362012,
-        //     PixelHeight = 1512,
-        //     PixelWidth = 2016,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "f59b3913bdd53b6cb485a2c04770d1153350df2caf6dabf38b8b8311fb3fb583becbf7d368a1e0987d3584251a64bca72042d334b6e6c25edb7dfaead2db383d",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset23 = new()
-        // {
-        //     FileName = "1336_TopPart.JPG",
-        //     FileSize = 737269,
-        //     PixelHeight = 1512,
-        //     PixelWidth = 4032,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 75,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "93d6ea1575ea8fd4f540b88ae3ce727d28c657a11388c9b6cf927572abffdcc467d3e9b43e622b34158c18ed680c841d43e17a80c7b544261f106d887b51d2d2",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset24 = new()
-        // {
-        //     FileName = "1336_TopRightPart.JPG",
-        //     FileSize = 383508,
-        //     PixelHeight = 1512,
-        //     PixelWidth = 2016,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "3fde05f0e85d71a909fa38351411f3d45305857ea7a920ad22bcffaf4cf50136b4a55acb128bdc9cd9d7db600332f83e4157926a511939b0b57f2e50c020e3d7",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset25 = new()
-        // {
-        //     FileName = "1336_1K.JPG",
-        //     FileSize = 311067,
-        //     PixelHeight = 768,
-        //     PixelWidth = 1024,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "4dcbbf63585dc9fff056a0370ee33efc3d7c57b556bce917f89c5012fbacbc1ee2929f7d3a11ee2f8af426b183212d67167d87e48b80707ab5a1fb4e766d2544",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset26 = new()
-        // {
-        //     FileName = "1336_2K.JPG",
-        //     FileSize = 1154116,
-        //     PixelHeight = 1536,
-        //     PixelWidth = 2048,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "76a8f0b611fdd32b73bff92a186449a7e4bf0b84d618fe8b9666bbf2b022ff6bf259a4a98be42db7d9043ff3c3ff20ae720c5067966c40d16ad3fc67769f514b",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset27 = new()
-        // {
-        //     FileName = "1336_3K.JPG",
-        //     FileSize = 2098339,
-        //     PixelHeight = 2160,
-        //     PixelWidth = 2880,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "98044e6674187219ab629c901dfdf5a72f2535104d83cd167d1bdd9039ded91b7a585b74c5c89860f2e0fab85af9e2181265cba48b908028a42b8ec042265f03",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset28 = new()
-        // {
-        //     FileName = "1336_4K_Original.JPG",
-        //     FileSize = 4526710,
-        //     PixelHeight = 3024,
-        //     PixelWidth = 4032,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset29 = new()
-        // {
-        //     FileName = "1336_8K.JPG",
-        //     FileSize = 8855421,
-        //     PixelHeight = 5760,
-        //     PixelWidth = 7680,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "18289324fb22b8b337b1f4a7d627c605056e04fd308699bc831af0579cbc2d6a5959811dbecce09b26f82c341ea82d02d5c99c1580f50c24106d19c88bd6eba2",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset30 = new()
-        // {
-        //     FileName = "1336_Thumbnail.JPG",
-        //     FileSize = 19472,
-        //     PixelHeight = 152,
-        //     PixelWidth = 202,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "0bbabdb2fe28d4ef53b78a917eb89938fe564d758ebb9cb011e5a675dbee0a8e92bc38b8fe0762e279d48e95e7d17f1bb392fd96e8db7006e9e0bb60c5d2ed31",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset31 = new()
-        // {
-        //     FileName = "Image_1336_Mini.JPG",
-        //     FileSize = 1586,
-        //     PixelHeight = 32,
-        //     PixelWidth = 43,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 149,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "768d0fd37e280f1ef8d2a17702626ca1b290521167c22b0aecadd3cc2f858a88ed59a72f7a4b36c123f487da69842e55e4407de0dd248076947ce7df53e92be4",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset32 = new()
-        // {
-        //     FileName = "Image_1336_Original.JPG",
-        //     FileSize = 4526710,
-        //     PixelHeight = 3024,
-        //     PixelWidth = 4032,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset33 = new()
-        // {
-        //     FileName = "Image_1336_ShitQuality.JPG",
-        //     FileSize = 370819,
-        //     PixelHeight = 3024,
-        //     PixelWidth = 4032,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "0861602a84f5bf56e5f4acf49c1d98da8129542e871208a9c9f25eb497cdc65a75ccf4941874c2be7f4e36309053fe34d61a42b4d1b266910918a0b68f19cfc2",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
-        //
-        // asset34 = new()
-        // {
-        //     FileName = "Image_1336_Small.JPG",
-        //     FileSize = 53227,
-        //     PixelHeight = 443,
-        //     PixelWidth = 591,
-        //     ThumbnailPixelWidth = 200,
-        //     ThumbnailPixelHeight = 150,
-        //     ImageRotation = Rotation.Rotate0,
-        //     Hash = "787146674307ab1e867c0961968dfea28aafc7d45e6cfd83f1562fbd201d029812289cd692c36a4f537c576b25af03c9f6f3cc996a8651f3c69f8240ecb3d5f4",
-        //     IsAssetCorrupted = false,
-        //     AssetCorruptedMessage = null,
-        //     IsAssetRotated = false,
-        //     AssetRotatedMessage = null
-        // };
         _asset1Temp = new()
         {
             FileName = "Image 1_duplicate_copied.jpg",
@@ -775,6 +235,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         _catalogAssetsService = new (_testableAssetRepository, assetHashCalculatorService, storageService, _userConfigurationService, directoryComparer);
     }
 
+    // ADD SECTION (Start) ------------------------------------------------------------------------------------------------
     [Test]
     [TestCase(false)]
     [TestCase(true)]
@@ -1743,9 +1204,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
+    // ADD SECTION (End) ------------------------------------------------------------------------------------------------
 
-    // --------------------------------------------------------------------------------------------------------------------------------------------
-    // UpdatedAssets
+    // UPDATE SECTION (Start) -------------------------------------------------------------------------------------------
     [Test]
     [TestCase(false)]
     [TestCase(true)]
@@ -3231,9 +2692,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             File.Delete(destinationFilePathToCopy);
         }
     }
+    // UPDATE SECTION (End) -------------------------------------------------------------------------------------------
 
-    // --------------------------------------------------------------------------------------------------------------------------------------------
-    // DeletedAssets
+    // DELETE SECTION (Start) -----------------------------------------------------------------------------------------
     [Test]
     [TestCase(false)]
     [TestCase(true)]
@@ -5708,9 +5169,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Directory.Delete(assetsDirectory, true);
         }
     }
+    // DELETE SECTION (End) -----------------------------------------------------------------------------------------
 
-    // --------------------------------------------------------------------------------------------------------------------------------------------
-    // Full scenario test
+    // FULL SCENARIO SECTION (Start) --------------------------------------------------------------------------------
     [Test]
     public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssets()
     {
@@ -7117,9 +6578,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Directory.Delete(assetsDirectory, true);
         }
     }
+    // FULL SCENARIO SECTION (End) --------------------------------------------------------------------------------
 
-    // --------------------------------------------------------------------------------------------------------------------------------------------
-
+    // NO ASSET SECTION (Start) -----------------------------------------------------------------------------------
     [Test]
     [TestCase(2)]
     [TestCase(100)]
@@ -7418,8 +6879,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             }
         }
     }
+    // NO ASSET SECTION (End) -----------------------------------------------------------------------------------
 
-    // BACKUP SECTION ------------------------------------------------------------------------------------------------
+    // BACKUP SECTION (Start) -----------------------------------------------------------------------------------
     [Test]
     [TestCase(false)]
     [TestCase(true)]
@@ -8117,17 +7579,13 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             File.Delete(destinationFilePathToCopy);
         }
     }
+    // BACKUP SECTION (End) -----------------------------------------------------------------------------------
 
-    // BACKUP SECTION ------------------------------------------------------------------------------------------------
-
-    // TODO: RAF (+ cases in Notion)
-    // TODO: Add testCase for AnalyseVideo for each tests
-    // TODO: Clean up
-    // TODO: Verify each ReasonEnum and fix them
     // TODO: Cases for exception handling
     // TODO: Test to Cancel the token for each method (testcase)
 
-    // TODO: Tests the remaining catch in the method to have 100% of coverage.
+    // ERROR SECTION (Start) -----------------------------------------------------------------------------------
+    // TODO: Tests the remaining catch in the method to have 100% of coverage. (don't forget to add TestCase for AnalyseVideo)
     [Test]
     [Ignore("")]
     public void CatalogAssetsAsync_NoAssetsAndTokenIsCancelled_Throws()
@@ -8230,6 +7688,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         // await func.Should().ThrowAsync<OperationCanceledException>();
         // mock.Mock<IAssetRepository>().Verify(r => r.SaveCatalog(It.IsAny<Folder>()), Times.Once);
     }
+    // ERROR SECTION (End) -------------------------------------------------------------------------------------
 
     private static void CheckBlobsAndTablesBeforeSaveCatalog(string blobsPath, string tablesPath)
     {
@@ -8591,7 +8050,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.AreEqual(0, catalogChange.CataloguedAssetsByPath.Count);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
+        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
         Assert.AreEqual($"Inspecting folder {assetsDirectory}.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
         increment++;
@@ -8736,27 +8195,4 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         File.Delete(backupFilePath);
         Assert.IsFalse(File.Exists(backupFilePath));
     }
-
-    // private void CheckCatalogChanges(List<CatalogChangeCallbackEventArgs> catalogChanges)
-    // {
-    //     List<Asset> processedAssets = catalogChanges.Where(s => s.Asset != null).Select(s => s.Asset!).ToList();
-    //     // TODO: beautify this code
-    //     Dictionary<string, List<Asset>> cataloguedAssets = [];
-    //
-    //     foreach (CatalogChangeCallbackEventArgs catalogChange in catalogChanges)
-    //     {
-    //         if (catalogChange.CataloguedAssets.Count > 0)
-    //         {
-    //             cataloguedAssets.Add(catalogChange.Asset?.FileName ?? string.Empty, catalogChange.CataloguedAssets);
-    //         }
-    //     }
-    //
-    //     // TODO: Check the content of cataloguedAssets when in working cases with synced assets
-    //
-    //     List<Exception> exceptions = catalogChanges.Where(s => s.Exception != null).Select(s => s.Exception!).ToList();
-    //     Asset[] repositoryAssets = _testableAssetRepository!.GetAssetsByPath(_dataDirectory!);
-    //
-    //     Assert.AreEqual(repositoryAssets.Length, processedAssets.Count); // TODO: Make a fileList ? -> OneTimeSetup fileList.AddRange(jpegFiles); ... 
-    //     Assert.IsEmpty(exceptions);
-    // }
 }

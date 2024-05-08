@@ -46,10 +46,6 @@ public class CatalogAssetsService : ICatalogAssetsService
             try
             {
                 Folder[] foldersToCatalog = GetFoldersToCatalog();
-                // TODO: Since the root folders to catalog are combined in the same list
-                // with the catalogued sub-folders, the catalog process should keep a list
-                // of the already visited folders so they don't get catalogued twice
-                // in the same execution.
 
                 foreach (Folder folder in foldersToCatalog)
                 {
