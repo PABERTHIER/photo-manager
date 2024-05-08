@@ -58,16 +58,19 @@ public class CatalogAssetsService : ICatalogAssetsService
 
                 if (!_assetRepository.BackupExists() || !_backupHasSameContent)
                 {
+                    // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
                     callback?.Invoke(!_assetRepository.BackupExists()
                         ? new CatalogChangeCallbackEventArgs { Message = "Creating catalog backup..." }
                         : new CatalogChangeCallbackEventArgs { Message = "Updating catalog backup..." });
 
                     _assetRepository.WriteBackup();
+                    // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
                     callback?.Invoke(new CatalogChangeCallbackEventArgs { Message = string.Empty });
 
                     _backupHasSameContent = true;
                 }
 
+                // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
                 callback?.Invoke(new CatalogChangeCallbackEventArgs { Message = string.Empty });
             }
             catch (OperationCanceledException)
@@ -76,6 +79,8 @@ public class CatalogAssetsService : ICatalogAssetsService
                 // there is a risk that it happens while saving the catalog files.
                 // This could result in the files being damaged.
                 // Therefore the application saves the files before the task is completely shut down.
+
+                // TODO: Test if _currentFolderPath is good & SaveCatalog performed correctly
                 Folder? currentFolder = _assetRepository.GetFolderByPath(_currentFolderPath);
                 _assetRepository.SaveCatalog(currentFolder);
                 throw;
@@ -83,10 +88,12 @@ public class CatalogAssetsService : ICatalogAssetsService
             catch (Exception ex)
             {
                 Log.Error(ex);
+                // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
                 callback?.Invoke(new CatalogChangeCallbackEventArgs { Exception = ex });
             }
             finally
             {
+                // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
                 callback?.Invoke(new CatalogChangeCallbackEventArgs { Message = string.Empty });
             }
         });
@@ -286,6 +293,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
         folder = _assetRepository.GetFolderByPath(directory);
 
+        // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
         callback?.Invoke(new CatalogChangeCallbackEventArgs
         {
             Folder = folder,
@@ -434,7 +442,7 @@ public class CatalogAssetsService : ICatalogAssetsService
             // TODO: Refacto the way cataloguedAssetsByPath is handled (bad practice to modify it like this above) + need to rework how to update file informations
             // cataloguedAssetsByPath = _assetRepository.GetCataloguedAssetsByPath(directory);
 
-            // TODO: Reorder each CatalogChangeCallbackEventArgs to match with the class
+            // TODO: Reorder each CatalogChangeCallbackEventArgs to match with the class (same for each UT)
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,

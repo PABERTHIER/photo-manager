@@ -8,6 +8,7 @@ public enum AppModeEnum
 
 public enum ReasonEnum
 {
+    // TODO: Add default value when 100% of code coverage, because AssetCreated should not be the default one
     AssetCreated,
     AssetUpdated,
     AssetDeleted,
