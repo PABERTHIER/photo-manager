@@ -1,5 +1,11 @@
-﻿using PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
+using PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 using System.IO.Compression;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
 
@@ -7581,14 +7587,14 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
     }
     // BACKUP SECTION (End) -----------------------------------------------------------------------------------
 
-    // TODO: Cases for exception handling
-    // TODO: Test to Cancel the token for each method (testcase)
-
     // ERROR SECTION (Start) -----------------------------------------------------------------------------------
-    // TODO: Tests the remaining catch in the method to have 100% of coverage. (don't forget to add TestCase for AnalyseVideo)
+    // TODO: Test case where IsCancellationRequested for no assets (tests Already above for adding, updating and deleting)
+    // (don't forget to add TestCase for AnalyseVideo)
+    // TODO: Test if _currentFolderPath is good & SaveCatalog performed correctly
+    // TODO: Test to Cancel the token for each method (testcase)
     [Test]
-    [Ignore("")]
-    public void CatalogAssetsAsync_NoAssetsAndTokenIsCancelled_Throws()
+    [Ignore("Needs the rework of CancellationToken")]
+    public void CatalogAssetsAsync_NoAssetsAndTokenIsCancelled_ThrowsOperationCanceledException()
     {
         // ConfigureCatalogAssetService(defaultAssetsDirectory!);
         //
@@ -7610,84 +7616,111 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         // }
     }
 
-    [Test]
-    [Ignore("")]
-    public async Task CatalogAssetsAsync_LogOnExceptionTest_()
-    {
-        // string appDataFolder = Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString());
-        //
-        // using var mock = AutoMock.GetLoose(
-        //     cfg =>
-        //     {
-        //         cfg.RegisterDatabaseTypes();
-        //         cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
-        //         cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
-        //         cfg.RegisterType<AssetRepository>().As<IAssetRepository>().SingleInstance();
-        //         cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
-        //         cfg.RegisterType<MoveAssetsService>().As<IMoveAssetsService>().SingleInstance();
-        //     });
-        // mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolderPath()).Returns(appDataFolder);
-        // mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
-        // mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(1000);
-        // mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetRootCatalogFolderPaths()).Returns(new string[] { dataDirectory });
-        //
-        // mock.Mock<IStorageService>().Setup(s => s.FolderExists(It.IsAny<string>())).Returns(true);
-        // mock.Mock<IStorageService>().Setup(s => s.GetFileNames(It.IsAny<string>())).Throws(new IOException());
-        // mock.Mock<IStorageService>().Setup(s => s.ResolveDataDirectory(It.IsAny<double>())).Returns(appDataFolder);
-        //
-        // var repository = mock.Container.Resolve<IAssetRepository>();
-        // var catalogAssetsService = mock.Container.Resolve<ICatalogAssetsService>();
-        // var moveAssetsService = mock.Container.Resolve<IMoveAssetsService>();
-        //
-        // string[] fileList = Directory.GetFiles(dataDirectory, "*.jp*g") // jpg and jpeg files
-        // .Select(f => Path.GetFileName(f))
-        // .ToArray();
-        //
-        // var statusChanges = new List<CatalogChangeCallbackEventArgs>();
-        //
-        // await catalogAssetsService.CatalogAssetsAsync(e => statusChanges.Add(e));
-        //
-        // var processedAssets = statusChanges.Where(s => s.Asset != null).Select(s => s.Asset).ToList();
-        // var exceptions = statusChanges.Where(s => s.Exception != null).Select(s => s.Exception).ToList();
-        //
-        // var repositoryAssets = repository.GetAssetsByPath(dataDirectory);
-        // processedAssets.Should().BeEmpty();
-        // repositoryAssets.Should().BeEmpty();
-        // exceptions.Should().ContainSingle();
-    }
+    // TODO: Not test case for it ? (Catalog service)
 
     [Test]
-    [Ignore("")]
-    public async Task CatalogAssetsAsync_SaveCatalogOnOperationCanceledExceptionTest_()
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task CatalogAssetsAsync_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsError(bool analyseVideos)
     {
-        // using var mock = AutoMock.GetLoose(
-        //     cfg =>
-        //     {
-        //         cfg.RegisterType<Database>().As<IDatabase>().SingleInstance();
-        //         cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
-        //         cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
-        //         cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
-        //         cfg.RegisterType<MoveAssetsService>().As<IMoveAssetsService>().SingleInstance();
-        //     });
-        // mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetApplicationBackupFolderPath()).Returns(Path.Combine(dataDirectory, "ApplicationData", Guid.NewGuid().ToString()));
-        // mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetPicturesDirectory()).Returns(dataDirectory);
-        // mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetCatalogBatchSize()).Returns(1000);
-        // mock.Mock<IUserConfigurationService>().Setup(conf => conf.GetRootCatalogFolderPaths()).Returns(new string[] { dataDirectory });
-        //
-        // mock.Mock<IStorageService>().Setup(s => s.FolderExists(It.IsAny<string>())).Returns(true);
-        // mock.Mock<IStorageService>().Setup(s => s.GetFileNames(It.IsAny<string>())).Throws(new OperationCanceledException());
-        // mock.Mock<IAssetRepository>().Setup(a => a.GetFolders()).Returns(new Folder[] { new Folder { Path = dataDirectory } });
-        //
-        // var repository = mock.Container.Resolve<IAssetRepository>();
-        // var catalogAssetsService = mock.Container.Resolve<ICatalogAssetsService>();
-        // var moveAssetsService = mock.Container.Resolve<IMoveAssetsService>();
-        //
-        // var statusChanges = new List<CatalogChangeCallbackEventArgs>();
-        //
-        // Func<Task> func = async () => await catalogAssetsService.CatalogAssetsAsync(e => statusChanges.Add(e));
-        // await func.Should().ThrowAsync<OperationCanceledException>();
-        // mock.Mock<IAssetRepository>().Verify(r => r.SaveCatalog(It.IsAny<Folder>()), Times.Once);
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+
+        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        try
+        {
+            MemoryAppender memoryAppender = new();
+            BasicConfigurator.Configure(memoryAppender);
+
+            Directory.CreateDirectory(assetsDirectory);
+
+            string imagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string imagePathToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
+
+            File.Copy(imagePath, imagePathToCopy);
+
+            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
+            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.IsTrue(File.Exists(imagePathToCopy));
+
+            Folder? rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNull(rootFolder);
+
+            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+
+            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
+            CheckBackupBefore(backupFilePath);
+
+            List<Asset> assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.IsEmpty(assetsInRootFromRepositoryByPath);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.IsEmpty(assetsFromRepository);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            Assert.IsEmpty(thumbnails);
+
+            CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
+
+            Assert.IsFalse(_testableAssetRepository.HasChanges());
+
+            DenyAccess(assetsDirectory);
+
+            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
+
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+
+            rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Assert.IsNotNull(rootFolder);
+
+            _asset2Temp!.Folder = rootFolder!;
+            _asset2Temp!.FolderId = rootFolder!.FolderId;
+
+            Assert.IsFalse(_testableAssetRepository!.BackupExists());
+
+            assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.IsEmpty(assetsInRootFromRepositoryByPath);
+
+            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.IsEmpty(assetsFromRepository);
+
+            List<Folder> folders = [rootFolder];
+
+            CheckBlobsAndTablesAfterSaveCatalogEmpty(blobsPath, tablesPath, false, false, rootFolder);
+
+            Assert.IsTrue(_testableAssetRepository.HasChanges()); // SaveCatalog has not been done due to the exception
+
+            CheckBackupBefore(backupFilePath);
+
+            Assert.AreEqual(3, catalogChanges.Count);
+
+            int increment = 0;
+
+            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
+
+            UnauthorizedAccessException unauthorizedAccessException = new ($"Access to the path '{assetsDirectory}' is denied.");
+            LoggingEvent[]? logMessages = memoryAppender.GetEvents();
+
+            Assert.AreEqual(1, logMessages.Length);
+            Assert.AreEqual(unauthorizedAccessException.GetType(), logMessages[0].MessageObject.GetType());
+            UnauthorizedAccessException? logMessage = logMessages[0].MessageObject as UnauthorizedAccessException;
+            Assert.AreEqual(unauthorizedAccessException.Message, logMessage!.Message);
+            Assert.AreEqual(typeof(CatalogAssetsService).ToString(), logMessages[0].LoggerName);
+
+            CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            CheckCatalogChangesException(catalogChanges, unauthorizedAccessException, ref increment);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            AllowAccess(assetsDirectory);
+            Directory.Delete(assetsDirectory, true);
+            LogManager.Shutdown();
+        }
     }
+
     // ERROR SECTION (End) -------------------------------------------------------------------------------------
 
     private static void CheckBlobsAndTablesBeforeSaveCatalog(string blobsPath, string tablesPath)
@@ -8158,6 +8191,29 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         }
     }
 
+    private static void CheckCatalogChangesException(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.AreEqual(0, catalogChange.CataloguedAssetsByPath.Count);
+        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
+        Assert.AreEqual(null, catalogChange.Message);
+        Assert.IsNotNull(catalogChange.Exception);
+        Assert.AreEqual(exceptionExpected.Message, catalogChange.Exception!.Message);
+        Assert.AreEqual(exceptionExpected.GetType(), catalogChange.Exception.GetType());
+        increment++;
+
+        catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.AreEqual(0, catalogChange.CataloguedAssetsByPath.Count);
+        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
+        Assert.AreEqual(string.Empty, catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+        increment++;
+    }
+
     private static void RemoveDatabaseBackup(
         List<Folder> folders,
         string blobsPath,
@@ -8194,5 +8250,35 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         // Delete ZIP file in backup
         File.Delete(backupFilePath);
         Assert.IsFalse(File.Exists(backupFilePath));
+    }
+
+    private static void DenyAccess(string directoryPath)
+    {
+        DirectoryInfo directoryInfo = new (directoryPath);
+        DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
+
+        // Use the well-known SID for "Everyone"
+        SecurityIdentifier everyone = new (WellKnownSidType.WorldSid, null);
+
+        // Deny the "ListFolder" and "ReadData" permissions to everyone.
+        // This effectively denies access to the folder.
+        directorySecurity.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.ListDirectory | FileSystemRights.ReadData, AccessControlType.Deny));
+
+        directoryInfo.SetAccessControl(directorySecurity);
+    }
+
+    private static void AllowAccess(string directoryPath)
+    {
+        DirectoryInfo directoryInfo = new (directoryPath);
+        DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
+
+        // Use the well-known SID for "Everyone"
+        SecurityIdentifier everyone = new (WellKnownSidType.WorldSid, null);
+
+        // Remove the "Deny" rule for the "ListFolder" and "ReadData" permissions.
+        // This effectively allows access to the folder.
+        directorySecurity.RemoveAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.ListDirectory | FileSystemRights.ReadData, AccessControlType.Deny));
+
+        directoryInfo.SetAccessControl(directorySecurity);
     }
 }

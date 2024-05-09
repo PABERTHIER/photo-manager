@@ -11,7 +11,7 @@ public class CatalogAssetsService : ICatalogAssetsService
     private readonly IUserConfigurationService _userConfigurationService;
     private readonly IDirectoryComparer _directoryComparer;
 
-    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
     private bool _backupHasSameContent;
     private string _currentFolderPath;
