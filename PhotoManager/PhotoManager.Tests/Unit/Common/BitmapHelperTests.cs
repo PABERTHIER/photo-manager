@@ -537,7 +537,7 @@ public class BitmapHelperTests
         Assert.AreEqual(0, image.DecodePixelWidth);
         Assert.AreEqual(0, image.DecodePixelHeight);
     }
-    
+
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
     [TestCase("Image_11_90.heic", Rotation.Rotate90, 4032, 3024)]

@@ -17,6 +17,7 @@ public class StorageServiceTests
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
 
         _userConfigurationService = new (configurationRootMock.Object);
         _storageService = new (_userConfigurationService);
@@ -782,6 +783,38 @@ public class StorageServiceTests
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.IsValidHeic(emptyHeicData));
 
         Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
+    }
+
+    [Test]
+    public void GetTotalFilesCount_FilesInDirectory_ReturnsTotalFilesCount()
+    {
+        int totalFilesCount = _storageService!.GetTotalFilesCount();
+        Assert.AreEqual(67, totalFilesCount);
+    }
+
+    [Test]
+    public void GetTotalFilesCount_EmptyDirectory_ReturnsTotalFilesCount()
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+
+        try
+        {
+            Directory.CreateDirectory(assetsDirectory);
+
+            Mock<IConfigurationRoot> configurationRootMock = new();
+            configurationRootMock.GetDefaultMockConfig();
+            configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
+
+            UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+            StorageService storageService = new (userConfigurationService);
+
+            int totalFilesCount = storageService.GetTotalFilesCount();
+            Assert.AreEqual(0, totalFilesCount);
+        }
+        finally
+        {
+            Directory.Delete(assetsDirectory, true);
+        }
     }
 
     private static bool IsValidImage(string filePath)

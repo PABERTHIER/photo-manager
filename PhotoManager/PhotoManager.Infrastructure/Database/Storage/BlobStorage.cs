@@ -9,9 +9,9 @@ public class BlobStorage : IBlobStorage
 
         if (File.Exists(binaryFilePath))
         {
-            using (FileStream fileStream = new(binaryFilePath, FileMode.Open))
+            using (FileStream fileStream = new (binaryFilePath, FileMode.Open))
             {
-                using (BinaryReader reader = new(fileStream))
+                using (BinaryReader reader = new (fileStream))
                 {
                     int itemCount = reader.ReadInt32();
                     result = new Dictionary<string, byte[]>(itemCount);
@@ -33,9 +33,9 @@ public class BlobStorage : IBlobStorage
 
     public void WriteToBinaryFile(Dictionary<string, byte[]> data, string binaryFilePath)
     {
-        using (FileStream fileStream = new(binaryFilePath, FileMode.Create))
+        using (FileStream fileStream = new (binaryFilePath, FileMode.Create))
         {
-            using (BinaryWriter writer = new(fileStream))
+            using (BinaryWriter writer = new (fileStream))
             {
                 writer.Write(data.Count);
 

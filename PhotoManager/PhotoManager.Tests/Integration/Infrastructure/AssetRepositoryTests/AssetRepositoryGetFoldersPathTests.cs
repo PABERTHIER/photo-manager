@@ -1,7 +1,7 @@
 ﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
-public class AssetRepositoryGetFoldersTests
+public class AssetRepositoryGetFoldersPathTests
 {
     private string? _dataDirectory;
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
@@ -33,7 +33,7 @@ public class AssetRepositoryGetFoldersTests
     }
 
     [Test]
-    public void GetFolders_Folders_ReturnsCorrectFolders()
+    public void GetFoldersPath_Folders_ReturnsCorrectFoldersPath()
     {
         try
         {
@@ -43,13 +43,13 @@ public class AssetRepositoryGetFoldersTests
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
-            Folder[] folders = _assetRepository!.GetFolders();
+            HashSet<string> foldersPath = _assetRepository!.GetFoldersPath();
 
-            Assert.AreEqual(2, folders.Length);
-            Assert.AreEqual(folderPath1, folders[0].Path);
-            Assert.AreEqual(addedFolder1.FolderId, folders[0].FolderId);
-            Assert.AreEqual(folderPath2, folders[1].Path);
-            Assert.AreEqual(addedFolder2.FolderId, folders[1].FolderId);
+            Assert.AreEqual(2, foldersPath.Count);
+            Assert.AreEqual(folderPath1, addedFolder1.Path);
+            Assert.IsTrue(foldersPath.Contains(folderPath1));
+            Assert.AreEqual(folderPath2, addedFolder2.Path);
+            Assert.IsTrue(foldersPath.Contains(folderPath2));
         }
         finally
         {
@@ -58,13 +58,13 @@ public class AssetRepositoryGetFoldersTests
     }
 
     [Test]
-    public void GetFolders_NoFolders_ReturnsEmptyArray()
+    public void GetFoldersPath_NoFolders_ReturnsEmptyHashSet()
     {
         try
         {
-            Folder[] folders = _assetRepository!.GetFolders();
+            HashSet<string> foldersPath = _assetRepository!.GetFoldersPath();
 
-            Assert.IsEmpty(folders);
+            Assert.IsEmpty(foldersPath);
         }
         finally
         {
@@ -73,7 +73,7 @@ public class AssetRepositoryGetFoldersTests
     }
 
     [Test]
-    public void GetFolders_ConcurrentAccess_FoldersAreHandledSafely()
+    public void GetFoldersPath_ConcurrentAccess_FoldersPathAreHandledSafely()
     {
         try
         {
@@ -83,34 +83,31 @@ public class AssetRepositoryGetFoldersTests
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
-            Folder[] folders1 = [];
-            Folder[] folders2 = [];
-            Folder[] folders3 = [];
+            HashSet<string> foldersPath1 = [];
+            HashSet<string> foldersPath2 = [];
+            HashSet<string> foldersPath3 = [];
 
             // Simulate concurrent access
             Parallel.Invoke(
-                () => folders1 = _assetRepository!.GetFolders(),
-                () => folders2 = _assetRepository!.GetFolders(),
-                () => folders3 = _assetRepository!.GetFolders()
+                () => foldersPath1 = _assetRepository!.GetFoldersPath(),
+                () => foldersPath2 = _assetRepository!.GetFoldersPath(),
+                () => foldersPath3 = _assetRepository!.GetFoldersPath()
             );
 
-            Assert.AreEqual(2, folders1.Length);
-            Assert.AreEqual(folderPath1, folders1[0].Path);
-            Assert.AreEqual(addedFolder1.FolderId, folders1[0].FolderId);
-            Assert.AreEqual(folderPath2, folders1[1].Path);
-            Assert.AreEqual(addedFolder2.FolderId, folders1[1].FolderId);
+            Assert.AreEqual(folderPath1, addedFolder1.Path);
+            Assert.AreEqual(folderPath2, addedFolder2.Path);
 
-            Assert.AreEqual(2, folders2.Length);
-            Assert.AreEqual(folderPath1, folders2[0].Path);
-            Assert.AreEqual(addedFolder1.FolderId, folders2[0].FolderId);
-            Assert.AreEqual(folderPath2, folders2[1].Path);
-            Assert.AreEqual(addedFolder2.FolderId, folders2[1].FolderId);
+            Assert.AreEqual(2, foldersPath1.Count);
+            Assert.IsTrue(foldersPath1.Contains(folderPath1));
+            Assert.IsTrue(foldersPath1.Contains(folderPath2));
 
-            Assert.AreEqual(2, folders3.Length);
-            Assert.AreEqual(folderPath1, folders3[0].Path);
-            Assert.AreEqual(addedFolder1.FolderId, folders3[0].FolderId);
-            Assert.AreEqual(folderPath2, folders3[1].Path);
-            Assert.AreEqual(addedFolder2.FolderId, folders3[1].FolderId);
+            Assert.AreEqual(2, foldersPath2.Count);
+            Assert.IsTrue(foldersPath2.Contains(folderPath1));
+            Assert.IsTrue(foldersPath2.Contains(folderPath2));
+
+            Assert.AreEqual(2, foldersPath3.Count);
+            Assert.IsTrue(foldersPath3.Contains(folderPath1));
+            Assert.IsTrue(foldersPath3.Contains(folderPath2));
         }
         finally
         {

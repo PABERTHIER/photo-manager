@@ -7,6 +7,7 @@ public interface IAssetRepository
     Folder AddFolder(string path);
     bool FolderExists(string path);
     Folder[] GetFolders();
+    HashSet<string> GetFoldersPath();
     Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
     Folder? GetFolderByPath(string path);
     void SaveCatalog(Folder? folder);
