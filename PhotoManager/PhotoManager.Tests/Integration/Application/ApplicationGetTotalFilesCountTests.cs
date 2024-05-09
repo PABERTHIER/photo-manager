@@ -19,7 +19,7 @@ public class ApplicationGetTotalFilesCountTests
     private UserConfigurationService? _userConfigurationService;
     private StorageService? _storageService;
     private Database? _database;
-    private DirectoryComparer? _directoryComparer;
+    private AssetsComparator? _assetsComparator;
     private AssetHashCalculatorService? _assetHashCalculatorService;
 
     private Mock<IStorageService>? _storageServiceMock;
@@ -48,11 +48,11 @@ public class ApplicationGetTotalFilesCountTests
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
         _storageService = new (_userConfigurationService);
         _assetHashCalculatorService = new (_userConfigurationService);
-        _directoryComparer = new (_storageService);
-        _catalogAssetsService = new (_testableAssetRepository, _assetHashCalculatorService, _storageService, _userConfigurationService, _directoryComparer);
+        _assetsComparator = new (_storageService);
+        _catalogAssetsService = new (_testableAssetRepository, _assetHashCalculatorService, _storageService, _userConfigurationService, _assetsComparator);
         _moveAssetsService = new (_testableAssetRepository, _storageService, _catalogAssetsService);
 
-        _syncAssetsService = new (_testableAssetRepository, _storageService, _directoryComparer, _moveAssetsService);
+        _syncAssetsService = new (_testableAssetRepository, _storageService, _assetsComparator, _moveAssetsService);
         _findDuplicatedAssetsService = new (_testableAssetRepository, _storageService, _userConfigurationService);
         _application = new (_testableAssetRepository, _syncAssetsService, _catalogAssetsService, _moveAssetsService, _findDuplicatedAssetsService, _userConfigurationService, _storageService);
     }

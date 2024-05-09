@@ -1,6 +1,6 @@
 ﻿namespace PhotoManager.Domain.Interfaces;
 
-public interface IDirectoryComparer
+public interface IAssetsComparator
 {
     string[] GetNewFileNames(string[] fileNames, List<Asset> cataloguedAssets);
     string[] GetNewFileNamesToSync(string[] sourceFileNames, string[] destinationFileNames);

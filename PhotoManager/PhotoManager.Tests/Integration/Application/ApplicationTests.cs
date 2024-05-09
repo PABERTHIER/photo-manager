@@ -33,7 +33,7 @@
 //                cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
 //                cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
 //                cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
-//                cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
+//                cfg.RegisterType<AssetsComparator>().As<IAssetsComparator>().SingleInstance();
 //                cfg.RegisterType<AssetRepository>().As<IAssetRepository>().SingleInstance();
 //                cfg.RegisterType<FindDuplicatedAssetsService>().As<IFindDuplicatedAssetsService>().SingleInstance();
 //                cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
@@ -89,7 +89,7 @@
 //                cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
 //                cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
 //                cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
-//                cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
+//                cfg.RegisterType<AssetsComparator>().As<IAssetsComparator>().SingleInstance();
 //                cfg.RegisterType<AssetRepository>().As<IAssetRepository>().SingleInstance();
 //                cfg.RegisterType<FindDuplicatedAssetsService>().As<IFindDuplicatedAssetsService>().SingleInstance();
 //                cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
@@ -128,7 +128,7 @@
 //                cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
 //                cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
 //                cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
-//                cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
+//                cfg.RegisterType<AssetsComparator>().As<IAssetsComparator>().SingleInstance();
 //                cfg.RegisterType<AssetRepository>().As<IAssetRepository>().SingleInstance();
 //                cfg.RegisterType<FindDuplicatedAssetsService>().As<IFindDuplicatedAssetsService>().SingleInstance();
 //                cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
@@ -179,7 +179,7 @@
 //                cfg.RegisterType<AssetHashCalculatorService>().As<IAssetHashCalculatorService>().SingleInstance();
 //                cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
 //                cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
-//                cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
+//                cfg.RegisterType<AssetsComparator>().As<IAssetsComparator>().SingleInstance();
 //                cfg.RegisterType<AssetRepository>().As<IAssetRepository>().SingleInstance();
 //                cfg.RegisterType<FindDuplicatedAssetsService>().As<IFindDuplicatedAssetsService>().SingleInstance();
 //                cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();
@@ -224,7 +224,7 @@
 //                cfg.RegisterDatabaseTypes();
 //                cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
 //                cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
-//                cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
+//                cfg.RegisterType<AssetsComparator>().As<IAssetsComparator>().SingleInstance();
 //                cfg.RegisterType<AssetRepository>().As<IAssetRepository>().SingleInstance();
 //            });
 //        var repository = mock.Container.Resolve<IAssetRepository>();
@@ -259,7 +259,7 @@
 //                cfg.RegisterDatabaseTypes();
 //                cfg.RegisterInstance(userConfigurationService).As<IUserConfigurationService>();
 //                cfg.RegisterType<StorageService>().As<IStorageService>().SingleInstance();
-//                cfg.RegisterType<DirectoryComparer>().As<IDirectoryComparer>().SingleInstance();
+//                cfg.RegisterType<AssetsComparator>().As<IAssetsComparator>().SingleInstance();
 //                cfg.RegisterType<UnencapsulatedAssetRepository>().As<IAssetRepository>().SingleInstance();
 //                cfg.RegisterType<FindDuplicatedAssetsService>().As<IFindDuplicatedAssetsService>().SingleInstance();
 //                cfg.RegisterType<CatalogAssetsService>().As<ICatalogAssetsService>().SingleInstance();

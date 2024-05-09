@@ -1,14 +1,7 @@
 ﻿namespace PhotoManager.Domain;
 
-public class DirectoryComparer : IDirectoryComparer
+public class AssetsComparator(IStorageService storageService) : IAssetsComparator
 {
-    private readonly IStorageService _storageService;
-
-    public DirectoryComparer(IStorageService storageService)
-    {
-        _storageService = storageService;
-    }
-
     public string[] GetNewFileNames(string[] fileNames, List<Asset> cataloguedAssets)
     {
         return GetNewFileNamesList(fileNames, cataloguedAssets.Select(ca => ca.FileName).ToArray());
@@ -28,7 +21,7 @@ public class DirectoryComparer : IDirectoryComparer
     {
         foreach (Asset asset in cataloguedAssets)
         {
-            _storageService.LoadFileInformation(asset);
+            storageService.LoadFileInformation(asset);
         }
 
         return cataloguedAssets.Where(IsUpdatedAsset()).Select(ca => ca.FileName).ToArray();
@@ -61,10 +54,10 @@ public class DirectoryComparer : IDirectoryComparer
 
     private static (string[], string[]) GetImageAndVideoNamesList(string[] fileNames)
     {
-        List<string> imageNames = new();
-        List<string> videoNames = new();
+        List<string> imageNames = [];
+        List<string> videoNames = [];
 
-        foreach (var fileName in fileNames)
+        foreach (string fileName in fileNames)
         {
             if (ImageHelper.IsImageFile(fileName))
             {

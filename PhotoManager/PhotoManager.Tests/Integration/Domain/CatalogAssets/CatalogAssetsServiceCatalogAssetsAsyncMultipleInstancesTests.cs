@@ -231,8 +231,8 @@ public class CatalogAssetsServiceCatalogAssetsAsyncMultipleInstancesTests
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
         StorageService storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        DirectoryComparer directoryComparer = new (storageService);
-        _catalogAssetsService = new (_testableAssetRepository, assetHashCalculatorService, storageService, _userConfigurationService, directoryComparer);
+        AssetsComparator assetsComparator = new (storageService);
+        _catalogAssetsService = new (_testableAssetRepository, assetHashCalculatorService, storageService, _userConfigurationService, assetsComparator);
     }
 
     // TODO: Do same tests as CatalogAssetsServiceCatalogAssetsAsyncTests but with multiple instances instead of one

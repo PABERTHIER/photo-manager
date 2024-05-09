@@ -9,7 +9,7 @@ public class CatalogAssetsService : ICatalogAssetsService
     private readonly IAssetHashCalculatorService _assetHashCalculatorService;
     private readonly IStorageService _storageService;
     private readonly IUserConfigurationService _userConfigurationService;
-    private readonly IDirectoryComparer _directoryComparer;
+    private readonly IAssetsComparator _assetsComparator;
 
     private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
@@ -22,13 +22,13 @@ public class CatalogAssetsService : ICatalogAssetsService
         IAssetHashCalculatorService assetHashCalculatorService,
         IStorageService storageService,
         IUserConfigurationService userConfigurationService,
-        IDirectoryComparer directoryComparer)
+        IAssetsComparator assetsComparator)
     {
         _assetRepository = assetRepository;
         _assetHashCalculatorService = assetHashCalculatorService;
         _storageService = storageService;
         _userConfigurationService = userConfigurationService;
-        _directoryComparer = directoryComparer;
+        _assetsComparator = assetsComparator;
 
         _backupHasSameContent = true;
         _currentFolderPath = string.Empty;
@@ -398,10 +398,10 @@ public class CatalogAssetsService : ICatalogAssetsService
         string[] imageNames;
         string[] videoNames;
 
-        (imageNames, videoNames) = _directoryComparer.GetImageAndVideoNames(fileNames);
+        (imageNames, videoNames) = _assetsComparator.GetImageAndVideoNames(fileNames);
 
-        string[] newImageFileNames = _directoryComparer.GetNewFileNames(imageNames, cataloguedAssetsByPath);
-        string[] newVideoFileNames = _directoryComparer.GetNewFileNames(videoNames, cataloguedAssetsByPath);
+        string[] newImageFileNames = _assetsComparator.GetNewFileNames(imageNames, cataloguedAssetsByPath);
+        string[] newVideoFileNames = _assetsComparator.GetNewFileNames(videoNames, cataloguedAssetsByPath);
 
         CreateAssets(newImageFileNames, false, directory, callback, ref cataloguedAssetsBatchCount, batchSize, cataloguedAssetsByPath, folderHasThumbnails, token);
 
@@ -537,7 +537,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, List<Asset> cataloguedAssetsByPath, bool folderHasThumbnails, CancellationToken? token = null)
     {
-        string[] updatedFileNames = _directoryComparer.GetUpdatedFileNames(cataloguedAssetsByPath); // TODO: Should not depend on it to have file info for each files -> break content in separate parts
+        string[] updatedFileNames = _assetsComparator.GetUpdatedFileNames(cataloguedAssetsByPath); // TODO: Should not depend on it to have file info for each files -> break content in separate parts
         //Folder folder = _assetRepository.GetFolderByPath(directory);
 
         foreach (string fileName in updatedFileNames)
@@ -561,7 +561,7 @@ public class CatalogAssetsService : ICatalogAssetsService
                     continue;
                 }
 
-                // TODO: Move from here and split _directoryComparer.GetUpdatedFileNames usage above !!
+                // TODO: Move from here and split _assetsComparator.GetUpdatedFileNames usage above !!
                 _storageService.LoadFileInformation(updatedAsset);
 
                 updatedAsset.ImageData = LoadThumbnail(directory, fileName, updatedAsset.ThumbnailPixelWidth, updatedAsset.ThumbnailPixelHeight);
@@ -589,7 +589,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private void CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, Folder folder, List<Asset> cataloguedAssetsByPath, CancellationToken? token = null)
     {
-        string[] deletedFileNames = _directoryComparer.GetDeletedFileNames(fileNames, cataloguedAssetsByPath);
+        string[] deletedFileNames = _assetsComparator.GetDeletedFileNames(fileNames, cataloguedAssetsByPath);
 
         foreach (string fileName in deletedFileNames)
         {

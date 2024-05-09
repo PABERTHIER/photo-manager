@@ -80,7 +80,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<IBlobStorage, BlobStorage>();
         services.AddSingleton<IBackupStorage, BackupStorage>();
         services.AddSingleton<IDatabase, Database>();
-        services.AddSingleton<IDirectoryComparer, DirectoryComparer>();
+        services.AddSingleton<IAssetsComparator, AssetsComparator>();
         services.AddSingleton<IProcessService, ProcessService>();
         services.AddSingleton<IStorageService, StorageService>();
         services.AddSingleton<IAssetRepository, AssetRepository>();

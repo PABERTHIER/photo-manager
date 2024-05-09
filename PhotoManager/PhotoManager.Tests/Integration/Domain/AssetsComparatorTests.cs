@@ -1,12 +1,12 @@
 ﻿namespace PhotoManager.Tests.Integration.Domain;
 
 [TestFixture]
-public class DirectoryComparerTests
+public class AssetsComparatorTests
 {
     private string? dataDirectory;
 
     private IStorageService? _storageService;
-    private IDirectoryComparer? _directoryComparer;
+    private IAssetsComparator? _assetsComparator;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? asset1;
@@ -22,9 +22,10 @@ public class DirectoryComparerTests
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         _storageService = new StorageService(userConfigurationService);
-        _directoryComparer = new DirectoryComparer(_storageService);
+        _assetsComparator = new AssetsComparator(_storageService);
     }
 
+    // TODO: Add cases for gif and heic + video
     [SetUp]
     public void SetUp()
     {
@@ -99,7 +100,7 @@ public class DirectoryComparerTests
 
             List<Asset> cataloguedAssets = new() { asset1!, asset2! };
 
-            string[] updatedFileNames = _directoryComparer!.GetUpdatedFileNames(cataloguedAssets);
+            string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
 
             Assert.IsNotEmpty(updatedFileNames);
             CollectionAssert.AreEquivalent(expectedFileNames, updatedFileNames);
@@ -127,7 +128,7 @@ public class DirectoryComparerTests
 
         List<Asset> cataloguedAssets = new() { asset1!, asset2! };
 
-        string[] updatedFileNames = _directoryComparer!.GetUpdatedFileNames(cataloguedAssets);
+        string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
 
         Assert.IsEmpty(updatedFileNames);
     }
@@ -144,7 +145,7 @@ public class DirectoryComparerTests
 
         List<Asset> cataloguedAssets = new() { asset1!, asset2! };
 
-        string[] updatedFileNames = _directoryComparer!.GetUpdatedFileNames(cataloguedAssets);
+        string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
 
         Assert.IsEmpty(updatedFileNames);
     }
@@ -154,7 +155,7 @@ public class DirectoryComparerTests
     {
         List<Asset> cataloguedAssets = new();
 
-        string[] updatedFileNames = _directoryComparer!.GetUpdatedFileNames(cataloguedAssets!);
+        string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets!);
 
         Assert.IsEmpty(updatedFileNames);
     }
@@ -164,7 +165,7 @@ public class DirectoryComparerTests
     {
         List<Asset>? cataloguedAssets = null;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _directoryComparer!.GetUpdatedFileNames(cataloguedAssets!));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetsComparator!.GetUpdatedFileNames(cataloguedAssets!));
 
         Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
     }

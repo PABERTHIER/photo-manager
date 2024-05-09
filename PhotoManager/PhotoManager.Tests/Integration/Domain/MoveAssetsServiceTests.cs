@@ -43,8 +43,8 @@ public class MoveAssetsServiceTests
         _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
         _storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        DirectoryComparer directoryComparer = new (_storageService);
-        _catalogAssetsService = new (_assetRepository, assetHashCalculatorService, _storageService, _userConfigurationService, directoryComparer);
+        AssetsComparator assetsComparator = new (_storageService);
+        _catalogAssetsService = new (_assetRepository, assetHashCalculatorService, _storageService, _userConfigurationService, assetsComparator);
         _moveAssetsService = new (_assetRepository, _storageService, _catalogAssetsService);
     }
 
