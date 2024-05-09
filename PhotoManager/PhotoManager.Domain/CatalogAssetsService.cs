@@ -15,7 +15,7 @@ public class CatalogAssetsService : ICatalogAssetsService
 
     private bool _backupHasSameContent;
     private string _currentFolderPath;
-    private HashSet<string> _directories;
+    private readonly HashSet<string> _directories;
 
     public CatalogAssetsService(
         IAssetRepository assetRepository,
@@ -45,13 +45,13 @@ public class CatalogAssetsService : ICatalogAssetsService
 
             try
             {
-                Folder[] foldersToCatalog = GetFoldersToCatalog();
+                HashSet<string> foldersPathToCatalog = GetFoldersPathToCatalog();
 
-                foreach (Folder folder in foldersToCatalog)
+                foreach (string path in foldersPathToCatalog)
                 {
                     // ThrowIfCancellationRequested should be in each if below ?
                     // token?.ThrowIfCancellationRequested(); rework all the cancellation
-                    CatalogAssets(folder.Path, callback, ref cataloguedAssetsBatchCount, visitedDirectories, token);
+                    CatalogAssets(path, callback, ref cataloguedAssetsBatchCount, visitedDirectories, token);
                 }
 
                 _directories.UnionWith(visitedDirectories);
@@ -233,7 +233,7 @@ public class CatalogAssetsService : ICatalogAssetsService
     }
 
     #region private
-    private Folder[] GetFoldersToCatalog()
+    private HashSet<string> GetFoldersPathToCatalog()
     {
         string[] rootPaths = _userConfigurationService.GetRootCatalogFolderPaths();
 
@@ -245,16 +245,11 @@ public class CatalogAssetsService : ICatalogAssetsService
             }
         }
 
-        return _assetRepository.GetFolders();
+        return _assetRepository.GetFoldersPath();
     }
 
     private void CatalogAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, HashSet<string> visitedDirectories, CancellationToken? token = null)
     {
-        if (visitedDirectories.Contains(directory))
-        {
-            return;
-        }
-
         _currentFolderPath = directory;
         int batchSize = _userConfigurationService.AssetSettings.CatalogBatchSize;
 

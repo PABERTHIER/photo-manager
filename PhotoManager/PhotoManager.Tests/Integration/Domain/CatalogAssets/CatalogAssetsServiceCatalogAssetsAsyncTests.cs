@@ -7616,8 +7616,6 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         // }
     }
 
-    // TODO: Not test case for it ? (Catalog service)
-
     [Test]
     [TestCase(false)]
     [TestCase(true)]

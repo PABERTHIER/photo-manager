@@ -158,10 +158,23 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            result = folders.ToArray();
+            result = [..folders];
         }
 
         return result;
+    }
+
+    // TODO: Is HashSet the right think to do ? (Because it does not preserve the order)
+    public HashSet<string> GetFoldersPath()
+    {
+        HashSet<string> folderPaths;
+
+        lock (syncLock)
+        {
+            folderPaths = folders.Select(folder => folder.Path).ToHashSet();
+        }
+
+        return folderPaths;
     }
 
     public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) // TODO: Remove includeHidden when tests done in the caller class
