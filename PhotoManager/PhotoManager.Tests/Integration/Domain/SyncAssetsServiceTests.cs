@@ -14,8 +14,6 @@ public class SyncAssetsServiceTests
     private Database? _database;
     private StorageService? _storageService;
     private MoveAssetsService? _moveAssetsService;
-    private CatalogAssetsService? _catalogAssetsService;
-    private AssetsComparator? _assetsComparator;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -38,15 +36,14 @@ public class SyncAssetsServiceTests
     public void Setup()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new(_configurationRootMock!.Object);
+        _userConfigurationService = new (_configurationRootMock!.Object);
         _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
         _storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        AssetsComparator assetsComparator = new(_storageService);
-        _catalogAssetsService = new (_assetRepository, assetHashCalculatorService, _storageService, _userConfigurationService, assetsComparator);
-        _moveAssetsService = new (_assetRepository, _storageService, _catalogAssetsService);
-        _assetsComparator = new (_storageService);
-        _syncAssetsService = new (_assetRepository, _storageService, _assetsComparator, _moveAssetsService);
+        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
+        AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
+        AssetsComparator assetsComparator = new (_storageService);
+        _moveAssetsService = new (_assetRepository, _storageService, assetCreationService);
+        _syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
     }
 
     [Test]

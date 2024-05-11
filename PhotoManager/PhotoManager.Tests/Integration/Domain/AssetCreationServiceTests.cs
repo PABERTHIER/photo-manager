@@ -1,9 +1,9 @@
 ﻿using PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
-namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
+namespace PhotoManager.Tests.Integration.Domain;
 
 [TestFixture]
-public class CatalogAssetsServiceCreateAssetTests
+public class AssetCreationServiceTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -11,7 +11,7 @@ public class CatalogAssetsServiceCreateAssetTests
     private const string DATABASE_END_PATH = "v1.0";
     private const string FFMPEG_PATH = "E:\\ffmpeg\\bin\\ffmpeg.exe"; // TODO: Will be removed when the dll of Ffmpeg would have been generated and stored in the project
 
-    private CatalogAssetsService? _catalogAssetsService;
+    private AssetCreationService? _assetCreationService;
     private Database? _database;
     private UserConfigurationService? _userConfigurationService;
     private TestableAssetRepository? _testableAssetRepository;
@@ -30,7 +30,7 @@ public class CatalogAssetsServiceCreateAssetTests
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
-    private void ConfigureCatalogAssetService(int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureAssetCreationService(int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -47,8 +47,7 @@ public class CatalogAssetsServiceCreateAssetTests
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
         StorageService storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetsComparator assetsComparator = new (storageService);
-        _catalogAssetsService = new (_testableAssetRepository, assetHashCalculatorService, storageService, _userConfigurationService, assetsComparator);
+        _assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
     }
 
     [Test]
@@ -102,7 +101,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int imageByteSize,
         string additionalPath)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -118,7 +117,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
+            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.IsNotNull(asset);
 
@@ -199,7 +198,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int imageByteSize,
         string additionalPath)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, true, false);
+        ConfigureAssetCreationService(200, 150, false, false, true, false);
 
         try
         {
@@ -215,7 +214,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
+            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.IsNotNull(asset);
 
@@ -296,7 +295,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int imageByteSize,
         string additionalPath)
     {
-        ConfigureCatalogAssetService(200, 150, true, false, false, false);
+        ConfigureAssetCreationService(200, 150, true, false, false, false);
 
         try
         {
@@ -312,7 +311,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
+            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.IsNotNull(asset);
 
@@ -393,7 +392,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int imageByteSize,
         string additionalPath)
     {
-        ConfigureCatalogAssetService(200, 150, false, true, false, false);
+        ConfigureAssetCreationService(200, 150, false, true, false, false);
 
         try
         {
@@ -409,7 +408,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
+            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.IsNotNull(asset);
 
@@ -456,7 +455,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int imageByteSize,
         string additionalPath)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -472,7 +471,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(folderPath, fileName);
+            Asset? asset = _assetCreationService!.CreateAsset(folderPath, fileName);
 
             Assert.IsNotNull(asset);
 
@@ -518,7 +517,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int expectedThumbnailPixelHeight,
         int expectedImageByteSize)
     {
-        ConfigureCatalogAssetService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
+        ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
         Asset expectedAsset = new()
         {
@@ -549,7 +548,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.IsNotNull(asset);
 
@@ -595,7 +594,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int expectedThumbnailPixelHeight,
         int expectedImageByteSize)
     {
-        ConfigureCatalogAssetService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
+        ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
         Asset expectedAsset = new()
         {
@@ -626,7 +625,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.IsNotNull(asset);
 
@@ -671,7 +670,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int expectedThumbnailPixelHeight,
         int expectedImageByteSize)
     {
-        ConfigureCatalogAssetService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
+        ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
         Asset expectedAsset = new()
         {
@@ -702,7 +701,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.IsNotNull(asset);
 
@@ -735,7 +734,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndCreatingTwiceSameImageInDifferentLocations_ReturnsAssetAndCreatesBothAssets()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         Asset expectedAsset = new()
         {
@@ -768,7 +767,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.IsNotNull(asset);
 
@@ -796,7 +795,7 @@ public class CatalogAssetsServiceCreateAssetTests
             string newSameImagePath = Path.Combine(newSameAssetFolderPath, expectedAsset.FileName);
             Assert.IsTrue(File.Exists(imagePath));
 
-            Asset? newSameAsset = _catalogAssetsService!.CreateAsset(newSameAssetFolderPath, expectedAsset.FileName);
+            Asset? newSameAsset = _assetCreationService!.CreateAsset(newSameAssetFolderPath, expectedAsset.FileName);
 
             Assert.IsNotNull(newSameAsset);
 
@@ -858,7 +857,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndCreatingTwiceSameImage_DoesNotAddTheSecondOneAndReturnsNull()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         Asset expectedAsset = new()
         {
@@ -891,7 +890,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.IsNotNull(asset);
 
@@ -915,7 +914,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
 
-            Asset? newSameAsset = _catalogAssetsService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
+            Asset? newSameAsset = _assetCreationService!.CreateAsset(_dataDirectory!, expectedAsset.FileName);
 
             Assert.IsNull(newSameAsset);
 
@@ -934,7 +933,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Image_11.heic", "Invalid_Image_11.heic")]
     public void CreateAsset_InvalidPicture_ReturnsNullAndDoesNotCreateAsset(string fileName, string invalidFileName)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
         string tempDirectory = Path.Combine(_dataDirectory!, "InvalidImage");
 
         try
@@ -958,7 +957,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(tempDirectory, invalidFileName);
+            Asset? asset = _assetCreationService!.CreateAsset(tempDirectory, invalidFileName);
 
             Assert.IsNull(asset);
 
@@ -989,7 +988,7 @@ public class CatalogAssetsServiceCreateAssetTests
         string hash,
         int imageByteSizeExpected)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
         string tempDirectory = Path.Combine(_dataDirectory!, "CorruptedImage");
 
         try
@@ -1029,7 +1028,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(tempDirectory, corruptedAssetFileName);
+            Asset? asset = _assetCreationService!.CreateAsset(tempDirectory, corruptedAssetFileName);
 
             Assert.IsNotNull(asset);
 
@@ -1063,7 +1062,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndFolderNotAdded_ThrowsNullReferenceExceptionAndAssetIsNotCreated()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -1078,7 +1077,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
 
             Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
 
@@ -1098,7 +1097,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Homer.gif", 100, 100000)] // Width == Height
     public void CreateAsset_PictureAndBasicHashTypeAndThumbnailSettingsTooBig_ThrowsOverflowExceptionAndAssetIsNotCreated(string assetName, int thumbnailMaxWidth, int thumbnailMaxHeight)
     {
-        ConfigureCatalogAssetService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
+        ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
         try
         {
@@ -1113,7 +1112,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            OverflowException? exception = Assert.Throws<OverflowException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
+            OverflowException? exception = Assert.Throws<OverflowException>(() => _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
 
             Assert.AreEqual("The image data generated an overflow during processing.", exception?.Message);
 
@@ -1134,7 +1133,7 @@ public class CatalogAssetsServiceCreateAssetTests
         const int thumbnailMaxWidth = 150;
         const int thumbnailMaxHeight = 10000000;
 
-        ConfigureCatalogAssetService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
+        ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
         try
         {
@@ -1149,7 +1148,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
+            InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
 
             Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
 
@@ -1170,7 +1169,7 @@ public class CatalogAssetsServiceCreateAssetTests
         const int thumbnailMaxWidth = -100;
         const int thumbnailMaxHeight = -100;
 
-        ConfigureCatalogAssetService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
+        ConfigureAssetCreationService(thumbnailMaxWidth, thumbnailMaxHeight, false, false, false, false);
 
         try
         {
@@ -1185,7 +1184,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
 
             Assert.AreEqual("Value should not be negative. (Parameter 'width')", exception?.Message);
 
@@ -1202,7 +1201,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndDirectoryNameIsNull_ThrowsArgumentNullExceptionAndAssetIsNotCreated()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -1218,7 +1217,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _catalogAssetsService!.CreateAsset(null!, assetName));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetCreationService!.CreateAsset(null!, assetName));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
 
@@ -1235,7 +1234,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndDirectoryNameIsEmpty_LogsErrorAndReturnsNullAndAssetIsNotCreated()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
         LoggingAssertsService loggingAssertsService = new();
 
         try
@@ -1254,7 +1253,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(directoryName, assetName);
+            Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName);
 
             Assert.IsNull(asset);
 
@@ -1264,7 +1263,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             FileNotFoundException fileNotFoundException = new ($"The file {Path.Combine(directoryName, assetName)} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
-            Type typeOfService = typeof(CatalogAssetsService);
+            Type typeOfService = typeof(AssetCreationService);
 
             loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
         }
@@ -1278,7 +1277,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndDirectoryNamePointingToAFile_LogsErrorAndReturnsNullAndAssetIsNotCreated()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
         LoggingAssertsService loggingAssertsService = new();
 
         try
@@ -1297,7 +1296,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(directoryName, assetName);
+            Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName);
 
             Assert.IsNull(asset);
 
@@ -1307,7 +1306,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             FileNotFoundException fileNotFoundException = new ($"The file {Path.Combine(directoryName, assetName)} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
-            Type typeOfService = typeof(CatalogAssetsService);
+            Type typeOfService = typeof(AssetCreationService);
 
             loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
         }
@@ -1321,7 +1320,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndFileNameIsNull_ThrowsArgumentNullExceptionAndAssetIsNotCreated()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
 
         try
         {
@@ -1334,7 +1333,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetCreationService!.CreateAsset(_dataDirectory!, assetName));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path2')", exception?.Message);
 
@@ -1351,7 +1350,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndFileNameDoesNotExist_LogsErrorAndReturnsNullAndAssetIsNotCreated()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
         LoggingAssertsService loggingAssertsService = new();
 
         try
@@ -1369,7 +1368,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName);
 
             Assert.IsNull(asset);
 
@@ -1379,7 +1378,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             FileNotFoundException fileNotFoundException = new ($"The file {imagePath} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
-            Type typeOfService = typeof(CatalogAssetsService);
+            Type typeOfService = typeof(AssetCreationService);
 
             loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
         }
@@ -1393,7 +1392,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_PictureAndBasicHashTypeAndFileNameIsADirectory_LogsErrorAndReturnsNullAndAssetIsNotCreated()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, false);
+        ConfigureAssetCreationService(200, 150, false, false, false, false);
         LoggingAssertsService loggingAssertsService = new();
 
         try
@@ -1411,7 +1410,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, _dataDirectory!);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, _dataDirectory!);
 
             Assert.IsNull(asset);
 
@@ -1421,7 +1420,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             FileNotFoundException fileNotFoundException = new ($"The file {_dataDirectory} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
-            Type typeOfService = typeof(CatalogAssetsService);
+            Type typeOfService = typeof(AssetCreationService);
 
             loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
         }
@@ -1449,7 +1448,7 @@ public class CatalogAssetsServiceCreateAssetTests
         string assetRotatedMessage,
         int imageByteSize)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -1469,7 +1468,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.IsNull(asset);
 
@@ -1482,7 +1481,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             Folder folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
 
-            asset = _catalogAssetsService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
+            asset = _assetCreationService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
 
             Assert.IsNotNull(asset);
 
@@ -1550,8 +1549,7 @@ public class CatalogAssetsServiceCreateAssetTests
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
         StorageService storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetsComparator assetsComparator = new (storageService);
-        _catalogAssetsService = new (_testableAssetRepository, assetHashCalculatorService, storageService, _userConfigurationService, assetsComparator);
+        _assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -1579,7 +1577,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(firstFrameVideosPath, fileName, true);
+            Asset? asset = _assetCreationService!.CreateAsset(firstFrameVideosPath, fileName, true);
 
             // Assert.IsNotNull(asset);
             Assert.IsNull(asset);
@@ -1622,7 +1620,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Homer1s.mp4", "Homer1s.jpg")]
     public void CreateAsset_VideoTooShortAndBasicHashType_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset(string fileName, string firstFrameFileName)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -1642,7 +1640,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.IsNull(asset);
 
@@ -1677,7 +1675,7 @@ public class CatalogAssetsServiceCreateAssetTests
         string assetRotatedMessage,
         int imageByteSize)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -1697,7 +1695,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.IsNull(asset1);
 
@@ -1710,7 +1708,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             Folder folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
 
-            Asset? asset2 = _catalogAssetsService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
+            Asset? asset2 = _assetCreationService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
 
             Assert.IsNotNull(asset2);
 
@@ -1737,7 +1735,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, imageByteSize);
 
-            Asset? asset3 = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
+            Asset? asset3 = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.IsNull(asset3);
 
@@ -1748,7 +1746,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
 
-            Asset? asset4 = _catalogAssetsService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
+            Asset? asset4 = _assetCreationService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
 
             Assert.IsNull(asset4);
 
@@ -1769,7 +1767,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Homer.mp4", "Homer.jpg")]
     public void CreateAsset_VideoAndBasicHashTypeButAnotherImageAlreadyExistsInTheOutputDirectory_DoesNotCreateFirstFrame(string fileName, string firstFrameFileName)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -1793,7 +1791,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.IsNull(asset1);
 
@@ -1806,7 +1804,7 @@ public class CatalogAssetsServiceCreateAssetTests
 
             Folder folder = _testableAssetRepository.AddFolder(firstFrameVideosPath); // Set above, not in this method
 
-            Asset? asset2 = _catalogAssetsService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
+            Asset? asset2 = _assetCreationService!.CreateAsset(firstFrameVideosPath, firstFrameFileName);
 
             Assert.IsNotNull(asset2);
 
@@ -1865,7 +1863,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [TestCase("Homer.mp4", "Homer.jpg", true, false)]
     public void CreateAsset_VideoAndIsVideoAndAnalyseVideos_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset(string fileName, string firstFrameFileName, bool analyseVideos, bool isVideo)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, analyseVideos);
+        ConfigureAssetCreationService(200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -1880,7 +1878,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, isVideo);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, isVideo);
 
             Assert.IsNull(asset);
 
@@ -1918,7 +1916,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int imageByteSize,
         bool analyseVideos)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, analyseVideos);
+        ConfigureAssetCreationService(200, 150, false, false, false, analyseVideos);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -1935,7 +1933,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.IsNotNull(asset);
 
@@ -1990,7 +1988,7 @@ public class CatalogAssetsServiceCreateAssetTests
         int imageByteSize,
         bool analyseVideos)
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, analyseVideos);
+        ConfigureAssetCreationService(200, 150, false, false, false, analyseVideos);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
@@ -2007,7 +2005,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, fileName, true);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, fileName, true);
 
             Assert.IsNull(asset);
 
@@ -2032,7 +2030,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_VideoAndBasicHashTypeAndDirectoryNameIsNull_ThrowsArgumentNullExceptionAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         try
         {
@@ -2048,7 +2046,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _catalogAssetsService!.CreateAsset(null!, assetName, true));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetCreationService!.CreateAsset(null!, assetName, true));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
 
@@ -2070,7 +2068,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_VideoAndBasicHashTypeAndDirectoryNameIsEmpty_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         try
         {
@@ -2088,7 +2086,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(directoryName, assetName, true);
+            Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName, true);
 
             Assert.IsNull(asset);
 
@@ -2112,7 +2110,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_VideoAndBasicHashTypeAndDirectoryNamePointingToAFile_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         try
         {
@@ -2130,7 +2128,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(directoryName, assetName, true);
+            Asset? asset = _assetCreationService!.CreateAsset(directoryName, assetName, true);
 
             Assert.IsNull(asset);
 
@@ -2154,7 +2152,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_VideoAndBasicHashTypeAndFileNameIsNull_ThrowsArgumentNullExceptionAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         try
         {
@@ -2167,7 +2165,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName, true));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetCreationService!.CreateAsset(_dataDirectory!, assetName, true));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path2')", exception?.Message);
 
@@ -2185,7 +2183,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_VideoAndBasicHashTypeAndFileNameDoesNotExist_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         try
         {
@@ -2202,7 +2200,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, assetName, true);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, assetName, true);
 
             Assert.IsNull(asset);
 
@@ -2220,7 +2218,7 @@ public class CatalogAssetsServiceCreateAssetTests
     [Test]
     public void CreateAsset_VideoAndBasicHashTypeAndFileNameIsADirectory_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset()
     {
-        ConfigureCatalogAssetService(200, 150, false, false, false, true);
+        ConfigureAssetCreationService(200, 150, false, false, false, true);
 
         try
         {
@@ -2237,7 +2235,7 @@ public class CatalogAssetsServiceCreateAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(_dataDirectory!, _dataDirectory!, true);
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, _dataDirectory!, true);
 
             Assert.IsNull(asset);
 

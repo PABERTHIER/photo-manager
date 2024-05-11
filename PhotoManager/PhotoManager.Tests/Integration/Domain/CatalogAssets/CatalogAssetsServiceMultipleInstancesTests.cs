@@ -4,7 +4,7 @@ using System.IO.Compression;
 namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
 
 [TestFixture]
-public class CatalogAssetsServiceCatalogAssetsAsyncMultipleInstancesTests
+public class CatalogAssetsServiceMultipleInstancesTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -231,8 +231,9 @@ public class CatalogAssetsServiceCatalogAssetsAsyncMultipleInstancesTests
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
         StorageService storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
+        AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new (storageService);
-        _catalogAssetsService = new (_testableAssetRepository, assetHashCalculatorService, storageService, _userConfigurationService, assetsComparator);
+        _catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
     }
 
     // TODO: Do same tests as CatalogAssetsServiceCatalogAssetsAsyncTests but with multiple instances instead of one

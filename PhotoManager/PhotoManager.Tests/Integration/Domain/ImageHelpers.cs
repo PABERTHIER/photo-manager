@@ -1,4 +1,4 @@
-﻿namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
+﻿namespace PhotoManager.Tests.Integration.Domain;
 
 public static class ImageHelpers
 {

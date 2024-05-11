@@ -1,21 +1,11 @@
 ﻿namespace PhotoManager.Domain;
 
-public class MoveAssetsService : IMoveAssetsService
+public class MoveAssetsService(
+    IAssetRepository assetRepository,
+    IStorageService storageService,
+    IAssetCreationService assetCreationService)
+    : IMoveAssetsService
 {
-    private readonly IAssetRepository _assetRepository;
-    private readonly IStorageService _storageService;
-    private readonly ICatalogAssetsService _catalogAssetsService;
-
-    public MoveAssetsService(
-        IAssetRepository assetRepository,
-        IStorageService storageService,
-        ICatalogAssetsService catalogAssetsService)
-    {
-        _assetRepository = assetRepository;
-        _storageService = storageService;
-        _catalogAssetsService = catalogAssetsService;
-    }
-
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles)
     {
         if (destinationFolder == null)
@@ -26,7 +16,7 @@ public class MoveAssetsService : IMoveAssetsService
         ValidateParameters(assets);
 
         bool result = false;
-        Folder? folder = _assetRepository.GetFolderByPath(destinationFolder.Path); // If the folder is null, it means is not present in the catalog
+        Folder? folder = assetRepository.GetFolderByPath(destinationFolder.Path); // If the folder is null, it means is not present in the catalog
 
         // TODO: IF THE DESTINATION FOLDER IS NEW, THE FOLDER NAVIGATION CONTROL SHOULD DISPLAY IT WHEN THE USER GOES BACK TO THE MAIN WINDOW.
         bool isDestinationFolderInCatalog = folder != null;
@@ -50,12 +40,12 @@ public class MoveAssetsService : IMoveAssetsService
 
             if (!isDestinationFolderInCatalog)
             {
-                destinationFolder = _assetRepository.AddFolder(destinationFolder.Path);
+                destinationFolder = assetRepository.AddFolder(destinationFolder.Path);
                 isDestinationFolderInCatalog = true;
 
             }
 
-            _catalogAssetsService.CreateAsset(destinationFolder.Path, asset.FileName);
+            assetCreationService.CreateAsset(destinationFolder.Path, asset.FileName);
 
             if (result && !preserveOriginalFiles && !destinationFolder.IsSameDirectory(assets[0].Folder))
             {
@@ -65,7 +55,7 @@ public class MoveAssetsService : IMoveAssetsService
 
         if (result)
         {
-            _assetRepository.UpdateTargetPathToRecent(destinationFolder);
+            assetRepository.UpdateTargetPathToRecent(destinationFolder);
             SaveCatalog(destinationFolder);
         }
 
@@ -114,7 +104,7 @@ public class MoveAssetsService : IMoveAssetsService
                 throw new ArgumentNullException(nameof(asset.Folder), "asset.Folder cannot be null.");
             }
 
-            if (!_storageService.FileExists(asset.Folder, asset))
+            if (!storageService.FileExists(asset.Folder, asset))
             {
                 throw new FileNotFoundException($"File does not exist: '{asset.FullPath}'.");
             }
@@ -123,30 +113,30 @@ public class MoveAssetsService : IMoveAssetsService
 
     private void DeleteAsset(Asset asset)
     {
-        _assetRepository.DeleteAsset(asset.Folder.Path, asset.FileName);
-        _storageService.DeleteFile(asset.Folder.Path, asset.FileName);
+        assetRepository.DeleteAsset(asset.Folder.Path, asset.FileName);
+        storageService.DeleteFile(asset.Folder.Path, asset.FileName);
     }
 
     private bool Copy(string sourceFilePath, string destinationFilePath)
     {
         try
         {
-            if (_storageService.FileExists(destinationFilePath))
+            if (storageService.FileExists(destinationFilePath))
             {
                 // TODO: Log the file already exists in the destination
-                return _storageService.FileExists(sourceFilePath);
+                return storageService.FileExists(sourceFilePath);
             }
 
             string destinationFolderPath = new FileInfo(destinationFilePath).Directory!.FullName;
 
             if (!Directory.Exists(destinationFolderPath))
             {
-                _storageService.CreateDirectory(destinationFolderPath);
+                storageService.CreateDirectory(destinationFolderPath);
             }
 
             File.Copy(sourceFilePath, destinationFilePath);
 
-            return _storageService.FileExists(sourceFilePath) && _storageService.FileExists(destinationFilePath);
+            return storageService.FileExists(sourceFilePath) && storageService.FileExists(destinationFilePath);
         }
         catch (FileNotFoundException)
         {
@@ -177,6 +167,6 @@ public class MoveAssetsService : IMoveAssetsService
 
     private void SaveCatalog(Folder folder)
     {
-        _assetRepository.SaveCatalog(folder);
+        assetRepository.SaveCatalog(folder);
     }
 }

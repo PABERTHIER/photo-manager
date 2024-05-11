@@ -21,9 +21,9 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
             return GetDuplicatesBetweenOriginalAndThumbnail(assets, _userConfigurationService.HashSettings.PHashThreshold);
         }
 
-        var assetGroups = assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1).ToList();
+        List<IGrouping<string, Asset>> assetGroups = assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1).ToList();
 
-        foreach (var group in assetGroups)
+        foreach (IGrouping<string, Asset> group in assetGroups)
         {
             List<Asset> duplicatedSet = [.. group];
             duplicatedSet.RemoveAll(asset => !_storageService.FileExists(asset.FullPath));

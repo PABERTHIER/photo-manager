@@ -10,9 +10,11 @@ public class ApplicationGetTotalFilesCountTests
     private string? _databasePath;
     private const string DATABASE_END_PATH = "v1.0";
 
+    // TODO: Except for _application, declare each in SetUp direclty
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
     private SyncAssetsService? _syncAssetsService;
+    private AssetCreationService? _assetCreationService;
     private CatalogAssetsService? _catalogAssetsService;
     private MoveAssetsService? _moveAssetsService;
     private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
@@ -49,8 +51,9 @@ public class ApplicationGetTotalFilesCountTests
         _storageService = new (_userConfigurationService);
         _assetHashCalculatorService = new (_userConfigurationService);
         _assetsComparator = new (_storageService);
-        _catalogAssetsService = new (_testableAssetRepository, _assetHashCalculatorService, _storageService, _userConfigurationService, _assetsComparator);
-        _moveAssetsService = new (_testableAssetRepository, _storageService, _catalogAssetsService);
+        _assetCreationService = new (_testableAssetRepository, _storageService, _assetHashCalculatorService, _userConfigurationService);
+        _catalogAssetsService = new (_testableAssetRepository, _storageService, _assetCreationService, _userConfigurationService, _assetsComparator);
+        _moveAssetsService = new (_testableAssetRepository, _storageService, _assetCreationService);
 
         _syncAssetsService = new (_testableAssetRepository, _storageService, _assetsComparator, _moveAssetsService);
         _findDuplicatedAssetsService = new (_testableAssetRepository, _storageService, _userConfigurationService);

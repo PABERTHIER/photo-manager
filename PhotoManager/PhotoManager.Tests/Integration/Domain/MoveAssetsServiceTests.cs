@@ -16,7 +16,7 @@ public class MoveAssetsServiceTests
     private AssetRepository? _assetRepository;
     private Database? _database;
     private StorageService? _storageService;
-    private CatalogAssetsService? _catalogAssetsService;
+    private AssetCreationService? _assetCreationService;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -43,9 +43,8 @@ public class MoveAssetsServiceTests
         _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
         _storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        AssetsComparator assetsComparator = new (_storageService);
-        _catalogAssetsService = new (_assetRepository, assetHashCalculatorService, _storageService, _userConfigurationService, assetsComparator);
-        _moveAssetsService = new (_assetRepository, _storageService, _catalogAssetsService);
+        _assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
+        _moveAssetsService = new (_assetRepository, _storageService, _assetCreationService);
     }
 
     [Test]
@@ -70,9 +69,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _catalogAssetsService!.CreateAsset(dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -209,9 +208,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(sourceDirectory, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _catalogAssetsService!.CreateAsset(sourceDirectory, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -325,9 +324,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(dataDirectory!);
             Folder destinationFolder = new() { FolderId = Guid.NewGuid(), Path = destinationDirectory };
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _catalogAssetsService!.CreateAsset(dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -466,9 +465,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
             Folder destinationFolder = new() { FolderId = Guid.NewGuid(), Path = destinationDirectory };
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(sourceDirectory, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _catalogAssetsService!.CreateAsset(sourceDirectory, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -585,7 +584,7 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(dataDirectory!, "Image 1.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 1.jpg");
             Assert.IsNotNull(asset1);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -703,9 +702,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(sourceDirectory, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _catalogAssetsService!.CreateAsset(destinationDirectory, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(destinationDirectory, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -826,9 +825,9 @@ public class MoveAssetsServiceTests
             string fakeRecentTargetPath = Path.Combine(destinationDirectory, "fake");
             _assetRepository.SaveRecentTargetPaths(new List<string> { fakeRecentTargetPath, destinationDirectory });
 
-            Asset? asset1 = _catalogAssetsService!.CreateAsset(dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _catalogAssetsService!.CreateAsset(dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -953,7 +952,7 @@ public class MoveAssetsServiceTests
 
             Folder sourceFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(destinationDirectory, "Image 1.jpg");
+            Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, "Image 1.jpg");
             Assert.IsNotNull(asset);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -1003,7 +1002,7 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
             Folder destinationFolder = new() { FolderId = Guid.NewGuid(), Path = destinationDirectory };
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(sourceDirectory, assetOldFileName);
+            Asset? asset = _assetCreationService!.CreateAsset(sourceDirectory, assetOldFileName);
             Assert.IsNotNull(asset);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -1110,7 +1109,7 @@ public class MoveAssetsServiceTests
 
             Folder sourceFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(destinationDirectory, assetOldFileName);
+            Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, assetOldFileName);
             Assert.IsNotNull(asset);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -1358,7 +1357,7 @@ public class MoveAssetsServiceTests
 
             Assert.IsTrue(File.Exists(sourceFilePath1));
 
-            Asset? asset = _catalogAssetsService!.CreateAsset(destinationDirectory, "Image 6.jpg");
+            Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, "Image 6.jpg");
             Assert.IsNotNull(asset);
             _assetRepository!.SaveCatalog(sourceFolder);
 

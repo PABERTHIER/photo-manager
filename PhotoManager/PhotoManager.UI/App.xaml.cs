@@ -85,6 +85,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<IStorageService, StorageService>();
         services.AddSingleton<IAssetRepository, AssetRepository>();
         services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
+        services.AddSingleton<IAssetCreationService, AssetCreationService>();
         services.AddSingleton<ICatalogAssetsService, CatalogAssetsService>();
         services.AddSingleton<IMoveAssetsService, MoveAssetsService>();
         services.AddSingleton<IFindDuplicatedAssetsService, FindDuplicatedAssetsService>();
