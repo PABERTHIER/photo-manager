@@ -1,8 +1,4 @@
-﻿using log4net;
-using log4net.Appender;
-using log4net.Config;
-using log4net.Core;
-using PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 using System.IO.Compression;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -7624,12 +7620,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
-            MemoryAppender memoryAppender = new();
-            BasicConfigurator.Configure(memoryAppender);
-
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -7699,13 +7693,10 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
             UnauthorizedAccessException unauthorizedAccessException = new ($"Access to the path '{assetsDirectory}' is denied.");
-            LoggingEvent[]? logMessages = memoryAppender.GetEvents();
+            Exception[] expectedExceptions = [unauthorizedAccessException];
+            Type typeOfService = typeof(CatalogAssetsService);
 
-            Assert.AreEqual(1, logMessages.Length);
-            Assert.AreEqual(unauthorizedAccessException.GetType(), logMessages[0].MessageObject.GetType());
-            UnauthorizedAccessException? logMessage = logMessages[0].MessageObject as UnauthorizedAccessException;
-            Assert.AreEqual(unauthorizedAccessException.Message, logMessage!.Message);
-            Assert.AreEqual(typeof(CatalogAssetsService).ToString(), logMessages[0].LoggerName);
+            loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
 
             CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
             CheckCatalogChangesException(catalogChanges, unauthorizedAccessException, ref increment);
@@ -7715,7 +7706,7 @@ public class CatalogAssetsServiceCatalogAssetsAsyncTests
             Directory.Delete(_databaseDirectory!, true);
             AllowAccess(assetsDirectory);
             Directory.Delete(assetsDirectory, true);
-            LogManager.Shutdown();
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
