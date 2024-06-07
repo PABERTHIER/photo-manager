@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace PhotoManager.UI.ViewModels;
 
+// TODO: Move these 4 into separated file
 public class FolderAddedEventArgs
 {
     public Folder Folder { get; set; }
@@ -28,8 +29,8 @@ public class ApplicationViewModel : BaseViewModel
     private AppModeEnum appMode;
     private int viewerPosition;
     private string currentFolder;
-    private Asset[] cataloguedAssets;
-    private ObservableCollection<Asset> observableAssets;
+    private Asset[] cataloguedAssets; // TODO: ByPath
+    private ObservableCollection<Asset> observableAssets; // TODO: ByPath
     private string globaleAssetsCounter;
     private string executionTime;
     private string totalFilesNumber;
@@ -40,8 +41,8 @@ public class ApplicationViewModel : BaseViewModel
     private SortCriteriaEnum previousSortCriteria;
 
     public bool SortAscending { get; private set; } = true;
-    public string Product { get; set; }
-    public string Version { get; set; }
+    public string? Product { get; set; }
+    public string? Version { get; set; }
     public bool IsRefreshingFolders { get; set; }
 
     public event FolderAddedEventHandler FolderAdded;
@@ -49,8 +50,13 @@ public class ApplicationViewModel : BaseViewModel
 
     public ApplicationViewModel(IApplication application, SortCriteriaEnum initialSortCriteria = SortCriteriaEnum.FileName) : base(application)
     {
+        cataloguedAssets = [];
+        observableAssets = [];
+        selectedAssets = [];
+
+        SortCriteria = initialSortCriteria; // TODO: Should be FileName the default one -> delete this line and the parameter in the ctor
+        // TODO: Rename to CurrentFolderPath
         CurrentFolder = Application.GetInitialFolder();
-        SortCriteria = initialSortCriteria;
     }
 
     public AppModeEnum AppMode
@@ -76,14 +82,12 @@ public class ApplicationViewModel : BaseViewModel
 
     public void ChangeAppMode()
     {
-        if (AppMode == AppModeEnum.Viewer)
+        AppMode = AppMode switch
         {
-            AppMode = AppModeEnum.Thumbnails;
-        }
-        else if (AppMode == AppModeEnum.Thumbnails)
-        {
-            AppMode = AppModeEnum.Viewer;
-        }
+            AppModeEnum.Viewer => AppModeEnum.Thumbnails,
+            AppModeEnum.Thumbnails => AppModeEnum.Viewer,
+            _ => AppMode
+        };
     }
 
     public void ChangeAppMode(AppModeEnum appMode)
@@ -126,9 +130,11 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
+    // TODO: Rename to CurrentFolderPath
     public string CurrentFolder
     {
         get { return currentFolder; }
+        // TODO: Set the setter into private -> rework SetAssets to pass the path as parameter into it, to set the value of CurrentFolder
         set
         {
             currentFolder = value;
@@ -137,6 +143,8 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
+    // TODO: Not the best thing to update ObservableAssets while CataloguedAssets can also be updated, need to improve this
+    // TODO: ByPath
     public ObservableCollection<Asset> ObservableAssets
     {
         get { return observableAssets; }
@@ -148,6 +156,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
+    // TODO: Rename to GlobalAssetsCounterWording
     public string GlobaleAssetsCounter
     {
         get { return globaleAssetsCounter; }
@@ -158,6 +167,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
+    // TODO: Rename to ExecutionTimeWording
     public string ExecutionTime
     {
         get { return executionTime; }
@@ -168,6 +178,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
+    // TODO: Rename to TotalFilesNumberWording
     public string TotalFilesNumber
     {
         get { return totalFilesNumber; }
@@ -185,13 +196,15 @@ public class ApplicationViewModel : BaseViewModel
         // the GetImages method is called, since the thumbnails file is not
         // created yet, the assets catalogued so far are returned without
         // its thumbnails.
-        cataloguedAssets = assets?.Where(a => a.ImageData != null).ToArray();
+        cataloguedAssets = assets?.Where(a => a.ImageData != null).ToArray() ?? [];
         SortAssets();
     }
 
     private void SortAssets()
     {
-        if (cataloguedAssets != null)
+        bool isCataloguedAssetsEmpty = cataloguedAssets.Length == 0;
+
+        if (!isCataloguedAssetsEmpty)
         {
             switch (SortCriteria)
             {
@@ -228,7 +241,7 @@ public class ApplicationViewModel : BaseViewModel
         }
         
 
-        ObservableAssets = cataloguedAssets != null ? new ObservableCollection<Asset>(cataloguedAssets) : null;
+        ObservableAssets = !isCataloguedAssetsEmpty ? new ObservableCollection<Asset>(cataloguedAssets) : [];
     }
 
     public string AppTitle
@@ -251,7 +264,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public Asset CurrentAsset
+    public Asset? CurrentAsset
     {
         get { return ObservableAssets?.Count > 0 && ViewerPosition >= 0 ? ObservableAssets?[ViewerPosition] : null; }
     }
@@ -264,6 +277,7 @@ public class ApplicationViewModel : BaseViewModel
         {
             ObservableAssets.Add(asset);
             NotifyPropertyChanged(nameof(ObservableAssets));
+            UpdateAppTitle();
         }
     }
 
@@ -271,6 +285,7 @@ public class ApplicationViewModel : BaseViewModel
     {
         if (ObservableAssets != null)
         {
+            // TODO: Need to also check path and hash (even if the path is checked above)
             var updatedAsset = ObservableAssets.FirstOrDefault(
                 a => string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
 
@@ -279,20 +294,23 @@ public class ApplicationViewModel : BaseViewModel
                 RemoveAssets(new Asset[] { updatedAsset });
                 AddAsset(asset);
                 NotifyPropertyChanged(nameof(ObservableAssets));
+                UpdateAppTitle();
             }
         }
     }
 
     public void RemoveAssets(Asset[] assets)
     {
-        if (ObservableAssets != null && assets != null)
+        int observableAssetsCount = ObservableAssets.Count;
+
+        if (observableAssetsCount > 0 && assets != null)
         {
             foreach (var asset in assets)
             {
                 int position = ViewerPosition;
                 ObservableAssets.Remove(asset);
 
-                if (position == ObservableAssets.Count)
+                if (position == observableAssetsCount)
                 {
                     position--;
                 }
@@ -308,6 +326,8 @@ public class ApplicationViewModel : BaseViewModel
 
     private void RemoveFolder(Folder folder) => FolderRemoved?.Invoke(this, new FolderRemovedEventArgs { Folder = folder });
 
+    // TODO: Need to rework the content of the title + case where init getting -> image 1 de 0 -> not good
+    // TODO: Called to many times, need to rework this
     private void UpdateAppTitle()
     {
         string title = null;
@@ -317,7 +337,7 @@ public class ApplicationViewModel : BaseViewModel
         {
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
-                "{0} {1} - {2} - image {3} de {4} - sorted by {5}",
+                "{0} {1} - {2} - image {3} of {4} - sorted by {5}",
                 Product,
                 Version,
                 CurrentFolder,
@@ -329,7 +349,7 @@ public class ApplicationViewModel : BaseViewModel
         {
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
-                "{0} {1} - {2} - {3} - image {4} de {5} - sorted by {6}",
+                "{0} {1} - {2} - {3} - image {4} of {5} - sorted by {6}",
                 Product,
                 Version,
                 CurrentFolder,
@@ -400,16 +420,19 @@ public class ApplicationViewModel : BaseViewModel
             case ReasonEnum.AssetCreated:
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
-                    // If the files list is empty or belongs to other directory
-                    if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssetsByPath != null)
-                    {
-                        cataloguedAssets = e.CataloguedAssetsByPath.Where(a => a.ImageData != null).ToArray();
-                        SortAssets();
-                    }
-                    else
-                    {
-                        AddAsset(e.Asset);
-                    }
+                    // // If the files list is empty or belongs to other directory
+                    // if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssetsByPath != null)
+                    // {
+                    //     cataloguedAssets = e.CataloguedAssetsByPath.Where(a => a.ImageData != null).ToArray();
+                    //     SortAssets();
+                    // }
+                    // else
+                    // {
+                    //     AddAsset(e.Asset);
+                    // }
+
+                    Application.LoadThumbnail(e.Asset);
+                    AddAsset(e.Asset);
                 }
 
                 break;
@@ -417,22 +440,29 @@ public class ApplicationViewModel : BaseViewModel
             case ReasonEnum.AssetUpdated:
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
-                    // If the files list is empty or belongs to other directory
-                    if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssetsByPath != null)
-                    {
-                        cataloguedAssets = e.CataloguedAssetsByPath.Where(a => a.ImageData != null).ToArray();
-                        SortAssets();
-                    }
-                    else
-                    {
-                        UpdateAsset(e.Asset);
-                    }
+                    // // If the files list is empty or belongs to other directory
+                    // if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssetsByPath != null)
+                    // {
+                    //     cataloguedAssets = e.CataloguedAssetsByPath.Where(a => a.ImageData != null).ToArray();
+                    //     SortAssets();
+                    // }
+                    // else
+                    // {
+                    //     UpdateAsset(e.Asset);
+                    // }
+
+                    Application.LoadThumbnail(e.Asset);
+                    UpdateAsset(e.Asset);
                 }
 
                 break;
 
             case ReasonEnum.AssetDeleted:
-                RemoveAssets(new Asset[] { e.Asset });
+                if (e?.Asset?.Folder?.Path == CurrentFolder)
+                {
+                    RemoveAssets([e.Asset]);
+                }
+
                 break;
 
             case ReasonEnum.FolderCreated:

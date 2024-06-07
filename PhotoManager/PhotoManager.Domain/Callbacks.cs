@@ -13,7 +13,7 @@ public class CatalogChangeCallbackEventArgs
     public Asset? Asset { get; set; }
     public Folder? Folder { get; set; }
     public List<Asset> CataloguedAssetsByPath { get; set; } = [];
-    public ReasonEnum Reason { get; set; }
+    public ReasonEnum Reason { get; set; } // TODO: Add required
     public string? Message { get; set; }
     public Exception? Exception { get; set; }
 }

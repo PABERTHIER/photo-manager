@@ -10,8 +10,10 @@ public enum ReasonEnum
 {
     // TODO: Add default value when 100% of code coverage, because AssetCreated should not be the default one
     AssetCreated,
+    AssetNotCreated,
     AssetUpdated,
     AssetDeleted,
+    FolderInspectionInProgress,
     FolderCreated,
     FolderDeleted
 }
@@ -36,7 +38,7 @@ public enum ProcessStepEnum
 
 public enum SortCriteriaEnum
 {
-    Undefined,
+    Undefined, // TODO: Remove that one, should be FileName the default one
     FileName,
     FileSize,
     FileCreationDateTime,

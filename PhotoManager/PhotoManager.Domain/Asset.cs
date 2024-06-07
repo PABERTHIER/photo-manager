@@ -2,7 +2,7 @@
 
 public class Asset
 {
-    // TODO: use intead Folder.FolderId ? -> if done, update tests
+    // TODO: use instead Folder.FolderId ? -> if done, update tests
     // TODO: property required
     public Guid FolderId { get; set; }
     public Folder Folder { get; set; }

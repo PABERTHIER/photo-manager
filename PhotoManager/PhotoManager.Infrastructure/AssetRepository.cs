@@ -352,6 +352,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
+    // TODO: Seems to be a dead method
     public bool ContainsThumbnail(string directoryName, string fileName)
     {
         bool result = false;

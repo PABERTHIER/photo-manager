@@ -95,7 +95,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<ApplicationViewModel>();
     }
 
-    // TODO: if needeed to test the registers: here is the sample for database, need to be completed
+    // TODO: if needed to test the registers: here is the sample for database, need to be completed
     //[TestMethod]
     //public void AddDatabaseServices_AddsAllRequiredServices()
     //{

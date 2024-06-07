@@ -1,6 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Domain;
+﻿namespace PhotoManager.Tests;
 
-public static class ImageHelpers
+public static class ImageHelper
 {
     public static void CreateInvalidImage(string validImagePath, string invalidImagePath)
     {

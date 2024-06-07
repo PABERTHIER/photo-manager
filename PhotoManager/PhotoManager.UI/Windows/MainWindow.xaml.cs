@@ -299,7 +299,7 @@ public partial class MainWindow : Window
         try
         {
             var about = _application.GetAboutInformation(GetType().Assembly);
-            AboutWindow duplicatedAssetsWindow = new(about);  // TODO: Add Author above
+            AboutWindow duplicatedAssetsWindow = new (about);  // TODO: Add Author above
             duplicatedAssetsWindow.ShowDialog();
         }
         catch (Exception ex)

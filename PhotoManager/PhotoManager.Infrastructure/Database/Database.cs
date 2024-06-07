@@ -121,7 +121,7 @@ public class Database : IDatabase
         _blobStorage.WriteToBinaryFile(blob, blobFilePath);
     }
 
-    // This method verifies if the folder has its .bin generated, but not if there are data in it or not
+    // TODO: This method verifies if the folder has its .bin generated, but not if there are data in it or not
     public bool FolderHasThumbnails(string blobName) // FolderId + ".bin"
     {
         string blobFilePath = ResolveBlobFilePath(blobName);
