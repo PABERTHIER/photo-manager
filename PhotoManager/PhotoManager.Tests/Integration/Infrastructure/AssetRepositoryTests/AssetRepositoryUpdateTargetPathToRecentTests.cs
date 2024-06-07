@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryUpdateTargetPathToRecentTests
@@ -35,6 +37,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
     [Test]
     public void UpdateTargetPathToRecent_NewFolderAndExisting_UpdateRecentTargetPathsAndSave()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
@@ -54,16 +59,22 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.AreEqual(folder3.Path, recentTargetPaths[1]);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void UpdateTargetPathToRecent_MaxCountHasBeenReached_UpdateRecentPathsAndSave()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             for (int i = 0; i < 30; i++)
@@ -79,16 +90,22 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.AreEqual("D:\\Workspace\\PhotoManager\\Folder10", recentTargetPaths[19]);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void UpdateTargetPathToRecent_PathIsNull_UpdateRecentPathsAndSave()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string? nullPath = null;
@@ -109,16 +126,22 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.AreEqual(folder3.Path, recentTargetPaths[0]);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void UpdateTargetPathToRecent_PathIsEmpty_UpdateRecentPathsAndSave()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string emptyPath = string.Empty;
@@ -139,16 +162,22 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.AreEqual(folder3.Path, recentTargetPaths[0]);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void UpdateTargetPathToRecent_FolderIsNull_ThrowsNullReferenceException()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
@@ -169,16 +198,22 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.AreEqual(folder2.Path, recentTargetPaths[0]);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void UpdateTargetPathToRecent_ConcurrentAccess_RecentTargetPathsAreHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
@@ -201,10 +236,13 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
             Assert.IsTrue(recentTargetPaths.Any(x => x == folder3.Path));
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

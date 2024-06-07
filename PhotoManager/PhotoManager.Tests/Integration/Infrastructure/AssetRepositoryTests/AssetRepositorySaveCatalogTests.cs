@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositorySaveCatalogTests
@@ -57,6 +59,9 @@ public class AssetRepositorySaveCatalogTests
     [Test]
     public void SaveCatalog_HasChanges_SaveOperationsPerformed()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -104,6 +109,9 @@ public class AssetRepositorySaveCatalogTests
             _assetRepository.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             _assetRepository.SaveRecentTargetPaths(recentTargetPathsToSave);
             // Just to fill the syncassetsdirectoriesdefinitions.db and the recenttargetpaths.db files
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
 
             _assetRepository.SaveCatalog(addedFolder1);
 
@@ -132,23 +140,30 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.AreEqual(1, assets.Count);
             Asset? asset = assets.FirstOrDefault(x => x.Hash == asset1.Hash);
-            Assert.IsTrue(asset?.FileName == asset1.FileName && asset?.FolderId == asset1.FolderId);
+            Assert.IsTrue(asset?.FileName == asset1.FileName && asset.FolderId == asset1.FolderId);
 
             Assert.AreEqual(2, syncAssetsDirectoriesDefinitions.Count);
             Assert.IsTrue(syncAssetsDirectoriesDefinitions.Any(x => x.SourceDirectory == "C:\\Toto\\Screenshots"));
 
             Assert.AreEqual(2, recentTargetPaths.Count);
             Assert.IsTrue(recentTargetPaths.Any(x => x == "D:\\Workspace\\PhotoManager\\Toto"));
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void SaveCatalog_FolderIsNullAndHasChanges_SaveOperationsPerformed()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -166,6 +181,9 @@ public class AssetRepositorySaveCatalogTests
             Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
             Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
 
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+
             _assetRepository.SaveCatalog(null);
 
             Assert.IsFalse(_assetRepository.HasChanges());
@@ -175,16 +193,23 @@ public class AssetRepositorySaveCatalogTests
             Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
             Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
             Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void SaveCatalog_FolderIsNullAndHasChangesAndEverythingEmpty_SaveOperationsPerformed()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -207,16 +232,22 @@ public class AssetRepositorySaveCatalogTests
             Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
             Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
             Assert.IsTrue(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void SaveCatalog_FolderIsNullAndHasNoChanges_DoesNothing()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Assert.IsFalse(_assetRepository!.HasChanges());
@@ -233,16 +264,22 @@ public class AssetRepositorySaveCatalogTests
             Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
             Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
             Assert.IsFalse(File.Exists(Path.Combine(backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void SaveCatalog_ConcurrentAccess_EverythingIsHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -291,6 +328,9 @@ public class AssetRepositorySaveCatalogTests
             _assetRepository.SaveRecentTargetPaths(recentTargetPathsToSave);
             // Just to fill the syncassetsdirectoriesdefinitions.db and the recenttargetpaths.db files
 
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+
             // Simulate concurrent access
             Parallel.Invoke(
                 () => _assetRepository.SaveCatalog(addedFolder1),
@@ -318,17 +358,21 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.AreEqual(1, assets.Count);
             Asset? asset = assets.FirstOrDefault(x => x.Hash == asset1.Hash);
-            Assert.IsTrue(asset?.FileName == asset1.FileName && asset?.FolderId == asset1.FolderId);
+            Assert.IsTrue(asset?.FileName == asset1.FileName && asset.FolderId == asset1.FolderId);
 
             Assert.AreEqual(2, syncAssetsDirectoriesDefinitions.Count);
             Assert.IsTrue(syncAssetsDirectoriesDefinitions.Any(x => x.SourceDirectory == "C:\\Toto\\Screenshots"));
 
             Assert.AreEqual(2, recentTargetPaths.Count);
             Assert.IsTrue(recentTargetPaths.Any(x => x == "D:\\Workspace\\PhotoManager\\Toto"));
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

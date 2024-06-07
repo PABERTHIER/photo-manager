@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryAddAssetTests
@@ -31,9 +33,9 @@ public class AssetRepositoryAddAssetTests
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new TestableAssetRepository(_database, _storageServiceMock!.Object, userConfigurationService);
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+        _testableAssetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
 
         asset1 = new()
         {
@@ -72,8 +74,11 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_FolderAndThumbnailsExist_AssetIsAdded()
+    public void AddAsset_FolderAndThumbnailsExist_AssetIsAddedAndAssetsUpdatedIsUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "NewFolder");
@@ -110,16 +115,24 @@ public class AssetRepositoryAddAssetTests
             Assert.IsTrue(thumbnails[folderPath].ContainsKey(asset2.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[folderPath][asset1.FileName]);
             Assert.AreEqual(Array.Empty<byte>(), thumbnails[folderPath][asset2.FileName]);
+
+            Assert.AreEqual(2, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_FolderDoesNotExist_AssetIsAdded()
+    public void AddAsset_FolderDoesNotExist_AssetIsAddedAndAssetsUpdatedIsUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "NewFolder");
@@ -156,16 +169,24 @@ public class AssetRepositoryAddAssetTests
             Assert.IsTrue(thumbnails[folderPath].ContainsKey(asset2.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[folderPath][asset1.FileName]);
             Assert.AreEqual(Array.Empty<byte>(), thumbnails[folderPath][asset2.FileName]);
+
+            Assert.AreEqual(2, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_ThumbnailDoesNotExist_AssetIsAdded()
+    public void AddAsset_ThumbnailDoesNotExist_AssetIsAddedAndAssetsUpdatedIsUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "NewFolder");
@@ -192,16 +213,23 @@ public class AssetRepositoryAddAssetTests
             Assert.AreEqual(1, thumbnails[asset1!.Folder.Path].Count);
             Assert.IsTrue(thumbnails[asset1!.Folder.Path].ContainsKey(asset1.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[asset1!.Folder.Path][asset1.FileName]);
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_ThumbnailDoesNotExistButBinExists_AssetIsAdded()
+    public void AddAsset_ThumbnailDoesNotExistButBinExists_AssetIsAddedAndAssetsUpdatedIsUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "NewFolder");
@@ -238,22 +266,29 @@ public class AssetRepositoryAddAssetTests
             Assert.IsTrue(thumbnails[folderPath].ContainsKey(asset2.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[folderPath][asset1.FileName]);
             Assert.AreEqual(Array.Empty<byte>(), thumbnails[folderPath][asset2.FileName]);
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_ThumbnailsDictionaryEntriesToKeepIs0_AssetIsNotAdded()
+    public void AddAsset_ThumbnailsDictionaryEntriesToKeepIs0_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock!.Object);
-        TestableAssetRepository testableAssetRepository = new(_database!, _storageServiceMock!.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        TestableAssetRepository testableAssetRepository = new (_database!, _storageServiceMock!.Object, userConfigurationService);
+
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
@@ -274,16 +309,22 @@ public class AssetRepositoryAddAssetTests
             Assert.IsTrue(testableAssetRepository.HasChanges()); // Due to AddFolder()
             Assert.IsEmpty(assets);
             Assert.IsEmpty(thumbnails);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_FolderAndThumbnailsDoNotExist_AssetIsAdded()
+    public void AddAsset_FolderAndThumbnailsDoNotExist_AssetIsAddedAndAssetsUpdatedIsUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "NewFolder");
@@ -310,16 +351,23 @@ public class AssetRepositoryAddAssetTests
             Assert.AreEqual(1, thumbnails[asset1!.Folder.Path].Count);
             Assert.IsTrue(thumbnails[asset1!.Folder.Path].ContainsKey(asset1.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[asset1!.Folder.Path][asset1.FileName]);
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_AssetFolderIsNull_AssetIsNotAdded()
+    public void AddAsset_AssetFolderIsNull_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             byte[] assetData = new byte[] { 1, 2, 3 };
@@ -335,16 +383,22 @@ public class AssetRepositoryAddAssetTests
             Assert.IsFalse(_testableAssetRepository.HasChanges());
             Assert.IsEmpty(assets);
             Assert.IsEmpty(thumbnails);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_AssetIsNull_ThrowsNullReferenceException()
+    public void AddAsset_AssetIsNull_ThrowsNullReferenceExceptionAndAssetsUpdatedIsNotUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Asset? asset = null;
@@ -362,16 +416,22 @@ public class AssetRepositoryAddAssetTests
             Assert.IsFalse(_testableAssetRepository.HasChanges());
             Assert.IsEmpty(assets);
             Assert.IsEmpty(thumbnails);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_ThumbnailDataIsNull_AssetIsAdded()
+    public void AddAsset_ThumbnailDataIsNull_AssetIsAddedAndAssetsUpdatedIsUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "NewFolder");
@@ -398,16 +458,23 @@ public class AssetRepositoryAddAssetTests
             Assert.AreEqual(1, thumbnails[asset1!.Folder.Path].Count);
             Assert.IsTrue(thumbnails[asset1!.Folder.Path].ContainsKey(asset1.FileName));
             Assert.AreEqual(null, thumbnails[asset1!.Folder.Path][asset1.FileName]);
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
-    public void AddAsset_ConcurrentAccess_AssetsAreHandledSafely()
+    public void AddAsset_ConcurrentAccess_AssetsAreHandledSafelyAndAssetsUpdatedIsUpdated()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "NewFolder");
@@ -447,10 +514,15 @@ public class AssetRepositoryAddAssetTests
             Assert.IsTrue(thumbnails[folderPath].ContainsKey(asset2.FileName));
             Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[folderPath][asset1.FileName]);
             Assert.AreEqual(Array.Empty<byte>(), thumbnails[folderPath][asset2.FileName]);
+
+            Assert.AreEqual(2, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

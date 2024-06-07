@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositorySaveSyncAssetsConfigurationTests
@@ -35,6 +37,9 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
     [Test]
     public void SaveSyncAssetsConfiguration_SyncAssetsConfiguration_SaveConfiguration()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
@@ -72,16 +77,22 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
             Assert.AreEqual(0, syncAssetsConfiguration.Definitions.Count);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void SaveSyncAssetsConfiguration_ConcurrentAccess_SyncAssetsConfigurationIsHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
@@ -118,10 +129,13 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
             Assert.AreEqual("C:\\Images\\Tutu", syncAssetsConfiguration.Definitions[1].DestinationDirectory);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

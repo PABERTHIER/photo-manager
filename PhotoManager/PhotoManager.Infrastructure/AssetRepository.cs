@@ -1,4 +1,7 @@
 using log4net;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reflection;
 
 namespace PhotoManager.Infrastructure;
@@ -23,6 +26,8 @@ public class AssetRepository : IAssetRepository
     private readonly Queue<string> recentThumbnailsQueue;
     private bool hasChanges;
     private readonly object syncLock;
+    private readonly Subject<Unit> _assetsUpdatedSubject = new();
+    public IObservable<Unit> AssetsUpdated => _assetsUpdatedSubject.AsObservable();
 
     public AssetRepository(IDatabase database, IStorageService storageService, IUserConfigurationService userConfigurationService)
     {
@@ -90,6 +95,7 @@ public class AssetRepository : IAssetRepository
         return assetsList.ToArray();
     }
 
+    // TODO: Return Asset created
     public void AddAsset(Asset asset, byte[] thumbnailData)
     {
         lock (syncLock)
@@ -117,6 +123,7 @@ public class AssetRepository : IAssetRepository
                 folderThumbnails[asset.FileName] = thumbnailData;
                 assets.Add(asset);
                 hasChanges = true;
+                _assetsUpdatedSubject.OnNext(Unit.Default);
             }
         }
     }
@@ -184,7 +191,7 @@ public class AssetRepository : IAssetRepository
 
     public Folder? GetFolderByPath(string path)
     {
-        Folder? result = null;
+        Folder? result;
 
         lock (syncLock)
         {
@@ -246,6 +253,7 @@ public class AssetRepository : IAssetRepository
         return cataloguedAssets;
     }
 
+    // TODO: Improve it by having a Dict instead Dictionary<string, List<Asset>>
     public List<Asset> GetCataloguedAssetsByPath(string directory)
     {
         List<Asset> cataloguedAssets = new();
@@ -276,7 +284,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
-    public void DeleteAsset(string directory, string fileName)
+    public Asset? DeleteAsset(string directory, string fileName)
     {
         lock (syncLock)
         {
@@ -306,8 +314,13 @@ public class AssetRepository : IAssetRepository
                 {
                     assets.Remove(assetToDelete);
                     hasChanges = true;
+                    _assetsUpdatedSubject.OnNext(Unit.Default);
                 }
+
+                return assetToDelete;
             }
+
+            return null;
         }
     }
 
@@ -377,7 +390,7 @@ public class AssetRepository : IAssetRepository
             }
             else
             {
-                DeleteAsset(directoryName, fileName);
+                _ = DeleteAsset(directoryName, fileName);
                 Folder? folder = GetFolderByPath(directoryName);
                 SaveCatalog(folder);
             }
@@ -386,6 +399,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
+    // TODO: Rename to FolderHasBlobs or something like this (Thumbnails has been used too much wrongly)
     public bool FolderHasThumbnails(Folder folder)
     {
         return _database.FolderHasThumbnails(folder.ThumbnailsFilename);

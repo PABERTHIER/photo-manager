@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryFolderHasThumbnailsTests
@@ -36,6 +38,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
     [Test]
     public void FolderHasThumbnails_ThumbnailsExist_ReturnsTrue()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Folder folder = new() { FolderId = Guid.NewGuid(), Path = dataDirectory! };
@@ -44,16 +49,22 @@ public class AssetRepositoryFolderHasThumbnailsTests
             bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
 
             Assert.IsTrue(folderHasThumbnails);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void FolderHasThumbnails_ThumbnailsDoNotExist_ReturnsFalse()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Folder folder = new() { FolderId = Guid.NewGuid(), Path = dataDirectory! };
@@ -61,16 +72,22 @@ public class AssetRepositoryFolderHasThumbnailsTests
             bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
 
             Assert.IsFalse(folderHasThumbnails);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void FolderHasThumbnails_FolderIsNull_ThrowsNullReferenceException()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Folder? folder = null;
@@ -78,10 +95,13 @@ public class AssetRepositoryFolderHasThumbnailsTests
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetRepository!.FolderHasThumbnails(folder!));
 
             Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }
