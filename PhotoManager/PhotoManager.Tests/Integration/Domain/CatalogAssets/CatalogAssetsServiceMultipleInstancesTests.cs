@@ -330,8 +330,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Folder? subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
             Assert.IsNull(subSubDirFolder);
 
-            Folder? videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -387,8 +387,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
             subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
             Assert.IsNotNull(subSubDirFolder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFrameFolder);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
@@ -403,10 +403,10 @@ public class CatalogAssetsServiceMultipleInstancesTests
             _asset2Temp!.FolderId = imageUpdatedFolder!.FolderId;
             _asset3Temp!.Folder = subDirFolder!;
             _asset3Temp!.FolderId = subDirFolder!.FolderId;
-            _asset4Temp!.Folder = videoFirstFramefolder!;
-            _asset4Temp!.FolderId = videoFirstFramefolder!.FolderId;
-            _asset5Temp!.Folder = videoFirstFramefolder;
-            _asset5Temp!.FolderId = videoFirstFramefolder.FolderId;
+            _asset4Temp!.Folder = videoFirstFrameFolder!;
+            _asset4Temp!.FolderId = videoFirstFrameFolder!.FolderId;
+            _asset5Temp!.Folder = videoFirstFrameFolder;
+            _asset5Temp!.FolderId = videoFirstFrameFolder.FolderId;
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -431,7 +431,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(6, assetsFromRepository.Count);
 
-            List<Folder> expectedFolders = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, videoFirstFramefolder, videoFirstFramefolder];
+            List<Folder> expectedFolders = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, videoFirstFrameFolder, videoFirstFrameFolder];
             List<string> expectedDirectories = [assetsDirectory, imageDeletedDirectory, imageUpdatedDirectory, subDirDirectory, firstFrameVideosDirectory, firstFrameVideosDirectory];
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
@@ -439,15 +439,15 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsFirstSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            List<Folder> folders = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, subSubDirFolder!, videoFirstFramefolder];
-            List<Folder> foldersContainingAssetsFirstSync = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, videoFirstFramefolder];
+            List<Folder> folders = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, subSubDirFolder!, videoFirstFrameFolder];
+            List<Folder> foldersContainingAssetsFirstSync = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, videoFirstFrameFolder];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new()
             {
                 { rootFolder, [_asset4!]},
                 { imageDeletedFolder, [_asset2!]},
                 { imageUpdatedFolder, [_asset2Temp!]},
                 { subDirFolder, [_asset3Temp!]},
-                { videoFirstFramefolder, [_asset4Temp!, _asset5Temp!]}
+                { videoFirstFrameFolder, [_asset4Temp!, _asset5Temp!]}
             };
             Dictionary<string, int> assetNameToByteSizeMappingFirstSync = new()
             {
@@ -516,14 +516,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
 
-            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFramefolder].Count; i++)
+            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFrameFolder].Count; i++)
             {
                 CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
                     catalogChanges,
                     firstFrameVideosDirectory,
-                    folderToAssetsMappingFirstSync[videoFirstFramefolder][..(i + 1)],
-                    folderToAssetsMappingFirstSync[videoFirstFramefolder][i],
-                    videoFirstFramefolder,
+                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][..(i + 1)],
+                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][i],
+                    videoFirstFrameFolder,
                     ref increment);
             }
 
@@ -541,12 +541,12 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             thumbnails = _testableAssetRepository!.GetThumbnails();
 
-            List<Folder> foldersContainingAssetsSecondSync = [imageDeletedFolder, imageUpdatedFolder, videoFirstFramefolder];
+            List<Folder> foldersContainingAssetsSecondSync = [imageDeletedFolder, imageUpdatedFolder, videoFirstFrameFolder];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
                 { rootFolder, [_asset4!]},
                 { subDirFolder, [_asset3Temp!]},
-                { videoFirstFramefolder, [_asset4Temp!, _asset5Temp!]},
+                { videoFirstFrameFolder, [_asset4Temp!, _asset5Temp!]},
                 { imageUpdatedFolder, [_asset2Temp!]}
             };
             Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
@@ -594,8 +594,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
             subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
             Assert.IsNotNull(subSubDirFolder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFrameFolder);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
@@ -608,10 +608,10 @@ public class CatalogAssetsServiceMultipleInstancesTests
             _asset2Temp!.FolderId = imageUpdatedFolder!.FolderId;
             _asset3Temp!.Folder = subDirFolder!;
             _asset3Temp!.FolderId = subDirFolder!.FolderId;
-            _asset4Temp!.Folder = videoFirstFramefolder!;
-            _asset4Temp!.FolderId = videoFirstFramefolder!.FolderId;
-            _asset5Temp!.Folder = videoFirstFramefolder;
-            _asset5Temp!.FolderId = videoFirstFramefolder.FolderId;
+            _asset4Temp!.Folder = videoFirstFrameFolder!;
+            _asset4Temp!.FolderId = videoFirstFrameFolder!.FolderId;
+            _asset5Temp!.Folder = videoFirstFrameFolder;
+            _asset5Temp!.FolderId = videoFirstFrameFolder.FolderId;
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -637,7 +637,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Assert.AreEqual(5, assetsFromRepository.Count);
 
             assetPathsAfterSync = [imagePath1ToCopy, imagePath4ToCopy, firstFramePath1, firstFramePath2, imagePath3ToCopy];
-            expectedFolders = [rootFolder, subDirFolder, videoFirstFramefolder, videoFirstFramefolder, imageUpdatedFolder];
+            expectedFolders = [rootFolder, subDirFolder, videoFirstFrameFolder, videoFirstFrameFolder, imageUpdatedFolder];
             expectedDirectories = [assetsDirectory, subDirDirectory, firstFrameVideosDirectory, firstFrameVideosDirectory, imageUpdatedDirectory];
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
@@ -702,14 +702,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
 
-            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFramefolder].Count; i++)
+            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFrameFolder].Count; i++)
             {
                 CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
                     catalogChanges,
                     firstFrameVideosDirectory,
-                    folderToAssetsMappingFirstSync[videoFirstFramefolder][..(i + 1)],
-                    folderToAssetsMappingFirstSync[videoFirstFramefolder][i],
-                    videoFirstFramefolder,
+                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][..(i + 1)],
+                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][i],
+                    videoFirstFrameFolder,
                     ref increment);
             }
 

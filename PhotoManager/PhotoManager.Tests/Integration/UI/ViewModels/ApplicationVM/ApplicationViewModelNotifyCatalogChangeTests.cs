@@ -496,8 +496,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
 
-            Folder? videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -529,8 +529,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFrameFolder);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
@@ -540,8 +540,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _asset3Temp!.FolderId = folder!.FolderId;
             _asset2Temp!.Folder = folder;
             _asset2Temp!.FolderId = folder.FolderId;
-            _asset4Temp!.Folder = videoFirstFramefolder!;
-            _asset4Temp!.FolderId = videoFirstFramefolder!.FolderId;
+            _asset4Temp!.Folder = videoFirstFrameFolder!;
+            _asset4Temp!.FolderId = videoFirstFrameFolder!.FolderId;
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -554,7 +554,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(3, assetsFromRepository.Count);
 
-            List<Folder> expectedFolders = [folder, folder, videoFirstFramefolder];
+            List<Folder> expectedFolders = [folder, folder, videoFirstFrameFolder];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
@@ -562,11 +562,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            List<Folder> folders = [folder, videoFirstFramefolder];
+            List<Folder> folders = [folder, videoFirstFrameFolder];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
             {
                 { folder, [_asset3Temp!, _asset2Temp!]},
-                { videoFirstFramefolder, [_asset4Temp!]}
+                { videoFirstFrameFolder, [_asset4Temp!]}
             };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
@@ -633,9 +633,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory,
                 assetsDirectory,
                 2,
-                folderToAssetsMapping[videoFirstFramefolder],
+                folderToAssetsMapping[videoFirstFrameFolder],
                 _asset4Temp!,
-                videoFirstFramefolder,
+                videoFirstFrameFolder,
                 ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -676,7 +676,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Because the root folder is already added
             Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFramefolder, folderAddedEvents[0]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
 
             Assert.IsEmpty(folderRemovedEvents);
 
@@ -686,14 +686,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(firstFrameVideosDirectory);
             
             Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
-            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFramefolder], _applicationViewModel!.ObservableAssets);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
                 1,
-                folderToAssetsMapping[videoFirstFramefolder],
-                folderToAssetsMapping[videoFirstFramefolder][0],
-                videoFirstFramefolder,
+                folderToAssetsMapping[videoFirstFrameFolder],
+                folderToAssetsMapping[videoFirstFrameFolder][0],
+                videoFirstFrameFolder,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
@@ -779,8 +779,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
 
-            Folder? videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -812,8 +812,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             Assert.IsFalse(File.Exists(firstFramePath1));
 
@@ -950,7 +950,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 0,
                 [],
                 null!,
-                videoFirstFramefolder!,
+                videoFirstFrameFolder!,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
@@ -1899,8 +1899,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
 
-            Folder? videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -1932,8 +1932,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFrameFolder);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
@@ -1943,8 +1943,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _asset3Temp!.FolderId = folder!.FolderId;
             _asset2Temp!.Folder = folder;
             _asset2Temp!.FolderId = folder.FolderId;
-            _asset4Temp!.Folder = videoFirstFramefolder!;
-            _asset4Temp!.FolderId = videoFirstFramefolder!.FolderId;
+            _asset4Temp!.Folder = videoFirstFrameFolder!;
+            _asset4Temp!.FolderId = videoFirstFrameFolder!.FolderId;
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -1957,7 +1957,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(3, assetsFromRepository.Count);
 
-            List<Folder> expectedFolders = [folder, folder, videoFirstFramefolder];
+            List<Folder> expectedFolders = [folder, folder, videoFirstFrameFolder];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
@@ -1965,11 +1965,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            List<Folder> folders = [folder, videoFirstFramefolder];
+            List<Folder> folders = [folder, videoFirstFrameFolder];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
             {
                 { folder, [_asset3Temp!, _asset2Temp!]},
-                { videoFirstFramefolder, [_asset4Temp!]}
+                { videoFirstFrameFolder, [_asset4Temp!]}
             };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
@@ -2036,9 +2036,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory,
                 assetsDirectory,
                 2,
-                folderToAssetsMapping[videoFirstFramefolder],
+                folderToAssetsMapping[videoFirstFrameFolder],
                 _asset4Temp!,
-                videoFirstFramefolder,
+                videoFirstFrameFolder,
                 ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -2079,7 +2079,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Because the root folder is already added
             Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFramefolder, folderAddedEvents[0]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
 
             Assert.IsEmpty(folderRemovedEvents);
 
@@ -2102,8 +2102,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFrameFolder);
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -2203,7 +2203,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Because the root folder is already added
             Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFramefolder, folderAddedEvents[0]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
 
             Assert.IsEmpty(folderRemovedEvents);
 
@@ -2213,14 +2213,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(firstFrameVideosDirectory);
 
             Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
-            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFramefolder!], _applicationViewModel!.ObservableAssets);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
                 1,
-                folderToAssetsMapping[videoFirstFramefolder!],
-                folderToAssetsMapping[videoFirstFramefolder!][0],
-                videoFirstFramefolder!,
+                folderToAssetsMapping[videoFirstFrameFolder!],
+                folderToAssetsMapping[videoFirstFrameFolder!][0],
+                videoFirstFrameFolder!,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
@@ -2303,8 +2303,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
 
-            Folder? videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -2336,8 +2336,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             Assert.IsFalse(File.Exists(firstFramePath1));
 
@@ -2476,8 +2476,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -2586,7 +2586,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 0,
                 [],
                 null!,
-                videoFirstFramefolder!,
+                videoFirstFrameFolder!,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
@@ -4051,8 +4051,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
 
-            Folder? videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -4084,8 +4084,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFrameFolder);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
@@ -4095,8 +4095,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _asset3Temp!.FolderId = folder!.FolderId;
             _asset2Temp!.Folder = folder;
             _asset2Temp!.FolderId = folder.FolderId;
-            _asset4Temp!.Folder = videoFirstFramefolder!;
-            _asset4Temp!.FolderId = videoFirstFramefolder!.FolderId;
+            _asset4Temp!.Folder = videoFirstFrameFolder!;
+            _asset4Temp!.FolderId = videoFirstFrameFolder!.FolderId;
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -4109,7 +4109,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(3, assetsFromRepository.Count);
 
-            List<Folder> expectedFolders = [folder, folder, videoFirstFramefolder];
+            List<Folder> expectedFolders = [folder, folder, videoFirstFrameFolder];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
@@ -4117,11 +4117,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            List<Folder> folders = [folder, videoFirstFramefolder];
+            List<Folder> folders = [folder, videoFirstFrameFolder];
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new()
             {
                 { folder, [_asset3Temp!, _asset2Temp!]},
-                { videoFirstFramefolder, [_asset4Temp!]}
+                { videoFirstFrameFolder, [_asset4Temp!]}
             };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
@@ -4188,9 +4188,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory,
                 assetsDirectory,
                 2,
-                folderToAssetsMapping[videoFirstFramefolder],
+                folderToAssetsMapping[videoFirstFrameFolder],
                 _asset4Temp!,
-                videoFirstFramefolder,
+                videoFirstFrameFolder,
                 ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -4231,7 +4231,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Because the root folder is already added
             Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFramefolder, folderAddedEvents[0]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
 
             Assert.IsEmpty(folderRemovedEvents);
 
@@ -4251,8 +4251,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNotNull(videoFirstFrameFolder);
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -4352,7 +4352,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Because the root folder is already added
             Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFramefolder, folderAddedEvents[0]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
 
             Assert.IsEmpty(folderRemovedEvents);
 
@@ -4362,14 +4362,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(firstFrameVideosDirectory);
 
             Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
-            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFramefolder!], _applicationViewModel!.ObservableAssets);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
                 1,
-                folderToAssetsMapping[videoFirstFramefolder!],
-                folderToAssetsMapping[videoFirstFramefolder!][0],
-                videoFirstFramefolder!,
+                folderToAssetsMapping[videoFirstFrameFolder!],
+                folderToAssetsMapping[videoFirstFrameFolder!][0],
+                videoFirstFrameFolder!,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
@@ -4457,8 +4457,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
 
-            Folder? videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -4490,8 +4490,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             Assert.IsFalse(File.Exists(firstFramePath1));
 
@@ -4629,8 +4629,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            videoFirstFramefolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFramefolder);
+            videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
+            Assert.IsNull(videoFirstFrameFolder);
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -4739,7 +4739,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 0,
                 [],
                 null!,
-                videoFirstFramefolder!,
+                videoFirstFrameFolder!,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
