@@ -2,9 +2,9 @@
 
 ![PhotoManager](PhotoManager/Images/AppIcon.png)
 
-[![Test](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/test.yml/badge.svg)](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/test.yml)
-[![Release](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/release.yaml/badge.svg)](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/release.yaml)
-[![CodeQL](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jpablodrexler/jp-photo-manager/actions/workflows/codeql-analysis.yml)
+<!-- [![Test](https://github.com/PABERTHIER/photo-manager/actions/workflows/test.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/test.yml)
+[![Release](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml)
+[![CodeQL](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml) -->
 
 **I used this [repo](https://github.com/jpablodrexler/jp-photo-manager) as a base to shape my own PhotoManager with optimizations, new features, bugs fix...
 Thank you jpablodrexler for your work :heart:**

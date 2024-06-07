@@ -16,7 +16,7 @@ jobs:
         shell: bash
       - name: Get the zip file name
         id: get_zip_file_name
-        run: echo ::set-output name=ZIP_FILE_NAME::jp-photo-manager-v${{ steps.get_version.outputs.VERSION }}.zip
+        run: echo ::set-output name=ZIP_FILE_NAME::photo-manager-v${{ steps.get_version.outputs.VERSION }}.zip
         shell: bash
       - name: Echo
         run: echo ${{ steps.get_version.outputs.VERSION }} ${{ steps.get_zip_file_name.outputs.ZIP_FILE_NAME }}
