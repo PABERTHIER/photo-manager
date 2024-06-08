@@ -1,31 +1,33 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryGetAssetsCounterTests
 {
-    private string? dataDirectory;
-    private const string backupEndPath = "DatabaseTests\\v1.0";
-    private string? backupPath;
+    private string? _dataDirectory;
+    private string? _backupPath;
+    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private IAssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
-    private Asset? asset1;
-    private Asset? asset2;
-    private Asset? asset3;
+    private Asset? _asset1;
+    private Asset? _asset2;
+    private Asset? _asset3;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        backupPath = Path.Combine(dataDirectory, backupEndPath);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(_backupPath);
     }
 
     [SetUp]
@@ -35,7 +37,7 @@ public class AssetRepositoryGetAssetsCounterTests
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
 
-        asset1 = new()
+        _asset1 = new()
         {
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
@@ -52,7 +54,7 @@ public class AssetRepositoryGetAssetsCounterTests
             AssetRotatedMessage = null,
             IsAssetRotated = false
         };
-        asset2 = new()
+        _asset2 = new()
         {
             FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = "Image 9.png",
@@ -69,7 +71,7 @@ public class AssetRepositoryGetAssetsCounterTests
             AssetRotatedMessage = "The asset has been rotated",
             IsAssetRotated = true
         };
-        asset3 = new()
+        _asset3 = new()
         {
             FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
             FileName = "Image_11.heic",
@@ -91,77 +93,115 @@ public class AssetRepositoryGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_AssetsExist_ReturnsNumberOfAssets()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
-            int assetsCounter;
-
-            string folderPath = Path.Combine(dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _assetRepository!.AddFolder(folderPath);
-            asset1!.Folder = folder;
-            asset1!.FolderId = folder.FolderId;
-            asset2!.Folder = folder;
-            asset2!.FolderId = folder.FolderId;
-            asset3!.Folder = folder;
-            asset3!.FolderId = folder.FolderId;
+            _asset1!.Folder = folder;
+            _asset1!.FolderId = folder.FolderId;
+            _asset2!.Folder = folder;
+            _asset2!.FolderId = folder.FolderId;
+            _asset3!.Folder = folder;
+            _asset3!.FolderId = folder.FolderId;
 
-            assetsCounter = _assetRepository.GetAssetsCounter();
+            Assert.IsEmpty(assetsUpdatedEvents);
+
+            int assetsCounter = _assetRepository.GetAssetsCounter();
             Assert.AreEqual(0, assetsCounter);
 
-            _assetRepository.AddAsset(asset1!, Array.Empty<byte>());
+            Assert.IsEmpty(assetsUpdatedEvents);
+
+            _assetRepository.AddAsset(_asset1!, []);
             assetsCounter = _assetRepository.GetAssetsCounter();
             Assert.AreEqual(1, assetsCounter);
 
-            _assetRepository.AddAsset(asset2!, Array.Empty<byte>());
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+
+            _assetRepository.AddAsset(_asset2!, []);
             assetsCounter = _assetRepository.GetAssetsCounter();
             Assert.AreEqual(2, assetsCounter);
 
-            _assetRepository.AddAsset(asset3!, Array.Empty<byte>());
+            Assert.AreEqual(2, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
+
+            _assetRepository.AddAsset(_asset3!, []);
             assetsCounter = _assetRepository.GetAssetsCounter();
             Assert.AreEqual(3, assetsCounter);
 
-            _assetRepository.DeleteAsset(folderPath, asset3.FileName);
+            Assert.AreEqual(3, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
+
+            _assetRepository.DeleteAsset(folderPath, _asset3.FileName);
 
             assetsCounter = _assetRepository.GetAssetsCounter();
             Assert.AreEqual(2, assetsCounter);
+
+            Assert.AreEqual(4, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[3]);
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetAssetsCounter_NoAsset_Returns0()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             int assetsCounter = _assetRepository!.GetAssetsCounter();
 
             Assert.AreEqual(0, assetsCounter);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetAssetsCounter_ConcurrentAccess_AssetsAreHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
-            string folderPath = Path.Combine(dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _assetRepository!.AddFolder(folderPath);
-            asset1!.Folder = folder;
-            asset1!.FolderId = folder.FolderId;
-            asset2!.Folder = folder;
-            asset2!.FolderId = folder.FolderId;
-            asset3!.Folder = folder;
-            asset3!.FolderId = folder.FolderId;
+            _asset1!.Folder = folder;
+            _asset1!.FolderId = folder.FolderId;
+            _asset2!.Folder = folder;
+            _asset2!.FolderId = folder.FolderId;
+            _asset3!.Folder = folder;
+            _asset3!.FolderId = folder.FolderId;
 
-            _assetRepository.AddAsset(asset1!, Array.Empty<byte>());
-            _assetRepository.AddAsset(asset2!, Array.Empty<byte>());
-            _assetRepository.AddAsset(asset3!, Array.Empty<byte>());
+            _assetRepository.AddAsset(_asset1!, []);
+            _assetRepository.AddAsset(_asset2!, []);
+            _assetRepository.AddAsset(_asset3!, []);
+
+            Assert.AreEqual(3, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
 
             int assetsCounter1 = 0;
             int assetsCounter2 = 0;
@@ -177,10 +217,16 @@ public class AssetRepositoryGetAssetsCounterTests
             Assert.AreEqual(3, assetsCounter1);
             Assert.AreEqual(3, assetsCounter2);
             Assert.AreEqual(3, assetsCounter3);
+
+            Assert.AreEqual(3, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

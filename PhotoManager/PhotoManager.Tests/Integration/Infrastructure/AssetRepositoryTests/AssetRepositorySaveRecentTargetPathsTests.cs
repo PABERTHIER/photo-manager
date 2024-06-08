@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositorySaveRecentTargetPathsTests
@@ -35,6 +37,9 @@ public class AssetRepositorySaveRecentTargetPathsTests
     [Test]
     public void SaveRecentTargetPaths_RecentTargetPaths_SaveRecentTargetPaths()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             List<string> recentTargetPathsToSave = new()
@@ -58,16 +63,22 @@ public class AssetRepositorySaveRecentTargetPathsTests
             Assert.IsEmpty(recentTargetPaths);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void SaveRecentTargetPaths_ConcurrentAccess_RecentTargetPathsAreHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             List<string> recentTargetPathsToSave = new()
@@ -90,10 +101,13 @@ public class AssetRepositorySaveRecentTargetPathsTests
             Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths[1]);
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

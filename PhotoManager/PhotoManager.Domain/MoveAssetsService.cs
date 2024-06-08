@@ -113,7 +113,7 @@ public class MoveAssetsService(
 
     private void DeleteAsset(Asset asset)
     {
-        assetRepository.DeleteAsset(asset.Folder.Path, asset.FileName);
+        _ = assetRepository.DeleteAsset(asset.Folder.Path, asset.FileName);
         storageService.DeleteFile(asset.Folder.Path, asset.FileName);
     }
 

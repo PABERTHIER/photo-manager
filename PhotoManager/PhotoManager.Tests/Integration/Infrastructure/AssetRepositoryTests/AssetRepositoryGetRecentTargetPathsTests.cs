@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryGetRecentTargetPathsTests
@@ -35,6 +37,9 @@ public class AssetRepositoryGetRecentTargetPathsTests
     [Test]
     public void GetRecentTargetPaths_RecentTargetPaths_ReturnsRecentTargetPaths()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             List<string> recentTargetPathsToSave = new()
@@ -49,31 +54,43 @@ public class AssetRepositoryGetRecentTargetPathsTests
             Assert.AreEqual(2, recentTargetPaths.Count);
             Assert.AreEqual(recentTargetPathsToSave[0], recentTargetPaths[0]);
             Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths[1]);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetRecentTargetPaths_NoRecentTargetPaths_ReturnsEmptyList()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
             Assert.IsEmpty(recentTargetPaths);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetRecentTargetPaths_ConcurrentAccess_RecentTargetPathsAreHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             List<string> recentTargetPathsToSave = new()
@@ -106,10 +123,13 @@ public class AssetRepositoryGetRecentTargetPathsTests
             Assert.AreEqual(2, recentTargetPaths3.Count);
             Assert.AreEqual(recentTargetPathsToSave[0], recentTargetPaths3[0]);
             Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths3[1]);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

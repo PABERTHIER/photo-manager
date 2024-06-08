@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryFolderExistsTests
@@ -35,6 +37,9 @@ public class AssetRepositoryFolderExistsTests
     [Test]
     public void FolderExists_FolderExists_ReturnsTrue()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "TestFolder1");
@@ -44,16 +49,22 @@ public class AssetRepositoryFolderExistsTests
             bool folderExists = _assetRepository!.FolderExists(folderPath);
 
             Assert.IsTrue(folderExists);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void FolderExists_FolderDoesNotExist_ReturnsFalse()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -64,16 +75,22 @@ public class AssetRepositoryFolderExistsTests
             bool folderExists = _assetRepository!.FolderExists(folderPath2);
 
             Assert.IsFalse(folderExists);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void FolderExists_ConcurrentAccess_FoldersAreHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath = Path.Combine(dataDirectory!, "TestFolder1");
@@ -94,10 +111,13 @@ public class AssetRepositoryFolderExistsTests
             Assert.IsTrue(folderExists1);
             Assert.IsTrue(folderExists2);
             Assert.IsTrue(folderExists3);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

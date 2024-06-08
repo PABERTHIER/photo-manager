@@ -1,7 +1,10 @@
-﻿namespace PhotoManager.Domain.Interfaces;
+﻿using System.Reactive;
+
+namespace PhotoManager.Domain.Interfaces;
 
 public interface IAssetRepository
 {
+    IObservable<Unit> AssetsUpdated { get; }
     Asset[] GetAssetsByPath(string directory);
     void AddAsset(Asset asset, byte[] thumbnailData);
     Folder AddFolder(string path);
@@ -16,7 +19,7 @@ public interface IAssetRepository
     List<Asset> GetCataloguedAssets();
     List<Asset> GetCataloguedAssetsByPath(string directory);
     bool IsAssetCatalogued(string directoryName, string fileName);
-    void DeleteAsset(string directory, string deletedFileName);
+    Asset? DeleteAsset(string directory, string deletedFileName);
     void DeleteFolder(Folder folder);
     bool HasChanges();
     bool ContainsThumbnail(string directoryName, string fileName);

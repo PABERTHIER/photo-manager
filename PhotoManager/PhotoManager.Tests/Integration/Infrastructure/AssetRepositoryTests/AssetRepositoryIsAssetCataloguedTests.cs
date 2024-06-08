@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryIsAssetCataloguedTests
@@ -55,6 +57,9 @@ public class AssetRepositoryIsAssetCataloguedTests
     [Test]
     public void IsAssetCatalogued_FolderAndAssetExist_ReturnsTrue()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -67,21 +72,31 @@ public class AssetRepositoryIsAssetCataloguedTests
             asset1!.FolderId = addedFolder1.FolderId;
             _assetRepository!.AddAsset(asset1!, Array.Empty<byte>());
 
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+
             bool isAssetCatalogued1 = _assetRepository!.IsAssetCatalogued(folderPath1, asset1.FileName);
             bool isAssetCatalogued2 = _assetRepository!.IsAssetCatalogued(folderPath2, "toto.jpg");
 
             Assert.IsTrue(isAssetCatalogued1);
             Assert.IsFalse(isAssetCatalogued2);
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void IsAssetCatalogued_DirectoryWithNoFolder_ReturnsFalse()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -93,19 +108,29 @@ public class AssetRepositoryIsAssetCataloguedTests
             asset1!.FolderId = addedFolder1.FolderId;
             _assetRepository!.AddAsset(asset1!, Array.Empty<byte>());
 
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+
             bool isAssetCatalogued = _assetRepository.IsAssetCatalogued(folderPath2, "toto.jpg");
 
             Assert.IsFalse(isAssetCatalogued);
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void IsAssetCatalogued_DirectoryNameIsNull_ReturnsFalse()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string? folderPath = null;
@@ -113,16 +138,22 @@ public class AssetRepositoryIsAssetCataloguedTests
             bool isAssetCatalogued = _assetRepository!.IsAssetCatalogued(folderPath!, "toto.jpg");
 
             Assert.IsFalse(isAssetCatalogued);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void IsAssetCatalogued_FileNameIsNull_ReturnsFalse()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -134,16 +165,22 @@ public class AssetRepositoryIsAssetCataloguedTests
             bool isAssetCatalogued = _assetRepository.IsAssetCatalogued(folderPath1, fileName!);
 
             Assert.IsFalse(isAssetCatalogued);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void IsAssetCatalogued_ConcurrentAccess_AssetsAreHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -155,6 +192,9 @@ public class AssetRepositoryIsAssetCataloguedTests
             asset1!.Folder = addedFolder1;
             asset1!.FolderId = addedFolder1.FolderId;
             _assetRepository!.AddAsset(asset1!, Array.Empty<byte>());
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
 
             bool isAssetCatalogued1 = false;
             bool isAssetCatalogued2 = false;
@@ -167,10 +207,14 @@ public class AssetRepositoryIsAssetCataloguedTests
 
             Assert.IsTrue(isAssetCatalogued1);
             Assert.IsFalse(isAssetCatalogued2);
+
+            Assert.AreEqual(1, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

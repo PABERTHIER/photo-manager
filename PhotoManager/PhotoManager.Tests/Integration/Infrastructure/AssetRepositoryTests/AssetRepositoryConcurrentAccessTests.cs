@@ -1,32 +1,35 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryConcurrentAccessTests
 {
-    private string? dataDirectory;
-    private const string backupEndPath = "DatabaseTests\\v1.0";
-    private string? backupPath;
+    private string? _dataDirectory;
+    private string? _backupPath;
+    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
 
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
-    private Asset? asset1;
-    private Asset? asset2;
-    private Asset? asset3;
+    private Asset? _asset1;
+    private Asset? _asset2;
+    private Asset? _asset3;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        backupPath = Path.Combine(dataDirectory, backupEndPath);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(_backupPath);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
         _storageServiceMock.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
     }
@@ -34,11 +37,11 @@ public class AssetRepositoryConcurrentAccessTests
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new TestableAssetRepository(_database, _storageServiceMock!.Object, userConfigurationService);
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+        _testableAssetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
 
-        asset1 = new()
+        _asset1 = new()
         {
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
@@ -55,7 +58,7 @@ public class AssetRepositoryConcurrentAccessTests
             AssetRotatedMessage = null,
             IsAssetRotated = false
         };
-        asset2 = new()
+        _asset2 = new()
         {
             FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = "Image 9.png",
@@ -72,7 +75,7 @@ public class AssetRepositoryConcurrentAccessTests
             AssetRotatedMessage = "The asset has been rotated",
             IsAssetRotated = true
         };
-        asset3 = new()
+        _asset3 = new()
         {
             FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
             FileName = "Image_11.heic",
@@ -129,29 +132,32 @@ public class AssetRepositoryConcurrentAccessTests
             IsAssetRotated = true
         };
 
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
-            string folderPath1 = Path.Combine(dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(dataDirectory!, "NewFolder2");
-            string folderPath3 = Path.Combine(dataDirectory!, "NewFolder3");
-            string folderPath4 = Path.Combine(dataDirectory!, "NewFolder4");
+            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
+            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath3 = Path.Combine(_dataDirectory!, "NewFolder3");
+            string folderPath4 = Path.Combine(_dataDirectory!, "NewFolder4");
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 
             Folder folder3 = new() { FolderId = Guid.NewGuid(), Path = folderPath3 };
             Folder folder4 = new() { FolderId = Guid.NewGuid(), Path = folderPath4 };
 
-            asset1!.Folder = folder1;
-            asset1!.FolderId = folder1.FolderId;
-            byte[] assetData1 = new byte[] { 1, 2, 3 };
+            _asset1!.Folder = folder1;
+            _asset1!.FolderId = folder1.FolderId;
+            byte[] assetData1 = [1, 2, 3];
 
-            asset2!.Folder = folder1;
-            asset2!.FolderId = folder1.FolderId;
-            byte[]? assetData2 = Array.Empty<byte>();
+            _asset2!.Folder = folder1;
+            _asset2!.FolderId = folder1.FolderId;
+            byte[] assetData2 = [];
 
-            asset3!.Folder = folder2;
-            asset3!.FolderId = folder2.FolderId;
-            byte[] assetData3 = new byte[] { 4, 5, 6 };
+            _asset3!.Folder = folder2;
+            _asset3!.FolderId = folder2.FolderId;
+            byte[] assetData3 = [4, 5, 6];
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
@@ -171,11 +177,11 @@ public class AssetRepositoryConcurrentAccessTests
                     DeleteAssetsNotInSource = false
                 });
 
-            List<string> recentTargetPathsToSave = new()
-            {
+            List<string> recentTargetPathsToSave =
+            [
                 "D:\\Workspace\\PhotoManager\\Toto",
                 "D:\\Workspace\\PhotoManager\\Tutu"
-            };
+            ];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.IsEmpty(cataloguedAssets);
@@ -184,17 +190,17 @@ public class AssetRepositoryConcurrentAccessTests
             Assert.IsEmpty(thumbnails);
 
             // DeleteAsset
-            string folderPath5 = Path.Combine(dataDirectory!, "NewFolder5");
-            string folderPath6 = Path.Combine(dataDirectory!, "NewFolder6");
+            string folderPath5 = Path.Combine(_dataDirectory!, "NewFolder5");
+            string folderPath6 = Path.Combine(_dataDirectory!, "NewFolder6");
             Folder folder5 = _testableAssetRepository!.AddFolder(folderPath5);
             Folder folder6 = _testableAssetRepository!.AddFolder(folderPath6);
-            asset4!.Folder = folder5;
-            asset4!.FolderId = folder5.FolderId;
-            byte[] assetData4 = new byte[] { 1, 2, 3 };
+            asset4.Folder = folder5;
+            asset4.FolderId = folder5.FolderId;
+            byte[] assetData4 = [1, 2, 3];
 
-            asset5!.Folder = folder6;
-            asset5!.FolderId = folder6.FolderId;
-            byte[]? assetData5 = Array.Empty<byte>();
+            asset5.Folder = folder6;
+            asset5.FolderId = folder6.FolderId;
+            byte[] assetData5 = [];
 
             _testableAssetRepository.AddAsset(asset4, assetData4);
             _testableAssetRepository.AddAsset(asset5, assetData5);
@@ -212,7 +218,7 @@ public class AssetRepositoryConcurrentAccessTests
                 () => _testableAssetRepository.SaveCatalog(folder1),
                 () => _testableAssetRepository.DeleteFolder(folder4),
                 () => _testableAssetRepository.HasChanges(),
-                () => _testableAssetRepository.ContainsThumbnail(folderPath2, asset2.FileName),
+                () => _testableAssetRepository.ContainsThumbnail(folderPath2, _asset2.FileName),
                 () => _testableAssetRepository.GetCataloguedAssets(),
                 () => _testableAssetRepository.SaveRecentTargetPaths(recentTargetPathsToSave),
                 () => _testableAssetRepository.GetSubFolders(folder1, false),
@@ -220,38 +226,38 @@ public class AssetRepositoryConcurrentAccessTests
                 () => _testableAssetRepository.GetSyncAssetsConfiguration(),
                 () => _testableAssetRepository.SaveSyncAssetsConfiguration(syncAssetsConfigurationToSave),
                 () => _testableAssetRepository.DeleteAsset(folderPath5, asset4.FileName),
-                () => _testableAssetRepository.LoadThumbnail(folderPath1, asset2.FileName, 150, 150),
+                () => _testableAssetRepository.LoadThumbnail(folderPath1, _asset2.FileName, 150, 150),
                 () => _testableAssetRepository.GetAssetsCounter(),
                 () => _testableAssetRepository.HasChanges(),
-                () => _testableAssetRepository.AddAsset(asset1, assetData1),
+                () => _testableAssetRepository.AddAsset(_asset1, assetData1),
                 () => _testableAssetRepository.SaveCatalog(folder1),
                 () => _testableAssetRepository.GetSyncAssetsConfiguration(),
                 _testableAssetRepository.WriteBackup,
-                () => _testableAssetRepository.ContainsThumbnail(folderPath1, asset1.FileName),
+                () => _testableAssetRepository.ContainsThumbnail(folderPath1, _asset1.FileName),
                 () => _testableAssetRepository.GetCataloguedAssetsByPath(folderPath1),
                 () => _testableAssetRepository.GetFolders(),
                 () => _testableAssetRepository.DeleteFolder(folder3),
                 () => _testableAssetRepository.DeleteAsset(folderPath6, asset5.FileName),
                 () => _testableAssetRepository.GetRecentTargetPaths(),
-                () => _testableAssetRepository.LoadThumbnail(folderPath2, asset3.FileName, 150, 150),
+                () => _testableAssetRepository.LoadThumbnail(folderPath2, _asset3.FileName, 150, 150),
                 () => _testableAssetRepository.SaveSyncAssetsConfiguration(syncAssetsConfigurationToSave),
                 () => _testableAssetRepository.AddFolder(folderPath3),
                 () => _testableAssetRepository.FolderHasThumbnails(folder2),
                 () => _testableAssetRepository.SaveCatalog(null),
-                () => _testableAssetRepository.AddAsset(asset2, assetData2),
-                () => _testableAssetRepository.IsAssetCatalogued(folderPath1, asset1.FileName),
+                () => _testableAssetRepository.AddAsset(_asset2, assetData2),
+                () => _testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName),
                 () => folderExists1 = _testableAssetRepository.FolderExists(folderPath1),
                 () => _testableAssetRepository.GetFolders(),
                 () => folderByPath1 = _testableAssetRepository.GetFolderByPath(folderPath1),
                 () => _testableAssetRepository.SaveRecentTargetPaths(recentTargetPathsToSave),
                 () => _testableAssetRepository.GetCataloguedAssets(),
                 _testableAssetRepository.WriteBackup,
-                () => _testableAssetRepository.AddAsset(asset3, assetData3),
+                () => _testableAssetRepository.AddAsset(_asset3, assetData3),
                 () => _testableAssetRepository.GetSubFolders(folder2, false),
                 () => _testableAssetRepository.AddFolder(folderPath4),
                 () => _testableAssetRepository.GetRecentTargetPaths(),
                 () => folderByPath2 = _testableAssetRepository.GetFolderByPath(folderPath2),
-                () => _testableAssetRepository.IsAssetCatalogued(folderPath2, asset2.FileName),
+                () => _testableAssetRepository.IsAssetCatalogued(folderPath2, _asset2.FileName),
                 () => _testableAssetRepository.FolderHasThumbnails(folder1),
                 () => _testableAssetRepository.GetCataloguedAssetsByPath(folderPath2),
                 () => _testableAssetRepository.BackupExists(),
@@ -262,9 +268,9 @@ public class AssetRepositoryConcurrentAccessTests
             );
 
             Assert.AreEqual(3, cataloguedAssets.Count);
-            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == asset1.FileName));
-            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == asset2.FileName));
-            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == asset3.FileName));
+            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == _asset1.FileName));
+            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == _asset2.FileName));
+            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == _asset3.FileName));
 
             Assert.AreEqual(4, thumbnails.Count);
             Assert.IsTrue(thumbnails.ContainsKey(folderPath1));
@@ -277,13 +283,13 @@ public class AssetRepositoryConcurrentAccessTests
             Assert.IsEmpty(thumbnails[folderPath5]);
             Assert.IsEmpty(thumbnails[folderPath6]);
 
-            Assert.IsTrue(thumbnails[folderPath1].ContainsKey(asset1.FileName));
-            Assert.IsTrue(thumbnails[folderPath1].ContainsKey(asset2.FileName));
-            Assert.IsTrue(thumbnails[folderPath2].ContainsKey(asset3.FileName));
+            Assert.IsTrue(thumbnails[folderPath1].ContainsKey(_asset1.FileName));
+            Assert.IsTrue(thumbnails[folderPath1].ContainsKey(_asset2.FileName));
+            Assert.IsTrue(thumbnails[folderPath2].ContainsKey(_asset3.FileName));
 
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[folderPath1][asset1.FileName]);
-            Assert.AreEqual(Array.Empty<byte>(), thumbnails[folderPath1][asset2.FileName]);
-            Assert.AreEqual(new byte[] { 4, 5, 6 }, thumbnails[folderPath2][asset3.FileName]);
+            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[folderPath1][_asset1.FileName]);
+            Assert.AreEqual(Array.Empty<byte>(), thumbnails[folderPath1][_asset2.FileName]);
+            Assert.AreEqual(new byte[] { 4, 5, 6 }, thumbnails[folderPath2][_asset3.FileName]);
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
             Assert.GreaterOrEqual(folders.Length, 4);
@@ -297,10 +303,20 @@ public class AssetRepositoryConcurrentAccessTests
 
             Assert.IsNotNull(folderByPath1);
             Assert.IsNotNull(folderByPath2);
+
+            Assert.AreEqual(7, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[3]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[4]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[5]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[6]);
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryGetCataloguedAssetsTests
@@ -73,6 +75,9 @@ public class AssetRepositoryGetCataloguedAssetsTests
     [Test]
     public void GetCataloguedAssets_AssetsCatalogued_ReturnsEmptyList()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "NewFolder1");
@@ -91,6 +96,10 @@ public class AssetRepositoryGetCataloguedAssetsTests
             _assetRepository!.AddAsset(asset2!, Array.Empty<byte>());
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.AreEqual(2, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
 
             List<Asset> assets = _assetRepository!.GetCataloguedAssets();
 
@@ -98,31 +107,45 @@ public class AssetRepositoryGetCataloguedAssetsTests
             Assert.AreEqual(2, assets.Count);
             Assert.IsTrue(assets.FirstOrDefault(x => x.Hash == asset1.Hash)?.FileName == asset1.FileName);
             Assert.IsTrue(assets.FirstOrDefault(x => x.Hash == asset2.Hash)?.FileName == asset2.FileName);
+
+            Assert.AreEqual(2, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetCataloguedAssets_NoAssetCatalogued_ReturnsEmptyList()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             List<Asset> assets = _assetRepository!.GetCataloguedAssets();
 
             Assert.IsEmpty(assets);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetCataloguedAssets_ConcurrentAccess_AssetsAreHandledSafely()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string folderPath1 = Path.Combine(dataDirectory!, "NewFolder1");
@@ -141,6 +164,10 @@ public class AssetRepositoryGetCataloguedAssetsTests
             _assetRepository!.AddAsset(asset2!, Array.Empty<byte>());
 
             Assert.IsTrue(_assetRepository.HasChanges());
+
+            Assert.AreEqual(2, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
 
             List<Asset> assets1 = new();
             List<Asset> assets2 = new();
@@ -167,10 +194,15 @@ public class AssetRepositoryGetCataloguedAssetsTests
             Assert.AreEqual(2, assets3.Count);
             Assert.IsTrue(assets3.FirstOrDefault(x => x.Hash == asset1.Hash)?.FileName == asset1.FileName);
             Assert.IsTrue(assets3.FirstOrDefault(x => x.Hash == asset2.Hash)?.FileName == asset2.FileName);
+
+            Assert.AreEqual(2, assetsUpdatedEvents.Count);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
+﻿using Reactive = System.Reactive;
+
+namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
 public class AssetRepositoryGetSubFoldersTests
@@ -35,6 +37,9 @@ public class AssetRepositoryGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentHasSubFolders_ReturnsMatchingSubFolders()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string parentFolderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -70,16 +75,22 @@ public class AssetRepositoryGetSubFoldersTests
             Assert.IsEmpty(childFolders1);
             Assert.IsEmpty(childFolders2);
             Assert.IsEmpty(childFolders3);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetSubFolders_ParentHasNoSubFolders_ReturnsEmptyArray()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string parentFolderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -93,16 +104,22 @@ public class AssetRepositoryGetSubFoldersTests
 
             Assert.IsEmpty(parentFolders1);
             Assert.IsEmpty(parentFolders2);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetSubFolders_NoFoldersRegistered_ReturnsEmptyArray()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             string parentFolderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
@@ -116,16 +133,22 @@ public class AssetRepositoryGetSubFoldersTests
 
             Assert.IsEmpty(parentFolders1);
             Assert.IsEmpty(parentFolders2);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 
     [Test]
     public void GetSubFolders_ParentFolderIsNull_ThrowsArgumentException()
     {
+        List<Reactive.Unit> assetsUpdatedEvents = new();
+        IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
         try
         {
             Folder? parentFolder1 = null;
@@ -137,10 +160,13 @@ public class AssetRepositoryGetSubFoldersTests
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => _assetRepository!.GetSubFolders(parentFolder1!, includeHidden: false));
 
             Assert.AreEqual("Delegate to an instance method cannot have null 'this'.", exception?.Message);
+
+            Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
             Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            assetsUpdatedSubscription.Dispose();
         }
     }
 }
