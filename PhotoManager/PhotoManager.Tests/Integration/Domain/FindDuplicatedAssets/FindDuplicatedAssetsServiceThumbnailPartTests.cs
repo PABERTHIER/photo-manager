@@ -101,7 +101,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 1512,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -118,7 +118,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 1512,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 75,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -135,7 +135,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 1512,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -152,7 +152,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 3024,
             ThumbnailPixelWidth = 100,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -169,7 +169,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 3024,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -186,7 +186,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 3024,
             ThumbnailPixelWidth = 100,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -203,7 +203,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 1512,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -220,7 +220,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 1512,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 75,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -237,7 +237,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 1512,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 10, 28, 5, 56, 25),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -254,7 +254,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             PixelHeight = 720,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,

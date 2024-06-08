@@ -1816,7 +1816,7 @@ public class AssetCreationServiceTests
                 PixelWidth = 1280,
                 ThumbnailPixelWidth = 200,
                 ThumbnailPixelHeight = 112,
-                ThumbnailCreationDateTime = new DateTime(2023, 01, 07, 00, 00, 00),
+                ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
                 ImageRotation = Rotation.Rotate0,
                 Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
                 IsAssetCorrupted = false,
