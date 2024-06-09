@@ -630,6 +630,325 @@ public class StorageServiceTests
     }
 
     [Test]
+    public void LoadFilesInformation_SomeFilesExist_PopulatesAssetsDates()
+    {
+        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
+
+            const string fileName1 = "Homer.gif";
+            const string fileName2 = "Image 1.jpg";
+            const string fileName3 = "Image 9.png";
+            const string fileName4 = "Image_11.heic";
+            const string fileName5 = "nonexistent.jpg";
+
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
+            string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, fileName2);
+            string destinationFilePath2 = Path.Combine(destinationPath, fileName2);
+            string sourceFilePath3 = Path.Combine(_dataDirectory!, fileName3);
+            string destinationFilePath3 = Path.Combine(destinationPath, fileName3);
+            string sourceFilePath4 = Path.Combine(_dataDirectory!, fileName4);
+            string destinationFilePath4 = Path.Combine(destinationPath, fileName4);
+
+            File.Copy(sourceFilePath1, destinationFilePath1);
+            File.Copy(sourceFilePath2, destinationFilePath2);
+            File.Copy(sourceFilePath3, destinationFilePath3);
+            File.Copy(sourceFilePath4, destinationFilePath4);
+
+            Folder folder = new() { Path = destinationPath };
+
+            DateTime creationTime = DateTime.Now;
+            DateTime oldDateTime = DateTime.Now.AddDays(-1);
+
+            File.SetLastWriteTime(destinationFilePath1, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath2, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath3, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath4, oldDateTime);
+
+            Asset asset1 = new() { Folder = folder, FileName = fileName1 };
+            Asset asset2 = new() { Folder = folder, FileName = fileName2 };
+            Asset asset3 = new() { Folder = folder, FileName = fileName3 };
+            Asset asset4 = new() { Folder = folder, FileName = fileName4 };
+            Asset asset5 = new() { Folder = folder, FileName = fileName5 };
+
+            Assert.AreEqual(DateTime.MinValue, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset1.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset2.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset3.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset3.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileModificationDateTime.Date);
+
+            _storageService!.LoadFilesInformation([asset1, asset2, asset3, asset4, asset5]);
+
+            Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime.Date, asset1.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime.Date, asset2.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset3.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime.Date, asset3.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset4.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime.Date, asset4.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
+    }
+
+    [Test]
+    public void LoadFilesInformation_AssetsIsEmpty_DoesNothing()
+    {
+        _storageService!.LoadFilesInformation([]);
+    }
+
+    [Test]
+    public void LoadFilesInformation_AssetsIsNull_ThrowsNullReferenceException()
+    {
+        List<Asset>? assets = null;
+
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.LoadFilesInformation(assets!));
+
+        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+    }
+
+    [Test]
+    public void LoadFilesInformation_FolderIsNull_DoesNotPopulateAssetsDates()
+    {
+        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
+
+            const string fileName1 = "Homer.gif";
+            const string fileName2 = "Image 1.jpg";
+            const string fileName3 = "Image 9.png";
+            const string fileName4 = "Image_11.heic";
+            const string fileName5 = "nonexistent.jpg";
+
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
+            string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, fileName2);
+            string destinationFilePath2 = Path.Combine(destinationPath, fileName2);
+            string sourceFilePath3 = Path.Combine(_dataDirectory!, fileName3);
+            string destinationFilePath3 = Path.Combine(destinationPath, fileName3);
+            string sourceFilePath4 = Path.Combine(_dataDirectory!, fileName4);
+            string destinationFilePath4 = Path.Combine(destinationPath, fileName4);
+
+            File.Copy(sourceFilePath1, destinationFilePath1);
+            File.Copy(sourceFilePath2, destinationFilePath2);
+            File.Copy(sourceFilePath3, destinationFilePath3);
+            File.Copy(sourceFilePath4, destinationFilePath4);
+
+            Folder? folder = null;
+
+            DateTime creationTime = default;
+            DateTime modificationTime = default;
+            DateTime oldDateTime = DateTime.Now.AddDays(-1);
+
+            File.SetLastWriteTime(destinationFilePath1, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath2, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath3, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath4, oldDateTime);
+
+            Asset asset1 = new() { Folder = folder!, FileName = fileName1 };
+            Asset asset2 = new() { Folder = folder!, FileName = fileName2 };
+            Asset asset3 = new() { Folder = folder!, FileName = fileName3 };
+            Asset asset4 = new() { Folder = folder!, FileName = fileName4 };
+            Asset asset5 = new() { Folder = folder!, FileName = fileName5 };
+
+            Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset1.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset2.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset3.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset3.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset4.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset4.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset5.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset5.FileModificationDateTime.Date);
+
+            _storageService!.LoadFilesInformation([asset1, asset2, asset3, asset4, asset5]);
+
+            Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset1.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset2.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset3.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset3.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset4.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset4.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset5.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset5.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
+    }
+
+    [Test]
+    public void LoadFilesInformation_FilePathIsNull_ThrowsArgumentNullException()
+    {
+        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
+
+            const string fileName1 = "Homer.gif";
+            const string fileName2 = "Image 1.jpg";
+            const string fileName3 = "Image 9.png";
+            const string fileName4 = "Image_11.heic";
+            const string fileName5 = "nonexistent.jpg";
+
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
+            string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, fileName2);
+            string destinationFilePath2 = Path.Combine(destinationPath, fileName2);
+            string sourceFilePath3 = Path.Combine(_dataDirectory!, fileName3);
+            string destinationFilePath3 = Path.Combine(destinationPath, fileName3);
+            string sourceFilePath4 = Path.Combine(_dataDirectory!, fileName4);
+            string destinationFilePath4 = Path.Combine(destinationPath, fileName4);
+
+            File.Copy(sourceFilePath1, destinationFilePath1);
+            File.Copy(sourceFilePath2, destinationFilePath2);
+            File.Copy(sourceFilePath3, destinationFilePath3);
+            File.Copy(sourceFilePath4, destinationFilePath4);
+
+            string? path = null;
+            Folder folder = new() { Path = path! };
+
+            DateTime creationTime = default;
+            DateTime modificationTime = default;
+            DateTime oldDateTime = DateTime.Now.AddDays(-1);
+
+            File.SetLastWriteTime(destinationFilePath1, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath2, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath3, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath4, oldDateTime);
+
+            Asset asset1 = new() { Folder = folder, FileName = fileName1 };
+            Asset asset2 = new() { Folder = folder, FileName = fileName2 };
+            Asset asset3 = new() { Folder = folder, FileName = fileName3 };
+            Asset asset4 = new() { Folder = folder, FileName = fileName4 };
+            Asset asset5 = new() { Folder = folder, FileName = fileName5 };
+
+            Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset1.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset2.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset3.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset3.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset4.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset4.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset5.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset5.FileModificationDateTime.Date);
+
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFilesInformation([asset1, asset2, asset3, asset4, asset5]));
+
+            Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
+
+            Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset1.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset2.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset3.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset3.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset4.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset4.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset5.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset5.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
+    }
+
+    [Test]
+    public void LoadFilesInformation_OneAssetIsNull_ThrowsNullReferenceException()
+    {
+        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
+
+            const string fileName1 = "Homer.gif";
+            const string fileName2 = "Image 1.jpg";
+            const string fileName3 = "Image 9.png";
+            const string fileName4 = "Image_11.heic";
+            const string fileName5 = "nonexistent.jpg";
+
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
+            string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, fileName2);
+            string destinationFilePath2 = Path.Combine(destinationPath, fileName2);
+            string sourceFilePath3 = Path.Combine(_dataDirectory!, fileName3);
+            string destinationFilePath3 = Path.Combine(destinationPath, fileName3);
+            string sourceFilePath4 = Path.Combine(_dataDirectory!, fileName4);
+            string destinationFilePath4 = Path.Combine(destinationPath, fileName4);
+
+            File.Copy(sourceFilePath1, destinationFilePath1);
+            File.Copy(sourceFilePath2, destinationFilePath2);
+            File.Copy(sourceFilePath3, destinationFilePath3);
+            File.Copy(sourceFilePath4, destinationFilePath4);
+
+            Folder folder = new() { Path = destinationPath };
+
+            DateTime creationTime = DateTime.Now;
+            DateTime oldDateTime = DateTime.Now.AddDays(-1);
+
+            File.SetLastWriteTime(destinationFilePath1, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath2, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath3, oldDateTime);
+            File.SetLastWriteTime(destinationFilePath4, oldDateTime);
+
+            Asset asset1 = new() { Folder = folder, FileName = fileName1 };
+            Asset asset2 = new() { Folder = folder, FileName = fileName2 };
+            Asset? asset3 = null;
+            Asset asset4 = new() { Folder = folder, FileName = fileName4 };
+            Asset asset5 = new() { Folder = folder, FileName = fileName5 };
+
+            Assert.AreEqual(DateTime.MinValue, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset1.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset2.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileModificationDateTime.Date);
+
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.LoadFilesInformation([asset1, asset2, asset3!, asset4, asset5]));
+
+            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+
+            Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime.Date, asset1.FileModificationDateTime.Date);
+            Assert.AreEqual(creationTime.Date, asset2.FileCreationDateTime.Date);
+            Assert.AreEqual(oldDateTime.Date, asset2.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileModificationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
+    }
+
+    [Test]
     public void LoadFileInformation_FileExists_PopulatesAssetDates()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
@@ -654,6 +973,9 @@ public class StorageServiceTests
 
             Asset asset = new() { Folder = folder, FileName = fileName };
 
+            Assert.AreEqual(DateTime.MinValue, asset.FileCreationDateTime.Date);
+            Assert.AreEqual(DateTime.MinValue, asset.FileModificationDateTime.Date);
+
             _storageService!.LoadFileInformation(asset);
 
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
@@ -668,48 +990,119 @@ public class StorageServiceTests
     [Test]
     public void LoadFileInformation_FileDoesNotExist_DoesNotPopulateAssetDates()
     {
-        const string fileName = "nonexistent.jpg";
-        Folder folder = new() { Path = _dataDirectory! };
-        Asset asset = new() { Folder = folder, FileName = fileName };
-        DateTime creationTime = default;
-        DateTime modificationTime = default;
+        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
-        _storageService!.LoadFileInformation(asset);
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
 
-        Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
-        Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+            const string fileName = "nonexistent.jpg";
+
+            Folder folder = new() { Path = destinationPath };
+            Asset asset = new() { Folder = folder, FileName = fileName };
+
+            DateTime creationTime = default;
+            DateTime modificationTime = default;
+
+            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+
+            _storageService!.LoadFileInformation(asset);
+
+            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
     }
 
     [Test]
-    public void LoadFileInformation_NullFolder_DoesNotPopulateAssetDates()
+    public void LoadFileInformation_FolderIsNull_DoesNotPopulateAssetDates()
     {
-        const string fileName = "Image 1.jpg";
-        Folder? folder = null;
-        Asset asset = new() { Folder = folder!, FileName = fileName };
-        DateTime creationTime = default;
-        DateTime modificationTime = default;
+        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
-        _storageService!.LoadFileInformation(asset);
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
 
-        Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
-        Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+            const string fileName = "Image 1.jpg";
+
+            string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
+            string destinationFilePath = Path.Combine(destinationPath, fileName);
+
+            File.Copy(sourceFilePath, destinationFilePath);
+
+            Folder? folder = null;
+
+            DateTime creationTime = default;
+            DateTime modificationTime = default;
+            DateTime oldDateTime = DateTime.Now.AddDays(-1);
+
+            File.SetLastWriteTime(destinationFilePath, oldDateTime);
+
+            Asset asset = new() { Folder = folder!, FileName = fileName };
+
+            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+
+            _storageService!.LoadFileInformation(asset);
+
+            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
     }
 
     [Test]
     public void LoadFileInformation_FilePathIsNull_ThrowsArgumentNullException()
     {
-        const string fileName = "Image 1.jpg";
-        string? path = null;
-        Folder folder = new() { Path = path! };
-        Asset asset = new() { Folder = folder, FileName = fileName };
+        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFileInformation(asset));
+        try
+        {
+            Directory.CreateDirectory(destinationPath);
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
+            const string fileName = "Image 1.jpg";
+
+            string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
+            string destinationFilePath = Path.Combine(destinationPath, fileName);
+
+            File.Copy(sourceFilePath, destinationFilePath);
+
+            string? path = null;
+            Folder folder = new() { Path = path! };
+
+            DateTime creationTime = default;
+            DateTime modificationTime = default;
+            DateTime oldDateTime = DateTime.Now.AddDays(-1);
+
+            File.SetLastWriteTime(destinationFilePath, oldDateTime);
+
+            Asset asset = new() { Folder = folder, FileName = fileName };
+
+            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFileInformation(asset));
+
+            Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
+
+            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
+        }
+        finally
+        {
+            Directory.Delete(destinationPath, true);
+        }
     }
 
     [Test]
-    public void LoadFileInformation_NullAsset_ThrowsNullReferenceException()
+    public void LoadFileInformation_AssetIsNull_ThrowsNullReferenceException()
     {
         Asset? asset = null;
 
