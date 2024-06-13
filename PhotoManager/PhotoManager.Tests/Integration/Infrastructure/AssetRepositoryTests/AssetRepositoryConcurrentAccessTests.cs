@@ -31,7 +31,7 @@ public class AssetRepositoryConcurrentAccessTests
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(_backupPath);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
-        _storageServiceMock.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
+        _storageServiceMock.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
     }
 
     [SetUp]

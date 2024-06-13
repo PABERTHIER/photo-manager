@@ -138,17 +138,15 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
         return Directory.Exists(fullPath);
     }
 
-    // TODO: Rename to UpdateAssetsFileDateTimeProperties
-    public void LoadFilesInformation(List<Asset> assets)
+    public void UpdateAssetsFileDateTimeProperties(List<Asset> assets)
     {
         for (int i = 0; i < assets.Count; i++)
         {
-            LoadFileInformation(assets[i]);
+            UpdateAssetFileDateTimeProperties(assets[i]);
         }
     }
 
-    // TODO: Rename to UpdateAssetFileDateTimeProperties
-    public void LoadFileInformation(Asset asset)
+    public void UpdateAssetFileDateTimeProperties(Asset asset)
     {
         if (!FileExists(asset.FullPath))
         {

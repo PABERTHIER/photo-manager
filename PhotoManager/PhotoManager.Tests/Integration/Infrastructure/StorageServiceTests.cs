@@ -630,7 +630,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFilesInformation_SomeFilesExist_PopulatesAssetsDates()
+    public void UpdateAssetsFileDateTimeProperties_SomeFilesExist_PopulatesAssetsDates()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -685,7 +685,7 @@ public class StorageServiceTests
             Assert.AreEqual(DateTime.MinValue, asset5.FileCreationDateTime.Date);
             Assert.AreEqual(DateTime.MinValue, asset5.FileModificationDateTime.Date);
 
-            _storageService!.LoadFilesInformation([asset1, asset2, asset3, asset4, asset5]);
+            _storageService!.UpdateAssetsFileDateTimeProperties([asset1, asset2, asset3, asset4, asset5]);
 
             Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
             Assert.AreEqual(oldDateTime.Date, asset1.FileModificationDateTime.Date);
@@ -705,23 +705,23 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFilesInformation_AssetsIsEmpty_DoesNothing()
+    public void UpdateAssetsFileDateTimeProperties_AssetsIsEmpty_DoesNothing()
     {
-        _storageService!.LoadFilesInformation([]);
+        _storageService!.UpdateAssetsFileDateTimeProperties([]);
     }
 
     [Test]
-    public void LoadFilesInformation_AssetsIsNull_ThrowsNullReferenceException()
+    public void UpdateAssetsFileDateTimeProperties_AssetsIsNull_ThrowsNullReferenceException()
     {
         List<Asset>? assets = null;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.LoadFilesInformation(assets!));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetsFileDateTimeProperties(assets!));
 
         Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
     }
 
     [Test]
-    public void LoadFilesInformation_FolderIsNull_DoesNotPopulateAssetsDates()
+    public void UpdateAssetsFileDateTimeProperties_FolderIsNull_DoesNotPopulateAssetsDates()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -777,7 +777,7 @@ public class StorageServiceTests
             Assert.AreEqual(creationTime.Date, asset5.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset5.FileModificationDateTime.Date);
 
-            _storageService!.LoadFilesInformation([asset1, asset2, asset3, asset4, asset5]);
+            _storageService!.UpdateAssetsFileDateTimeProperties([asset1, asset2, asset3, asset4, asset5]);
 
             Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset1.FileModificationDateTime.Date);
@@ -797,7 +797,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFilesInformation_FilePathIsNull_ThrowsArgumentNullException()
+    public void UpdateAssetsFileDateTimeProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -854,7 +854,7 @@ public class StorageServiceTests
             Assert.AreEqual(creationTime.Date, asset5.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset5.FileModificationDateTime.Date);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFilesInformation([asset1, asset2, asset3, asset4, asset5]));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.UpdateAssetsFileDateTimeProperties([asset1, asset2, asset3, asset4, asset5]));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
 
@@ -876,7 +876,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFilesInformation_OneAssetIsNull_ThrowsNullReferenceException()
+    public void UpdateAssetsFileDateTimeProperties_OneAssetIsNull_ThrowsNullReferenceException()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -929,7 +929,7 @@ public class StorageServiceTests
             Assert.AreEqual(DateTime.MinValue, asset5.FileCreationDateTime.Date);
             Assert.AreEqual(DateTime.MinValue, asset5.FileModificationDateTime.Date);
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.LoadFilesInformation([asset1, asset2, asset3!, asset4, asset5]));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetsFileDateTimeProperties([asset1, asset2, asset3!, asset4, asset5]));
 
             Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
 
@@ -949,7 +949,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFileInformation_FileExists_PopulatesAssetDates()
+    public void UpdateAssetFileDateTimeProperties_FileExists_PopulatesAssetDates()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -976,7 +976,7 @@ public class StorageServiceTests
             Assert.AreEqual(DateTime.MinValue, asset.FileCreationDateTime.Date);
             Assert.AreEqual(DateTime.MinValue, asset.FileModificationDateTime.Date);
 
-            _storageService!.LoadFileInformation(asset);
+            _storageService!.UpdateAssetFileDateTimeProperties(asset);
 
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
             Assert.AreEqual(oldDateTime.Date, asset.FileModificationDateTime.Date);
@@ -988,7 +988,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFileInformation_FileDoesNotExist_DoesNotPopulateAssetDates()
+    public void UpdateAssetFileDateTimeProperties_FileDoesNotExist_DoesNotPopulateAssetDates()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -1007,7 +1007,7 @@ public class StorageServiceTests
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
 
-            _storageService!.LoadFileInformation(asset);
+            _storageService!.UpdateAssetFileDateTimeProperties(asset);
 
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
@@ -1019,7 +1019,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFileInformation_FolderIsNull_DoesNotPopulateAssetDates()
+    public void UpdateAssetFileDateTimeProperties_FolderIsNull_DoesNotPopulateAssetDates()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -1047,7 +1047,7 @@ public class StorageServiceTests
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
 
-            _storageService!.LoadFileInformation(asset);
+            _storageService!.UpdateAssetFileDateTimeProperties(asset);
 
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
@@ -1059,7 +1059,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFileInformation_FilePathIsNull_ThrowsArgumentNullException()
+    public void UpdateAssetFileDateTimeProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -1088,7 +1088,7 @@ public class StorageServiceTests
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadFileInformation(asset));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.UpdateAssetFileDateTimeProperties(asset));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
 
@@ -1102,11 +1102,11 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void LoadFileInformation_AssetIsNull_ThrowsNullReferenceException()
+    public void UpdateAssetFileDateTimeProperties_AssetIsNull_ThrowsNullReferenceException()
     {
         Asset? asset = null;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.LoadFileInformation(asset!));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetFileDateTimeProperties(asset!));
 
         Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
     }

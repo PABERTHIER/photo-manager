@@ -82,7 +82,7 @@ public class AssetRepository : IAssetRepository
 
                     foreach (Asset asset in assetsList)
                     {
-                        _storageService.LoadFileInformation(asset);
+                        _storageService.UpdateAssetFileDateTimeProperties(asset);
                     }
                 }
             }
