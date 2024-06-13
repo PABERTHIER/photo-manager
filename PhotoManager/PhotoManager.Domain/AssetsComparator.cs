@@ -1,6 +1,6 @@
 ﻿namespace PhotoManager.Domain;
 
-public class AssetsComparator(IStorageService storageService) : IAssetsComparator
+public class AssetsComparator : IAssetsComparator
 {
     public string[] GetNewFileNames(string[] fileNames, List<Asset> cataloguedAssets)
     {
@@ -19,11 +19,6 @@ public class AssetsComparator(IStorageService storageService) : IAssetsComparato
 
     public string[] GetUpdatedFileNames(List<Asset> cataloguedAssets)
     {
-        foreach (Asset asset in cataloguedAssets)
-        {
-            storageService.LoadFileInformation(asset);
-        }
-
         return cataloguedAssets.Where(IsUpdatedAsset()).Select(ca => ca.FileName).ToArray();
     }
 

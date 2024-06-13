@@ -233,7 +233,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         StorageService storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
         AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
-        AssetsComparator assetsComparator = new (storageService);
+        AssetsComparator assetsComparator = new();
         _catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
         _moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
         _syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, _moveAssetsService);

@@ -41,7 +41,7 @@ public class SyncAssetsServiceTests
         _storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
         AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
-        AssetsComparator assetsComparator = new (_storageService);
+        AssetsComparator assetsComparator = new();
         _moveAssetsService = new (_assetRepository, _storageService, assetCreationService);
         _syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
     }

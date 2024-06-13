@@ -3,19 +3,54 @@
 [TestFixture]
 public class AssetsComparatorTests
 {
-    private IStorageService? _storageService;
-    private IAssetsComparator? _assetsComparator;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
+    private AssetsComparator? _assetsComparator;
+
+    private Asset? _asset1;
+    private Asset? _asset2;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        _configurationRootMock = new Mock<IConfigurationRoot>();
-        _configurationRootMock.GetDefaultMockConfig();
+        _assetsComparator = new();
+    }
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _storageService = new StorageService(userConfigurationService);
-        _assetsComparator = new AssetsComparator(_storageService);
+    [SetUp]
+    public void SetUp()
+    {
+        _asset1 = new()
+        {
+            FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
+            FileName = "Image 1.jpg",
+            FileSize = 363888,
+            ImageRotation = Rotation.Rotate0,
+            PixelWidth = 1920,
+            PixelHeight = 1080,
+            ThumbnailPixelWidth = 200,
+            ThumbnailPixelHeight = 112,
+            ThumbnailCreationDateTime = DateTime.Now,
+            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            AssetCorruptedMessage = null,
+            IsAssetCorrupted = false,
+            AssetRotatedMessage = null,
+            IsAssetRotated = false
+        };
+        _asset2 = new()
+        {
+            FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
+            FileName = "Image 9.png",
+            FileSize = 4602393,
+            ImageRotation = Rotation.Rotate90,
+            PixelWidth = 1280,
+            PixelHeight = 700,
+            ThumbnailPixelWidth = 147,
+            ThumbnailPixelHeight = 150,
+            ThumbnailCreationDateTime = DateTime.Now,
+            Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
+            AssetCorruptedMessage = null,
+            IsAssetCorrupted = false,
+            AssetRotatedMessage = null,
+            IsAssetRotated = false
+        };
     }
 
     [Test]
@@ -226,6 +261,73 @@ public class AssetsComparatorTests
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetsComparator!.GetImageAndVideoNames(fileNames!));
 
         Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+    }
+
+    [Test]
+    public void GetUpdatedFileNames_ThumbnailCreationDateTimeBeforeFileCreationOrModificationDateTime_ReturnsArrayOfNamesOfAssetsUpdated()
+    {
+        string[] expectedFileNames = [_asset1!.FileName, _asset2!.FileName];
+
+        DateTime oldDateTime1 = DateTime.Now.AddDays(-1);
+        DateTime oldDateTime2 = DateTime.Now.AddDays(-2);
+
+        _asset1.ThumbnailCreationDateTime = oldDateTime1;
+        _asset2.ThumbnailCreationDateTime = oldDateTime2;
+
+        _asset1.FileCreationDateTime = DateTime.Now;
+        _asset1.FileModificationDateTime = DateTime.Now.AddDays(-2);
+        _asset2.FileCreationDateTime = DateTime.Now.AddDays(-3);
+        _asset2.FileModificationDateTime = DateTime.Now;
+
+        List<Asset> cataloguedAssets = [_asset1!, _asset2!];
+
+        string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
+
+        Assert.IsNotEmpty(updatedFileNames);
+        CollectionAssert.AreEquivalent(expectedFileNames, updatedFileNames);
+    }
+
+    [Test]
+    public void GetUpdatedFileNames_ThumbnailCreationDateTimeIsSameAsFileCreationOrModificationDateTime_ReturnsEmptyArray()
+    {
+        List<Asset> cataloguedAssets = [_asset1!, _asset2!];
+
+        string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
+
+        Assert.IsEmpty(updatedFileNames);
+    }
+
+    [Test]
+    public void GetUpdatedFileNames_ThumbnailCreationDateTimeAfterFileCreationOrModificationDateTime_ReturnsEmptyArray()
+    {
+        _asset1!.ThumbnailCreationDateTime = DateTime.Now.AddDays(1);
+        _asset2!.ThumbnailCreationDateTime = DateTime.Now.AddDays(1);
+
+        List<Asset> cataloguedAssets = [_asset1!, _asset2!];
+
+        string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
+
+        Assert.IsEmpty(updatedFileNames);
+    }
+
+    [Test]
+    public void GetUpdatedFileNames_CataloguedAssetsIsEmpty_ReturnsEmptyArray()
+    {
+        List<Asset> cataloguedAssets = [];
+
+        string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
+
+        Assert.IsEmpty(updatedFileNames);
+    }
+
+    [Test]
+    public void GetUpdatedFileNames_CataloguedAssetsIsNull_ThrowsArgumentNullException()
+    {
+        List<Asset>? cataloguedAssets = null;
+
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetUpdatedFileNames(cataloguedAssets!));
+
+        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
     }
 
     [Test]

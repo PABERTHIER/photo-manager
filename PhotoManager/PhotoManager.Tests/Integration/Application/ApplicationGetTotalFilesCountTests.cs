@@ -47,7 +47,7 @@ public class ApplicationGetTotalFilesCountTests
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
         _storageService = new (_userConfigurationService);
         _assetHashCalculatorService = new (_userConfigurationService);
-        _assetsComparator = new (_storageService);
+        _assetsComparator = new();
         _assetCreationService = new (_testableAssetRepository, _storageService, _assetHashCalculatorService, _userConfigurationService);
         _catalogAssetsService = new (_testableAssetRepository, _storageService, _assetCreationService, _userConfigurationService, _assetsComparator);
         _moveAssetsService = new (_testableAssetRepository, _storageService, _assetCreationService);

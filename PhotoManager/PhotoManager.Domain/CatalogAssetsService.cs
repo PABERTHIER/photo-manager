@@ -172,11 +172,18 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             Reason = ReasonEnum.FolderInspectionInProgress
         });
 
-        string[] filesName = _storageService.GetFileNames(directory);
+        string[] fileNames = _storageService.GetFileNames(directory);
 
-        CatalogNewAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, filesName, token);
-        CatalogUpdatedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, token);
-        CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, filesName, token);
+        CatalogNewAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, fileNames, token);
+
+        _storageService.UpdateAssetsFileDateTimeProperties(_cataloguedAssetsByPath);
+        string[] updatedFileNames = _assetsComparator.GetUpdatedFileNames(_cataloguedAssetsByPath);
+
+        CatalogUpdatedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, updatedFileNames, token);
+
+        string[] deletedFileNames = _assetsComparator.GetDeletedFileNames(fileNames, _cataloguedAssetsByPath);
+
+        CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, deletedFileNames, token);
 
         bool folderHasThumbnails = folder != null && _assetRepository.FolderHasThumbnails(folder);
 
@@ -308,11 +315,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
         }
     }
 
-    private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, CancellationToken? token = null)
+    private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] updatedFileNames, CancellationToken? token = null)
     {
-        // TODO: Need to rework how to update file information
-        string[] updatedFileNames = _assetsComparator.GetUpdatedFileNames(_cataloguedAssetsByPath); // TODO: Should not depend on it to have file info for each files -> break content in separate parts
-
         foreach (string fileName in updatedFileNames)
         {
             // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
@@ -342,8 +346,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                     continue;
                 }
 
-                // TODO: Move from here and split _assetsComparator.GetUpdatedFileNames usage above !!
-                _storageService.LoadFileInformation(updatedAsset);
+                _storageService.UpdateAssetFileDateTimeProperties(updatedAsset);
 
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
@@ -358,10 +361,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
         }
     }
 
-    private void CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] fileNames, CancellationToken? token = null)
+    private void CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] deletedFileNames, CancellationToken? token = null)
     {
-        string[] deletedFileNames = _assetsComparator.GetDeletedFileNames(fileNames, _cataloguedAssetsByPath);
-
         foreach (string fileName in deletedFileNames)
         {
             // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition

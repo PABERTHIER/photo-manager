@@ -225,7 +225,7 @@ public class ApplicationViewModelCatalogAssetsTests
         StorageService storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
         AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
-        AssetsComparator assetsComparator = new (storageService);
+        AssetsComparator assetsComparator = new();
         CatalogAssetsService catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
         MoveAssetsService moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
