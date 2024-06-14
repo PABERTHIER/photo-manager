@@ -11294,7 +11294,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
         Assert.IsNull(catalogChange.Folder);
         Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
-        // AssertCataloguedAssetsByPath(expectedAssets, expectedAsset, catalogChange);
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange, cataloguedAssetsByPathCount);
         Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);

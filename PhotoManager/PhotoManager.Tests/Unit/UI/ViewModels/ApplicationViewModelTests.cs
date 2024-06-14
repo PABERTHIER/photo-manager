@@ -158,8 +158,8 @@ public class ApplicationViewModelTests
             _applicationViewModel.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Message = statusMessage,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = statusMessage
             });
 
             Assert.AreEqual(6, _applicationViewModel.ObservableAssets.Count);
@@ -208,8 +208,8 @@ public class ApplicationViewModelTests
             _applicationViewModel.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Message = statusMessage,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = statusMessage
             });
 
             Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
@@ -258,8 +258,8 @@ public class ApplicationViewModelTests
             {
                 Asset = cataloguedAssets[4],
                 CataloguedAssetsByPath = cataloguedAssets,
-                Message = statusMessage,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = statusMessage
             });
 
             Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
@@ -500,8 +500,8 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = assets[2],
-                Message = statusMessage,
-                Reason = ReasonEnum.AssetDeleted
+                Reason = ReasonEnum.AssetDeleted,
+                Message = statusMessage
             });
 
             Assert.AreEqual(4, _applicationViewModel.ObservableAssets.Count);

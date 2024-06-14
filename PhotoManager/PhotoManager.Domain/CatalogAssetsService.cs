@@ -158,8 +158,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Folder = folder,
-                Message = $"Folder {directory} added to catalog.",
-                Reason = ReasonEnum.FolderCreated
+                Reason = ReasonEnum.FolderCreated,
+                Message = $"Folder {directory} added to catalog."
             });
         }
 
@@ -168,8 +168,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
         callback?.Invoke(new CatalogChangeCallbackEventArgs
         {
             Folder = folder,
-            Message = $"Inspecting folder {directory}.",
-            Reason = ReasonEnum.FolderInspectionInProgress
+            Reason = ReasonEnum.FolderInspectionInProgress,
+            Message = $"Inspecting folder {directory}."
         });
 
         string[] fileNames = _storageService.GetFileNames(directory);
@@ -235,8 +235,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                 {
                     Asset = asset,
                     CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                    Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog.",
-                    Reason = ReasonEnum.AssetDeleted
+                    Reason = ReasonEnum.AssetDeleted,
+                    Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog."
                 });
             }
 
@@ -248,8 +248,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
                     Folder = folder,
-                    Message = $"Folder {directory} deleted from catalog.",
-                    Reason = ReasonEnum.FolderDeleted
+                    Reason = ReasonEnum.FolderDeleted,
+                    Message = $"Folder {directory} deleted from catalog."
                 });
             }
 
@@ -293,21 +293,20 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                     callback?.Invoke(new CatalogChangeCallbackEventArgs
                     {
                         CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                        Message = $"Image {Path.Combine(directory, fileName)} not added to catalog (corrupted).",
-                        Reason = ReasonEnum.AssetNotCreated
+                        Reason = ReasonEnum.AssetNotCreated,
+                        Message = $"Image {Path.Combine(directory, fileName)} not added to catalog (corrupted)."
                     });
                 }
 
                 continue;
             }
 
-            // TODO: Reorder each CatalogChangeCallbackEventArgs to match with the class (same for each UT)
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                Message = $"Image {Path.Combine(directory, newAsset.FileName)} added to catalog.",
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = $"Image {Path.Combine(directory, newAsset.FileName)} added to catalog."
             });
 
             _backupHasSameContent = false;
@@ -339,8 +338,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                     {
                         Asset = deletedAsset,
                         CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                        Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog (corrupted).",
-                        Reason = ReasonEnum.AssetDeleted
+                        Reason = ReasonEnum.AssetDeleted,
+                        Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog (corrupted)."
                     });
 
                     continue;
@@ -352,8 +351,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                 {
                     Asset = updatedAsset,
                     CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                    Message = $"Image {fullPath} updated in catalog.",
-                    Reason = ReasonEnum.AssetUpdated
+                    Reason = ReasonEnum.AssetUpdated,
+                    Message = $"Image {fullPath} updated in catalog."
                 });
 
                 cataloguedAssetsBatchCount++;
@@ -377,8 +376,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             {
                 Asset = deletedAsset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog.",
-                Reason = ReasonEnum.AssetDeleted
+                Reason = ReasonEnum.AssetDeleted,
+                Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog."
             });
 
             _backupHasSameContent = false;
