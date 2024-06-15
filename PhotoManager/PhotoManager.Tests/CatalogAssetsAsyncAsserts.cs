@@ -371,27 +371,6 @@ public static class CatalogAssetsAsyncAsserts
         Assert.AreEqual(minDate, assetFromDatabase.FileModificationDateTime.Date); // Not saved in Db, loaded at the runtime
     }
 
-    public static void CheckCatalogChangesBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
-    {
-        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
-        Assert.AreEqual(expectedMessage, catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
-        increment++;
-
-        catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
-        Assert.AreEqual(string.Empty, catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
-        increment++;
-    }
-
     public static void CheckCatalogChangesInspectingFolder(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
@@ -403,6 +382,18 @@ public static class CatalogAssetsAsyncAsserts
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
         Assert.AreEqual(ReasonEnum.FolderInspectionInProgress, catalogChange.Reason);
         Assert.AreEqual($"Inspecting folder {assetsDirectory}.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+        increment++;
+    }
+
+    public static void CheckCatalogChangesFolderInspected(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string assetsDirectory, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.FolderInspectionCompleted, catalogChange.Reason);
+        Assert.AreEqual($"Folder inspection for {assetsDirectory}, subfolders included, has been completed.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
         increment++;
     }
@@ -526,21 +517,51 @@ public static class CatalogAssetsAsyncAsserts
         }
     }
 
+    public static void CheckCatalogChangesBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
+    {
+        ReasonEnum reason = string.Equals(expectedMessage, CREATING_BACKUP_MESSAGE) ? ReasonEnum.BackupCreationStarted : ReasonEnum.BackupUpdateStarted;
+
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(reason, catalogChange.Reason);
+        Assert.AreEqual(expectedMessage, catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+        increment++;
+
+        catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.BackupCompleted, catalogChange.Reason);
+        Assert.AreEqual("Backup completed successfully.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+        increment++;
+    }
+
+    public static void CheckCatalogChangesNoBackupChanges(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.NoBackupChangesDetected, catalogChange.Reason);
+        Assert.AreEqual("No changes made to the backup.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+        increment++;
+    }
+
     public static void CheckCatalogChangesEnd(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
     {
-        int baseIncrement = increment;
-
-        for (int i = increment; i < baseIncrement + 2; i++)
-        {
-            CatalogChangeCallbackEventArgs catalogChange = catalogChanges[i];
-            Assert.IsNull(catalogChange.Asset);
-            Assert.IsNull(catalogChange.Folder);
-            Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-            Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
-            Assert.AreEqual(string.Empty, catalogChange.Message);
-            Assert.IsNull(catalogChange.Exception);
-            increment++;
-        }
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.CatalogProcessEnded, catalogChange.Reason);
+        Assert.AreEqual("The catalog process has ended.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+        increment++;
     }
 
     public static void CheckCatalogChangesException(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
@@ -549,20 +570,11 @@ public static class CatalogAssetsAsyncAsserts
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
-        Assert.AreEqual(null, catalogChange.Message);
+        Assert.AreEqual(ReasonEnum.CatalogProcessFailed, catalogChange.Reason);
+        Assert.AreEqual("The catalog process has failed.", catalogChange.Message);
         Assert.IsNotNull(catalogChange.Exception);
         Assert.AreEqual(exceptionExpected.Message, catalogChange.Exception!.Message);
         Assert.AreEqual(exceptionExpected.GetType(), catalogChange.Exception.GetType());
-        increment++;
-
-        catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason); // TODO: Bad reason
-        Assert.AreEqual(string.Empty, catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
         increment++;
     }
 

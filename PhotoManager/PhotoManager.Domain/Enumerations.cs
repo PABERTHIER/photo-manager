@@ -8,14 +8,21 @@ public enum AppModeEnum
 
 public enum ReasonEnum
 {
-    // TODO: Add default value when 100% of code coverage, because AssetCreated should not be the default one
     AssetCreated,
     AssetNotCreated,
     AssetUpdated,
     AssetDeleted,
     FolderInspectionInProgress,
+    FolderInspectionCompleted,
     FolderCreated,
-    FolderDeleted
+    FolderDeleted,
+    BackupCreationStarted,
+    BackupUpdateStarted,
+    NoBackupChangesDetected,
+    BackupCompleted,
+    CatalogProcessCancelled,
+    CatalogProcessFailed,
+    CatalogProcessEnded
 }
 
 public enum WallpaperStyle

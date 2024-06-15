@@ -46,7 +46,6 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
 
     public async Task CatalogAssetsAsync(CatalogChangeCallback? callback, CancellationToken? token = null)
     {
-        // TODO: Improve Message for each event
         await Task.Run(() =>
         {
             int cataloguedAssetsBatchCount = 0;
@@ -58,52 +57,71 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
 
                 foreach (string path in foldersPathToCatalog)
                 {
+                    // TODO: Rework the whole cancellation
                     // ThrowIfCancellationRequested should be in each if below ?
-                    // token?.ThrowIfCancellationRequested(); rework all the cancellation
+                    // token?.ThrowIfCancellationRequested();
+
                     CatalogFolders(path, callback, ref cataloguedAssetsBatchCount, visitedDirectories, token);
+                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Reason = ReasonEnum.FolderInspectionCompleted, Message = $"Folder inspection for {path}, subfolders included, has been completed." });
                 }
 
                 _directories.UnionWith(visitedDirectories);
 
                 if (!_assetRepository.BackupExists() || !_backupHasSameContent)
                 {
-                    // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
                     callback?.Invoke(!_assetRepository.BackupExists()
-                        ? new CatalogChangeCallbackEventArgs { Message = "Creating catalog backup..." }
-                        : new CatalogChangeCallbackEventArgs { Message = "Updating catalog backup..." });
+                        ? new CatalogChangeCallbackEventArgs { Reason = ReasonEnum.BackupCreationStarted, Message = "Creating catalog backup..." }
+                        : new CatalogChangeCallbackEventArgs { Reason = ReasonEnum.BackupUpdateStarted, Message = "Updating catalog backup..." });
 
                     _assetRepository.WriteBackup();
-                    // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Message = string.Empty });
+                    callback?.Invoke(new CatalogChangeCallbackEventArgs
+                    {
+                        Reason = ReasonEnum.BackupCompleted,
+                        Message = "Backup completed successfully."
+                    });
 
                     _backupHasSameContent = true;
                 }
-
-                // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
-                callback?.Invoke(new CatalogChangeCallbackEventArgs { Message = string.Empty });
+                else
+                {
+                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Reason = ReasonEnum.NoBackupChangesDetected, Message = "No changes made to the backup." });
+                }
             }
             catch (OperationCanceledException)
             {
-                // If the catalog background process is cancelled,
-                // there is a risk that it happens while saving the catalog files.
+                // If the catalog background process is cancelled, there is a risk that it happens while saving the catalog files.
                 // This could result in the files being damaged.
                 // Therefore the application saves the files before the task is completely shut down.
 
                 // TODO: Test if _currentFolderPath is good & SaveCatalog performed correctly
                 Folder? currentFolder = _assetRepository.GetFolderByPath(_currentFolderPath);
                 _assetRepository.SaveCatalog(currentFolder);
+
+                callback?.Invoke(new CatalogChangeCallbackEventArgs
+                {
+                    Reason = ReasonEnum.CatalogProcessCancelled,
+                    Message = "The catalog process has been cancelled."
+                });
+
                 throw;
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
-                // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
-                callback?.Invoke(new CatalogChangeCallbackEventArgs { Exception = ex });
+                callback?.Invoke(new CatalogChangeCallbackEventArgs
+                {
+                    Reason = ReasonEnum.CatalogProcessFailed,
+                    Message = "The catalog process has failed.",
+                    Exception = ex
+                });
             }
             finally
             {
-                // TODO: Need to add ReasonEnum (or at least change the default value to match these cases)
-                callback?.Invoke(new CatalogChangeCallbackEventArgs { Message = string.Empty });
+                callback?.Invoke(new CatalogChangeCallbackEventArgs
+                {
+                    Reason = ReasonEnum.CatalogProcessEnded,
+                    Message = "The catalog process has ended."
+                });
             }
         });
     }

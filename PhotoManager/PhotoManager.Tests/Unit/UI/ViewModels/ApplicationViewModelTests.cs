@@ -296,7 +296,8 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = string.Empty
             });
 
             Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
@@ -336,7 +337,8 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = string.Empty
             });
 
             Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
@@ -382,13 +384,15 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = null,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = string.Empty
             });
 
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = string.Empty
             });
 
             Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
@@ -450,13 +454,15 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = null,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = string.Empty
             });
 
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated
+                Reason = ReasonEnum.AssetCreated,
+                Message = string.Empty
             });
 
             Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
