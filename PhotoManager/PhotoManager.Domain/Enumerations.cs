@@ -28,13 +28,3 @@ public enum WallpaperStyle
     Stretch,
     Tile
 }
-
-public enum SortCriteriaEnum
-{
-    Undefined, // TODO: Remove that one, should be FileName the default one
-    FileName,
-    FileSize,
-    FileCreationDateTime,
-    FileModificationDateTime,
-    ThumbnailCreationDateTime
-}

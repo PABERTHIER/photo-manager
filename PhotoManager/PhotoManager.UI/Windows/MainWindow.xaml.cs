@@ -430,27 +430,27 @@ public partial class MainWindow : Window
 
     private void SortAssetsByFileName_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+        ViewModel.SortAssetsByCriteria(SortCriteria.FileName);
     }
 
     private void SortAssetsByFileSize_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.SortAssetsByCriteria(SortCriteriaEnum.FileSize);
+        ViewModel.SortAssetsByCriteria(SortCriteria.FileSize);
     }
 
     private void SortAssetsByFileCreationDateTime_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.SortAssetsByCriteria(SortCriteriaEnum.FileCreationDateTime);
+        ViewModel.SortAssetsByCriteria(SortCriteria.FileCreationDateTime);
     }
 
     private void SortAssetsByFileModificationDateTime_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.SortAssetsByCriteria(SortCriteriaEnum.FileModificationDateTime);
+        ViewModel.SortAssetsByCriteria(SortCriteria.FileModificationDateTime);
     }
 
     private void SortAssetsByThumbnailCreationDateTime_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.SortAssetsByCriteria(SortCriteriaEnum.ThumbnailCreationDateTime);
+        ViewModel.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
     }
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

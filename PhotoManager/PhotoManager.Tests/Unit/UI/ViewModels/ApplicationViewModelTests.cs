@@ -973,7 +973,7 @@ public class ApplicationViewModelTests
             Asset[] assets = null;
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
             Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
         }
@@ -996,7 +996,7 @@ public class ApplicationViewModelTests
             Asset[] assets = [];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
             Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
         }
@@ -1007,20 +1007,20 @@ public class ApplicationViewModelTests
     }
 
     [Test]
-    [TestCase(SortCriteriaEnum.FileCreationDateTime, false)]
-    [TestCase(SortCriteriaEnum.FileCreationDateTime, true)]
-    [TestCase(SortCriteriaEnum.FileModificationDateTime, false)]
-    [TestCase(SortCriteriaEnum.FileModificationDateTime, true)]
-    [TestCase(SortCriteriaEnum.FileName, false)]
-    [TestCase(SortCriteriaEnum.FileName, true)]
-    [TestCase(SortCriteriaEnum.FileSize, false)]
-    [TestCase(SortCriteriaEnum.FileSize, true)]
-    [TestCase(SortCriteriaEnum.ThumbnailCreationDateTime, false)]
-    [TestCase(SortCriteriaEnum.ThumbnailCreationDateTime, true)]
-    [TestCase(SortCriteriaEnum.Undefined, false)]
-    [TestCase(SortCriteriaEnum.Undefined, true)]
+    [TestCase(SortCriteria.FileCreationDateTime, false)]
+    [TestCase(SortCriteria.FileCreationDateTime, true)]
+    [TestCase(SortCriteria.FileModificationDateTime, false)]
+    [TestCase(SortCriteria.FileModificationDateTime, true)]
+    [TestCase(SortCriteria.FileName, false)]
+    [TestCase(SortCriteria.FileName, true)]
+    [TestCase(SortCriteria.FileSize, false)]
+    [TestCase(SortCriteria.FileSize, true)]
+    [TestCase(SortCriteria.ThumbnailCreationDateTime, false)]
+    [TestCase(SortCriteria.ThumbnailCreationDateTime, true)]
+    [TestCase(SortCriteria.Undefined, false)]
+    [TestCase(SortCriteria.Undefined, true)]
     // TODO: Update the name
-    public void SortAssetsByCriteria_SingleItemAssetList_AssetListHasSameSingleItem(SortCriteriaEnum sortCriteria, bool analyseVideos)
+    public void SortAssetsByCriteria_SingleItemAssetList_AssetListHasSameSingleItem(SortCriteria sortCriteria, bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 
@@ -1070,10 +1070,10 @@ public class ApplicationViewModelTests
                 new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() }
             ];
 
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.Undefined);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.Undefined);
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1107,12 +1107,12 @@ public class ApplicationViewModelTests
                 new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() }
             ];
 
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.Undefined);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.Undefined);
             _applicationViewModel!.SetAssets(assets);
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
@@ -1162,7 +1162,7 @@ public class ApplicationViewModelTests
             ];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.ThumbnailCreationDateTime);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1200,7 +1200,7 @@ public class ApplicationViewModelTests
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.ThumbnailCreationDateTime);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
@@ -1250,7 +1250,7 @@ public class ApplicationViewModelTests
             ];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileCreationDateTime);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileCreationDateTime);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1288,7 +1288,7 @@ public class ApplicationViewModelTests
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileCreationDateTime);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileCreationDateTime);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
@@ -1338,7 +1338,7 @@ public class ApplicationViewModelTests
             ];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileModificationDateTime);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileModificationDateTime);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1376,7 +1376,7 @@ public class ApplicationViewModelTests
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileModificationDateTime);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileModificationDateTime);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
@@ -1424,7 +1424,7 @@ public class ApplicationViewModelTests
             ];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileSize);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileSize);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1462,7 +1462,7 @@ public class ApplicationViewModelTests
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileSize);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileSize);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
