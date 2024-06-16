@@ -235,46 +235,48 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
 
         Folder? folder = _assetRepository.GetFolderByPath(directory);
 
-        if (folder != null)
+        if (folder == null)
         {
-            foreach (Asset asset in _cataloguedAssetsByPath)
+            return;
+        }
+
+        foreach (Asset asset in _cataloguedAssetsByPath)
+        {
+            // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
+            if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
             {
-                // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
-                if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
-                {
-                    break;
-                }
-
-                _ = _assetRepository.DeleteAsset(directory, asset.FileName);
-                _backupHasSameContent = false;
-                cataloguedAssetsBatchCount++;
-
-                callback?.Invoke(new CatalogChangeCallbackEventArgs
-                {
-                    Asset = asset,
-                    CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                    Reason = ReasonEnum.AssetDeleted,
-                    Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog."
-                });
+                break;
             }
 
-            if (_cataloguedAssetsByPath.Count == 0)
-            {
-                _assetRepository.DeleteFolder(folder);
-                _directories.Remove(folder.Path);
+            _ = _assetRepository.DeleteAsset(directory, asset.FileName);
+            _backupHasSameContent = false;
+            cataloguedAssetsBatchCount++;
 
-                callback?.Invoke(new CatalogChangeCallbackEventArgs
-                {
-                    Folder = folder,
-                    Reason = ReasonEnum.FolderDeleted,
-                    Message = $"Folder {directory} deleted from catalog."
-                });
-            }
-
-            if (_assetRepository.HasChanges())
+            callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
-                _assetRepository.SaveCatalog(folder);
-            }
+                Asset = asset,
+                CataloguedAssetsByPath = _cataloguedAssetsByPath,
+                Reason = ReasonEnum.AssetDeleted,
+                Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog."
+            });
+        }
+
+        if (_cataloguedAssetsByPath.Count == 0)
+        {
+            _assetRepository.DeleteFolder(folder);
+            _directories.Remove(folder.Path);
+
+            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            {
+                Folder = folder,
+                Reason = ReasonEnum.FolderDeleted,
+                Message = $"Folder {directory} deleted from catalog."
+            });
+        }
+
+        if (_assetRepository.HasChanges())
+        {
+            _assetRepository.SaveCatalog(folder);
         }
     }
 
@@ -293,7 +295,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
         }
     }
 
-    private void CatalogAssets(string[] fileNames, bool isAssetVideo, string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, CancellationToken? token = null)
+    private void CatalogAssets(IEnumerable<string> fileNames, bool isAssetVideo, string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, CancellationToken? token = null)
     {
         foreach (string fileName in fileNames)
         {
@@ -332,7 +334,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
         }
     }
 
-    private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] updatedFileNames, CancellationToken? token = null)
+    private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, IEnumerable<string> updatedFileNames, CancellationToken? token = null)
     {
         foreach (string fileName in updatedFileNames)
         {
@@ -344,41 +346,38 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
 
             Asset? deletedAsset = _assetRepository.DeleteAsset(directory, fileName);
             _backupHasSameContent = false;
-            string fullPath = Path.Combine(directory, fileName);
 
-            if (_storageService.FileExists(fullPath))
+            Asset? updatedAsset = _assetCreationService.CreateAsset(directory, fileName);
+
+            if (updatedAsset == null)
             {
-                Asset? updatedAsset = _assetCreationService.CreateAsset(directory, fileName);
-
-                if (updatedAsset == null)
-                {
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs
-                    {
-                        Asset = deletedAsset,
-                        CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                        Reason = ReasonEnum.AssetDeleted,
-                        Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog (corrupted)."
-                    });
-
-                    continue;
-                }
-
-                _storageService.UpdateAssetFileDateTimeProperties(updatedAsset);
-
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
-                    Asset = updatedAsset,
+                    Asset = deletedAsset,
                     CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                    Reason = ReasonEnum.AssetUpdated,
-                    Message = $"Image {fullPath} updated in catalog."
+                    Reason = ReasonEnum.AssetDeleted,
+                    Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog (corrupted)."
                 });
 
-                cataloguedAssetsBatchCount++;
+                continue;
             }
+
+            _storageService.UpdateAssetFileDateTimeProperties(updatedAsset);
+
+            string fullPath = Path.Combine(directory, fileName);
+            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            {
+                Asset = updatedAsset,
+                CataloguedAssetsByPath = _cataloguedAssetsByPath,
+                Reason = ReasonEnum.AssetUpdated,
+                Message = $"Image {fullPath} updated in catalog."
+            });
+
+            cataloguedAssetsBatchCount++;
         }
     }
 
-    private void CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, string[] deletedFileNames, CancellationToken? token = null)
+    private void CatalogDeletedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, IEnumerable<string> deletedFileNames, CancellationToken? token = null)
     {
         foreach (string fileName in deletedFileNames)
         {
