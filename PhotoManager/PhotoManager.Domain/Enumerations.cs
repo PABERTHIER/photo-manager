@@ -18,13 +18,3 @@ public enum ReasonEnum
     CatalogProcessFailed,
     CatalogProcessEnded
 }
-
-public enum WallpaperStyle
-{
-    Center,
-    Fill,
-    Fit,
-    Span,
-    Stretch,
-    Tile
-}
