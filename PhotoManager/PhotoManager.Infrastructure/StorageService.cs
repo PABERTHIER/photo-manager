@@ -138,7 +138,15 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
         return Directory.Exists(fullPath);
     }
 
-    public void LoadFileInformation(Asset asset)
+    public void UpdateAssetsFileDateTimeProperties(List<Asset> assets)
+    {
+        for (int i = 0; i < assets.Count; i++)
+        {
+            UpdateAssetFileDateTimeProperties(assets[i]);
+        }
+    }
+
+    public void UpdateAssetFileDateTimeProperties(Asset asset)
     {
         if (!FileExists(asset.FullPath))
         {

@@ -82,7 +82,7 @@ public class AssetRepository : IAssetRepository
 
                     foreach (Asset asset in assetsList)
                     {
-                        _storageService.LoadFileInformation(asset);
+                        _storageService.UpdateAssetFileDateTimeProperties(asset);
                     }
                 }
             }
@@ -352,6 +352,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
+    // TODO: Seems to be a dead method
     public bool ContainsThumbnail(string directoryName, string fileName)
     {
         bool result = false;

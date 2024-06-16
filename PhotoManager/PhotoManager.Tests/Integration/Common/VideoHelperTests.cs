@@ -5,8 +5,6 @@ public class VideoHelperTests
 {
     private string? _dataDirectory;
 
-    private const string FFMPEG_PATH = "E:\\ffmpeg\\bin\\ffmpeg.exe"; // TODO: Will be removed when the dll of Ffmpeg would have been generated and stored in the project
-
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
@@ -28,7 +26,7 @@ public class VideoHelperTests
 
         try
         {
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, FFMPEG_PATH);
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, Constants.FFMPEG_PATH);
 
             // Get the captured console output
             string consoleOutput = stringWriter.ToString();
@@ -66,7 +64,7 @@ public class VideoHelperTests
             string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, FFMPEG_PATH);
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, Constants.FFMPEG_PATH);
 
             // Get the captured console output
             string consoleOutput = stringWriter.ToString();
@@ -101,7 +99,7 @@ public class VideoHelperTests
             string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
-            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, FFMPEG_PATH);
+            string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath, Constants.FFMPEG_PATH);
 
             // Get the captured console output
             string consoleOutput = stringWriter.ToString();

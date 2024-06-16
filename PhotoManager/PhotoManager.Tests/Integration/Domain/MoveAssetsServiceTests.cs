@@ -1,7 +1,4 @@
-﻿using System.Security.AccessControl;
-using System.Security.Principal;
-
-namespace PhotoManager.Tests.Integration.Domain;
+﻿namespace PhotoManager.Tests.Integration.Domain;
 
 [TestFixture]
 public class MoveAssetsServiceTests
@@ -573,7 +570,7 @@ public class MoveAssetsServiceTests
             Directory.CreateDirectory(destinationDirectory);
 
             // Deny write access to the directory
-            DenyWriteAccess(destinationDirectory);
+            DirectoryHelper.DenyWriteAccess(destinationDirectory);
 
             string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
@@ -658,7 +655,7 @@ public class MoveAssetsServiceTests
             Directory.Delete(databasePath!, true);
 
             // Allow write access to the directory
-            AllowWriteAccess(destinationDirectory);
+            DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(destinationDirectory, true);
         }
@@ -1527,7 +1524,7 @@ public class MoveAssetsServiceTests
             Directory.CreateDirectory(destinationDirectory);
 
             // Deny write access to the directory
-            DenyWriteAccess(destinationDirectory);
+            DirectoryHelper.DenyWriteAccess(destinationDirectory);
 
             string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
@@ -1543,7 +1540,7 @@ public class MoveAssetsServiceTests
             Directory.Delete(databasePath!, true);
 
             // Allow write access to the directory
-            AllowWriteAccess(destinationDirectory);
+            DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(destinationDirectory, true);
         }
@@ -1869,31 +1866,5 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(databasePath!, true);
         }
-    }
-
-    private static void DenyWriteAccess(string directoryPath)
-    {
-        DirectoryInfo directoryInfo = new(directoryPath);
-        DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
-
-        // Use the well-known SID for "Everyone"
-        SecurityIdentifier everyone = new(WellKnownSidType.WorldSid, null);
-
-        directorySecurity.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.WriteData, AccessControlType.Deny));
-
-        directoryInfo.SetAccessControl(directorySecurity);
-    }
-
-    private static void AllowWriteAccess(string directoryPath)
-    {
-        DirectoryInfo directoryInfo = new(directoryPath);
-        DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
-
-        // Use the well-known SID for "Everyone"
-        SecurityIdentifier everyone = new(WellKnownSidType.WorldSid, null);
-
-        directorySecurity.RemoveAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.WriteData, AccessControlType.Deny));
-
-        directoryInfo.SetAccessControl(directorySecurity);
     }
 }

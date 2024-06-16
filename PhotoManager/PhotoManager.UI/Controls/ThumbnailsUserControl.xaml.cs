@@ -47,6 +47,8 @@ public partial class ThumbnailsUserControl : UserControl
             if (!ViewModel.IsRefreshingFolders)
             {
                 ViewModel.CurrentFolder = selectedImagePath;
+                // TODO: Each time the folder is switched, it will LoadBitmapThumbnailImage for each asset in the current dir
+                // (if switching between two folders multiple time, it will call each time LoadBitmapThumbnailImage) -> not good for perf
                 Asset[] assets = await GetAssets(application, ViewModel.CurrentFolder).ConfigureAwait(true);
                 ViewModel.SetAssets(assets);
 
@@ -63,9 +65,9 @@ public partial class ThumbnailsUserControl : UserControl
         }
     }
 
-    private static Task<Asset[]> GetAssets(IApplication application, string folder)
+    private static Task<Asset[]> GetAssets(IApplication application, string directory)
     {
-        return Task.Run(() => application.GetAssets(folder));
+        return Task.Run(() => application.GetAssets(directory));
     }
 
     private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)

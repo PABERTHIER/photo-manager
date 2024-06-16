@@ -1,7 +1,10 @@
-﻿namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
+﻿using System.ComponentModel;
+using System.Windows;
+
+namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 
 [TestFixture]
-public class CatalogAssetsServiceTests
+public class ApplicationViewModelNotifyCatalogChangeTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -11,11 +14,16 @@ public class CatalogAssetsServiceTests
     private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
     private string? _defaultAssetsDirectory;
 
+    private ApplicationViewModel? _applicationViewModel;
+    private PhotoManager.Application.Application? _application;
+    private TestableAssetRepository? _testableAssetRepository;
+    private SyncAssetsService? _syncAssetsService;
     private CatalogAssetsService? _catalogAssetsService;
+    private MoveAssetsService? _moveAssetsService;
+    private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
+    private UserConfigurationService? _userConfigurationService;
     private BlobStorage? _blobStorage;
     private Database? _database;
-    private UserConfigurationService? _userConfigurationService;
-    private TestableAssetRepository? _testableAssetRepository;
     private Mock<IStorageService>? _storageServiceMock;
 
     private Asset? _asset1;
@@ -206,7 +214,7 @@ public class CatalogAssetsServiceTests
         };
     }
 
-    private void ConfigureCatalogAssetService(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -227,20 +235,33 @@ public class CatalogAssetsServiceTests
         AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
         _catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        _moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
+        _syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, _moveAssetsService);
+        _findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
+        _application = new (_testableAssetRepository, _syncAssetsService, _catalogAssetsService, _moveAssetsService, _findDuplicatedAssetsService, _userConfigurationService, storageService);
+        _applicationViewModel = new (_application);
     }
 
     // ADD SECTION (Start) ------------------------------------------------------------------------------------------------
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExists_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExists_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -283,7 +304,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -355,22 +376,65 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(17, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -379,14 +443,22 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets()
+    public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExists_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -453,7 +525,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -540,31 +612,112 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
                 catalogChanges,
                 firstFrameVideosDirectory,
+                assetsDirectory,
+                2,
                 folderToAssetsMapping[videoFirstFrameFolder],
                 _asset4Temp!,
                 videoFirstFrameFolder,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(14, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
+
+            // Changing folder
+            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+
+            GoToFolderEmulation(firstFrameVideosDirectory);
+            
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                firstFrameVideosDirectory,
+                1,
+                folderToAssetsMapping[videoFirstFrameFolder],
+                folderToAssetsMapping[videoFirstFrameFolder][0],
+                videoFirstFrameFolder,
+                false);
+
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(22, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[21]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
         }
         finally
         {
@@ -574,14 +727,22 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_SyncTheAssetsButNotTheVideo()
+    public async Task NotifyCatalogChange_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -648,7 +809,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -725,22 +886,96 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
+
+            // Changing folder
+            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+
+            GoToFolderEmulation(firstFrameVideosDirectory);
+
+            Assert.AreEqual(0, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                firstFrameVideosDirectory,
+                0,
+                [],
+                null!,
+                videoFirstFrameFolder!,
+                false);
+
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(19, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[18]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
         }
         finally
         {
@@ -752,14 +987,22 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_SyncTheFirstAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
 
@@ -800,7 +1043,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -866,22 +1109,59 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -892,15 +1172,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_SyncTheAssetsButNotTheCorruptedImage(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_NotifiesChangesButNotTheCorruptedImage(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -955,7 +1243,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1015,23 +1303,58 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetNotCreated(catalogChanges, folderToAssetsMapping[folder], imagePath1ToCopy, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeAssetNotCreated(catalogChanges, assetsDirectory, 1, folderToAssetsMapping[folder], imagePath1ToCopy, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                false);
+
+            Assert.AreEqual(9, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -1046,145 +1369,26 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    [TestCase(false)]
-    [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCallbackIsNull_SyncTheAssetsWithoutEvent(bool analyseVideos)
-    {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
-
-        try
-        {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
-
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
-            List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
-
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
-
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.IsTrue(File.Exists(assetPath));
-            }
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
-
-            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
-
-            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
-
-            CatalogChangeCallback? catalogChangeCallback = null;
-
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChangeCallback!);
-
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
-
-            _asset1!.Folder = folder!;
-            _asset1!.FolderId = folder!.FolderId;
-            _asset2!.Folder = folder;
-            _asset2!.FolderId = folder.FolderId;
-            _asset3!.Folder = folder;
-            _asset3!.FolderId = folder.FolderId;
-            _asset4!.Folder = folder;
-            _asset4!.FolderId = folder.FolderId;
-
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
-
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
-
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder],
-                [folder],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder],
-                [folder],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.IsNull(catalogChangeCallback);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
     [TestCase(true, 0)]
     [TestCase(true, 2)]
     [TestCase(true, 100)]
     [TestCase(false, 0)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndIsCancellationRequestedOrCatalogBatchSizeIsEqualTo0_StopsTheSync(bool canceled, int catalogBatchSize)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndIsCancellationRequestedOrCatalogBatchSizeIsEqualTo0_NotifiesNoAssetChanges(bool canceled, int catalogBatchSize)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(catalogBatchSize, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(catalogBatchSize, assetsDirectory, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -1226,7 +1430,7 @@ public class CatalogAssetsServiceTests
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
             CancellationToken cancellationToken = new (canceled);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add, cancellationToken);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1259,9 +1463,23 @@ public class CatalogAssetsServiceTests
 
             int increment = 0;
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(_applicationViewModel!, assetsDirectory, 0, [], null!, folder!, false);
+
+            Assert.AreEqual(4, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory, 0, [], null!, folder!, false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -1274,15 +1492,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -1326,7 +1552,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1401,22 +1627,68 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -1441,7 +1713,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(5, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1456,8 +1728,14 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.IsNotNull(assetsFromRepository[2].ImageData);
+            Assert.IsNotNull(assetsFromRepository[3].ImageData);
+            Assert.IsNull(assetsFromRepository[4].ImageData);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
@@ -1501,32 +1779,73 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetUpdated(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(36, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[31]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -1537,14 +1856,22 @@ public class CatalogAssetsServiceTests
 
     // TODO: It is not able to detect if a video has been updated
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_SyncTheAssets()
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -1608,7 +1935,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1695,31 +2022,75 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
                 catalogChanges,
                 firstFrameVideosDirectory,
+                assetsDirectory,
+                2,
                 folderToAssetsMapping[videoFirstFrameFolder],
                 _asset4Temp!,
                 videoFirstFrameFolder,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(14, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -1731,7 +2102,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
@@ -1756,8 +2127,12 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.IsNull(assetsFromRepository[2].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders, thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -1791,42 +2166,97 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                catalogChanges,
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
+
+            // Changing folder
+            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+
+            GoToFolderEmulation(firstFrameVideosDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
                 firstFrameVideosDirectory,
+                1,
                 folderToAssetsMapping[videoFirstFrameFolder!],
-                _asset4Temp!,
+                folderToAssetsMapping[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+                false);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(28, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[27]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
         }
         finally
         {
@@ -1836,14 +2266,22 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_SyncTheAssets()
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -1907,7 +2345,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1984,22 +2422,59 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -2009,7 +2484,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(3, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             Assert.IsFalse(File.Exists(firstFramePath1));
 
@@ -2032,8 +2507,11 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -2067,31 +2545,88 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(11, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(15, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
+
+            // Changing folder
+            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+
+            GoToFolderEmulation(firstFrameVideosDirectory);
+
+            Assert.AreEqual(0, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                firstFrameVideosDirectory,
+                0,
+                [],
+                null!,
+                videoFirstFrameFolder!,
+                false);
+
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[22]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
         }
         finally
         {
@@ -2103,14 +2638,22 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -2158,7 +2701,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2218,22 +2761,56 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                false);
+
+            Assert.AreEqual(8, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -2259,7 +2836,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2277,8 +2854,11 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNull(assetsFromRepository[1].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -2312,38 +2892,61 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(12, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder][..(i + 1)],
-                    folderToAssetsMapping[folder][i],
-                    folder,
-                    ref increment);
-            }
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetCreated(
                 catalogChanges,
                 assetsDirectory,
+                assetsDirectory,
+                2,
                 folderToAssetsMappingUpdated[folder],
                 _asset3Temp,
                 folder,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMappingUpdated[folder],
+                folderToAssetsMappingUpdated[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(16, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMappingUpdated[folder],
+                folderToAssetsMappingUpdated[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -2355,15 +2958,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_SyncTheAssetsAndRemovesTheCorruptedImage(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -2412,7 +3023,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2478,22 +3089,59 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -2521,7 +3169,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2536,8 +3184,10 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
@@ -2574,39 +3224,69 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(13, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetDeleted(
                 catalogChanges,
                 assetsDirectory,
+                assetsDirectory,
+                folderToAssetsMappingUpdated[folder!].Count,
                 folderToAssetsMappingUpdated[folder!],
                 _asset2Temp,
                 folder!,
                 true,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
+                folder!,
+                false);
+
+            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
+                folder!,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -2623,15 +3303,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -2675,7 +3363,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2750,22 +3438,68 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -2792,7 +3526,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(5, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2807,8 +3541,14 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.IsNotNull(assetsFromRepository[2].ImageData);
+            Assert.IsNotNull(assetsFromRepository[3].ImageData);
+            Assert.IsNull(assetsFromRepository[4].ImageData);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
@@ -2852,32 +3592,73 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetUpdated(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(36, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[31]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -2891,15 +3672,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -2943,7 +3732,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3018,22 +3807,68 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -3056,7 +3891,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3071,7 +3906,7 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
+                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
@@ -3115,32 +3950,69 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetDeleted(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsUpdated.Count, expectedAssetsUpdated, _asset1Temp, folder!, false, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(32, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -3154,15 +4026,23 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_SyncTheAssets()
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -3225,7 +4105,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3312,31 +4192,75 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
                 catalogChanges,
                 firstFrameVideosDirectory,
+                assetsDirectory,
+                2,
                 folderToAssetsMapping[videoFirstFrameFolder],
                 _asset4Temp!,
                 videoFirstFrameFolder,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(14, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -3345,7 +4269,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
@@ -3370,8 +4294,12 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.IsNull(assetsFromRepository[2].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders, thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -3405,42 +4333,97 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges,folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                catalogChanges,
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
+
+            // Changing folder
+            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+
+            GoToFolderEmulation(firstFrameVideosDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
                 firstFrameVideosDirectory,
+                1,
                 folderToAssetsMapping[videoFirstFrameFolder!],
-                _asset4Temp!,
+                folderToAssetsMapping[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
-                ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+                false);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(28, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[27]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
         }
         finally
         {
@@ -3455,15 +4438,23 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_SyncTheAssets()
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -3526,7 +4517,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3603,22 +4594,59 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -3627,7 +4655,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             Assert.IsFalse(File.Exists(firstFramePath1));
 
@@ -3650,8 +4678,11 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -3685,31 +4716,88 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(11, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(15, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
+
+            // Changing folder
+            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+
+            GoToFolderEmulation(firstFrameVideosDirectory);
+
+            Assert.AreEqual(0, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                firstFrameVideosDirectory,
+                0,
+                [],
+                null!,
+                videoFirstFrameFolder!,
+                false);
+
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[22]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
         }
         finally
         {
@@ -3726,15 +4814,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -3786,7 +4882,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3861,22 +4957,68 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMappingFirstSync[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMappingFirstSync[folder][..(i + 1)],
                     folderToAssetsMappingFirstSync[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMappingFirstSync[folder],
+                folderToAssetsMappingFirstSync[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMappingFirstSync[folder],
+                folderToAssetsMappingFirstSync[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -3887,7 +5029,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3902,7 +5044,7 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterFirstSync[i], assetsDirectory, folder!);
+                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterFirstSync[i], assetsDirectory, folder!);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new() { { folder!, expectedAssetsSecondSync } };
@@ -3946,32 +5088,69 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetDeleted(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsSecondSync.Count, expectedAssetsSecondSync, _asset1Temp, folder!, false, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMappingFirstSync[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMappingFirstSync[folder!][..(i + 1)],
-                    folderToAssetsMappingFirstSync[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMappingSecondSync[folder!],
+                folderToAssetsMappingSecondSync[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(32, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsSecondSync, _asset1Temp, folder!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMappingSecondSync[folder!],
+                folderToAssetsMappingSecondSync[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Third sync
 
@@ -3982,7 +5161,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsTrue(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3997,8 +5176,14 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsThirdSync[i], assetPathsAfterSecondSync[i], assetsDirectory, folder!);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsThirdSync[i], assetPathsAfterSecondSync[i], assetsDirectory, folder!);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.IsNotNull(assetsFromRepository[2].ImageData);
+            Assert.IsNotNull(assetsFromRepository[3].ImageData);
+            Assert.IsNull(assetsFromRepository[4].ImageData);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingThirdSync = new() { { folder!, expectedAssetsThirdSync } };
             Dictionary<string, int> assetNameToByteSizeMappingThirdSync = new()
@@ -4042,38 +5227,77 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(22, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetCreated(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsThirdSync.Count, expectedAssetsThirdSync, _asset1Temp, folder!, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMappingFirstSync[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMappingFirstSync[folder!][..(i + 1)],
-                    folderToAssetsMappingFirstSync[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMappingThirdSync[folder!],
+                folderToAssetsMappingThirdSync[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(40, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[34]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[35]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[36]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[37]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[38]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[39]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsSecondSync, _asset1Temp, folder!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMappingThirdSync[folder!],
+                folderToAssetsMappingThirdSync[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, expectedAssetsThirdSync, _asset1Temp, folder!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -4088,15 +5312,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
 
-        ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -4142,7 +5374,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4202,22 +5434,56 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                false);
+
+            Assert.AreEqual(8, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -4241,7 +5507,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4259,8 +5525,11 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNull(assetsFromRepository[1].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder], thumbnails, assetsImageByteSizeUpdated);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -4294,38 +5563,61 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(12, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder][..(i + 1)],
-                    folderToAssetsMapping[folder][i],
-                    folder,
-                    ref increment);
-            }
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetCreated(
                 catalogChanges,
                 assetsDirectory,
+                assetsDirectory,
+                2,
                 folderToAssetsMappingUpdated[folder],
                 _asset3Temp,
                 folder,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                2,
+                folderToAssetsMappingUpdated[folder],
+                folderToAssetsMappingUpdated[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(16, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                2,
+                folderToAssetsMappingUpdated[folder],
+                folderToAssetsMappingUpdated[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -4342,15 +5634,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -4394,7 +5694,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4469,22 +5769,68 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -4509,7 +5855,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4524,7 +5870,7 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
+                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
@@ -4568,32 +5914,69 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetDeleted(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsUpdated.Count, expectedAssetsUpdated, _asset1Temp, folder!, false, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                expectedAssetsUpdated,
+                expectedAssetsUpdated[0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(32, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                expectedAssetsUpdated,
+                expectedAssetsUpdated[0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -4611,15 +5994,23 @@ public class CatalogAssetsServiceTests
     [Ignore("Need to rework the CancellationRequested")]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_NotifiesNoAssetChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -4663,7 +6054,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4738,22 +6129,69 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -4777,7 +6215,7 @@ public class CatalogAssetsServiceTests
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
             CancellationToken cancellationToken = new (true);
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add, cancellationToken);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4792,7 +6230,7 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
+                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
@@ -4837,32 +6275,37 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            foldersInRepository = _testableAssetRepository!.GetFolders();
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            Assert.AreEqual(24, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -4878,16 +6321,24 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_SyncTheAssetsAndRemovesDeletedOnes(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string tempDirectory = Path.Combine(assetsDirectory, "TempFolder");
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(tempDirectory);
 
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
@@ -4944,7 +6395,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5030,36 +6481,85 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder1].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder1][..(i + 1)],
                     folderToAssetsMapping[folder1][i],
                     folder1,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder2].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     tempDirectory,
+                    assetsDirectory,
+                    folderToAssetsMapping[folder1].Count,
                     folderToAssetsMapping[folder2][..(i + 1)],
                     folderToAssetsMapping[folder2][i],
                     folder2,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder1],
+                folderToAssetsMapping[folder1][0],
+                folder1,
+                true);
+
+            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder1],
+                folderToAssetsMapping[folder1][0],
+                folder1,
+                true);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(folder2, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -5078,7 +6578,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5099,7 +6599,7 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder1!);
+                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder1!);
             }
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder1!, expectedAssetsUpdated } };
@@ -5143,48 +6643,69 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(20, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeAssetDeleted(catalogChanges, tempDirectory, assetsDirectory, 4, assetsFromRepositoryByPath2, _asset1Temp, folder2, false, ref increment);
+            NotifyCatalogChangeFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder1!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder1!][..(i + 1)],
-                    folderToAssetsMapping[folder1!][i],
-                    folder1!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMappingUpdated[folder1!],
+                folderToAssetsMappingUpdated[folder1!][0],
+                folder1!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, 1, [folder2], tempDirectory, ref increment); // Not foldersInRepository because this folder has been deleted
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, [folder2], tempDirectory, ref increment); // Not foldersInRepository because this folder has been deleted
+            Assert.AreEqual(28, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
 
-            for (int i = 0; i < folderToAssetsMapping[folder2].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    tempDirectory,
-                    folderToAssetsMapping[folder2][..(i + 1)],
-                    folderToAssetsMapping[folder2][i],
-                    folder2,
-                    ref increment);
-            }
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMappingUpdated[folder1!],
+                folderToAssetsMappingUpdated[folder1!][0],
+                folder1!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(folder2, folderAddedEvents[0]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, assetsFromRepositoryByPath2, _asset1Temp, folder2, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(1, folderRemovedEvents.Count);
+            Assert.AreEqual(folder2, folderRemovedEvents[0]);
         }
         finally
         {
@@ -5200,15 +6721,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_SyncTheAssetsAndDoesNotRemoveAllDeletedOnes(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string tempDirectory = Path.Combine(assetsDirectory, "FolderToDelete");
 
-        ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
             Directory.CreateDirectory(tempDirectory);
 
@@ -5267,7 +6796,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5330,17 +6859,59 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingFirstSync[folder2], _asset2Temp, folder2, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                tempDirectory,
+                assetsDirectory,
+                0,
+                folderToAssetsMappingFirstSync[folder2],
+                _asset2Temp,
+                folder2,
+                ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder1!,
+                false);
+
+            Assert.AreEqual(8, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder1!,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(folder2, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5371,6 +6942,7 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
+                // Assets are not in the current folder, so ImageData stays null
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], folderToAssetsMappingSecondSync[folder2][i], assetPaths[i], tempDirectory, folder2);
             }
 
@@ -5406,23 +6978,63 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(16, catalogChanges.Count);
 
-            increment = 0;
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                tempDirectory,
+                assetsDirectory,
+                0,
+                folderToAssetsMappingSecondSync[folder2],
+                _asset2,
+                folder2,
+                ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingFirstSync[folder2], _asset2Temp, folder2, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder1!,
+                false);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2], _asset2, folder2, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(16, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder1!,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(folder2, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Third sync
 
@@ -5431,7 +7043,7 @@ public class CatalogAssetsServiceTests
             Assert.IsFalse(File.Exists(destinationFilePathToCopy1));
             Assert.IsFalse(File.Exists(destinationFilePathToCopy2));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5486,39 +7098,70 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(23, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingFirstSync[folder2!], _asset2Temp, folder2!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 2, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeAssetDeleted(catalogChanges, tempDirectory, assetsDirectory, 0, [_asset2], _asset2Temp, folder2!, false, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2!], _asset2, folder2!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder1!,
+                false);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 2, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, [_asset2], _asset2Temp, folder2!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder1!,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(folder2, folderAddedEvents[0]);
+
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Fourth sync
 
             assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(0, assetsInDirectory1.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5572,40 +7215,73 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(31, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders, assetsDirectory, ref increment);  // Not foldersInRepository because this folder has been deleted
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, folders, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingFirstSync[folder2!], _asset2Temp, folder2!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeAssetDeleted(catalogChanges, tempDirectory, assetsDirectory, 0, [], _asset2, folder2!, false, ref increment);
+            NotifyCatalogChangeFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, folders, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, tempDirectory, folderToAssetsMappingSecondSync[folder2!], _asset2, folder2!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder1!,
+                false);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, [_asset2], _asset2Temp, folder2!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(31, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, tempDirectory, [], _asset2, folder2!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder1!,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(1, folderAddedEvents.Count);
+            Assert.AreEqual(folder2, folderAddedEvents[0]);
+
+            Assert.AreEqual(1, folderRemovedEvents.Count);
+            Assert.AreEqual(folder2, folderRemovedEvents[0]);
         }
         finally
         {
@@ -5622,16 +7298,24 @@ public class CatalogAssetsServiceTests
 
     // FULL SCENARIO SECTION (Start) --------------------------------------------------------------------------------
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssets()
+    public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
@@ -5760,7 +7444,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -5885,41 +7569,128 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder], _asset4!, rootFolder, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                _asset4,
+                rootFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageDeletedDirectory, folderToAssetsMappingFirstSync[imageDeletedFolder], _asset2!, imageDeletedFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                imageDeletedDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[imageDeletedFolder],
+                _asset2,
+                imageDeletedFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                imageUpdatedDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[imageUpdatedFolder],
+                _asset2Temp,
+                imageUpdatedFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder], _asset3Temp!, subDirFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                subDirDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[subDirFolder],
+                _asset3Temp,
+                subDirFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFrameFolder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     firstFrameVideosDirectory,
+                    assetsDirectory,
+                    1,
                     folderToAssetsMappingFirstSync[videoFirstFrameFolder][..(i + 1)],
                     folderToAssetsMappingFirstSync[videoFirstFrameFolder][i],
                     videoFirstFrameFolder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                folderToAssetsMappingFirstSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                folderToAssetsMappingFirstSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(5, folderAddedEvents.Count);
+            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
+            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
+            Assert.AreEqual(subDirFolder, folderAddedEvents[2]);
+            Assert.AreEqual(subSubDirFolder, folderAddedEvents[3]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[4]);
+
+            Assert.IsEmpty(folderRemovedEvents);
             
             // Second Sync
 
@@ -5957,7 +7728,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -6022,8 +7793,14 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNull(assetsFromRepository[1].ImageData);
+            Assert.IsNull(assetsFromRepository[2].ImageData);
+            Assert.IsNull(assetsFromRepository[3].ImageData);
+            Assert.IsNull(assetsFromRepository[4].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -6057,63 +7834,213 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(38, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder], _asset4!, rootFolder, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeAssetDeleted(catalogChanges, imageDeletedDirectory, assetsDirectory, 1, [], _asset2!, imageDeletedFolder!, false, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeAssetUpdated(
+                catalogChanges,
+                imageUpdatedDirectory,
+                assetsDirectory,
+                folderToAssetsMappingSecondSync[imageUpdatedFolder],
+                _asset2Temp,
+                imageUpdatedFolder,
+                ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageDeletedDirectory, folderToAssetsMappingFirstSync[imageDeletedFolder!], _asset2!, imageDeletedFolder!, ref increment);
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
+            Assert.AreEqual(40, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[36]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[37]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[38]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[39]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder], _asset3Temp!, subDirFolder, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            // Because the root folder is already added
+            Assert.AreEqual(5, folderAddedEvents.Count);
+            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
+            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
+            Assert.AreEqual(subDirFolder, folderAddedEvents[2]);
+            Assert.AreEqual(subSubDirFolder, folderAddedEvents[3]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[4]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            Assert.IsEmpty(folderRemovedEvents);
 
-            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFrameFolder].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    firstFrameVideosDirectory,
-                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][..(i + 1)],
-                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][i],
-                    videoFirstFrameFolder,
-                    ref increment);
-            }
+            // Changing to imageDeletedFolder -> imageDeletedDirectory
+            Assert.AreEqual(1, _applicationViewModel!.ObservableAssets.Count);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            GoToFolderEmulation(imageDeletedDirectory);
 
-            // Second part (second sync)
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, imageDeletedDirectory, [], _asset2!, imageDeletedFolder!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            AssertObservableAssets(imageDeletedDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                imageDeletedDirectory,
+                0,
+                [],
+                null!,
+                imageDeletedFolder!,
+                false);
+
+            // Changing to imageUpdatedFolder -> imageUpdatedDirectory
+            GoToFolderEmulation(imageUpdatedDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                imageUpdatedDirectory,
+                1,
+                folderToAssetsMappingSecondSync[imageUpdatedFolder],
+                folderToAssetsMappingSecondSync[imageUpdatedFolder][0],
+                imageUpdatedFolder,
+                false);
+
+            // Changing to subDirFolder -> subDirDirectory
+            GoToFolderEmulation(subDirDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(subDirDirectory, folderToAssetsMappingSecondSync[subDirFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                subDirDirectory,
+                1,
+                folderToAssetsMappingSecondSync[subDirFolder],
+                folderToAssetsMappingSecondSync[subDirFolder][0],
+                subDirFolder,
+                false);
+
+            // Changing to subSubDirFolder -> subSubDirDirectory
+            GoToFolderEmulation(subSubDirDirectory);
+
+            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            AssertObservableAssets(subSubDirDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                subSubDirDirectory,
+                0,
+                [],
+                null!,
+                subSubDirFolder!,
+                false);
+
+            // Changing to videoFirstFrameFolder -> firstFrameVideosDirectory
+            GoToFolderEmulation(firstFrameVideosDirectory);
+
+            Assert.AreEqual(2, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMappingSecondSync[videoFirstFrameFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                firstFrameVideosDirectory,
+                2,
+                folderToAssetsMappingSecondSync[videoFirstFrameFolder],
+                folderToAssetsMappingSecondSync[videoFirstFrameFolder][0],
+                videoFirstFrameFolder,
+                true);
+
+            // Changing to rootFolder -> assetsDirectory
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(assetsDirectory, folderToAssetsMappingSecondSync[rootFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            Assert.AreEqual(64, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[40]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[41]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[42]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[43]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[44]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[45]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[46]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[47]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[48]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[49]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[50]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[51]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[52]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[53]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[54]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[55]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[56]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[57]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[58]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[59]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[60]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[61]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[62]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[63]);
         }
         finally
         {
@@ -6129,16 +8056,24 @@ public class CatalogAssetsServiceTests
 
     // TODO: Actually, video with same name are considered the same, need to evolve this
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssetsButNotTheVideoInSubdirectory()
+    public async Task NotifyCatalogChange_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
@@ -6263,7 +8198,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -6384,37 +8319,123 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder], _asset4!, rootFolder, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                _asset4,
+                rootFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageDeletedDirectory, folderToAssetsMappingFirstSync[imageDeletedFolder], _asset2!, imageDeletedFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                imageDeletedDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[imageDeletedFolder],
+                _asset2,
+                imageDeletedFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                imageUpdatedDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[imageUpdatedFolder],
+                _asset2Temp,
+                imageUpdatedFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder], _asset3Temp!, subDirFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                subDirDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[subDirFolder],
+                _asset3Temp,
+                subDirFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
                 catalogChanges,
                 firstFrameVideosDirectory,
+                assetsDirectory,
+                1,
                 folderToAssetsMappingFirstSync[videoFirstFrameFolder],
                 _asset4Temp!,
                 videoFirstFrameFolder,
                 ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                folderToAssetsMappingFirstSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            Assert.AreEqual(22, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                folderToAssetsMappingFirstSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(5, folderAddedEvents.Count);
+            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
+            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
+            Assert.AreEqual(subDirFolder, folderAddedEvents[2]);
+            Assert.AreEqual(subSubDirFolder, folderAddedEvents[3]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[4]);
+
+            Assert.IsEmpty(folderRemovedEvents);
             
             // Second Sync
 
@@ -6451,7 +8472,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -6513,8 +8534,13 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNull(assetsFromRepository[1].ImageData);
+            Assert.IsNull(assetsFromRepository[2].ImageData);
+            Assert.IsNull(assetsFromRepository[3].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -6548,59 +8574,212 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(37, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder], _asset4!, rootFolder, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageDeletedDirectory, folderToAssetsMappingFirstSync[imageDeletedFolder!], _asset2!, imageDeletedFolder!, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder], _asset3Temp!, subDirFolder, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeAssetDeleted(catalogChanges, imageDeletedDirectory, assetsDirectory, 1, [], _asset2!, imageDeletedFolder!, false, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeAssetUpdated(
                 catalogChanges,
-                firstFrameVideosDirectory,
-                folderToAssetsMappingFirstSync[videoFirstFrameFolder],
-                _asset4Temp!,
-                videoFirstFrameFolder,
+                imageUpdatedDirectory,
+                assetsDirectory,
+                folderToAssetsMappingSecondSync[imageUpdatedFolder],
+                _asset2Temp,
+                imageUpdatedFolder,
                 ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
 
-            // Second part (second sync)
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, imageDeletedDirectory, [], _asset2!, imageDeletedFolder!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(39, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[36]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[37]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[38]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(5, folderAddedEvents.Count);
+            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
+            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
+            Assert.AreEqual(subDirFolder, folderAddedEvents[2]);
+            Assert.AreEqual(subSubDirFolder, folderAddedEvents[3]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[4]);
+
+            Assert.IsEmpty(folderRemovedEvents);
+
+            // Changing to imageDeletedFolder -> imageDeletedDirectory
+            Assert.AreEqual(1, _applicationViewModel!.ObservableAssets.Count);
+
+            GoToFolderEmulation(imageDeletedDirectory);
+
+            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            AssertObservableAssets(imageDeletedDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                imageDeletedDirectory,
+                0,
+                [],
+                null!,
+                imageDeletedFolder!,
+                false);
+
+            // Changing to imageUpdatedFolder -> imageUpdatedDirectory
+            GoToFolderEmulation(imageUpdatedDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                imageUpdatedDirectory,
+                1,
+                folderToAssetsMappingSecondSync[imageUpdatedFolder],
+                folderToAssetsMappingSecondSync[imageUpdatedFolder][0],
+                imageUpdatedFolder,
+                false);
+
+            // Changing to subDirFolder -> subDirDirectory
+            GoToFolderEmulation(subDirDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(subDirDirectory, folderToAssetsMappingSecondSync[subDirFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                subDirDirectory,
+                1,
+                folderToAssetsMappingSecondSync[subDirFolder],
+                folderToAssetsMappingSecondSync[subDirFolder][0],
+                subDirFolder,
+                false);
+
+            // Changing to subSubDirFolder -> subSubDirDirectory
+            GoToFolderEmulation(subSubDirDirectory);
+
+            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            AssertObservableAssets(subSubDirDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                subSubDirDirectory,
+                0,
+                [],
+                null!,
+                subSubDirFolder!,
+                false);
+
+            // Changing to videoFirstFrameFolder -> firstFrameVideosDirectory
+            GoToFolderEmulation(firstFrameVideosDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMappingSecondSync[videoFirstFrameFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                firstFrameVideosDirectory,
+                1,
+                folderToAssetsMappingSecondSync[videoFirstFrameFolder],
+                folderToAssetsMappingSecondSync[videoFirstFrameFolder][0],
+                videoFirstFrameFolder,
+                false);
+
+            // Changing to rootFolder -> assetsDirectory
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(assetsDirectory, folderToAssetsMappingSecondSync[rootFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            Assert.AreEqual(63, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[39]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[40]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[41]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[42]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[43]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[44]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[45]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[46]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[47]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[48]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[49]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[50]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[51]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[52]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[53]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[54]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[55]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[56]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[57]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[58]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[59]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[60]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[61]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[62]);
         }
         finally
         {
@@ -6616,16 +8795,24 @@ public class CatalogAssetsServiceTests
 
     // TODO: Videos need to be in the same folder or at least in folder before the OutputFirstFrame (alphabetical order)
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_SyncTheAssetsButTheVideoInSubdirectoryInTheSecondSync()
+    public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
@@ -6752,7 +8939,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -6874,37 +9061,123 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder], _asset4!, rootFolder, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                _asset4,
+                rootFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageDeletedDirectory, folderToAssetsMappingFirstSync[imageDeletedFolder], _asset2!, imageDeletedFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                imageDeletedDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[imageDeletedFolder],
+                _asset2,
+                imageDeletedFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                imageUpdatedDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[imageUpdatedFolder],
+                _asset2Temp,
+                imageUpdatedFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
                 catalogChanges,
                 firstFrameVideosDirectory,
+                assetsDirectory,
+                1,
                 folderToAssetsMappingFirstSync[videoFirstFrameFolder],
                 _asset4Temp!,
                 videoFirstFrameFolder,
                 ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder], _asset3Temp!, subDirFolder, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                subDirDirectory,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[subDirFolder],
+                _asset3Temp,
+                subDirFolder,
+                ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderCreated(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                folderToAssetsMappingFirstSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            Assert.AreEqual(22, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingFirstSync[rootFolder],
+                folderToAssetsMappingFirstSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(5, folderAddedEvents.Count);
+            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
+            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[2]);
+            Assert.AreEqual(subDirFolder, folderAddedEvents[3]);
+            Assert.AreEqual(subSubDirFolder, folderAddedEvents[4]);
+
+            Assert.IsEmpty(folderRemovedEvents);
             
             // Second Sync
 
@@ -6942,7 +9215,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -7007,8 +9280,13 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNull(assetsFromRepository[1].ImageData);
+            Assert.IsNull(assetsFromRepository[2].ImageData);
+            Assert.IsNull(assetsFromRepository[3].ImageData);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -7042,66 +9320,222 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(38, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder], _asset4!, rootFolder, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageDeletedDirectory, folderToAssetsMappingFirstSync[imageDeletedFolder!], _asset2!, imageDeletedFolder!, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeAssetDeleted(catalogChanges, imageDeletedDirectory, assetsDirectory, 1, [], _asset2!, imageDeletedFolder!, false, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageDeletedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeAssetUpdated(
                 catalogChanges,
-                firstFrameVideosDirectory,
-                folderToAssetsMappingFirstSync[videoFirstFrameFolder],
-                _asset4Temp!,
-                videoFirstFrameFolder,
+                imageUpdatedDirectory,
+                assetsDirectory,
+                folderToAssetsMappingSecondSync[imageUpdatedFolder],
+                _asset2Temp,
+                imageUpdatedFolder,
                 ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder], _asset3Temp!, subDirFolder, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-
-            // Second part (second sync)
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, imageDeletedDirectory, [], _asset2!, imageDeletedFolder!, false, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageUpdatedDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeAssetCreated(
                 catalogChanges,
                 firstFrameVideosDirectory,
+                assetsDirectory,
+                1,
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder],
                 _asset5Temp!,
                 videoFirstFrameFolder,
                 ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, firstFrameVideosDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, subSubDirDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            Assert.AreEqual(40, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[36]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[37]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[38]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[39]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            // Because the root folder is already added
+            Assert.AreEqual(5, folderAddedEvents.Count);
+            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
+            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
+            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[2]);
+            Assert.AreEqual(subDirFolder, folderAddedEvents[3]);
+            Assert.AreEqual(subSubDirFolder, folderAddedEvents[4]);
+
+            Assert.IsEmpty(folderRemovedEvents);
+
+            // Changing to imageDeletedFolder -> imageDeletedDirectory
+            Assert.AreEqual(1, _applicationViewModel!.ObservableAssets.Count);
+
+            GoToFolderEmulation(imageDeletedDirectory);
+
+            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            AssertObservableAssets(imageDeletedDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                imageDeletedDirectory,
+                0,
+                [],
+                null!,
+                imageDeletedFolder!,
+                false);
+
+            // Changing to imageUpdatedFolder -> imageUpdatedDirectory
+            GoToFolderEmulation(imageUpdatedDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                imageUpdatedDirectory,
+                1,
+                folderToAssetsMappingSecondSync[imageUpdatedFolder],
+                folderToAssetsMappingSecondSync[imageUpdatedFolder][0],
+                imageUpdatedFolder,
+                false);
+
+            // Changing to videoFirstFrameFolder -> firstFrameVideosDirectory
+            GoToFolderEmulation(firstFrameVideosDirectory);
+
+            Assert.AreEqual(2, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMappingSecondSync[videoFirstFrameFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                firstFrameVideosDirectory,
+                2,
+                folderToAssetsMappingSecondSync[videoFirstFrameFolder],
+                folderToAssetsMappingSecondSync[videoFirstFrameFolder][0],
+                videoFirstFrameFolder,
+                true);
+
+            // Changing to subDirFolder -> subDirDirectory
+            GoToFolderEmulation(subDirDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(subDirDirectory, folderToAssetsMappingSecondSync[subDirFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                subDirDirectory,
+                1,
+                folderToAssetsMappingSecondSync[subDirFolder],
+                folderToAssetsMappingSecondSync[subDirFolder][0],
+                subDirFolder,
+                false);
+
+            // Changing to subSubDirFolder -> subSubDirDirectory
+            GoToFolderEmulation(subSubDirDirectory);
+
+            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            AssertObservableAssets(subSubDirDirectory, [], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                subSubDirDirectory,
+                0,
+                [],
+                null!,
+                subSubDirFolder!,
+                false);
+
+            // Changing to rootFolder -> assetsDirectory
+            GoToFolderEmulation(assetsDirectory);
+
+            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            AssertObservableAssets(assetsDirectory, folderToAssetsMappingSecondSync[rootFolder], _applicationViewModel!.ObservableAssets);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                1,
+                folderToAssetsMappingSecondSync[rootFolder],
+                folderToAssetsMappingSecondSync[rootFolder][0],
+                rootFolder,
+                false);
+
+            Assert.AreEqual(64, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[40]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[41]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[42]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[43]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[44]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[45]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[46]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[47]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[48]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[49]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[50]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[51]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[52]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[53]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[54]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[55]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[56]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[57]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[58]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[59]);
+            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[60]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[61]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[62]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[63]);
         }
         finally
         {
@@ -7120,12 +9554,20 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(2)]
     [TestCase(100)]
-    public async Task CatalogAssetsAsync_NoAssetsAndRootCatalogFolderExists_DoesNothing(int catalogBatchSize)
+    public async Task NotifyCatalogChange_NoAssetsAndRootCatalogFolderExists_NotifiesNoAssetChanges(int catalogBatchSize)
     {
-        ConfigureCatalogAssetService(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(_defaultAssetsDirectory!);
+
             Directory.CreateDirectory(_defaultAssetsDirectory!);
 
             string[] assetsInDirectory = Directory.GetFiles(_defaultAssetsDirectory!);
@@ -7156,7 +9598,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.IsNotNull(folder);
@@ -7191,10 +9633,39 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, _defaultAssetsDirectory!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, _defaultAssetsDirectory!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, _defaultAssetsDirectory!, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, _defaultAssetsDirectory!, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                _defaultAssetsDirectory!,
+                0,
+                [],
+                null!,
+                folder!,
+                false);
+
+            Assert.AreEqual(5, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                _defaultAssetsDirectory!,
+                0,
+                [],
+                null!,
+                folder!,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -7206,12 +9677,20 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(2)]
     [TestCase(100)]
-    public async Task CatalogAssetsAsync_NoAssetsAndRootCatalogFolderDoesNotExist_DoesNothing(int catalogBatchSize)
+    public async Task NotifyCatalogChange_NoAssetsAndRootCatalogFolderDoesNotExist_NotifiesNoAssetChanges(int catalogBatchSize)
     {
-        ConfigureCatalogAssetService(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(_defaultAssetsDirectory!);
+
             Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.IsNull(folder);
 
@@ -7237,7 +9716,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.IsNull(folder);
@@ -7272,10 +9751,41 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderDeleted(catalogChanges, 0, foldersInRepository.Length, _defaultAssetsDirectory!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, _defaultAssetsDirectory!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderDeleted(catalogChanges, 0, foldersInRepository.Length, _defaultAssetsDirectory!, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, _defaultAssetsDirectory!, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                _defaultAssetsDirectory!,
+                0,
+                [],
+                null!,
+                folder!,
+                false);
+
+            Assert.AreEqual(5, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                _defaultAssetsDirectory!,
+                0,
+                [],
+                null!,
+                folder!,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+
+            Assert.AreEqual(1, folderRemovedEvents.Count);
+            Assert.AreEqual(_defaultAssetsDirectory, folderRemovedEvents[0].Path);
         }
         finally
         {
@@ -7286,14 +9796,22 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_RootCatalogFolderPointsToAFile_DoesNotSyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_RootCatalogFolderPointsToAFile_NotifiesNoAssetChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Image 1.jpg");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
 
@@ -7319,7 +9837,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
@@ -7354,10 +9872,41 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderDeleted(catalogChanges, 0, foldersInRepository.Length, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderDeleted(catalogChanges, 0, foldersInRepository.Length, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder!,
+                false);
+
+            Assert.AreEqual(5, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                folder!,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+
+            Assert.AreEqual(1, folderRemovedEvents.Count);
+            Assert.AreEqual(assetsDirectory, folderRemovedEvents[0].Path);
         }
         finally
         {
@@ -7372,12 +9921,20 @@ public class CatalogAssetsServiceTests
     [TestCase(2, false)]
     [TestCase(100, true)]
     [TestCase(100, false)]
-    public async Task CatalogAssetsAsync_NoAssetsAndRootCatalogExistAndFolderAndIsCancellationRequested_StopsTheSync(int catalogBatchSize, bool folderExists)
+    public async Task NotifyCatalogChange_NoAssetsAndRootCatalogExistAndFolderAndIsCancellationRequested_NotifiesNoAssetChanges(int catalogBatchSize, bool folderExists)
     {
-        ConfigureCatalogAssetService(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(_defaultAssetsDirectory!);
+
             if (folderExists)
             {
                 Directory.CreateDirectory(_defaultAssetsDirectory!);
@@ -7412,7 +9969,7 @@ public class CatalogAssetsServiceTests
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
             CancellationToken cancellationToken = new (true);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add, cancellationToken);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.IsNotNull(folder);
@@ -7445,9 +10002,37 @@ public class CatalogAssetsServiceTests
 
             int increment = 0;
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, _defaultAssetsDirectory!, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, _defaultAssetsDirectory!, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                _defaultAssetsDirectory!,
+                0,
+                [],
+                null!,
+                folder!,
+                false);
+
+            Assert.AreEqual(4, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                _defaultAssetsDirectory!,
+                0,
+                [],
+                null!,
+                folder!,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -7465,14 +10050,22 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -7515,7 +10108,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -7587,26 +10180,69 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(17, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -7621,7 +10257,7 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
+                AssertCurrentAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
             }
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
@@ -7656,31 +10292,57 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(13, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(21, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder!],
+                folderToAssetsMapping[folder!][0],
+                folder!,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -7691,15 +10353,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -7742,7 +10412,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -7814,22 +10484,65 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(17, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -7851,7 +10564,7 @@ public class CatalogAssetsServiceTests
             Assert.AreEqual(5, assetsInDirectory.Length);
             Assert.IsTrue(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -7869,8 +10582,14 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.IsNotNull(assetsFromRepository[2].ImageData);
+            Assert.IsNotNull(assetsFromRepository[3].ImageData);
+            Assert.IsNull(assetsFromRepository[4].ImageData);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
@@ -7914,32 +10633,70 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(15, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                5,
+                expectedAssetsUpdated,
+                _asset1Temp,
+                folder,
+                ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder][..(i + 1)],
-                    folderToAssetsMapping[folder][i],
-                    folder,
-                    ref increment);
-            }
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMappingUpdated[folder],
+                folderToAssetsMappingUpdated[folder][0],
+                folder,
+                true);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            Assert.AreEqual(25, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMappingUpdated[folder],
+                folderToAssetsMappingUpdated[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -7951,17 +10708,25 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_SyncTheAssets(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_NotifiesChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
         string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
         string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -8002,7 +10767,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -8074,22 +10839,65 @@ public class CatalogAssetsServiceTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
             {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
+                NotifyCatalogChangeAssetCreated(
                     catalogChanges,
                     assetsDirectory,
+                    assetsDirectory,
+                    i + 1,
                     folderToAssetsMapping[folder][..(i + 1)],
                     folderToAssetsMapping[folder][i],
                     folder,
                     ref increment);
             }
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(17, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                4,
+                folderToAssetsMapping[folder],
+                folderToAssetsMapping[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
 
             // Second sync
 
@@ -8118,7 +10926,7 @@ public class CatalogAssetsServiceTests
             Assert.AreEqual(5, assetsInDirectory.Length);
             Assert.IsTrue(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -8136,8 +10944,14 @@ public class CatalogAssetsServiceTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder);
             }
+
+            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.IsNotNull(assetsFromRepository[2].ImageData);
+            Assert.IsNotNull(assetsFromRepository[3].ImageData);
+            Assert.IsNull(assetsFromRepository[4].ImageData);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
@@ -8181,35 +10995,73 @@ public class CatalogAssetsServiceTests
 
             Assert.AreEqual(15, catalogChanges.Count);
 
-            increment = 0;
-
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder][..(i + 1)],
-                    folderToAssetsMapping[folder][i],
-                    folder,
-                    ref increment);
-            }
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, expectedAssetsUpdated, _asset1Temp, folder, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                5,
+                expectedAssetsUpdated,
+                _asset1Temp,
+                folder,
+                ref increment);
+            NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
+            NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
             Assert.IsTrue(File.Exists(oldBackupFilePath));
             Assert.IsTrue(File.Exists(backupFilePath));
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                5,
+                folderToAssetsMappingUpdated[folder],
+                folderToAssetsMappingUpdated[folder][0],
+                folder,
+                true);
+
+            Assert.AreEqual(25, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
+            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[19]);
+            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[20]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                5,
+                folderToAssetsMappingUpdated[folder],
+                folderToAssetsMappingUpdated[folder][0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -8231,16 +11083,16 @@ public class CatalogAssetsServiceTests
     // TODO: Test to Cancel the token for each method (testcase)
     [Test]
     [Ignore("Needs the rework of CancellationToken")]
-    public void CatalogAssetsAsync_NoAssetsAndTokenIsCancelled_ThrowsOperationCanceledException()
+    public void NotifyCatalogChange_NoAssetsAndTokenIsCancelled_NotifiesNoAssetChanges()
     {
-        // ConfigureCatalogAssetService(defaultAssetsDirectory!);
+        // ConfigureApplicationViewModel(defaultAssetsDirectory!);
         //
         // try
         // {
         //     CancellationTokenSource cancellationTokenSource = new();
         //
         //     // Start the task but don't wait for it
-        //     Task task = _catalogAssetsService!.CatalogAssetsAsync(null!, cancellationTokenSource.Token);
+        //     Task task = _applicationViewModel!.CatalogAssets(null!, cancellationTokenSource.Token);
         //
         //     // Simulate cancellation after a short delay
         //     cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(1));
@@ -8256,15 +11108,23 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsError(bool analyseVideos)
+    public async Task NotifyCatalogChange_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsErrorAndNotifiesNoAssetChanges(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
         LoggingAssertsService loggingAssertsService = new();
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
 
         try
         {
+            CheckBeforeNotifyCatalogChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -8303,7 +11163,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -8339,9 +11199,36 @@ public class CatalogAssetsServiceTests
 
             loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesException(catalogChanges, unauthorizedAccessException, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            NotifyCatalogChangeException(catalogChanges, unauthorizedAccessException, ref increment);
+            NotifyCatalogChangeEnd(catalogChanges, ref increment);
+
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                rootFolder,
+                false);
+
+            Assert.AreEqual(3, notifyPropertyChangedEvents.Count);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
+            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                0,
+                [],
+                null!,
+                rootFolder,
+                false);
+
+            // Because the root folder is already added
+            Assert.IsEmpty(folderAddedEvents);
+            Assert.IsEmpty(folderRemovedEvents);
         }
         finally
         {
@@ -8353,198 +11240,539 @@ public class CatalogAssetsServiceTests
     }
     // ERROR SECTION (End) -------------------------------------------------------------------------------------
 
-    [Test]
-    [TestCase(false)]
-    [TestCase(true)]
-    public async Task Dispose_AssetsAndRootCatalogFolderExists_DoesNotUpdateCataloguedAssetsByPath(bool analyseVideos)
+    private
+        (List<string> notifyPropertyChangedEvents,
+        List<ApplicationViewModel> applicationViewModelInstances,
+        List<Folder> folderAddedEvents,
+        List<Folder> folderRemovedEvents)
+        NotifyPropertyChangedEvents()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        List<string> notifyPropertyChangedEvents = new();
+        List<ApplicationViewModel> applicationViewModelInstances = new();
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
-
-        try
+        _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            notifyPropertyChangedEvents.Add(e.PropertyName!);
+            applicationViewModelInstances.Add((ApplicationViewModel)sender!);
+        };
 
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
-            List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
+        List<Folder> folderAddedEvents = new();
 
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
-
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.IsTrue(File.Exists(assetPath));
-            }
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
-
-            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
-
-            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
-
-            _catalogAssetsService!.Dispose();
-
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
-
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
-
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
-
-            _asset1!.Folder = folder!;
-            _asset1!.FolderId = folder!.FolderId;
-            _asset2!.Folder = folder;
-            _asset2!.FolderId = folder.FolderId;
-            _asset3!.Folder = folder;
-            _asset3!.FolderId = folder.FolderId;
-            _asset4!.Folder = folder;
-            _asset4!.FolderId = folder.FolderId;
-
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
-
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
-
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                DisposeAssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder],
-                [folder],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder],
-                [folder],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.AreEqual(9, catalogChanges.Count);
-
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
-            {
-                DisposeCheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder][i],
-                    folder,
-                    ref increment);
-            }
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-        }
-        finally
+        _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
         {
-            Directory.Delete(_databaseDirectory!, true);
-        }
+            folderAddedEvents.Add(e.Folder);
+        };
+
+        List<Folder> folderRemovedEvents = new();
+
+        _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        {
+            folderRemovedEvents.Add(e.Folder);
+        };
+
+        return (notifyPropertyChangedEvents, applicationViewModelInstances, folderAddedEvents, folderRemovedEvents);
     }
 
-    // TODO: Rework if tested in above services
-    private static void DisposeAssertAssetPropertyValidityAndImageData(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
+    private void CheckBeforeNotifyCatalogChanges(string expectedRootDirectory)
     {
-        DateTime actualDate = DateTime.Now.Date;
-
-        Assert.AreEqual(expectedAsset.FileName, asset.FileName);
-        Assert.AreEqual(folder.FolderId, asset.FolderId);
-        Assert.AreEqual(folder, asset.Folder);
-        Assert.AreEqual(expectedAsset.FileSize, asset.FileSize);
-        Assert.AreEqual(expectedAsset.PixelWidth, asset.PixelWidth);
-        Assert.AreEqual(expectedAsset.PixelHeight, asset.PixelHeight);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelWidth, asset.ThumbnailPixelWidth);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelHeight, asset.ThumbnailPixelHeight);
-        Assert.AreEqual(expectedAsset.ImageRotation, asset.ImageRotation);
-        Assert.AreEqual(actualDate, asset.ThumbnailCreationDateTime.Date);
-        Assert.AreEqual(expectedAsset.Hash, asset.Hash);
-        Assert.AreEqual(expectedAsset.IsAssetCorrupted, asset.IsAssetCorrupted);
-        Assert.AreEqual(expectedAsset.AssetCorruptedMessage, asset.AssetCorruptedMessage);
-        Assert.AreEqual(expectedAsset.IsAssetRotated, asset.IsAssetRotated);
-        Assert.AreEqual(expectedAsset.AssetRotatedMessage, asset.AssetRotatedMessage);
-        Assert.AreEqual(assetPath, asset.FullPath);
-        Assert.AreEqual(folderPath, asset.Folder.Path);
-        Assert.AreEqual(DateTime.MinValue, asset.FileCreationDateTime.Date);
-        Assert.AreEqual(DateTime.MinValue, asset.FileModificationDateTime.Date);
-
-        Assert.IsNull(asset.ImageData); // Set above, not in this method
+        Assert.IsTrue(_applicationViewModel!.SortAscending);
+        Assert.IsNull(_applicationViewModel!.Product);
+        Assert.IsNull(_applicationViewModel!.Version);
+        Assert.IsFalse(_applicationViewModel!.IsRefreshingFolders);
+        Assert.AreEqual(AppModeEnum.Thumbnails, _applicationViewModel!.AppMode);
+        Assert.AreEqual(SortCriteriaEnum.FileName, _applicationViewModel!.SortCriteria);
+        Assert.AreEqual(Visibility.Visible, _applicationViewModel!.ThumbnailsVisible);
+        Assert.AreEqual(Visibility.Hidden, _applicationViewModel!.ViewerVisible);
+        Assert.AreEqual(0, _applicationViewModel!.ViewerPosition);
+        Assert.IsEmpty(_applicationViewModel!.SelectedAssets);
+        Assert.AreEqual(expectedRootDirectory, _applicationViewModel!.CurrentFolder);
+        Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
+        Assert.IsNull(_applicationViewModel!.GlobaleAssetsCounter);
+        Assert.IsNull(_applicationViewModel!.ExecutionTime);
+        Assert.IsNull(_applicationViewModel!.TotalFilesNumber);
+        Assert.AreEqual($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending", _applicationViewModel!.AppTitle);
+        Assert.IsNull(_applicationViewModel!.StatusMessage);
+        Assert.IsNull(_applicationViewModel!.CurrentAsset);
+        Assert.IsNull(_applicationViewModel!.LastSelectedFolder); // TODO: Should it be the root folder (add it in the ctor) ?
+        Assert.IsFalse(_applicationViewModel!.CanGoToPreviousAsset);
+        Assert.IsFalse(_applicationViewModel!.CanGoToNextAsset);
     }
 
-    private static void DisposeCheckCatalogChangesAssetAdded(
+    private static void CheckAfterNotifyCatalogChanges(
+        ApplicationViewModel applicationViewModelInstance,
+        string expectedLastDirectoryInspected,
+        int expectedAppTitleAssetsCount,
+        IReadOnlyCollection<Asset> expectedObservableAssets,
+        Asset expectedCurrentAsset,
+        Folder expectedFolder,
+        bool expectedCanGoToNextAsset)
+    {
+        Assert.IsTrue(applicationViewModelInstance.SortAscending);
+        Assert.IsNull(applicationViewModelInstance.Product);
+        Assert.IsNull(applicationViewModelInstance.Version);
+        Assert.IsFalse(applicationViewModelInstance.IsRefreshingFolders);
+        Assert.AreEqual(AppModeEnum.Thumbnails, applicationViewModelInstance.AppMode);
+        Assert.AreEqual(SortCriteriaEnum.FileName, applicationViewModelInstance.SortCriteria);
+        Assert.AreEqual(Visibility.Visible, applicationViewModelInstance.ThumbnailsVisible);
+        Assert.AreEqual(Visibility.Hidden, applicationViewModelInstance.ViewerVisible);
+        Assert.AreEqual(0, applicationViewModelInstance.ViewerPosition);
+        Assert.IsEmpty(applicationViewModelInstance.SelectedAssets);
+        Assert.AreEqual(expectedLastDirectoryInspected, applicationViewModelInstance.CurrentFolder);
+        Assert.AreEqual(expectedObservableAssets.Count, applicationViewModelInstance.ObservableAssets.Count);
+        Assert.IsNull(applicationViewModelInstance.GlobaleAssetsCounter);
+        Assert.IsNull(applicationViewModelInstance.ExecutionTime);
+        Assert.IsNull(applicationViewModelInstance.TotalFilesNumber);
+        Assert.AreEqual($"  - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending", applicationViewModelInstance.AppTitle);
+        Assert.AreEqual("The catalog process has ended.", applicationViewModelInstance.StatusMessage);
+
+        if (applicationViewModelInstance.CurrentAsset != null)
+        {
+            AssertCurrentAssetPropertyValidity(applicationViewModelInstance.CurrentAsset, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
+        }
+
+        Assert.IsNull(applicationViewModelInstance.LastSelectedFolder); // TODO: Should it be the root folder (add it in the ctor) ?
+        Assert.IsFalse(applicationViewModelInstance.CanGoToPreviousAsset);
+        Assert.AreEqual(expectedCanGoToNextAsset, applicationViewModelInstance.CanGoToNextAsset);
+    }
+
+    private void NotifyCatalogChangeFolderInspectionInProgress(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.AreEqual(expectedFoldersCount, folders.Count);
+        Assert.IsNotNull(catalogChange.Folder);
+        Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
+        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.FolderInspectionInProgress, catalogChange.Reason);
+        Assert.AreEqual($"Inspecting folder {assetsDirectory}.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual($"Inspecting folder {assetsDirectory}.", _applicationViewModel!.StatusMessage);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeFolderInspectionCompleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string assetsDirectory, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.FolderInspectionCompleted, catalogChange.Reason);
+        Assert.AreEqual($"Folder inspection for {assetsDirectory}, subfolders included, has been completed.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual($"Folder inspection for {assetsDirectory}, subfolders included, has been completed.", _applicationViewModel!.StatusMessage);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeFolderCreated(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.AreEqual(expectedFoldersCount, folders.Count);
+        Assert.IsNotNull(catalogChange.Folder);
+        Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
+        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.FolderCreated, catalogChange.Reason);
+        Assert.AreEqual($"Folder {assetsDirectory} added to catalog.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual($"Folder {assetsDirectory} added to catalog.", _applicationViewModel!.StatusMessage);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.AreEqual(expectedFoldersCount, foldersCount);
+        Assert.IsNotNull(catalogChange.Folder);
+        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.FolderDeleted, catalogChange.Reason);
+        Assert.AreEqual($"Folder {assetsDirectory} deleted from catalog.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual($"Folder {assetsDirectory} deleted from catalog.", _applicationViewModel!.StatusMessage);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeAssetCreated(
         IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
         string assetsDirectory,
+        string currentDirectory,
+        int expectedAppTitleAssetsCount,
+        IReadOnlyList<Asset> expectedAssets,
         Asset expectedAsset,
         Folder folder,
         ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        int cataloguedAssetsByPathCount = catalogChange.CataloguedAssetsByPath.Count;
+
         Assert.IsNotNull(catalogChange.Asset);
-        DisposeAssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
+        CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
         Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
+        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange, cataloguedAssetsByPathCount);
         Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
         Assert.AreEqual($"Image {expectedAsset.FullPath} added to catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
+
+        // Cases when having multiple sync, assets in the firsts sync has ImageData loaded, unlike the new ones (added, updated)
+        if (string.Equals(expectedAsset.FullPath, catalogChange.Asset!.FullPath))
+        {
+            Assert.IsNull(catalogChange.Asset!.ImageData);
+        }
+        else
+        {
+            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+        }
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+
+        // While the user has not clicked on another folder, ImageData stays null for all other assets
+        if (string.Equals(catalogChange.Asset.Folder.Path, currentDirectory))
+        {
+            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+            AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
+        }
+        else
+        {
+            Assert.IsNull(catalogChange.Asset!.ImageData);
+            Assert.IsEmpty(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList());
+        }
+
+        Assert.AreEqual($"Image {expectedAsset.FullPath} added to catalog.", _applicationViewModel!.StatusMessage);
+        Assert.AreEqual($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending", _applicationViewModel!.AppTitle);
         increment++;
+    }
+
+    private void NotifyCatalogChangeAssetNotCreated(
+        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        string currentDirectory,
+        int expectedAppTitleAssetsCount,
+        IReadOnlyList<Asset> expectedAssets,
+        string expectedAssetPath,
+        ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        int cataloguedAssetsByPathCount = catalogChange.CataloguedAssetsByPath.Count;
+
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.AreEqual(expectedAssets.Count, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
+        Assert.IsTrue(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData != null));
+        Assert.AreEqual(ReasonEnum.AssetNotCreated, catalogChange.Reason);
+        Assert.AreEqual($"Image {expectedAssetPath} not added to catalog (corrupted).", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+
+        AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
+
+        Assert.AreEqual($"Image {expectedAssetPath} not added to catalog (corrupted).", _applicationViewModel!.StatusMessage);
+        Assert.AreEqual($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending", _applicationViewModel!.AppTitle);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeAssetUpdated(
+        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        string assetsDirectory,
+        string currentDirectory,
+        IReadOnlyList<Asset> expectedAssets,
+        Asset expectedAsset,
+        Folder folder,
+        ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        int cataloguedAssetsByPathCount = catalogChange.CataloguedAssetsByPath.Count;
+
+        Assert.IsNotNull(catalogChange.Asset);
+        CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
+        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange, cataloguedAssetsByPathCount);
+        Assert.AreEqual(ReasonEnum.AssetUpdated, catalogChange.Reason);
+        Assert.AreEqual($"Image {expectedAsset.FullPath} updated in catalog.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        // Cases when having multiple sync, assets in the firsts sync has ImageData loaded, unlike the new ones (added, updated)
+        if (string.Equals(expectedAsset.FullPath, catalogChange.Asset!.FullPath))
+        {
+            Assert.IsNull(catalogChange.Asset!.ImageData);
+        }
+        else
+        {
+            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+        }
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+
+        // While the user has not clicked on another folder, ImageData stays null for all other assets
+        if (string.Equals(catalogChange.Asset.Folder.Path, currentDirectory))
+        {
+            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+            AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
+        }
+        else
+        {
+            Assert.IsNull(catalogChange.Asset!.ImageData);
+            Assert.IsEmpty(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList());
+        }
+
+        Assert.AreEqual($"Image {expectedAsset.FullPath} updated in catalog.", _applicationViewModel!.StatusMessage);
+        Assert.AreEqual($"  - {currentDirectory} - image 1 of {expectedAssets.Count} - sorted by file name ascending", _applicationViewModel!.AppTitle);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeAssetDeleted(
+        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        string assetsDirectory,
+        string currentDirectory,
+        int expectedAppTitleAssetsCount,
+        IReadOnlyList<Asset> expectedAssets,
+        Asset expectedAsset,
+        Folder folder,
+        bool isCorrupted,
+        ref int increment)
+    {
+        string expectedStatusMessage = isCorrupted ? $"Image {expectedAsset.FullPath} deleted from catalog (corrupted)." : $"Image {expectedAsset.FullPath} deleted from catalog.";
+
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        int cataloguedAssetsByPathCount = catalogChange.CataloguedAssetsByPath.Count;
+
+        Assert.IsNotNull(catalogChange.Asset);
+        CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.AreEqual(expectedAssets.Count, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
+        AssertCataloguedAssetsByPathImageDataAssetDeleted(currentDirectory, catalogChange, cataloguedAssetsByPathCount);
+        Assert.AreEqual(ReasonEnum.AssetDeleted, catalogChange.Reason);
+        Assert.AreEqual(expectedStatusMessage, catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+
+        // While the user has not clicked on another folder, ImageData stays null for all other assets
+        if (string.Equals(catalogChange.Asset!.Folder.Path, currentDirectory))
+        {
+            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+            AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
+        }
+        else
+        {
+            Assert.IsNull(catalogChange.Asset!.ImageData);
+            Assert.IsEmpty(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList());
+        }
+
+        Assert.AreEqual(expectedStatusMessage, _applicationViewModel!.StatusMessage);
+        Assert.AreEqual($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending", _applicationViewModel!.AppTitle);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
+    {
+        ReasonEnum reason = string.Equals(expectedMessage, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE) ? ReasonEnum.BackupCreationStarted : ReasonEnum.BackupUpdateStarted;
+
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(reason, catalogChange.Reason);
+        Assert.AreEqual(expectedMessage, catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual(expectedMessage, _applicationViewModel!.StatusMessage);
+        increment++;
+
+        catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.BackupCompleted, catalogChange.Reason);
+        Assert.AreEqual("Backup completed successfully.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual("Backup completed successfully.", _applicationViewModel!.StatusMessage);
+        increment++;
+    }
+
+    private void NotifyCatalogChangesNoBackupChanges(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.NoBackupChangesDetected, catalogChange.Reason);
+        Assert.AreEqual("No changes made to the backup.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual("No changes made to the backup.", _applicationViewModel!.StatusMessage);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeEnd(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.CatalogProcessEnded, catalogChange.Reason);
+        Assert.AreEqual("The catalog process has ended.", catalogChange.Message);
+        Assert.IsNull(catalogChange.Exception);
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual("The catalog process has ended.", _applicationViewModel!.StatusMessage);
+        increment++;
+    }
+
+    private void NotifyCatalogChangeException(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
+    {
+        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
+        Assert.IsNull(catalogChange.Asset);
+        Assert.IsNull(catalogChange.Folder);
+        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
+        Assert.AreEqual(ReasonEnum.CatalogProcessFailed, catalogChange.Reason);
+        Assert.AreEqual("The catalog process has failed.", catalogChange.Message);
+        Assert.IsNotNull(catalogChange.Exception);
+        Assert.AreEqual(exceptionExpected.Message, catalogChange.Exception!.Message);
+        Assert.AreEqual(exceptionExpected.GetType(), catalogChange.Exception.GetType());
+
+        _applicationViewModel!.NotifyCatalogChange(catalogChange);
+        Assert.AreEqual("The catalog process has failed.", _applicationViewModel!.StatusMessage);
+        increment++;
+    }
+
+    private static void AssertCataloguedAssetsByPathPropertyValidity(IReadOnlyList<Asset> expectedAssets, CatalogChangeCallbackEventArgs catalogChange, int cataloguedAssetsByPathCount)
+    {
+        for (int i = 0; i < cataloguedAssetsByPathCount; i++)
+        {
+            Asset currentExpectedAsset = expectedAssets[i];
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(
+                catalogChange.CataloguedAssetsByPath[i],
+                currentExpectedAsset,
+                currentExpectedAsset.FullPath,
+                currentExpectedAsset.Folder.Path,
+                currentExpectedAsset.Folder);
+        }
+    }
+
+    private static void AssertCataloguedAssetsByPathImageData(
+        Asset expectedNewAsset,
+        string currentDirectory,
+        CatalogChangeCallbackEventArgs catalogChange,
+        int cataloguedAssetsByPathCount)
+    {
+        if (cataloguedAssetsByPathCount > 0)
+        {
+            // The ImageData of the last current has not been loaded yet
+            for (int i = 0; i < cataloguedAssetsByPathCount - 1; i++)
+            {
+                Asset currentCataloguedAssetsByPath = catalogChange.CataloguedAssetsByPath[i];
+
+                // Cases when having multiple sync, assets in the firsts sync has ImageData loaded, unlike the new ones (added, updated)
+                if (string.Equals(currentCataloguedAssetsByPath.FullPath, expectedNewAsset.FullPath))
+                {
+                    Assert.IsNull(currentCataloguedAssetsByPath.ImageData);
+                }
+                else if (!string.Equals(currentDirectory, currentCataloguedAssetsByPath.Folder.Path)) // All assets in other directories have ImageData null
+                {
+                    Assert.IsNull(currentCataloguedAssetsByPath.ImageData);
+                }
+                else
+                {
+                    Assert.IsNotNull(currentCataloguedAssetsByPath.ImageData);
+                }
+            }
+
+            Assert.IsNull(catalogChange.CataloguedAssetsByPath[^1].ImageData);
+        }
+    }
+
+    private static void AssertCataloguedAssetsByPathImageDataAssetDeleted(
+        string currentDirectory,
+        CatalogChangeCallbackEventArgs catalogChange,
+        int cataloguedAssetsByPathCount)
+    {
+        if (cataloguedAssetsByPathCount > 0 && string.Equals(currentDirectory, catalogChange.CataloguedAssetsByPath[0].Folder.Path))
+        {
+            Assert.IsTrue(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData != null));
+        }
+        else
+        {
+            Assert.IsTrue(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData == null)); 
+        }
+    }
+
+    private static void AssertCurrentAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
+    {
+        CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
+        Assert.IsNotNull(asset.ImageData); // Unlike below (Application, CatalogAssetsService), it is set here
+    }
+
+    private static void AssertObservableAssets(string currentDirectory, IReadOnlyList<Asset> expectedAssets, IReadOnlyList<Asset> observableAssets)
+    {
+        Assert.AreEqual(expectedAssets.Count, observableAssets.Count);
+
+        for (int i = 0; i < observableAssets.Count; i++)
+        {
+            Asset currentExpectedAsset = expectedAssets[i];
+            Asset currentObservableAssets = observableAssets[i];
+
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAssets, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+
+            if (string.Equals(currentObservableAssets.Folder.Path, currentDirectory))
+            {
+                Assert.IsNotNull(currentObservableAssets.ImageData);
+            }
+            else
+            {
+                Assert.IsNull(currentObservableAssets.ImageData);
+            }
+        }
+    }
+
+    private static void CheckInstance(
+        IReadOnlyList<ApplicationViewModel> applicationViewModelInstances,
+        string expectedLastDirectoryInspected,
+        int expectedAppTitleAssetsCount,
+        IReadOnlyCollection<Asset> expectedObservableAssets,
+        Asset expectedCurrentAsset,
+        Folder expectedFolder,
+        bool expectedCanGoToNextAsset)
+    {
+        int applicationViewModelInstancesCount = applicationViewModelInstances.Count;
+        Assert.AreEqual(applicationViewModelInstances[0], applicationViewModelInstances[applicationViewModelInstancesCount - 2]);
+        // No need to go deeper same instance because ref updated each time
+        Assert.AreEqual(applicationViewModelInstances[applicationViewModelInstancesCount - 2], applicationViewModelInstances[applicationViewModelInstancesCount - 1]);
+
+        CheckAfterNotifyCatalogChanges(
+            applicationViewModelInstances[0],
+            expectedLastDirectoryInspected,
+            expectedAppTitleAssetsCount,
+            expectedObservableAssets,
+            expectedCurrentAsset,
+            expectedFolder,
+            expectedCanGoToNextAsset);
+    }
+
+    private void GoToFolderEmulation(string assetsDirectory)
+    {
+        _applicationViewModel!.CurrentFolder = assetsDirectory;
+        Asset[] assets = _application!.GetAssets(assetsDirectory);
+        _applicationViewModel!.SetAssets(assets);
     }
 }

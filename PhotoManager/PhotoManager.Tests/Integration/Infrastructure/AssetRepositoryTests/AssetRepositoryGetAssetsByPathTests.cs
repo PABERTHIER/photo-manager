@@ -34,7 +34,7 @@ public class AssetRepositoryGetAssetsByPathTests
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
-        _storageServiceMock.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
+        _storageServiceMock.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
 
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
@@ -50,7 +50,7 @@ public class AssetRepositoryGetAssetsByPathTests
             PixelHeight = 1080,
             ThumbnailPixelWidth = 200,
             ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -67,7 +67,7 @@ public class AssetRepositoryGetAssetsByPathTests
             PixelHeight = 6120,
             ThumbnailPixelWidth = 147,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 10),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -84,7 +84,7 @@ public class AssetRepositoryGetAssetsByPathTests
             PixelHeight = 4032,
             ThumbnailPixelWidth = 112,
             ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2023, 8, 27, 6, 49, 20),
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "a92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
             AssetCorruptedMessage = "The asset is corrupted",
             IsAssetCorrupted = true,
@@ -164,7 +164,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(asset3!.FileName, assets2[0].FileName);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Exactly(3));
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Exactly(3));
 
             Assert.AreEqual(3, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
@@ -185,7 +185,7 @@ public class AssetRepositoryGetAssetsByPathTests
         Mock<IStorageService> storageService = new();
         storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
-        storageService.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
+        storageService.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         TestableAssetRepository testableAssetRepository = new(_database!, storageService.Object, userConfigurationService);
@@ -226,7 +226,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(assets1);
 
             storageService.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
-            storageService.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            storageService.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
 
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
@@ -299,7 +299,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(asset1.FileName, assets1[0].FileName);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Once);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Once);
 
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
@@ -355,7 +355,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(asset1.FileName, assets1[0].FileName);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Once);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Once);
 
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
@@ -395,7 +395,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(assets);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
@@ -447,7 +447,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(assets);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
 
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
@@ -487,7 +487,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(assets);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
@@ -538,7 +538,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(assets);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
@@ -572,7 +572,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(assets);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
@@ -624,7 +624,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.IsEmpty(assets1);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
 
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
@@ -642,7 +642,7 @@ public class AssetRepositoryGetAssetsByPathTests
         Mock<IStorageService> storageService = new();
         storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
-        storageService.Setup(x => x.LoadFileInformation(It.IsAny<Asset>()));
+        storageService.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
 
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
         TestableAssetRepository testableAssetRepository = new(_database!, storageService.Object, userConfigurationService);
@@ -698,7 +698,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(asset2.FileName, assets1[1].FileName);
 
             storageService.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
-            storageService.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Never);
+            storageService.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
 
             Assert.AreEqual(2, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
@@ -788,7 +788,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.AreEqual(asset3!.FileName, assets2[0].FileName);
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
-            _storageServiceMock!.Verify(x => x.LoadFileInformation(It.IsAny<Asset>()), Times.Exactly(3));
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Exactly(3));
 
             Assert.AreEqual(3, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);

@@ -31,7 +31,7 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
             if (duplicatedSet.Count > 1)
             {
                 duplicatedAssetsSets.Add(duplicatedSet);
-                LoadFileInformation(duplicatedSet);
+                _storageService.UpdateAssetsFileDateTimeProperties(duplicatedSet);
             }
         }
 
@@ -91,19 +91,11 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
         {
             if (assetSet.Count > 1)
             {
-                LoadFileInformation(assetSet);
+                _storageService.UpdateAssetsFileDateTimeProperties(assetSet);
                 duplicatedAssetsSets.Add(assetSet);
             }
         }
 
         return duplicatedAssetsSets;
-    }
-
-    private void LoadFileInformation(List<Asset> duplicatedSet)
-    {
-        foreach (Asset asset in duplicatedSet)
-        {
-            _storageService.LoadFileInformation(asset);
-        }
     }
 }

@@ -1,7 +1,7 @@
-﻿namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
+﻿namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 
 [TestFixture]
-public class CatalogAssetsServiceTests
+public class ApplicationViewModelCatalogAssetsTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -11,11 +11,11 @@ public class CatalogAssetsServiceTests
     private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
     private string? _defaultAssetsDirectory;
 
-    private CatalogAssetsService? _catalogAssetsService;
+    private ApplicationViewModel? _applicationViewModel;
+    private TestableAssetRepository? _testableAssetRepository;
+    private UserConfigurationService? _userConfigurationService;
     private BlobStorage? _blobStorage;
     private Database? _database;
-    private UserConfigurationService? _userConfigurationService;
-    private TestableAssetRepository? _testableAssetRepository;
     private Mock<IStorageService>? _storageServiceMock;
 
     private Asset? _asset1;
@@ -206,7 +206,7 @@ public class CatalogAssetsServiceTests
         };
     }
 
-    private void ConfigureCatalogAssetService(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
+    private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -226,18 +226,23 @@ public class CatalogAssetsServiceTests
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
         AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        _catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        CatalogAssetsService catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
+        PhotoManager.Application.Application application = new (_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        _applicationViewModel = new (application);
     }
 
     // ADD SECTION (Start) ------------------------------------------------------------------------------------------------
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExists_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExists_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -283,7 +288,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -379,11 +384,11 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets()
+    public async Task CatalogAssets_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
         try
         {
@@ -453,7 +458,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -574,11 +579,11 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_SyncTheAssetsButNotTheVideo()
+    public async Task CatalogAssets_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_SyncTheAssetsButNotTheVideo()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
         try
         {
@@ -648,7 +653,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -752,11 +757,11 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_SyncTheFirstAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_SyncTheFirstAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -800,7 +805,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -892,12 +897,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_SyncTheAssetsButNotTheCorruptedImage(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_SyncTheAssetsButNotTheCorruptedImage(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -955,7 +960,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1048,11 +1053,11 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCallbackIsNull_SyncTheAssetsWithoutEvent(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndCallbackIsNull_SyncTheAssetsWithoutEvent(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -1098,7 +1103,7 @@ public class CatalogAssetsServiceTests
 
             CatalogChangeCallback? catalogChangeCallback = null;
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChangeCallback!);
+            await _applicationViewModel!.CatalogAssets(catalogChangeCallback!);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1177,11 +1182,11 @@ public class CatalogAssetsServiceTests
     [TestCase(true, 2)]
     [TestCase(true, 100)]
     [TestCase(false, 0)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndIsCancellationRequestedOrCatalogBatchSizeIsEqualTo0_StopsTheSync(bool canceled, int catalogBatchSize)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndIsCancellationRequestedOrCatalogBatchSizeIsEqualTo0_StopsTheSync(bool canceled, int catalogBatchSize)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(catalogBatchSize, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(catalogBatchSize, assetsDirectory, 200, 150, false, false, false, false);
 
         try
         {
@@ -1226,7 +1231,7 @@ public class CatalogAssetsServiceTests
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
             CancellationToken cancellationToken = new (canceled);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add, cancellationToken);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1274,12 +1279,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -1326,7 +1331,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1441,7 +1446,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(5, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1537,11 +1542,11 @@ public class CatalogAssetsServiceTests
 
     // TODO: It is not able to detect if a video has been updated
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_SyncTheAssets()
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_SyncTheAssets()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
         try
         {
@@ -1608,7 +1613,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -1731,7 +1736,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
@@ -1836,11 +1841,11 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_SyncTheAssets()
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_SyncTheAssets()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
         try
         {
@@ -1907,7 +1912,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2009,7 +2014,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(3, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             Assert.IsFalse(File.Exists(firstFramePath1));
 
@@ -2103,11 +2108,11 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -2158,7 +2163,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2259,7 +2264,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2355,12 +2360,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_SyncTheAssetsAndRemovesTheCorruptedImage(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_SyncTheAssetsAndRemovesTheCorruptedImage(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -2412,7 +2417,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2521,7 +2526,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2623,12 +2628,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -2675,7 +2680,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2792,7 +2797,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(5, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -2891,12 +2896,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -2943,7 +2948,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3056,7 +3061,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3154,12 +3159,12 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_SyncTheAssets()
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_SyncTheAssets()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
         try
         {
@@ -3225,7 +3230,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3345,7 +3350,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
@@ -3455,12 +3460,12 @@ public class CatalogAssetsServiceTests
     }
 
     [Test]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_SyncTheAssets()
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_SyncTheAssets()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
         try
         {
@@ -3526,7 +3531,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3627,7 +3632,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             Assert.IsFalse(File.Exists(firstFramePath1));
 
@@ -3726,12 +3731,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -3786,7 +3791,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3887,7 +3892,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -3982,7 +3987,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsTrue(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4088,12 +4093,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
 
-        ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -4142,7 +4147,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4241,7 +4246,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4342,12 +4347,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -4394,7 +4399,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4509,7 +4514,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4611,12 +4616,12 @@ public class CatalogAssetsServiceTests
     [Ignore("Need to rework the CancellationRequested")]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -4663,7 +4668,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4777,7 +4782,7 @@ public class CatalogAssetsServiceTests
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
             CancellationToken cancellationToken = new (true);
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add, cancellationToken);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -4878,13 +4883,13 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_SyncTheAssetsAndRemovesDeletedOnes(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_SyncTheAssetsAndRemovesDeletedOnes(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string tempDirectory = Path.Combine(assetsDirectory, "TempFolder");
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -4944,7 +4949,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5078,7 +5083,7 @@ public class CatalogAssetsServiceTests
 
             Assert.IsFalse(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5200,12 +5205,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_SyncTheAssetsAndDoesNotRemoveAllDeletedOnes(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_SyncTheAssetsAndDoesNotRemoveAllDeletedOnes(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string tempDirectory = Path.Combine(assetsDirectory, "FolderToDelete");
 
-        ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -5267,7 +5272,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5340,7 +5345,7 @@ public class CatalogAssetsServiceTests
 
             // Second sync
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5431,7 +5436,7 @@ public class CatalogAssetsServiceTests
             Assert.IsFalse(File.Exists(destinationFilePathToCopy1));
             Assert.IsFalse(File.Exists(destinationFilePathToCopy2));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5518,7 +5523,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(0, assetsInDirectory1.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder1);
@@ -5622,13 +5627,13 @@ public class CatalogAssetsServiceTests
 
     // FULL SCENARIO SECTION (Start) --------------------------------------------------------------------------------
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssets()
+    public async Task CatalogAssets_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssets()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
         try
         {
@@ -5760,7 +5765,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -5957,7 +5962,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -6129,13 +6134,13 @@ public class CatalogAssetsServiceTests
 
     // TODO: Actually, video with same name are considered the same, need to evolve this
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssetsButNotTheVideoInSubdirectory()
+    public async Task CatalogAssets_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssetsButNotTheVideoInSubdirectory()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
         try
         {
@@ -6263,7 +6268,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -6451,7 +6456,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(1, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -6616,13 +6621,13 @@ public class CatalogAssetsServiceTests
 
     // TODO: Videos need to be in the same folder or at least in folder before the OutputFirstFrame (alphabetical order)
     [Test]
-    public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_SyncTheAssetsButTheVideoInSubdirectoryInTheSecondSync()
+    public async Task CatalogAssets_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_SyncTheAssetsButTheVideoInSubdirectoryInTheSecondSync()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
         string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
         string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
         try
         {
@@ -6752,7 +6757,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -6942,7 +6947,7 @@ public class CatalogAssetsServiceTests
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -7120,9 +7125,9 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(2)]
     [TestCase(100)]
-    public async Task CatalogAssetsAsync_NoAssetsAndRootCatalogFolderExists_DoesNothing(int catalogBatchSize)
+    public async Task CatalogAssets_NoAssetsAndRootCatalogFolderExists_DoesNothing(int catalogBatchSize)
     {
-        ConfigureCatalogAssetService(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -7156,7 +7161,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.IsNotNull(folder);
@@ -7206,9 +7211,9 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(2)]
     [TestCase(100)]
-    public async Task CatalogAssetsAsync_NoAssetsAndRootCatalogFolderDoesNotExist_DoesNothing(int catalogBatchSize)
+    public async Task CatalogAssets_NoAssetsAndRootCatalogFolderDoesNotExist_DoesNothing(int catalogBatchSize)
     {
-        ConfigureCatalogAssetService(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -7237,7 +7242,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.IsNull(folder);
@@ -7286,11 +7291,11 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_RootCatalogFolderPointsToAFile_DoesNotSyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_RootCatalogFolderPointsToAFile_DoesNotSyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Image 1.jpg");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -7319,7 +7324,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNull(folder);
@@ -7372,9 +7377,9 @@ public class CatalogAssetsServiceTests
     [TestCase(2, false)]
     [TestCase(100, true)]
     [TestCase(100, false)]
-    public async Task CatalogAssetsAsync_NoAssetsAndRootCatalogExistAndFolderAndIsCancellationRequested_StopsTheSync(int catalogBatchSize, bool folderExists)
+    public async Task CatalogAssets_NoAssetsAndRootCatalogExistAndFolderAndIsCancellationRequested_StopsTheSync(int catalogBatchSize, bool folderExists)
     {
-        ConfigureCatalogAssetService(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
+        ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -7412,7 +7417,7 @@ public class CatalogAssetsServiceTests
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
             CancellationToken cancellationToken = new (true);
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add, cancellationToken);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.IsNotNull(folder);
@@ -7465,11 +7470,11 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -7515,7 +7520,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -7606,7 +7611,7 @@ public class CatalogAssetsServiceTests
 
             // Second sync
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -7691,12 +7696,12 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -7742,7 +7747,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -7851,7 +7856,7 @@ public class CatalogAssetsServiceTests
             Assert.AreEqual(5, assetsInDirectory.Length);
             Assert.IsTrue(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -7951,14 +7956,14 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_SyncTheAssets(bool analyseVideos)
+    public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_SyncTheAssets(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
         string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
         string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
@@ -8002,7 +8007,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -8118,7 +8123,7 @@ public class CatalogAssetsServiceTests
             Assert.AreEqual(5, assetsInDirectory.Length);
             Assert.IsTrue(File.Exists(destinationFilePathToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
@@ -8231,16 +8236,16 @@ public class CatalogAssetsServiceTests
     // TODO: Test to Cancel the token for each method (testcase)
     [Test]
     [Ignore("Needs the rework of CancellationToken")]
-    public void CatalogAssetsAsync_NoAssetsAndTokenIsCancelled_ThrowsOperationCanceledException()
+    public void CatalogAssets_NoAssetsAndTokenIsCancelled_ThrowsOperationCanceledException()
     {
-        // ConfigureCatalogAssetService(defaultAssetsDirectory!);
+        // ConfigureApplicationViewModel(defaultAssetsDirectory!);
         //
         // try
         // {
         //     CancellationTokenSource cancellationTokenSource = new();
         //
         //     // Start the task but don't wait for it
-        //     Task task = _catalogAssetsService!.CatalogAssetsAsync(null!, cancellationTokenSource.Token);
+        //     Task task = _applicationViewModel!.CatalogAssets(null!, cancellationTokenSource.Token);
         //
         //     // Simulate cancellation after a short delay
         //     cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(1));
@@ -8256,11 +8261,11 @@ public class CatalogAssetsServiceTests
     [Test]
     [TestCase(false)]
     [TestCase(true)]
-    public async Task CatalogAssetsAsync_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsError(bool analyseVideos)
+    public async Task CatalogAssets_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsError(bool analyseVideos)
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
 
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
         LoggingAssertsService loggingAssertsService = new();
 
         try
@@ -8303,7 +8308,7 @@ public class CatalogAssetsServiceTests
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(rootFolder);
@@ -8352,199 +8357,4 @@ public class CatalogAssetsServiceTests
         }
     }
     // ERROR SECTION (End) -------------------------------------------------------------------------------------
-
-    [Test]
-    [TestCase(false)]
-    [TestCase(true)]
-    public async Task Dispose_AssetsAndRootCatalogFolderExists_DoesNotUpdateCataloguedAssetsByPath(bool analyseVideos)
-    {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-
-        ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
-
-        try
-        {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
-
-            List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
-            List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
-
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
-
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.IsTrue(File.Exists(assetPath));
-            }
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
-
-            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
-
-            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
-
-            _catalogAssetsService!.Dispose();
-
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
-
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
-
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
-
-            _asset1!.Folder = folder!;
-            _asset1!.FolderId = folder!.FolderId;
-            _asset2!.Folder = folder;
-            _asset2!.FolderId = folder.FolderId;
-            _asset3!.Folder = folder;
-            _asset3!.FolderId = folder.FolderId;
-            _asset4!.Folder = folder;
-            _asset4!.FolderId = folder.FolderId;
-
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
-
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
-
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                DisposeAssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
-                { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE },
-                { _asset3!.FileName, ASSET3_IMAGE_BYTE_SIZE },
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder],
-                [folder],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder],
-                [folder],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.AreEqual(9, catalogChanges.Count);
-
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-
-            for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
-            {
-                DisposeCheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder][i],
-                    folder,
-                    ref increment);
-            }
-
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    // TODO: Rework if tested in above services
-    private static void DisposeAssertAssetPropertyValidityAndImageData(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
-    {
-        DateTime actualDate = DateTime.Now.Date;
-
-        Assert.AreEqual(expectedAsset.FileName, asset.FileName);
-        Assert.AreEqual(folder.FolderId, asset.FolderId);
-        Assert.AreEqual(folder, asset.Folder);
-        Assert.AreEqual(expectedAsset.FileSize, asset.FileSize);
-        Assert.AreEqual(expectedAsset.PixelWidth, asset.PixelWidth);
-        Assert.AreEqual(expectedAsset.PixelHeight, asset.PixelHeight);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelWidth, asset.ThumbnailPixelWidth);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelHeight, asset.ThumbnailPixelHeight);
-        Assert.AreEqual(expectedAsset.ImageRotation, asset.ImageRotation);
-        Assert.AreEqual(actualDate, asset.ThumbnailCreationDateTime.Date);
-        Assert.AreEqual(expectedAsset.Hash, asset.Hash);
-        Assert.AreEqual(expectedAsset.IsAssetCorrupted, asset.IsAssetCorrupted);
-        Assert.AreEqual(expectedAsset.AssetCorruptedMessage, asset.AssetCorruptedMessage);
-        Assert.AreEqual(expectedAsset.IsAssetRotated, asset.IsAssetRotated);
-        Assert.AreEqual(expectedAsset.AssetRotatedMessage, asset.AssetRotatedMessage);
-        Assert.AreEqual(assetPath, asset.FullPath);
-        Assert.AreEqual(folderPath, asset.Folder.Path);
-        Assert.AreEqual(DateTime.MinValue, asset.FileCreationDateTime.Date);
-        Assert.AreEqual(DateTime.MinValue, asset.FileModificationDateTime.Date);
-
-        Assert.IsNull(asset.ImageData); // Set above, not in this method
-    }
-
-    private static void DisposeCheckCatalogChangesAssetAdded(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
-        string assetsDirectory,
-        Asset expectedAsset,
-        Folder folder,
-        ref int increment)
-    {
-        CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNotNull(catalogChange.Asset);
-        DisposeAssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
-        Assert.AreEqual($"Image {expectedAsset.FullPath} added to catalog.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
-        increment++;
-    }
 }

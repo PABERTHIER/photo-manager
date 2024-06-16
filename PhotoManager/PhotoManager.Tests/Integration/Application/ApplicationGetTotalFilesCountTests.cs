@@ -1,6 +1,4 @@
-﻿using PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
-
-namespace PhotoManager.Tests.Integration.Application;
+﻿namespace PhotoManager.Tests.Integration.Application;
 
 [TestFixture]
 public class ApplicationGetTotalFilesCountTests
@@ -10,7 +8,7 @@ public class ApplicationGetTotalFilesCountTests
     private string? _databasePath;
     private const string DATABASE_END_PATH = "v1.0";
 
-    // TODO: Except for _application, declare each in SetUp direclty
+    // TODO: Except for _application, declare each in SetUp directly, use this test file as example to make the other ones
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
     private SyncAssetsService? _syncAssetsService;
@@ -23,7 +21,6 @@ public class ApplicationGetTotalFilesCountTests
     private Database? _database;
     private AssetsComparator? _assetsComparator;
     private AssetHashCalculatorService? _assetHashCalculatorService;
-
     private Mock<IStorageService>? _storageServiceMock;
 
     [OneTimeSetUp]
@@ -50,7 +47,7 @@ public class ApplicationGetTotalFilesCountTests
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
         _storageService = new (_userConfigurationService);
         _assetHashCalculatorService = new (_userConfigurationService);
-        _assetsComparator = new (_storageService);
+        _assetsComparator = new();
         _assetCreationService = new (_testableAssetRepository, _storageService, _assetHashCalculatorService, _userConfigurationService);
         _catalogAssetsService = new (_testableAssetRepository, _storageService, _assetCreationService, _userConfigurationService, _assetsComparator);
         _moveAssetsService = new (_testableAssetRepository, _storageService, _assetCreationService);
@@ -71,6 +68,33 @@ public class ApplicationGetTotalFilesCountTests
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void GetTotalFilesCount_EmptyDirectory_ReturnsTotalFilesCount()
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+
+        try
+        {
+            Directory.CreateDirectory(assetsDirectory);
+
+            Mock<IConfigurationRoot> configurationRootMock = new();
+            configurationRootMock.GetDefaultMockConfig();
+            configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
+
+            UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+            StorageService storageService = new (userConfigurationService);
+
+            _application = new (_testableAssetRepository!, _syncAssetsService!, _catalogAssetsService!, _moveAssetsService!, _findDuplicatedAssetsService!, userConfigurationService, storageService);
+
+            int totalFilesCount = _application.GetTotalFilesCount();
+            Assert.AreEqual(0, totalFilesCount);
+        }
+        finally
+        {
+            Directory.Delete(assetsDirectory, true);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
-
-namespace PhotoManager.Tests.Integration.Domain;
+﻿namespace PhotoManager.Tests.Integration.Domain;
 
 [TestFixture]
 public class AssetCreationServiceTests
@@ -9,7 +7,6 @@ public class AssetCreationServiceTests
     private string? _databaseDirectory;
     private string? _databasePath;
     private const string DATABASE_END_PATH = "v1.0";
-    private const string FFMPEG_PATH = "E:\\ffmpeg\\bin\\ffmpeg.exe"; // TODO: Will be removed when the dll of Ffmpeg would have been generated and stored in the project
 
     private AssetCreationService? _assetCreationService;
     private Database? _database;
@@ -41,7 +38,7 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMD5Hash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
-        configurationRootMock.MockGetValue(UserConfigurationKeys.FFMPEG_PATH, FFMPEG_PATH);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.FFMPEG_PATH, Constants.FFMPEG_PATH);
 
         _userConfigurationService = new (configurationRootMock.Object);
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
@@ -945,7 +942,7 @@ public class AssetCreationServiceTests
             string invalidImagePath = Path.Combine(tempDirectory, invalidFileName);
             Assert.IsFalse(File.Exists(invalidImagePath));
 
-            ImageHelpers.CreateInvalidImage(imagePath, invalidImagePath);
+            ImageHelper.CreateInvalidImage(imagePath, invalidImagePath);
 
             Assert.IsTrue(File.Exists(invalidImagePath));
 
@@ -1542,7 +1539,7 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, "false");
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "false");
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, "true");
-        configurationRootMock.MockGetValue(UserConfigurationKeys.FFMPEG_PATH, FFMPEG_PATH);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.FFMPEG_PATH, Constants.FFMPEG_PATH);
         configurationRootMock.MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "TempForVideo");
 
         _userConfigurationService = new (configurationRootMock.Object);
@@ -1819,7 +1816,7 @@ public class AssetCreationServiceTests
                 PixelWidth = 1280,
                 ThumbnailPixelWidth = 200,
                 ThumbnailPixelHeight = 112,
-                ThumbnailCreationDateTime = new DateTime(2023, 01, 07, 00, 00, 00),
+                ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
                 ImageRotation = Rotation.Rotate0,
                 Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
                 IsAssetCorrupted = false,
