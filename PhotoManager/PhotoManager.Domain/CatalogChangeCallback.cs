@@ -1,12 +1,6 @@
 ﻿namespace PhotoManager.Domain;
 
-public delegate void ProcessStatusChangedCallback(ProcessStatusChangedCallbackEventArgs e);
 public delegate void CatalogChangeCallback(CatalogChangeCallbackEventArgs e);
-
-public class ProcessStatusChangedCallbackEventArgs
-{
-    public string NewStatus { get; set; }
-}
 
 public class CatalogChangeCallbackEventArgs
 {
