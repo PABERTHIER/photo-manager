@@ -1,5 +1,6 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
+using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,7 +9,7 @@ namespace PhotoManager.UI.ViewModels;
 
 public abstract class BaseProcessViewModel<C, R> : BaseViewModel
 {
-    private ProcessStepEnum step = ProcessStepEnum.ViewDescription;
+    private ProcessStep step = ProcessStep.ViewDescription;
     private ObservableCollection<string> processStatusMessages;
     private ObservableCollection<R> results;
 
@@ -39,7 +40,7 @@ public abstract class BaseProcessViewModel<C, R> : BaseViewModel
 
     public abstract string Description { get; }
 
-    public ProcessStepEnum Step
+    public ProcessStep Step
     {
         get { return step; }
 
@@ -58,53 +59,53 @@ public abstract class BaseProcessViewModel<C, R> : BaseViewModel
 
     public Visibility DescriptionVisible
     {
-        get { return Step == ProcessStepEnum.ViewDescription ? Visibility.Visible : Visibility.Hidden; }
+        get { return Step == ProcessStep.ViewDescription ? Visibility.Visible : Visibility.Hidden; }
     }
 
     public Visibility ConfigurationVisible
     {
-        get { return Step == ProcessStepEnum.Configure ? Visibility.Visible : Visibility.Hidden; }
+        get { return Step == ProcessStep.Configure ? Visibility.Visible : Visibility.Hidden; }
     }
 
     public Visibility RunVisible
     {
-        get { return Step == ProcessStepEnum.Run ? Visibility.Visible : Visibility.Hidden; }
+        get { return Step == ProcessStep.Run ? Visibility.Visible : Visibility.Hidden; }
     }
 
     public Visibility ResultsVisible
     {
-        get { return Step == ProcessStepEnum.ViewResults ? Visibility.Visible : Visibility.Hidden; }
+        get { return Step == ProcessStep.ViewResults ? Visibility.Visible : Visibility.Hidden; }
     }
 
     public bool CanViewDescription
     {
-        get { return Step == ProcessStepEnum.ViewDescription; }
+        get { return Step == ProcessStep.ViewDescription; }
     }
 
     public bool CanConfigure
     {
-        get { return Step == ProcessStepEnum.Configure; }
+        get { return Step == ProcessStep.Configure; }
     }
 
     public bool CanViewResults
     {
-        get { return Step == ProcessStepEnum.Run && Results != null && Results.Count > 0; }
+        get { return Step == ProcessStep.Run && Results != null && Results.Count > 0; }
     }
 
     public void AdvanceStep()
     {
         switch (Step)
         {
-            case ProcessStepEnum.ViewDescription:
-                Step = ProcessStepEnum.Configure;
+            case ProcessStep.ViewDescription:
+                Step = ProcessStep.Configure;
                 break;
 
-            case ProcessStepEnum.Configure:
-                Step = ProcessStepEnum.Run;
+            case ProcessStep.Configure:
+                Step = ProcessStep.Run;
                 break;
 
-            case ProcessStepEnum.Run:
-                Step = ProcessStepEnum.ViewResults;
+            case ProcessStep.Run:
+                Step = ProcessStep.ViewResults;
                 break;
         }
     }

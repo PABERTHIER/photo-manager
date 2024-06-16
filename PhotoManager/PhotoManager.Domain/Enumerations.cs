@@ -35,14 +35,6 @@ public enum WallpaperStyle
     Tile
 }
 
-public enum ProcessStepEnum
-{
-    ViewDescription,
-    Configure,
-    Run,
-    ViewResults
-}
-
 public enum SortCriteriaEnum
 {
     Undefined, // TODO: Remove that one, should be FileName the default one
