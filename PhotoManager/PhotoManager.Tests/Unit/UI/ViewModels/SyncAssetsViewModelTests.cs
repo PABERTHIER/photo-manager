@@ -103,14 +103,14 @@
 //         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
 //         SyncAssetsViewModel viewModel = new(mock.Object);
 
-//         viewModel.Step.Should().Be(ProcessStepEnum.ViewDescription);
+//         viewModel.Step.Should().Be(ProcessStep.ViewDescription);
 //         viewModel.CanConfigure.Should().BeFalse();
 //         viewModel.CanViewResults.Should().BeFalse();
 //         viewModel.ResultsVisible.Should().Be(Visibility.Hidden);
 
 //         viewModel.AdvanceStep();
 
-//         viewModel.Step.Should().Be(ProcessStepEnum.Configure);
+//         viewModel.Step.Should().Be(ProcessStep.Configure);
 //         viewModel.CanConfigure.Should().BeTrue();
 //         viewModel.CanViewResults.Should().BeFalse();
 //         viewModel.ResultsVisible.Should().Be(Visibility.Hidden);
@@ -118,21 +118,21 @@
 //         viewModel.AdvanceStep();
 //         viewModel.Results = results;
 
-//         viewModel.Step.Should().Be(ProcessStepEnum.Run);
+//         viewModel.Step.Should().Be(ProcessStep.Run);
 //         viewModel.CanConfigure.Should().BeFalse();
 //         viewModel.CanViewResults.Should().BeTrue();
 //         viewModel.ResultsVisible.Should().Be(Visibility.Hidden);
 
 //         viewModel.AdvanceStep();
 
-//         viewModel.Step.Should().Be(ProcessStepEnum.ViewResults);
+//         viewModel.Step.Should().Be(ProcessStep.ViewResults);
 //         viewModel.CanConfigure.Should().BeFalse();
 //         viewModel.CanViewResults.Should().BeFalse();
 //         viewModel.ResultsVisible.Should().Be(Visibility.Visible);
 
 //         viewModel.AdvanceStep();
 
-//         viewModel.Step.Should().Be(ProcessStepEnum.ViewResults);
+//         viewModel.Step.Should().Be(ProcessStep.ViewResults);
 //         viewModel.CanConfigure.Should().BeFalse();
 //         viewModel.CanViewResults.Should().BeFalse();
 //         viewModel.ResultsVisible.Should().Be(Visibility.Visible);

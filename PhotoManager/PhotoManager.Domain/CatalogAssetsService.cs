@@ -62,7 +62,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                     // token?.ThrowIfCancellationRequested();
 
                     CatalogFolders(path, callback, ref cataloguedAssetsBatchCount, visitedDirectories, token);
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Reason = ReasonEnum.FolderInspectionCompleted, Message = $"Folder inspection for {path}, subfolders included, has been completed." });
+                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Reason = CatalogChangeReason.FolderInspectionCompleted, Message = $"Folder inspection for {path}, subfolders included, has been completed." });
                 }
 
                 _directories.UnionWith(visitedDirectories);
@@ -70,13 +70,13 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                 if (!_assetRepository.BackupExists() || !_backupHasSameContent)
                 {
                     callback?.Invoke(!_assetRepository.BackupExists()
-                        ? new CatalogChangeCallbackEventArgs { Reason = ReasonEnum.BackupCreationStarted, Message = "Creating catalog backup..." }
-                        : new CatalogChangeCallbackEventArgs { Reason = ReasonEnum.BackupUpdateStarted, Message = "Updating catalog backup..." });
+                        ? new CatalogChangeCallbackEventArgs { Reason = CatalogChangeReason.BackupCreationStarted, Message = "Creating catalog backup..." }
+                        : new CatalogChangeCallbackEventArgs { Reason = CatalogChangeReason.BackupUpdateStarted, Message = "Updating catalog backup..." });
 
                     _assetRepository.WriteBackup();
                     callback?.Invoke(new CatalogChangeCallbackEventArgs
                     {
-                        Reason = ReasonEnum.BackupCompleted,
+                        Reason = CatalogChangeReason.BackupCompleted,
                         Message = "Backup completed successfully."
                     });
 
@@ -84,7 +84,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                 }
                 else
                 {
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Reason = ReasonEnum.NoBackupChangesDetected, Message = "No changes made to the backup." });
+                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Reason = CatalogChangeReason.NoBackupChangesDetected, Message = "No changes made to the backup." });
                 }
             }
             catch (OperationCanceledException)
@@ -99,7 +99,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
 
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
-                    Reason = ReasonEnum.CatalogProcessCancelled,
+                    Reason = CatalogChangeReason.CatalogProcessCancelled,
                     Message = "The catalog process has been cancelled."
                 });
 
@@ -110,7 +110,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                 Log.Error(ex);
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
-                    Reason = ReasonEnum.CatalogProcessFailed,
+                    Reason = CatalogChangeReason.CatalogProcessFailed,
                     Message = "The catalog process has failed.",
                     Exception = ex
                 });
@@ -119,7 +119,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             {
                 callback?.Invoke(new CatalogChangeCallbackEventArgs
                 {
-                    Reason = ReasonEnum.CatalogProcessEnded,
+                    Reason = CatalogChangeReason.CatalogProcessEnded,
                     Message = "The catalog process has ended."
                 });
             }
@@ -176,7 +176,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Folder = folder,
-                Reason = ReasonEnum.FolderCreated,
+                Reason = CatalogChangeReason.FolderCreated,
                 Message = $"Folder {directory} added to catalog."
             });
         }
@@ -186,7 +186,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
         callback?.Invoke(new CatalogChangeCallbackEventArgs
         {
             Folder = folder,
-            Reason = ReasonEnum.FolderInspectionInProgress,
+            Reason = CatalogChangeReason.FolderInspectionInProgress,
             Message = $"Inspecting folder {directory}."
         });
 
@@ -256,7 +256,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             {
                 Asset = asset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                Reason = ReasonEnum.AssetDeleted,
+                Reason = CatalogChangeReason.AssetDeleted,
                 Message = $"Image {Path.Combine(directory, asset.FileName)} deleted from catalog."
             });
         }
@@ -269,7 +269,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {
                 Folder = folder,
-                Reason = ReasonEnum.FolderDeleted,
+                Reason = CatalogChangeReason.FolderDeleted,
                 Message = $"Folder {directory} deleted from catalog."
             });
         }
@@ -313,7 +313,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                     callback?.Invoke(new CatalogChangeCallbackEventArgs
                     {
                         CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                        Reason = ReasonEnum.AssetNotCreated,
+                        Reason = CatalogChangeReason.AssetNotCreated,
                         Message = $"Image {Path.Combine(directory, fileName)} not added to catalog (corrupted)."
                     });
                 }
@@ -325,7 +325,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             {
                 Asset = newAsset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = $"Image {Path.Combine(directory, newAsset.FileName)} added to catalog."
             });
 
@@ -355,7 +355,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                 {
                     Asset = deletedAsset,
                     CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                    Reason = ReasonEnum.AssetDeleted,
+                    Reason = CatalogChangeReason.AssetDeleted,
                     Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog (corrupted)."
                 });
 
@@ -369,7 +369,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             {
                 Asset = updatedAsset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                Reason = ReasonEnum.AssetUpdated,
+                Reason = CatalogChangeReason.AssetUpdated,
                 Message = $"Image {fullPath} updated in catalog."
             });
 
@@ -393,7 +393,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             {
                 Asset = deletedAsset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
-                Reason = ReasonEnum.AssetDeleted,
+                Reason = CatalogChangeReason.AssetDeleted,
                 Message = $"Image {Path.Combine(directory, fileName)} deleted from catalog."
             });
 

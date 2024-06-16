@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using PhotoManager.UI.ViewModels.Enums;
+using System.Windows;
 
 namespace PhotoManager.Tests.Unit.UI.ViewModels;
 
@@ -71,13 +72,13 @@ public class ApplicationViewModelTests
 
         try
         {
-            Assert.AreEqual(AppModeEnum.Thumbnails, _applicationViewModel!.AppMode);
+            Assert.AreEqual(AppMode.Thumbnails, _applicationViewModel!.AppMode);
             _applicationViewModel!.ChangeAppMode();
-            Assert.AreEqual(AppModeEnum.Viewer, _applicationViewModel!.AppMode);
+            Assert.AreEqual(AppMode.Viewer, _applicationViewModel!.AppMode);
             _applicationViewModel!.ChangeAppMode();
-            Assert.AreEqual(AppModeEnum.Thumbnails, _applicationViewModel!.AppMode);
-            _applicationViewModel!.ChangeAppMode(AppModeEnum.Viewer);
-            Assert.AreEqual(AppModeEnum.Viewer, _applicationViewModel!.AppMode);
+            Assert.AreEqual(AppMode.Thumbnails, _applicationViewModel!.AppMode);
+            _applicationViewModel!.ChangeAppMode(AppMode.Viewer);
+            Assert.AreEqual(AppMode.Viewer, _applicationViewModel!.AppMode);
         }
         finally
         {
@@ -86,12 +87,12 @@ public class ApplicationViewModelTests
     }
 
     [Test]
-    [TestCase(AppModeEnum.Thumbnails, Visibility.Visible, false)]
-    [TestCase(AppModeEnum.Thumbnails, Visibility.Visible, true)]
-    [TestCase(AppModeEnum.Viewer, Visibility.Hidden, false)]
-    [TestCase(AppModeEnum.Viewer, Visibility.Hidden, true)]
+    [TestCase(AppMode.Thumbnails, Visibility.Visible, false)]
+    [TestCase(AppMode.Thumbnails, Visibility.Visible, true)]
+    [TestCase(AppMode.Viewer, Visibility.Hidden, false)]
+    [TestCase(AppMode.Viewer, Visibility.Hidden, true)]
     // TODO: Update the name
-    public void ThumbnailsVisible_ChangeAppMode_RefreshThumbnailsVisible(AppModeEnum appMode, Visibility visibilityExpected, bool analyseVideos)
+    public void ThumbnailsVisible_ChangeAppMode_RefreshThumbnailsVisible(AppMode appMode, Visibility visibilityExpected, bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 
@@ -108,12 +109,12 @@ public class ApplicationViewModelTests
     }
 
     [Test]
-    [TestCase(AppModeEnum.Viewer, Visibility.Visible, false)]
-    [TestCase(AppModeEnum.Viewer, Visibility.Visible, true)]
-    [TestCase(AppModeEnum.Thumbnails, Visibility.Hidden, false)]
-    [TestCase(AppModeEnum.Thumbnails, Visibility.Hidden, true)]
+    [TestCase(AppMode.Viewer, Visibility.Visible, false)]
+    [TestCase(AppMode.Viewer, Visibility.Visible, true)]
+    [TestCase(AppMode.Thumbnails, Visibility.Hidden, false)]
+    [TestCase(AppMode.Thumbnails, Visibility.Hidden, true)]
     // TODO: Update the name
-    public void ViewerVisible_ChangeAppMode_RefreshViewerVisible(AppModeEnum appMode, Visibility visibilityExpected, bool analyseVideos)
+    public void ViewerVisible_ChangeAppMode_RefreshViewerVisible(AppMode appMode, Visibility visibilityExpected, bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 
@@ -158,7 +159,7 @@ public class ApplicationViewModelTests
             _applicationViewModel.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = statusMessage
             });
 
@@ -208,7 +209,7 @@ public class ApplicationViewModelTests
             _applicationViewModel.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = statusMessage
             });
 
@@ -258,7 +259,7 @@ public class ApplicationViewModelTests
             {
                 Asset = cataloguedAssets[4],
                 CataloguedAssetsByPath = cataloguedAssets,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = statusMessage
             });
 
@@ -296,7 +297,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
@@ -337,7 +338,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
@@ -384,14 +385,14 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = null,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
@@ -454,14 +455,14 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = null,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
@@ -506,7 +507,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = assets[2],
-                Reason = ReasonEnum.AssetDeleted,
+                Reason = CatalogChangeReason.AssetDeleted,
                 Message = statusMessage
             });
 
@@ -921,18 +922,18 @@ public class ApplicationViewModelTests
     }
 
     [Test]
-    [TestCase(AppModeEnum.Thumbnails, false)]
-    [TestCase(AppModeEnum.Thumbnails, true)]
-    [TestCase(AppModeEnum.Viewer, false)]
-    [TestCase(AppModeEnum.Viewer, true)]
+    [TestCase(AppMode.Thumbnails, false)]
+    [TestCase(AppMode.Thumbnails, true)]
+    [TestCase(AppMode.Viewer, false)]
+    [TestCase(AppMode.Viewer, true)]
     // TODO: Update the name
-    public void AppTitle_AppMode_ApplyAppTitleFormat(AppModeEnum appMode, bool analyseVideos)
+    public void AppTitle_AppMode_ApplyAppTitleFormat(AppMode appMode, bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string expectedTitle = appMode == AppModeEnum.Thumbnails
+            string expectedTitle = appMode == AppMode.Thumbnails
                 ? $"PhotoManager v1.0.0.0 - {_dataDirectory} - image 4 of 5 - sorted by file name ascending"
                 : $"PhotoManager v1.0.0.0 - {_dataDirectory} - Image 4.jpg - image 4 of 5 - sorted by file name ascending";
 
@@ -972,7 +973,7 @@ public class ApplicationViewModelTests
             Asset[] assets = null;
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
             Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
         }
@@ -995,7 +996,7 @@ public class ApplicationViewModelTests
             Asset[] assets = [];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
             Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
         }
@@ -1006,20 +1007,20 @@ public class ApplicationViewModelTests
     }
 
     [Test]
-    [TestCase(SortCriteriaEnum.FileCreationDateTime, false)]
-    [TestCase(SortCriteriaEnum.FileCreationDateTime, true)]
-    [TestCase(SortCriteriaEnum.FileModificationDateTime, false)]
-    [TestCase(SortCriteriaEnum.FileModificationDateTime, true)]
-    [TestCase(SortCriteriaEnum.FileName, false)]
-    [TestCase(SortCriteriaEnum.FileName, true)]
-    [TestCase(SortCriteriaEnum.FileSize, false)]
-    [TestCase(SortCriteriaEnum.FileSize, true)]
-    [TestCase(SortCriteriaEnum.ThumbnailCreationDateTime, false)]
-    [TestCase(SortCriteriaEnum.ThumbnailCreationDateTime, true)]
-    [TestCase(SortCriteriaEnum.Undefined, false)]
-    [TestCase(SortCriteriaEnum.Undefined, true)]
+    [TestCase(SortCriteria.FileCreationDateTime, false)]
+    [TestCase(SortCriteria.FileCreationDateTime, true)]
+    [TestCase(SortCriteria.FileModificationDateTime, false)]
+    [TestCase(SortCriteria.FileModificationDateTime, true)]
+    [TestCase(SortCriteria.FileName, false)]
+    [TestCase(SortCriteria.FileName, true)]
+    [TestCase(SortCriteria.FileSize, false)]
+    [TestCase(SortCriteria.FileSize, true)]
+    [TestCase(SortCriteria.ThumbnailCreationDateTime, false)]
+    [TestCase(SortCriteria.ThumbnailCreationDateTime, true)]
+    [TestCase(SortCriteria.Undefined, false)]
+    [TestCase(SortCriteria.Undefined, true)]
     // TODO: Update the name
-    public void SortAssetsByCriteria_SingleItemAssetList_AssetListHasSameSingleItem(SortCriteriaEnum sortCriteria, bool analyseVideos)
+    public void SortAssetsByCriteria_SingleItemAssetList_AssetListHasSameSingleItem(SortCriteria sortCriteria, bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 
@@ -1069,10 +1070,10 @@ public class ApplicationViewModelTests
                 new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() }
             ];
 
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.Undefined);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.Undefined);
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1106,12 +1107,12 @@ public class ApplicationViewModelTests
                 new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() }
             ];
 
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.Undefined);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.Undefined);
             _applicationViewModel!.SetAssets(assets);
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileName);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
@@ -1161,7 +1162,7 @@ public class ApplicationViewModelTests
             ];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.ThumbnailCreationDateTime);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1199,7 +1200,7 @@ public class ApplicationViewModelTests
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.ThumbnailCreationDateTime);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
@@ -1249,7 +1250,7 @@ public class ApplicationViewModelTests
             ];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileCreationDateTime);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileCreationDateTime);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1287,7 +1288,7 @@ public class ApplicationViewModelTests
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileCreationDateTime);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileCreationDateTime);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
@@ -1337,7 +1338,7 @@ public class ApplicationViewModelTests
             ];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileModificationDateTime);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileModificationDateTime);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1375,7 +1376,7 @@ public class ApplicationViewModelTests
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileModificationDateTime);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileModificationDateTime);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 
@@ -1423,7 +1424,7 @@ public class ApplicationViewModelTests
             ];
 
             _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileSize);
+            _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileSize);
 
             Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
             Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
@@ -1461,7 +1462,7 @@ public class ApplicationViewModelTests
 
             for (int i = 0; i < 10; i++)
             {
-                _applicationViewModel!.SortAssetsByCriteria(SortCriteriaEnum.FileSize);
+                _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileSize);
 
                 Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
 

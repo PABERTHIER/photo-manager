@@ -1,5 +1,6 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
+using PhotoManager.UI.ViewModels.Enums;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -26,7 +27,7 @@ public delegate void FolderRemovedEventHandler(object sender, FolderRemovedEvent
 
 public class ApplicationViewModel : BaseViewModel
 {
-    private AppModeEnum appMode;
+    private AppMode appMode;
     private int viewerPosition;
     private string currentFolder;
     private Asset[] cataloguedAssets; // TODO: ByPath
@@ -37,8 +38,8 @@ public class ApplicationViewModel : BaseViewModel
     private Asset[] selectedAssets;
     private string appTitle;
     private string statusMessage;
-    private SortCriteriaEnum sortCriteria;
-    private SortCriteriaEnum previousSortCriteria;
+    private SortCriteria sortCriteria;
+    private SortCriteria previousSortCriteria;
 
     public bool SortAscending { get; private set; } = true;
     public string? Product { get; set; }
@@ -48,7 +49,7 @@ public class ApplicationViewModel : BaseViewModel
     public event FolderAddedEventHandler FolderAdded;
     public event FolderRemovedEventHandler FolderRemoved;
 
-    public ApplicationViewModel(IApplication application, SortCriteriaEnum initialSortCriteria = SortCriteriaEnum.FileName) : base(application)
+    public ApplicationViewModel(IApplication application, SortCriteria initialSortCriteria = Enums.SortCriteria.FileName) : base(application)
     {
         cataloguedAssets = [];
         observableAssets = [];
@@ -59,7 +60,7 @@ public class ApplicationViewModel : BaseViewModel
         CurrentFolder = Application.GetInitialFolder();
     }
 
-    public AppModeEnum AppMode
+    public AppMode AppMode
     {
         get { return appMode; }
         private set
@@ -70,7 +71,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public SortCriteriaEnum SortCriteria
+    public SortCriteria SortCriteria
     {
         get { return sortCriteria; }
         private set
@@ -84,25 +85,25 @@ public class ApplicationViewModel : BaseViewModel
     {
         AppMode = AppMode switch
         {
-            AppModeEnum.Viewer => AppModeEnum.Thumbnails,
-            AppModeEnum.Thumbnails => AppModeEnum.Viewer,
+            AppMode.Viewer => AppMode.Thumbnails,
+            AppMode.Thumbnails => AppMode.Viewer,
             _ => AppMode
         };
     }
 
-    public void ChangeAppMode(AppModeEnum appMode)
+    public void ChangeAppMode(AppMode appMode)
     {
         AppMode = appMode;
     }
 
     public Visibility ThumbnailsVisible
     {
-        get { return AppMode == AppModeEnum.Thumbnails ? Visibility.Visible : Visibility.Hidden; }
+        get { return AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden; }
     }
 
     public Visibility ViewerVisible
     {
-        get { return AppMode == AppModeEnum.Viewer ? Visibility.Visible : Visibility.Hidden; }
+        get { return AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden; }
     }
 
     public int ViewerPosition
@@ -208,31 +209,31 @@ public class ApplicationViewModel : BaseViewModel
         {
             switch (SortCriteria)
             {
-                case SortCriteriaEnum.FileName:
+                case SortCriteria.FileName:
                     cataloguedAssets = SortAscending ?
                         cataloguedAssets.OrderBy(a => a.FileName).ToArray() :
                         cataloguedAssets.OrderByDescending(a => a.FileName).ToArray();
                     break;
 
-                case SortCriteriaEnum.ThumbnailCreationDateTime:
+                case SortCriteria.ThumbnailCreationDateTime:
                     cataloguedAssets = SortAscending ?
                         cataloguedAssets.OrderBy(a => a.ThumbnailCreationDateTime).ThenBy(a => a.FileName).ToArray() :
                         cataloguedAssets.OrderByDescending(a => a.ThumbnailCreationDateTime).ThenByDescending(a => a.FileName).ToArray();
                     break;
 
-                case SortCriteriaEnum.FileCreationDateTime:
+                case SortCriteria.FileCreationDateTime:
                     cataloguedAssets = SortAscending ?
                         cataloguedAssets.OrderBy(a => a.FileCreationDateTime).ThenBy(a => a.FileName).ToArray() :
                         cataloguedAssets.OrderByDescending(a => a.FileCreationDateTime).ThenByDescending(a => a.FileName).ToArray();
                     break;
 
-                case SortCriteriaEnum.FileModificationDateTime:
+                case SortCriteria.FileModificationDateTime:
                     cataloguedAssets = SortAscending ?
                         cataloguedAssets.OrderBy(a => a.FileModificationDateTime).ThenBy(a => a.FileName).ToArray() :
                         cataloguedAssets.OrderByDescending(a => a.FileModificationDateTime).ThenByDescending(a => a.FileName).ToArray();
                     break;
 
-                case SortCriteriaEnum.FileSize:
+                case SortCriteria.FileSize:
                     cataloguedAssets = SortAscending ?
                         cataloguedAssets.OrderBy(a => a.FileSize).ThenBy(a => a.FileName).ToArray() :
                         cataloguedAssets.OrderByDescending(a => a.FileSize).ThenByDescending(a => a.FileName).ToArray();
@@ -333,7 +334,7 @@ public class ApplicationViewModel : BaseViewModel
         string title = null;
         string sortCriteria = GetSortCriteriaDescription();
 
-        if (AppMode == AppModeEnum.Thumbnails)
+        if (AppMode == AppMode.Thumbnails)
         {
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
@@ -345,7 +346,7 @@ public class ApplicationViewModel : BaseViewModel
                 ObservableAssets?.Count,
                 sortCriteria);
         }
-        else if (AppMode == AppModeEnum.Viewer)
+        else if (AppMode == AppMode.Viewer)
         {
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
@@ -367,7 +368,7 @@ public class ApplicationViewModel : BaseViewModel
         GoToAsset(asset, AppMode);
     }
 
-    public void GoToAsset(Asset asset, AppModeEnum newAppMode)
+    public void GoToAsset(Asset asset, AppMode newAppMode)
     {
         Asset targetAsset = ObservableAssets.FirstOrDefault(f => f.FileName == asset.FileName);
 
@@ -417,7 +418,7 @@ public class ApplicationViewModel : BaseViewModel
 
         switch (e?.Reason)
         {
-            case ReasonEnum.AssetCreated:
+            case CatalogChangeReason.AssetCreated:
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
                     // // If the files list is empty or belongs to other directory
@@ -437,7 +438,7 @@ public class ApplicationViewModel : BaseViewModel
 
                 break;
 
-            case ReasonEnum.AssetUpdated:
+            case CatalogChangeReason.AssetUpdated:
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
                     // // If the files list is empty or belongs to other directory
@@ -457,7 +458,7 @@ public class ApplicationViewModel : BaseViewModel
 
                 break;
 
-            case ReasonEnum.AssetDeleted:
+            case CatalogChangeReason.AssetDeleted:
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
                     RemoveAssets([e.Asset]);
@@ -465,17 +466,17 @@ public class ApplicationViewModel : BaseViewModel
 
                 break;
 
-            case ReasonEnum.FolderCreated:
+            case CatalogChangeReason.FolderCreated:
                 AddFolder(e.Folder);
                 break;
 
-            case ReasonEnum.FolderDeleted:
+            case CatalogChangeReason.FolderDeleted:
                 RemoveFolder(e.Folder);
                 break;
         }
     }
 
-    public void SortAssetsByCriteria(SortCriteriaEnum sortCriteria)
+    public void SortAssetsByCriteria(SortCriteria sortCriteria)
     {
         previousSortCriteria = SortCriteria;
         SortCriteria = sortCriteria;
@@ -489,23 +490,23 @@ public class ApplicationViewModel : BaseViewModel
 
         switch (SortCriteria)
         {
-            case SortCriteriaEnum.FileName:
+            case SortCriteria.FileName:
                 result = "file name";
                 break;
 
-            case SortCriteriaEnum.FileSize:
+            case SortCriteria.FileSize:
                 result = "file size";
                 break;
 
-            case SortCriteriaEnum.FileCreationDateTime:
+            case SortCriteria.FileCreationDateTime:
                 result = "file creation";
                 break;
 
-            case SortCriteriaEnum.FileModificationDateTime:
+            case SortCriteria.FileModificationDateTime:
                 result = "file modification";
                 break;
 
-            case SortCriteriaEnum.ThumbnailCreationDateTime:
+            case SortCriteria.ThumbnailCreationDateTime:
                 result = "thumbnail creation";
                 break;
         }
