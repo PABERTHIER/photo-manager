@@ -610,6 +610,6 @@ public class AssetHashCalculatorServiceTests
             .MockGetValue(UserConfigurationKeys.USING_DHASH, usingDHash.ToString())
             .MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMd5Hash.ToString());
 
-        return new(configurationRootMock.Object);
+        return new (configurationRootMock.Object);
     }
 }

@@ -16,7 +16,7 @@ public class ObjectListStorageTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new (configurationRootMock.Object);
     }
 
     [SetUp]

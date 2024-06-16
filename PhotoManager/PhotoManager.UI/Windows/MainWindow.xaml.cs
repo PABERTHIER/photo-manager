@@ -262,9 +262,9 @@ public partial class MainWindow : Window
 
             if (duplicates.Count > 0)
             {
-                FindDuplicatedAssetsViewModel viewModel = new(_application);
+                FindDuplicatedAssetsViewModel viewModel = new (_application);
                 viewModel.SetDuplicates(duplicates);
-                DuplicatedAssetsWindow duplicatedAssetsWindow = new(viewModel) // DuplicatedAssetsWindow is FindDuplicatedAssetsWindow.xaml
+                DuplicatedAssetsWindow duplicatedAssetsWindow = new (viewModel) // DuplicatedAssetsWindow is FindDuplicatedAssetsWindow.xaml
                 {
                     MainWindowInstance = Current
                 };
@@ -285,8 +285,8 @@ public partial class MainWindow : Window
     {
         try
         {
-            SyncAssetsViewModel viewModel = new(_application);
-            SyncAssetsWindow syncAssetsWindow = new(viewModel);
+            SyncAssetsViewModel viewModel = new (_application);
+            SyncAssetsWindow syncAssetsWindow = new (viewModel);
             syncAssetsWindow.ShowDialog();
         }
         catch (Exception ex)

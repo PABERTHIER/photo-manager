@@ -16,7 +16,7 @@ public class DatabaseDeleteOldBackupsTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new (configurationRootMock.Object);
     }
 
     [SetUp]
@@ -50,7 +50,7 @@ public class DatabaseDeleteOldBackupsTests
         {
             _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
 
-            PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), _backupStorageMock.Object);
+            PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), _backupStorageMock.Object);
             database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,
@@ -94,7 +94,7 @@ public class DatabaseDeleteOldBackupsTests
         {
             _backupStorageMock!.Setup(x => x.GetBackupFilesPaths(It.IsAny<string>())).Returns(filesPath);
 
-            PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), _backupStorageMock.Object);
+            PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), _backupStorageMock.Object);
             database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,

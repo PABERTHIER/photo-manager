@@ -31,7 +31,7 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
         List<T> list = new();
         bool hasRecord;
 
-        using (StringReader reader = new(csv))
+        using (StringReader reader = new (csv))
         {
             string? line = reader.ReadLine();
 

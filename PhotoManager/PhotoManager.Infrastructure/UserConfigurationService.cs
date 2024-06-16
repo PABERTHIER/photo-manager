@@ -163,7 +163,7 @@ public class UserConfigurationService : IUserConfigurationService
 
         string? folderNameBlobs = _configuration.GetValue<string>(UserConfigurationKeys.BLOBS_FOLDER_NAME);
         string? folderNameTables = _configuration.GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME);
-        FoldersNameSettings foldersNameSettings = new(folderNameBlobs!, folderNameTables!);
+        FoldersNameSettings foldersNameSettings = new (folderNameBlobs!, folderNameTables!);
 
         char? separator = _configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR)?.ToCharArray().First();
         double storageVersion = _configuration.GetValue<double>(UserConfigurationKeys.STORAGE_VERSION);
@@ -172,7 +172,7 @@ public class UserConfigurationService : IUserConfigurationService
         string? foldersTableName = _configuration.GetValue<string>(UserConfigurationKeys.FOLDERS_TABLE_NAME);
         string? recentTargetPathsTableName = _configuration.GetValue<string>(UserConfigurationKeys.RECENT_TARGET_PATHS_TABLE_NAME);
         string? syncAssetsDirectoriesDefinitionsTableName = _configuration.GetValue<string>(UserConfigurationKeys.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME);
-        TablesSettings tablesSettings = new(assetsTableName!, foldersTableName!, recentTargetPathsTableName!, syncAssetsDirectoriesDefinitionsTableName!);
+        TablesSettings tablesSettings = new (assetsTableName!, foldersTableName!, recentTargetPathsTableName!, syncAssetsDirectoriesDefinitionsTableName!);
 
         ushort thumbnailsDictionaryEntriesToKeep = _configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
 

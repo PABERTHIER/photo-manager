@@ -32,9 +32,9 @@ public class AssetRepositoryContainsThumbnailTests
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+        _testableAssetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
 
         asset1 = new()
         {
@@ -216,7 +216,7 @@ public class AssetRepositoryContainsThumbnailTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
         TestableAssetRepository testableAssetRepository = new (_database!, _storageServiceMock!.Object, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = new();
