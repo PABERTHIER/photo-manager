@@ -32,7 +32,7 @@
 //         Mock<IApplication> mock = new();
 //         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
 
-//         SyncAssetsViewModel viewModel = new(mock.Object)
+//         SyncAssetsViewModel viewModel = new (mock.Object)
 //         {
 //             Definitions = definitions
 //         };
@@ -71,7 +71,7 @@
 //         Mock<IApplication> mock = new();
 //         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
 
-//         SyncAssetsViewModel viewModel = new(mock.Object)
+//         SyncAssetsViewModel viewModel = new (mock.Object)
 //         {
 //             Definitions = definitions
 //         };
@@ -101,7 +101,7 @@
 
 //         Mock<IApplication> mock = new();
 //         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
-//         SyncAssetsViewModel viewModel = new(mock.Object);
+//         SyncAssetsViewModel viewModel = new (mock.Object);
 
 //         viewModel.Step.Should().Be(ProcessStep.ViewDescription);
 //         viewModel.CanConfigure.Should().BeFalse();
@@ -163,7 +163,7 @@
 //         Mock<IApplication> mock = new();
 //         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
 
-//         SyncAssetsViewModel viewModel = new(mock.Object)
+//         SyncAssetsViewModel viewModel = new (mock.Object)
 //         {
 //             Definitions = definitions
 //         };
@@ -204,7 +204,7 @@
 //         Mock<IApplication> mock = new();
 //         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
 
-//         SyncAssetsViewModel viewModel = new(mock.Object)
+//         SyncAssetsViewModel viewModel = new (mock.Object)
 //         {
 //             Definitions = definitions
 //         };
@@ -226,7 +226,7 @@
 //         Mock<IApplication> mock = new();
 //         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
 
-//         SyncAssetsViewModel viewModel = new(mock.Object);
+//         SyncAssetsViewModel viewModel = new (mock.Object);
 
 //         viewModel.NotifyProcessStatusChanged(new ProcessStatusChangedCallbackEventArgs
 //         {

@@ -187,8 +187,8 @@ public class AssetRepositoryGetAssetsByPathTests
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
         storageService.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        TestableAssetRepository testableAssetRepository = new(_database!, storageService.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+        TestableAssetRepository testableAssetRepository = new (_database!, storageService.Object, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = new();
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -644,8 +644,8 @@ public class AssetRepositoryGetAssetsByPathTests
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
         storageService.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
 
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        TestableAssetRepository testableAssetRepository = new(_database!, storageService.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
+        TestableAssetRepository testableAssetRepository = new (_database!, storageService.Object, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = new();
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);

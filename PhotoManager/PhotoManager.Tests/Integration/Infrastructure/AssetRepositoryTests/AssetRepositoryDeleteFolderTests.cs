@@ -33,9 +33,9 @@ public class AssetRepositoryDeleteFolderTests
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _userConfigurationService = new (_configurationRootMock!.Object);
+        _testableAssetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
 
         asset1 = new()
         {

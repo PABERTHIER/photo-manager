@@ -30,8 +30,8 @@ public class AssetRepositoryFolderHasThumbnailsTests
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
         _assetRepository = new AssetRepository(_database, _storageServiceMock!.Object, userConfigurationService);
     }
 

@@ -167,7 +167,7 @@ public class AssetRepositoryLoadThumbnailTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
-        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
         TestableAssetRepository testableAssetRepository = new (_database!, _storageServiceMock!.Object, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = new();

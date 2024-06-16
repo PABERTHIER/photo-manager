@@ -452,7 +452,7 @@ public class AssetRepository : IAssetRepository
     {
         lock (syncLock)
         {
-            List<string> recentTargetPathsUpdated = new(recentTargetPaths);
+            List<string> recentTargetPathsUpdated = new (recentTargetPaths);
 
             if (recentTargetPathsUpdated.Contains(destinationFolder.Path))
             {

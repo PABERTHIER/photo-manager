@@ -36,10 +36,10 @@ public class MoveAssetsServiceTests
     public void Setup()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new(_configurationRootMock!.Object);
+        _userConfigurationService = new (_configurationRootMock!.Object);
         _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
         _storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
         _assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
         _moveAssetsService = new (_assetRepository, _storageService, _assetCreationService);
     }

@@ -33,8 +33,8 @@ public class AssetRepositoryGetAssetsCounterTests
     [SetUp]
     public void Setup()
     {
-        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
         _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
 
         _asset1 = new()

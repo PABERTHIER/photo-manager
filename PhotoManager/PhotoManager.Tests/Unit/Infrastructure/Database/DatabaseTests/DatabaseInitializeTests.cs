@@ -16,13 +16,13 @@ public class DatabaseInitializeTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new (configurationRootMock.Object);
     }
 
     [SetUp]
     public void Setup()
     {
-        _testableDatabase = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testableDatabase = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
     [Test]

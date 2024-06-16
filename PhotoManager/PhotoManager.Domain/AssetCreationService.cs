@@ -217,7 +217,7 @@ public class AssetCreationService(
         // directoryName comes from folder in assetRepository or CatalogExistingFolder that registers the folder if not in assetRepository
         Folder folder = assetRepository.GetFolderByPath(directoryName)!;
 
-        Asset asset = new ()
+        Asset asset = new()
         {
             FileName = Path.GetFileName(imagePath),
             FolderId = folder.FolderId,

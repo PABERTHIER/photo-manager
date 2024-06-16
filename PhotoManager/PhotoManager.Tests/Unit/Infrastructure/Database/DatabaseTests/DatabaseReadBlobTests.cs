@@ -18,13 +18,13 @@ public class DatabaseReadBlobTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new(configurationRootMock.Object);
+        _userConfigurationService = new (configurationRootMock.Object);
     }
 
     [SetUp]
     public void Setup()
     {
-        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
     [Test]
