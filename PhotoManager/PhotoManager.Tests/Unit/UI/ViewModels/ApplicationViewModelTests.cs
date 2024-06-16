@@ -159,7 +159,7 @@ public class ApplicationViewModelTests
             _applicationViewModel.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = statusMessage
             });
 
@@ -209,7 +209,7 @@ public class ApplicationViewModelTests
             _applicationViewModel.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = statusMessage
             });
 
@@ -259,7 +259,7 @@ public class ApplicationViewModelTests
             {
                 Asset = cataloguedAssets[4],
                 CataloguedAssetsByPath = cataloguedAssets,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = statusMessage
             });
 
@@ -297,7 +297,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
@@ -338,7 +338,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
@@ -385,14 +385,14 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = null,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
@@ -455,14 +455,14 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = null,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = newAsset,
-                Reason = ReasonEnum.AssetCreated,
+                Reason = CatalogChangeReason.AssetCreated,
                 Message = string.Empty
             });
 
@@ -507,7 +507,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
                 Asset = assets[2],
-                Reason = ReasonEnum.AssetDeleted,
+                Reason = CatalogChangeReason.AssetDeleted,
                 Message = statusMessage
             });
 

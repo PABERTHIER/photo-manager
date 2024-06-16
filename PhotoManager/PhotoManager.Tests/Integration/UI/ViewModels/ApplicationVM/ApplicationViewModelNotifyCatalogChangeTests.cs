@@ -11345,7 +11345,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.FolderInspectionInProgress, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.FolderInspectionInProgress, catalogChange.Reason);
         Assert.AreEqual($"Inspecting folder {assetsDirectory}.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11360,7 +11360,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.FolderInspectionCompleted, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.FolderInspectionCompleted, catalogChange.Reason);
         Assert.AreEqual($"Folder inspection for {assetsDirectory}, subfolders included, has been completed.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11378,7 +11378,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.FolderCreated, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.FolderCreated, catalogChange.Reason);
         Assert.AreEqual($"Folder {assetsDirectory} added to catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11395,7 +11395,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNotNull(catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.FolderDeleted, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.FolderDeleted, catalogChange.Reason);
         Assert.AreEqual($"Folder {assetsDirectory} deleted from catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11423,7 +11423,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange, cataloguedAssetsByPathCount);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.AssetCreated, catalogChange.Reason);
         Assert.AreEqual($"Image {expectedAsset.FullPath} added to catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11472,7 +11472,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.AreEqual(expectedAssets.Count, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
         Assert.IsTrue(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData != null));
-        Assert.AreEqual(ReasonEnum.AssetNotCreated, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.AssetNotCreated, catalogChange.Reason);
         Assert.AreEqual($"Image {expectedAssetPath} not added to catalog (corrupted).", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11503,7 +11503,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange, cataloguedAssetsByPathCount);
-        Assert.AreEqual(ReasonEnum.AssetUpdated, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.AssetUpdated, catalogChange.Reason);
         Assert.AreEqual($"Image {expectedAsset.FullPath} updated in catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11558,7 +11558,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.AreEqual(expectedAssets.Count, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathImageDataAssetDeleted(currentDirectory, catalogChange, cataloguedAssetsByPathCount);
-        Assert.AreEqual(ReasonEnum.AssetDeleted, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.AssetDeleted, catalogChange.Reason);
         Assert.AreEqual(expectedStatusMessage, catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11583,13 +11583,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     private void NotifyCatalogChangeBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
     {
-        ReasonEnum reason = string.Equals(expectedMessage, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE) ? ReasonEnum.BackupCreationStarted : ReasonEnum.BackupUpdateStarted;
+        CatalogChangeReason catalogChangeReason = string.Equals(expectedMessage, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE) ? CatalogChangeReason.BackupCreationStarted : CatalogChangeReason.BackupUpdateStarted;
 
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(reason, catalogChange.Reason);
+        Assert.AreEqual(catalogChangeReason, catalogChange.Reason);
         Assert.AreEqual(expectedMessage, catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11601,7 +11601,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.BackupCompleted, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.BackupCompleted, catalogChange.Reason);
         Assert.AreEqual("Backup completed successfully.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11616,7 +11616,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.NoBackupChangesDetected, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.NoBackupChangesDetected, catalogChange.Reason);
         Assert.AreEqual("No changes made to the backup.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11631,7 +11631,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.CatalogProcessEnded, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.CatalogProcessEnded, catalogChange.Reason);
         Assert.AreEqual("The catalog process has ended.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
 
@@ -11646,7 +11646,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(catalogChange.Asset);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.CatalogProcessFailed, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.CatalogProcessFailed, catalogChange.Reason);
         Assert.AreEqual("The catalog process has failed.", catalogChange.Message);
         Assert.IsNotNull(catalogChange.Exception);
         Assert.AreEqual(exceptionExpected.Message, catalogChange.Exception!.Message);

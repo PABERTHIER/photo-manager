@@ -418,7 +418,7 @@ public class ApplicationViewModel : BaseViewModel
 
         switch (e?.Reason)
         {
-            case ReasonEnum.AssetCreated:
+            case CatalogChangeReason.AssetCreated:
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
                     // // If the files list is empty or belongs to other directory
@@ -438,7 +438,7 @@ public class ApplicationViewModel : BaseViewModel
 
                 break;
 
-            case ReasonEnum.AssetUpdated:
+            case CatalogChangeReason.AssetUpdated:
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
                     // // If the files list is empty or belongs to other directory
@@ -458,7 +458,7 @@ public class ApplicationViewModel : BaseViewModel
 
                 break;
 
-            case ReasonEnum.AssetDeleted:
+            case CatalogChangeReason.AssetDeleted:
                 if (e?.Asset?.Folder?.Path == CurrentFolder)
                 {
                     RemoveAssets([e.Asset]);
@@ -466,11 +466,11 @@ public class ApplicationViewModel : BaseViewModel
 
                 break;
 
-            case ReasonEnum.FolderCreated:
+            case CatalogChangeReason.FolderCreated:
                 AddFolder(e.Folder);
                 break;
 
-            case ReasonEnum.FolderDeleted:
+            case CatalogChangeReason.FolderDeleted:
                 RemoveFolder(e.Folder);
                 break;
         }

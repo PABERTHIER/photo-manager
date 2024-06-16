@@ -1,6 +1,6 @@
 ﻿namespace PhotoManager.Domain;
 
-public enum ReasonEnum
+public enum CatalogChangeReason
 {
     AssetCreated,
     AssetNotCreated,

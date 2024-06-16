@@ -8542,7 +8542,7 @@ public class CatalogAssetsServiceTests
         DisposeAssertAssetPropertyValidityAndImageData(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
         Assert.IsNull(catalogChange.Folder);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(ReasonEnum.AssetCreated, catalogChange.Reason);
+        Assert.AreEqual(CatalogChangeReason.AssetCreated, catalogChange.Reason);
         Assert.AreEqual($"Image {expectedAsset.FullPath} added to catalog.", catalogChange.Message);
         Assert.IsNull(catalogChange.Exception);
         increment++;
