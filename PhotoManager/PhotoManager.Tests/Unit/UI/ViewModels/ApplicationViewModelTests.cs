@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using PhotoManager.UI.ViewModels.Enums;
+using System.Windows;
 
 namespace PhotoManager.Tests.Unit.UI.ViewModels;
 
@@ -71,13 +72,13 @@ public class ApplicationViewModelTests
 
         try
         {
-            Assert.AreEqual(AppModeEnum.Thumbnails, _applicationViewModel!.AppMode);
+            Assert.AreEqual(AppMode.Thumbnails, _applicationViewModel!.AppMode);
             _applicationViewModel!.ChangeAppMode();
-            Assert.AreEqual(AppModeEnum.Viewer, _applicationViewModel!.AppMode);
+            Assert.AreEqual(AppMode.Viewer, _applicationViewModel!.AppMode);
             _applicationViewModel!.ChangeAppMode();
-            Assert.AreEqual(AppModeEnum.Thumbnails, _applicationViewModel!.AppMode);
-            _applicationViewModel!.ChangeAppMode(AppModeEnum.Viewer);
-            Assert.AreEqual(AppModeEnum.Viewer, _applicationViewModel!.AppMode);
+            Assert.AreEqual(AppMode.Thumbnails, _applicationViewModel!.AppMode);
+            _applicationViewModel!.ChangeAppMode(AppMode.Viewer);
+            Assert.AreEqual(AppMode.Viewer, _applicationViewModel!.AppMode);
         }
         finally
         {
@@ -86,12 +87,12 @@ public class ApplicationViewModelTests
     }
 
     [Test]
-    [TestCase(AppModeEnum.Thumbnails, Visibility.Visible, false)]
-    [TestCase(AppModeEnum.Thumbnails, Visibility.Visible, true)]
-    [TestCase(AppModeEnum.Viewer, Visibility.Hidden, false)]
-    [TestCase(AppModeEnum.Viewer, Visibility.Hidden, true)]
+    [TestCase(AppMode.Thumbnails, Visibility.Visible, false)]
+    [TestCase(AppMode.Thumbnails, Visibility.Visible, true)]
+    [TestCase(AppMode.Viewer, Visibility.Hidden, false)]
+    [TestCase(AppMode.Viewer, Visibility.Hidden, true)]
     // TODO: Update the name
-    public void ThumbnailsVisible_ChangeAppMode_RefreshThumbnailsVisible(AppModeEnum appMode, Visibility visibilityExpected, bool analyseVideos)
+    public void ThumbnailsVisible_ChangeAppMode_RefreshThumbnailsVisible(AppMode appMode, Visibility visibilityExpected, bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 
@@ -108,12 +109,12 @@ public class ApplicationViewModelTests
     }
 
     [Test]
-    [TestCase(AppModeEnum.Viewer, Visibility.Visible, false)]
-    [TestCase(AppModeEnum.Viewer, Visibility.Visible, true)]
-    [TestCase(AppModeEnum.Thumbnails, Visibility.Hidden, false)]
-    [TestCase(AppModeEnum.Thumbnails, Visibility.Hidden, true)]
+    [TestCase(AppMode.Viewer, Visibility.Visible, false)]
+    [TestCase(AppMode.Viewer, Visibility.Visible, true)]
+    [TestCase(AppMode.Thumbnails, Visibility.Hidden, false)]
+    [TestCase(AppMode.Thumbnails, Visibility.Hidden, true)]
     // TODO: Update the name
-    public void ViewerVisible_ChangeAppMode_RefreshViewerVisible(AppModeEnum appMode, Visibility visibilityExpected, bool analyseVideos)
+    public void ViewerVisible_ChangeAppMode_RefreshViewerVisible(AppMode appMode, Visibility visibilityExpected, bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 
@@ -921,18 +922,18 @@ public class ApplicationViewModelTests
     }
 
     [Test]
-    [TestCase(AppModeEnum.Thumbnails, false)]
-    [TestCase(AppModeEnum.Thumbnails, true)]
-    [TestCase(AppModeEnum.Viewer, false)]
-    [TestCase(AppModeEnum.Viewer, true)]
+    [TestCase(AppMode.Thumbnails, false)]
+    [TestCase(AppMode.Thumbnails, true)]
+    [TestCase(AppMode.Viewer, false)]
+    [TestCase(AppMode.Viewer, true)]
     // TODO: Update the name
-    public void AppTitle_AppMode_ApplyAppTitleFormat(AppModeEnum appMode, bool analyseVideos)
+    public void AppTitle_AppMode_ApplyAppTitleFormat(AppMode appMode, bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string expectedTitle = appMode == AppModeEnum.Thumbnails
+            string expectedTitle = appMode == AppMode.Thumbnails
                 ? $"PhotoManager v1.0.0.0 - {_dataDirectory} - image 4 of 5 - sorted by file name ascending"
                 : $"PhotoManager v1.0.0.0 - {_dataDirectory} - Image 4.jpg - image 4 of 5 - sorted by file name ascending";
 

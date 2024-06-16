@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using PhotoManager.UI.ViewModels.Enums;
+using System.ComponentModel;
 using System.Windows;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
@@ -11279,7 +11280,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(_applicationViewModel!.Product);
         Assert.IsNull(_applicationViewModel!.Version);
         Assert.IsFalse(_applicationViewModel!.IsRefreshingFolders);
-        Assert.AreEqual(AppModeEnum.Thumbnails, _applicationViewModel!.AppMode);
+        Assert.AreEqual(AppMode.Thumbnails, _applicationViewModel!.AppMode);
         Assert.AreEqual(SortCriteriaEnum.FileName, _applicationViewModel!.SortCriteria);
         Assert.AreEqual(Visibility.Visible, _applicationViewModel!.ThumbnailsVisible);
         Assert.AreEqual(Visibility.Hidden, _applicationViewModel!.ViewerVisible);
@@ -11311,7 +11312,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(applicationViewModelInstance.Product);
         Assert.IsNull(applicationViewModelInstance.Version);
         Assert.IsFalse(applicationViewModelInstance.IsRefreshingFolders);
-        Assert.AreEqual(AppModeEnum.Thumbnails, applicationViewModelInstance.AppMode);
+        Assert.AreEqual(AppMode.Thumbnails, applicationViewModelInstance.AppMode);
         Assert.AreEqual(SortCriteriaEnum.FileName, applicationViewModelInstance.SortCriteria);
         Assert.AreEqual(Visibility.Visible, applicationViewModelInstance.ThumbnailsVisible);
         Assert.AreEqual(Visibility.Hidden, applicationViewModelInstance.ViewerVisible);

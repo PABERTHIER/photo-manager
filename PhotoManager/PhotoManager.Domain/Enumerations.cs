@@ -1,11 +1,5 @@
 ﻿namespace PhotoManager.Domain;
 
-public enum AppModeEnum
-{
-    Thumbnails,
-    Viewer
-}
-
 public enum ReasonEnum
 {
     AssetCreated,

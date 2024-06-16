@@ -3,6 +3,7 @@ using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
+using PhotoManager.UI.ViewModels.Enums;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -64,7 +65,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            ViewModel?.ChangeAppMode(AppModeEnum.Thumbnails);
+            ViewModel?.ChangeAppMode(AppMode.Thumbnails);
             thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolder);
             folderTreeView.SelectedPath = ViewModel?.CurrentFolder;
             await DoBackgroundWork();
@@ -133,7 +134,7 @@ public partial class MainWindow : Window
 
     private void ShowImage()
     {
-        if (ViewModel.AppMode == AppModeEnum.Viewer)
+        if (ViewModel.AppMode == AppMode.Viewer)
         {
             viewerUserControl.ShowImage();
         }
@@ -147,7 +148,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            ViewModel?.GoToAsset(e.Asset, AppModeEnum.Viewer);
+            ViewModel?.GoToAsset(e.Asset, AppMode.Viewer);
             ShowImage();
         }
         catch (Exception ex)
@@ -160,7 +161,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            ViewModel?.GoToAsset(e.Asset, AppModeEnum.Thumbnails);
+            ViewModel?.GoToAsset(e.Asset, AppMode.Thumbnails);
             ShowImage();
         }
         catch (Exception ex)
@@ -354,7 +355,7 @@ public partial class MainWindow : Window
                             {
                                 ViewModel.RemoveAssets(assets);
 
-                                if (ViewModel.AppMode == AppModeEnum.Viewer)
+                                if (ViewModel.AppMode == AppMode.Viewer)
                                 {
                                     viewerUserControl.ShowImage();
                                 }

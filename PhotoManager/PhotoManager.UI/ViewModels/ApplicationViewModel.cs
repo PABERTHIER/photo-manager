@@ -1,5 +1,6 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
+using PhotoManager.UI.ViewModels.Enums;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -26,7 +27,7 @@ public delegate void FolderRemovedEventHandler(object sender, FolderRemovedEvent
 
 public class ApplicationViewModel : BaseViewModel
 {
-    private AppModeEnum appMode;
+    private AppMode appMode;
     private int viewerPosition;
     private string currentFolder;
     private Asset[] cataloguedAssets; // TODO: ByPath
@@ -59,7 +60,7 @@ public class ApplicationViewModel : BaseViewModel
         CurrentFolder = Application.GetInitialFolder();
     }
 
-    public AppModeEnum AppMode
+    public AppMode AppMode
     {
         get { return appMode; }
         private set
@@ -84,25 +85,25 @@ public class ApplicationViewModel : BaseViewModel
     {
         AppMode = AppMode switch
         {
-            AppModeEnum.Viewer => AppModeEnum.Thumbnails,
-            AppModeEnum.Thumbnails => AppModeEnum.Viewer,
+            AppMode.Viewer => AppMode.Thumbnails,
+            AppMode.Thumbnails => AppMode.Viewer,
             _ => AppMode
         };
     }
 
-    public void ChangeAppMode(AppModeEnum appMode)
+    public void ChangeAppMode(AppMode appMode)
     {
         AppMode = appMode;
     }
 
     public Visibility ThumbnailsVisible
     {
-        get { return AppMode == AppModeEnum.Thumbnails ? Visibility.Visible : Visibility.Hidden; }
+        get { return AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden; }
     }
 
     public Visibility ViewerVisible
     {
-        get { return AppMode == AppModeEnum.Viewer ? Visibility.Visible : Visibility.Hidden; }
+        get { return AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden; }
     }
 
     public int ViewerPosition
@@ -333,7 +334,7 @@ public class ApplicationViewModel : BaseViewModel
         string title = null;
         string sortCriteria = GetSortCriteriaDescription();
 
-        if (AppMode == AppModeEnum.Thumbnails)
+        if (AppMode == AppMode.Thumbnails)
         {
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
@@ -345,7 +346,7 @@ public class ApplicationViewModel : BaseViewModel
                 ObservableAssets?.Count,
                 sortCriteria);
         }
-        else if (AppMode == AppModeEnum.Viewer)
+        else if (AppMode == AppMode.Viewer)
         {
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
@@ -367,7 +368,7 @@ public class ApplicationViewModel : BaseViewModel
         GoToAsset(asset, AppMode);
     }
 
-    public void GoToAsset(Asset asset, AppModeEnum newAppMode)
+    public void GoToAsset(Asset asset, AppMode newAppMode)
     {
         Asset targetAsset = ObservableAssets.FirstOrDefault(f => f.FileName == asset.FileName);
 

@@ -1,7 +1,7 @@
 ﻿using log4net;
-using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
+using PhotoManager.UI.ViewModels.Enums;
 using PhotoManager.UI.Windows;
 using System;
 using System.Reflection;
@@ -78,7 +78,7 @@ public partial class ViewerUserControl : UserControl
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel?.ChangeAppMode(AppModeEnum.Thumbnails);
+        ViewModel?.ChangeAppMode(AppMode.Thumbnails);
     }
 
     // Triggered when double clicked on the thumbnail image from ThumbnailsUserControl to pass into fullscreen mode
