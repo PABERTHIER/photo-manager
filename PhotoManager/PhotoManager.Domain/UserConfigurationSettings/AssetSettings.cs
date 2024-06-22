@@ -10,5 +10,5 @@ public record class AssetSettings(
     ushort DefaultExifOrientation,
     bool DetectThumbnails,
     bool SyncAssetsEveryXMinutes,
-    double ThumbnailMaxHeight,
-    double ThumbnailMaxWidth);
+    int ThumbnailMaxHeight,
+    int ThumbnailMaxWidth);

@@ -121,8 +121,8 @@ public class UserConfigurationService : IUserConfigurationService
         ushort defaultExifOrientation = _configuration.GetValue<ushort>(UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION);
         bool detectThumbnails = _configuration.GetValue<bool>(UserConfigurationKeys.DETECT_THUMBNAILS);
         bool syncAssetsEveryXMinutes = _configuration.GetValue<bool>(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES);
-        double thumbnailMaxHeight = _configuration.GetValue<double>(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT);
-        double thumbnailMaxWidth = _configuration.GetValue<double>(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH);
+        int thumbnailMaxHeight = _configuration.GetValue<int>(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT);
+        int thumbnailMaxWidth = _configuration.GetValue<int>(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH);
 
         AssetSettings = new (
             analyseVideos,

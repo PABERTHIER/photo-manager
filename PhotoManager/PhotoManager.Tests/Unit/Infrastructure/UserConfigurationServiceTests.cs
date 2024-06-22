@@ -115,7 +115,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void ThumbnailMaxHeight_CorrectValue_ReturnsThumbnailMaxHeightValue()
     {
-        double thumbnailMaxHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
+        int thumbnailMaxHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
         Assert.AreEqual(150, thumbnailMaxHeight);
     }
@@ -123,7 +123,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void ThumbnailMaxWidth_CorrectValue_ReturnsThumbnailMaxWidthValue()
     {
-        double thumbnailMaxWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
+        int thumbnailMaxWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
 
         Assert.AreEqual(200, thumbnailMaxWidth);
     }
