@@ -166,7 +166,7 @@ public class UserConfigurationService : IUserConfigurationService
         FoldersNameSettings foldersNameSettings = new (folderNameBlobs!, folderNameTables!);
 
         char? separator = _configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR)?.ToCharArray().First();
-        double storageVersion = _configuration.GetValue<double>(UserConfigurationKeys.STORAGE_VERSION);
+        string? storageVersion = _configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION);
 
         string? assetsTableName = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_TABLE_NAME);
         string? foldersTableName = _configuration.GetValue<string>(UserConfigurationKeys.FOLDERS_TABLE_NAME);
@@ -176,7 +176,7 @@ public class UserConfigurationService : IUserConfigurationService
 
         ushort thumbnailsDictionaryEntriesToKeep = _configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
 
-        StorageSettings = new (backupsToKeep, foldersNameSettings, (char)separator!, storageVersion, tablesSettings, thumbnailsDictionaryEntriesToKeep);
+        StorageSettings = new (backupsToKeep, foldersNameSettings, (char)separator!, storageVersion!, tablesSettings, thumbnailsDictionaryEntriesToKeep);
     }
 
     private string? GetProductVersion()

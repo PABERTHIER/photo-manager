@@ -265,10 +265,10 @@ public class UserConfigurationServiceTests
     [Test]
     public void StorageVersion_CorrectValue_ReturnsStorageVersionValue()
     {
-        double storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
+        string storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
 
         Assert.IsNotNull(storageVersion);
-        Assert.AreEqual(1.0, storageVersion);
+        Assert.AreEqual("1.0", storageVersion);
     }
 
     [Test]

@@ -25,7 +25,7 @@ public class ApplicationViewModelTests
         _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(_databasePath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
