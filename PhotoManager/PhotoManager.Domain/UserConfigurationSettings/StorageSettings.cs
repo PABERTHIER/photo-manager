@@ -4,7 +4,7 @@ public record class StorageSettings(
     ushort BackupsToKeep,
     FoldersNameSettings FoldersNameSettings,
     char Separator,
-    double StorageVersion,
+    string StorageVersion,
     TablesSettings TablesSettings,
     ushort ThumbnailsDictionaryEntriesToKeep);
 

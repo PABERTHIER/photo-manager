@@ -22,7 +22,7 @@ public class AssetCreationServiceTests
         _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(_databasePath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
 
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }

@@ -32,7 +32,7 @@ public class AssetRepositoryGetAssetsByPathTests
     public void Setup()
     {
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(backupPath!);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
         _storageServiceMock.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
 
@@ -183,7 +183,7 @@ public class AssetRepositoryGetAssetsByPathTests
     {
         BitmapImage? bitmapImage = null;
         Mock<IStorageService> storageService = new();
-        storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
+        storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(backupPath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
         storageService.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
 
@@ -640,7 +640,7 @@ public class AssetRepositoryGetAssetsByPathTests
     public void GetAssetsByPath_ExceptionThrown_ReturnsAssetsWithPartialData()
     {
         Mock<IStorageService> storageService = new();
-        storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<double>())).Returns(backupPath!);
+        storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(backupPath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
         storageService.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
 

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Globalization;
+using System.Text;
 
 namespace PhotoManager.Infrastructure;
 
@@ -19,9 +19,13 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
         return result;
     }
 
-    public string ResolveDataDirectory(double storageVersion)
+    public string ResolveDataDirectory(string storageVersion)
     {
-        return Path.Combine(userConfigurationService.PathSettings.BackupPath, "v" + storageVersion.ToString("0.0", CultureInfo.InvariantCulture));
+        StringBuilder currentStorageVersion = new();
+        currentStorageVersion.Append('v');
+        currentStorageVersion.Append(storageVersion);
+
+        return Path.Combine(userConfigurationService.PathSettings.BackupPath, currentStorageVersion.ToString());
     }
 
     public void CreateDirectory(string directory)

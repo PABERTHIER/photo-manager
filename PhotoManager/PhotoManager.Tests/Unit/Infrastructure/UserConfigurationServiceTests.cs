@@ -115,7 +115,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void ThumbnailMaxHeight_CorrectValue_ReturnsThumbnailMaxHeightValue()
     {
-        double thumbnailMaxHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
+        int thumbnailMaxHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
         Assert.AreEqual(150, thumbnailMaxHeight);
     }
@@ -123,7 +123,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void ThumbnailMaxWidth_CorrectValue_ReturnsThumbnailMaxWidthValue()
     {
-        double thumbnailMaxWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
+        int thumbnailMaxWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
 
         Assert.AreEqual(200, thumbnailMaxWidth);
     }
@@ -265,10 +265,10 @@ public class UserConfigurationServiceTests
     [Test]
     public void StorageVersion_CorrectValue_ReturnsStorageVersionValue()
     {
-        double storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
+        string storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
 
         Assert.IsNotNull(storageVersion);
-        Assert.AreEqual(1.0, storageVersion);
+        Assert.AreEqual("1.0", storageVersion);
     }
 
     [Test]

@@ -21,10 +21,10 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase(1.0, "v1.0")]
-    [TestCase(1.1, "v1.1")]
-    [TestCase(2.0, "v2.0")]
-    public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(double storageVersion, string storageVersionPath)
+    [TestCase("1.0", "v1.0")]
+    [TestCase("1.1", "v1.1")]
+    [TestCase("2.0", "v2.0")]
+    public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(string storageVersion, string storageVersionPath)
     {
         string expected = Path.Combine(_userConfigurationService!.PathSettings.BackupPath, storageVersionPath);
 

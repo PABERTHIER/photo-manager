@@ -4,7 +4,7 @@ public interface IStorageService
 {
     List<DirectoryInfo> GetSubDirectories(string directoryPath);
     List<DirectoryInfo> GetRecursiveSubDirectories(string directoryPath);
-    string ResolveDataDirectory(double storageVersion);
+    string ResolveDataDirectory(string storageVersion);
     void CreateDirectory(string directory);
     void DeleteFile(string directory, string fileName);
     string[] GetFileNames(string directory);
