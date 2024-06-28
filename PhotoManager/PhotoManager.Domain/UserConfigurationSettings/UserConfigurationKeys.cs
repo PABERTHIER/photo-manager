@@ -22,7 +22,6 @@ public static class UserConfigurationKeys
     public const string ASSETS_DIRECTORY = "appsettings:Paths:AssetsDirectory";
     public const string BACKUP_PATH = "appsettings:Paths:BackupPath";
     public const string EXEMPTED_FOLDER_PATH = "appsettings:Paths:ExemptedFolderPath";
-    public const string FFMPEG_PATH = "appsettings:Paths:FfmpegPath";
     public const string FIRST_FRAME_VIDEOS_FOLDER_NAME = "appsettings:Paths:FirstFrameVideosFolderName";
 
     public const string PROJECT_NAME = "appsettings:Project:Name";

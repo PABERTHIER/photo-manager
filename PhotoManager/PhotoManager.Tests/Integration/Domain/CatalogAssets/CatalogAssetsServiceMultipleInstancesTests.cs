@@ -218,7 +218,6 @@ public class CatalogAssetsServiceMultipleInstancesTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMD5Hash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
-        configurationRootMock.MockGetValue(UserConfigurationKeys.FFMPEG_PATH, Constants.FFMPEG_PATH);
 
         _userConfigurationService = new (configurationRootMock.Object);
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);

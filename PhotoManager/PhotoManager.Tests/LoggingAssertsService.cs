@@ -8,6 +8,7 @@ namespace PhotoManager.Tests;
 public class LoggingAssertsService
 {
     private MemoryAppender? _memoryAppender;
+
     public LoggingAssertsService()
     {
         LoggingAssertSetUp();
@@ -19,19 +20,42 @@ public class LoggingAssertsService
         BasicConfigurator.Configure(_memoryAppender);
     }
 
-    public void AssertLogs (Exception[] expectedExceptions, Type typeOfService)
+    public void AssertLogExceptions (Exception[] expectedExceptions, Type typeOfService)
     {
-        LoggingEvent[] logMessages = GetLoggingEvents();
+        LoggingEvent[] loggingEvents = GetLoggingEvents();
 
-        Assert.AreEqual(expectedExceptions.Length, logMessages.Length);
+        Assert.AreEqual(expectedExceptions.Length, loggingEvents.Length);
 
-        for (int i = 0; i < logMessages.Length; i++)
+        for (int i = 0; i < loggingEvents.Length; i++)
         {
-            Exception? logMessage = logMessages[i].MessageObject as Exception;
-            Assert.IsNotNull(logMessage);
-            Assert.AreEqual(expectedExceptions[i].GetType(), logMessage!.GetType());
-            Assert.AreEqual(expectedExceptions[i].Message, logMessage.Message);
-            Assert.AreEqual(typeOfService.ToString(), logMessages[i].LoggerName);
+            string? messageObject;
+
+            if (loggingEvents[i].MessageObject is Exception exception)
+            {
+                messageObject = exception.Message;
+            }
+            else
+            {
+                messageObject = loggingEvents[i].MessageObject as string;
+            }
+
+            AssertMessage(expectedExceptions[i].Message, messageObject);
+            
+            Assert.AreEqual(typeOfService.ToString(), loggingEvents[i].LoggerName);
+        }
+    }
+
+    public void AssertLogInfos (string[] expectedMessages, Type typeOfService)
+    {
+        LoggingEvent[] loggingEvents = GetLoggingEvents();
+
+        Assert.AreEqual(expectedMessages.Length, loggingEvents.Length);
+
+        for (int i = 0; i < loggingEvents.Length; i++)
+        {
+            string? messageObject = loggingEvents[i].MessageObject as string;
+            AssertMessage(expectedMessages[i], messageObject);
+            Assert.AreEqual(typeOfService.ToString(), loggingEvents[i].LoggerName);
         }
     }
 
@@ -46,5 +70,11 @@ public class LoggingAssertsService
         LoggingEvent[] logMessages = _memoryAppender?.GetEvents() ?? [];
 
         return logMessages;
+    }
+
+    private static void AssertMessage(string expectedMessage, string? message)
+    {
+        Assert.IsNotNull(message);
+        Assert.AreEqual(expectedMessage, message);
     }
 }

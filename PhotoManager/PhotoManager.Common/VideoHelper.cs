@@ -1,8 +1,12 @@
-﻿namespace PhotoManager.Common;
+﻿using FFMpegCore;
+using log4net;
+using System.Reflection;
+
+namespace PhotoManager.Common;
 
 public static class VideoHelper
 {
-    public static IProcessExecutor ProcessExecutor { get; set; } = new ProcessExecutor();
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
     //.3g2 - Mobile video
     //.3gp - Mobile video
@@ -23,26 +27,26 @@ public static class VideoHelper
     {
         return fileName.ToLowerInvariant() switch
         {
-            string s when s.EndsWith(".3g2") => true,
-            string s when s.EndsWith(".3gp") => true,
-            string s when s.EndsWith(".asf") => true,
-            string s when s.EndsWith(".av1") => true,
-            string s when s.EndsWith(".avi") => true,
-            string s when s.EndsWith(".flv") => true,
-            string s when s.EndsWith(".m4v") => true,
-            string s when s.EndsWith(".mkv") => true,
-            string s when s.EndsWith(".mov") => true,
-            string s when s.EndsWith(".mp4") => true,
-            string s when s.EndsWith(".mpeg") => true,
-            string s when s.EndsWith(".mpg") => true,
-            string s when s.EndsWith(".ogv") => true,
-            string s when s.EndsWith(".webm") => true,
-            string s when s.EndsWith(".wmv") => true,
+            { } s when s.EndsWith(".3g2") => true,
+            { } s when s.EndsWith(".3gp") => true,
+            { } s when s.EndsWith(".asf") => true,
+            { } s when s.EndsWith(".av1") => true,
+            { } s when s.EndsWith(".avi") => true,
+            { } s when s.EndsWith(".flv") => true,
+            { } s when s.EndsWith(".m4v") => true,
+            { } s when s.EndsWith(".mkv") => true,
+            { } s when s.EndsWith(".mov") => true,
+            { } s when s.EndsWith(".mp4") => true,
+            { } s when s.EndsWith(".mpeg") => true,
+            { } s when s.EndsWith(".mpg") => true,
+            { } s when s.EndsWith(".ogv") => true,
+            { } s when s.EndsWith(".webm") => true,
+            { } s when s.EndsWith(".wmv") => true,
             _ => false
         };
     }
 
-    public static string? GetFirstFramePath(string directoryName, string fileName, string destinationPath, string ffmpegPath)
+    public static string? GetFirstFramePath(string directoryName, string fileName, string destinationPath)
     {
         string videoPath = Path.Combine(directoryName, fileName);
 
@@ -55,25 +59,28 @@ public static class VideoHelper
         try
         {
             string firstFrameVideoPath = Path.Combine(destinationPath, firstFrameVideoName);
-            // Execute FFmpeg command to extract the first frame
-            string arguments = $"-i \"{videoPath}\" -ss 00:00:01 -vframes 1 \"{firstFrameVideoPath}\"";
-            ProcessExecutor.ExecuteFFmpegCommand(ffmpegPath, arguments);
 
-            // TODO: Remove this code when using dll -> getting if success or not instead
+            // Use FFMpegCore to extract the first frame
+            FFMpegArguments
+                .FromFileInput(videoPath)
+                .OutputToFile(firstFrameVideoPath, false, options => options
+                    .Seek(TimeSpan.FromSeconds(1))
+                    .WithFrameOutputCount(1))
+                .ProcessSynchronously();
+
             if (!File.Exists(firstFrameVideoPath))
             {
-                throw new FileNotFoundException("FFmpeg failed to generate the first frame.");
+                throw new FileFormatException("FFmpeg failed to generate the first frame file due to its format or content.");
             }
 
-            Console.WriteLine($"First frame extracted successfully for: {videoPath}");
-            Console.WriteLine($"First frame saved at: {firstFrameVideoPath}");
-            
+            Log.Info($"First frame extracted successfully for: {videoPath}");
+            Log.Info($"First frame saved at: {firstFrameVideoPath}");
+
             return firstFrameVideoPath;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to extract the first frame for: {videoPath}");
-            Console.WriteLine($"Error: {ex.Message}");
+            Log.Error($"Failed to extract the first frame for: {videoPath}, Message: {ex.Message}");
 
             return null;
         }
