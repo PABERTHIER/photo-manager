@@ -24,6 +24,8 @@ public class VideoHelperTests
 
         try
         {
+            Assert.IsFalse(File.Exists(expectedFirstFrameVideoPath));
+
             string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath);
 
             string[] messages = [
