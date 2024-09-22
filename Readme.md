@@ -29,7 +29,7 @@ Even the database is stored in your computer.**
 ## Upcoming :next_track_button:
 
 - 100% of code coverage.
-- Pipelines (once the dll of FFMPEG would have been generated).
+- Pipelines.
 - Progress bar.
 - Multithread.
 - Handling corrupted images and videos.
@@ -109,7 +109,6 @@ The lower the value of `PHashThreshold`, the more precise it is.
 - `AssetsDirectory = "the_directory\\to_your_pictures"`: The directory where your assets are, to analyse them.
 - `BackupPath = "the_directory\\to_your_local_database"`:  The directory where the database will be stored (The backup must be upper than the location to prevent bugs like "Process is already used" **WIP**).
 - `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the asset in this exempted path.
-- `FfmpegPath = "the_directory_to\\ffmpeg.exe"`: The path where your ffmpeg.exe is located **WIP** (Needed to be installed first, used if you set `AnalyseVideos` to true).
 - `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file (Used if you set `AnalyseVideos` to true), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
 
 **The `Project` part is about settings of project (there is no need to update it):** :building_construction:
@@ -188,4 +187,4 @@ Improvements **WIP**.
 - [log4net](https://logging.apache.org/log4net/)
 - [coverlet](https://github.com/coverlet-coverage/coverlet)
 - [ReportGenerator](https://github.com/danielpalme/ReportGenerator)
-- [FFMPEG](https://ffmpeg.org/)
+- [FFMpegCore](https://github.com/rosenbjerg/FFMpegCore)

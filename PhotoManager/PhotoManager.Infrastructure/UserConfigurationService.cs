@@ -147,12 +147,11 @@ public class UserConfigurationService : IUserConfigurationService
         string? assetsDirectory = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY);
         string? backupPath = _configuration.GetValue<string>(UserConfigurationKeys.BACKUP_PATH);
         string? exemptedFolderPath = _configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH);
-        string? ffmpegPath = _configuration.GetValue<string>(UserConfigurationKeys.FFMPEG_PATH);
         string? firstFrameVideosFolderName = _configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME);
 
         string firstFrameVideosPath = Path.Combine(assetsDirectory!, firstFrameVideosFolderName!);
 
-        PathSettings = new (assetsDirectory!, backupPath!, exemptedFolderPath!, ffmpegPath!, firstFrameVideosPath);
+        PathSettings = new (assetsDirectory!, backupPath!, exemptedFolderPath!, firstFrameVideosPath);
 
         string? projectName = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME);
         string? projectOwner = _configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER);

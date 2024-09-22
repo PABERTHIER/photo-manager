@@ -218,15 +218,6 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void FfmpegPath_CorrectValue_ReturnsFfmpegPathValue()
-    {
-        string ffmpegPath = _userConfigurationService!.PathSettings.FfmpegPath;
-
-        Assert.IsNotNull(ffmpegPath);
-        Assert.AreEqual("E:\\ffmpeg\\bin\\ffmpeg.exe", ffmpegPath);
-    }
-
-    [Test]
     public void FirstFrameVideosPath_CorrectValue_ReturnsFirstFrameVideosPathValue()
     {
         string assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;

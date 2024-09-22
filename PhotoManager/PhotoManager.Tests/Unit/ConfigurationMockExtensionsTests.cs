@@ -29,7 +29,6 @@ public class ConfigurationMockExtensionsTests
         Assert.AreEqual("C:\\Path", configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY));
         Assert.AreEqual("C:\\Path\\To\\Backup", configuration.GetValue<string>(UserConfigurationKeys.BACKUP_PATH));
         Assert.AreEqual("C:\\Path\\To\\FolderExempted", configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH));
-        Assert.AreEqual("C:\\Path\\To\\Ffmpeg.exe", configuration.GetValue<string>(UserConfigurationKeys.FFMPEG_PATH));
         Assert.AreEqual("OutputVideoFirstFrame", configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME));
         Assert.AreEqual("PhotoManager", configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME));
         Assert.AreEqual("Toto", configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER));

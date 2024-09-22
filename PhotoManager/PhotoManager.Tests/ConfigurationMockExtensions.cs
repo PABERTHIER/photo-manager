@@ -32,7 +32,6 @@ public static class ConfigurationMockExtensions
              .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "C:\\Path")
              .MockGetValue(UserConfigurationKeys.BACKUP_PATH, "C:\\Path\\To\\Backup")
              .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "C:\\Path\\To\\FolderExempted")
-             .MockGetValue(UserConfigurationKeys.FFMPEG_PATH, "C:\\Path\\To\\Ffmpeg.exe")
              .MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "OutputVideoFirstFrame")
              .MockGetValue(UserConfigurationKeys.PROJECT_NAME, "PhotoManager")
              .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, "Toto")

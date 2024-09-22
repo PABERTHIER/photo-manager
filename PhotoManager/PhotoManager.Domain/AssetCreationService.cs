@@ -17,11 +17,7 @@ public class AssetCreationService(
         if (isVideo && userConfigurationService.AssetSettings.AnalyseVideos)
         {
             // Create an asset from the video file
-            VideoHelper.GetFirstFramePath(
-                directoryName,
-                fileName,
-                userConfigurationService.PathSettings.FirstFrameVideosPath,
-                userConfigurationService.PathSettings.FfmpegPath);
+            VideoHelper.GetFirstFramePath(directoryName, fileName, userConfigurationService.PathSettings.FirstFrameVideosPath);
             // The video file is not in the same path than the asset created
             // The asset is null because the target is not the video but the asset created previously
             return null;

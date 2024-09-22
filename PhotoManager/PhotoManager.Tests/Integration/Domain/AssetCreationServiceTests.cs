@@ -38,7 +38,6 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMD5Hash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
-        configurationRootMock.MockGetValue(UserConfigurationKeys.FFMPEG_PATH, Constants.FFMPEG_PATH);
 
         _userConfigurationService = new (configurationRootMock.Object);
         _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
@@ -1262,7 +1261,7 @@ public class AssetCreationServiceTests
             Exception[] expectedExceptions = [fileNotFoundException];
             Type typeOfService = typeof(AssetCreationService);
 
-            loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
+            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
         }
         finally
         {
@@ -1305,7 +1304,7 @@ public class AssetCreationServiceTests
             Exception[] expectedExceptions = [fileNotFoundException];
             Type typeOfService = typeof(AssetCreationService);
 
-            loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
+            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
         }
         finally
         {
@@ -1377,7 +1376,7 @@ public class AssetCreationServiceTests
             Exception[] expectedExceptions = [fileNotFoundException];
             Type typeOfService = typeof(AssetCreationService);
 
-            loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
+            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
         }
         finally
         {
@@ -1419,7 +1418,7 @@ public class AssetCreationServiceTests
             Exception[] expectedExceptions = [fileNotFoundException];
             Type typeOfService = typeof(AssetCreationService);
 
-            loggingAssertsService.AssertLogs(expectedExceptions, typeOfService);
+            loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
         }
         finally
         {
@@ -1539,7 +1538,6 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, "false");
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "false");
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, "true");
-        configurationRootMock.MockGetValue(UserConfigurationKeys.FFMPEG_PATH, Constants.FFMPEG_PATH);
         configurationRootMock.MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "TempForVideo");
 
         _userConfigurationService = new (configurationRootMock.Object);
