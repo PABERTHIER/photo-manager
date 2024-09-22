@@ -12,6 +12,7 @@ using PhotoManager.UI.Windows;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 
 namespace PhotoManager.UI;
@@ -24,6 +25,7 @@ public partial class App : System.Windows.Application
 {
     private readonly ServiceProvider serviceProvider;
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private static readonly Mutex AppMutex = new (true, "PhotoManagerStartup");
     // TODO: Add a global exception handler.
 
     public App()
@@ -40,9 +42,10 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            if (!serviceProvider.GetService<IProcessService>()?.IsAlreadyRunning(Environment.ProcessId) ?? false)
+            if (AppMutex.WaitOne(TimeSpan.Zero, true))
             {
-                var mainWindow = serviceProvider.GetService<MainWindow>();
+                MainWindow? mainWindow = serviceProvider.GetService<MainWindow>();
+
                 if (mainWindow != null)
                 {
                     mainWindow.Show();
@@ -54,6 +57,7 @@ public partial class App : System.Windows.Application
             }
             else
             {
+                MessageBox.Show("The application is already running.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 Shutdown();
             }
         }
@@ -81,7 +85,6 @@ public partial class App : System.Windows.Application
         services.AddSingleton<IBackupStorage, BackupStorage>();
         services.AddSingleton<IDatabase, Database>();
         services.AddSingleton<IAssetsComparator, AssetsComparator>();
-        services.AddSingleton<IProcessService, ProcessService>();
         services.AddSingleton<IStorageService, StorageService>();
         services.AddSingleton<IAssetRepository, AssetRepository>();
         services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
