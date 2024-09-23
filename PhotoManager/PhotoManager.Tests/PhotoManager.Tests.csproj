@@ -323,7 +323,7 @@
   </Target> -->
 
   <!-- Apply the fixed date to the test files -->
-  <Target Name="SetFixedDate" AfterTargets="Build">
+  <Target Name="SetFixedDate" AfterTargets="PreBuildEvent">
     <SetFileDates Files="@(TestFiles)" Date="$(FixedDate)" />
   </Target>
 
