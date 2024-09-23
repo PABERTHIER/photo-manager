@@ -309,7 +309,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- TODO: Remove this ref -->
-    <ProjectReference Include="..\FileDateTask\FileDateTask.csproj" />
+    <!-- <ProjectReference Include="..\FileDateTask\FileDateTask.csproj" /> -->
     <ProjectReference Include="..\PhotoManager.UI\PhotoManager.UI.csproj" />
   </ItemGroup>
 
