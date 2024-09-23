@@ -12,9 +12,9 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <FixedDate>2024-06-07T00:00:00</FixedDate>
   </PropertyGroup>
-  <!-- <ItemGroup>
+  <ItemGroup>
     <TestFiles Include="TestFiles\**\*.*" />
-  </ItemGroup> -->
+  </ItemGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="TestFiles\Homer.gif" />
@@ -308,12 +308,14 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <!-- TODO: Remove this ref -->
     <ProjectReference Include="..\FileDateTask\FileDateTask.csproj" />
     <ProjectReference Include="..\PhotoManager.UI\PhotoManager.UI.csproj" />
   </ItemGroup>
 
   <!-- Reference the custom MSBuild task -->
-  <UsingTask TaskName="SetFileDates" AssemblyFile="bin\Debug\net8.0-windows\FileDateTask.dll" />
+  <!-- <UsingTask TaskName="SetFileDates" AssemblyFile="bin\Debug\net8.0-windows\FileDateTask.dll" /> -->
+  <UsingTask TaskName="SetFileDates" AssemblyFile="MSBuildTask\FileDateTask.dll" />
 
   <!-- Copy files to the output directory -->
   <!-- <Target Name="CopyTestFiles" AfterTargets="Build">
@@ -321,7 +323,7 @@
   </Target> -->
 
   <!-- Apply the fixed date to the test files -->
-  <Target Name="SetFixedDate" AfterTargets="CopyTestFiles">
+  <Target Name="SetFixedDate" AfterTargets="Build">
     <SetFileDates Files="@(TestFiles)" Date="$(FixedDate)" />
   </Target>
 
