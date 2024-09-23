@@ -1,0 +1,32 @@
+name: Build & Test
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Display .NET version
+        run: dotnet --info
+
+      - name: Restore dependencies
+        run: dotnet restore PhotoManager/PhotoManager.sln
+
+      - name: Build
+        run: dotnet build --no-restore PhotoManager/PhotoManager.sln
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal PhotoManager/PhotoManager.sln
