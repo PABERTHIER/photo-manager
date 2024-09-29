@@ -19,4 +19,23 @@
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.6.0" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
   </ItemGroup>
+
+  <!-- Reference the custom MSBuild task -->
+  <UsingTask TaskName="ExtractRarFile" AssemblyFile="MSBuildTask\FileExtractionTask.dll" />
+
+  <Target Name="ExtractFfmpegBinaries" AfterTargets="Build">
+    <!-- Define paths for the binaries and the .rar files -->
+    <PropertyGroup>
+      <FfmpegBinPath>$(MSBuildProjectDirectory)\Ffmpeg\Bin</FfmpegBinPath>
+      <FfmpegRarPath>$(MSBuildProjectDirectory)\Ffmpeg</FfmpegRarPath>
+      <FfmpegExePath>$(FfmpegBinPath)\ffmpeg.exe</FfmpegExePath>
+      <FfplayExePath>$(FfmpegBinPath)\ffplay.exe</FfplayExePath>
+      <FfprobeExePath>$(FfmpegBinPath)\ffprobe.exe</FfprobeExePath>
+    </PropertyGroup>
+
+    <!-- Check if the executables are missing, and if so, extract them -->
+    <ExtractRarFile Condition="!Exists('$(FfmpegExePath)')" RarFilePath="$(FfmpegRarPath)\ffmpeg.rar" DestinationFolder="$(FfmpegBinPath)" />
+    <ExtractRarFile Condition="!Exists('$(FfplayExePath)')" RarFilePath="$(FfmpegRarPath)\ffplay.rar" DestinationFolder="$(FfmpegBinPath)" />
+    <ExtractRarFile Condition="!Exists('$(FfprobeExePath)')" RarFilePath="$(FfmpegRarPath)\ffprobe.rar" DestinationFolder="$(FfmpegBinPath)" />
+  </Target>
 </Project>
