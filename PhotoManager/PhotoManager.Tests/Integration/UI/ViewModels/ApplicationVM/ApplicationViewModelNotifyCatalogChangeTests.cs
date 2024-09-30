@@ -211,14 +211,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
     }
 
-    [TearDown]
-    public void Cleanup()
-    {
-        _userConfigurationService = null;
-        _testableAssetRepository = null;
-        _applicationViewModel = null;
-    }
-
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();

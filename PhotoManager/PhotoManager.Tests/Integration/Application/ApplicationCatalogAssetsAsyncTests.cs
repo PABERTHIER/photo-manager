@@ -206,14 +206,6 @@ public class ApplicationCatalogAssetsAsyncTests
         };
     }
 
-    [TearDown]
-    public void Cleanup()
-    {
-        _userConfigurationService = null;
-        _testableAssetRepository = null;
-        _application = null;
-    }
-
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
