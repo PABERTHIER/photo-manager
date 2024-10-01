@@ -2952,12 +2952,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Issue in the CI, need to be fixed")] // TODO: Fix tests about OneCorruptedImageIsUpdated (failing in the CI only)
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"TempAssetsDirectory_{Guid.NewGuid()}"); // Issues in the CI to corrupt image if same directory for each case
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
