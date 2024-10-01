@@ -108,7 +108,7 @@ public class TotoTests
     [TestCase(true)]
     public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_SyncTheAssetsAndRemovesTheCorruptedImage(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"TempAssetsDirectory_{analyseVideos}");
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -368,8 +368,6 @@ public class TotoTests
             {
                 File.Delete(imagePath1ToCopyTemp);
             }
-
-            _asset2Temp = null;
         }
     }
 }
