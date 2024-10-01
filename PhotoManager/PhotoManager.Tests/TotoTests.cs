@@ -23,8 +23,8 @@ public class TotoTests
     private const int ASSET2_TEMP_IMAGE_BYTE_SIZE = 2097;
     private const int ASSET3_TEMP_IMAGE_BYTE_SIZE = 8594;
 
-    [OneTimeSetUp]
-    public void OneTimeSetup()
+    [SetUp]
+    public void Setup()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
@@ -37,11 +37,7 @@ public class TotoTests
 
         _blobStorage = new();
         _database = new (new ObjectListStorage(), _blobStorage, new BackupStorage());
-    }
 
-    [SetUp]
-    public void Setup()
-    {
         _asset2Temp = new()
         {
             FileName = "Image 1.jpg",
