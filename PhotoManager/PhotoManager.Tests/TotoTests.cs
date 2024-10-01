@@ -17,7 +17,8 @@ public class TotoTests
     private Database? _database;
     private Mock<IStorageService>? _storageServiceMock;
 
-    private Asset? _asset2Temp;
+    private Asset? _asset2TempFalse;
+    private Asset? _asset2TempTrue;
     private Asset? _asset3Temp;
 
     private const int ASSET2_TEMP_IMAGE_BYTE_SIZE = 2097;
@@ -38,7 +39,23 @@ public class TotoTests
         _blobStorage = new();
         _database = new (new ObjectListStorage(), _blobStorage, new BackupStorage());
 
-        _asset2Temp = new()
+        _asset2TempFalse = new()
+        {
+            FileName = "Image 1.jpg",
+            FileSize = 29857,
+            PixelHeight = 720,
+            PixelWidth = 1280,
+            ThumbnailPixelWidth = 200,
+            ThumbnailPixelHeight = 112,
+            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            ImageRotation = Rotation.Rotate0,
+            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            IsAssetCorrupted = false,
+            AssetCorruptedMessage = null,
+            IsAssetRotated = false,
+            AssetRotatedMessage = null
+        };
+        _asset2TempTrue = new()
         {
             FileName = "Image 1.jpg",
             FileSize = 29857,
@@ -122,7 +139,7 @@ public class TotoTests
             File.Copy(imagePath2, imagePath2ToCopy);
 
             List<string> assetPaths = [imagePath2ToCopy, imagePath1ToCopy];
-            List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
+            List<Asset> expectedAssets = [_asset3Temp!, _asset2TempFalse!];
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -163,8 +180,8 @@ public class TotoTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            _asset2Temp!.Folder = folder!;
-            _asset2Temp!.FolderId = folder!.FolderId;
+            _asset2TempFalse!.Folder = folder!;
+            _asset2TempFalse!.FolderId = folder!.FolderId;
             _asset3Temp!.Folder = folder;
             _asset3Temp!.FolderId = folder.FolderId;
 
@@ -185,7 +202,7 @@ public class TotoTests
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
+                { _asset2TempFalse!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
             };
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
@@ -243,7 +260,7 @@ public class TotoTests
 
             // Second sync
 
-            _asset2Temp.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
+            _asset2TempFalse.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
             File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
 
             // Corrupt image
@@ -258,7 +275,7 @@ public class TotoTests
 
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
-            expectedAssetsUpdated.Remove(_asset2Temp);
+            expectedAssetsUpdated.Remove(_asset2TempFalse);
 
             List<int> assetsImageByteSizeUpdated = [];
             assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
@@ -346,7 +363,7 @@ public class TotoTests
                 catalogChanges,
                 assetsDirectory,
                 folderToAssetsMappingUpdated[folder!],
-                _asset2Temp,
+                _asset2TempFalse,
                 folder!,
                 true,
                 ref increment);
@@ -389,7 +406,7 @@ public class TotoTests
             File.Copy(imagePath2, imagePath2ToCopy);
 
             List<string> assetPaths = [imagePath2ToCopy, imagePath1ToCopy];
-            List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
+            List<Asset> expectedAssets = [_asset3Temp!, _asset2TempTrue!];
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -430,8 +447,8 @@ public class TotoTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            _asset2Temp!.Folder = folder!;
-            _asset2Temp!.FolderId = folder!.FolderId;
+            _asset2TempTrue!.Folder = folder!;
+            _asset2TempTrue!.FolderId = folder!.FolderId;
             _asset3Temp!.Folder = folder;
             _asset3Temp!.FolderId = folder.FolderId;
 
@@ -452,7 +469,7 @@ public class TotoTests
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
+                { _asset2TempTrue!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
             };
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
@@ -510,7 +527,7 @@ public class TotoTests
 
             // Second sync
 
-            _asset2Temp.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
+            _asset2TempTrue.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
             File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
 
             // Corrupt image
@@ -525,7 +542,7 @@ public class TotoTests
 
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
-            expectedAssetsUpdated.Remove(_asset2Temp);
+            expectedAssetsUpdated.Remove(_asset2TempTrue);
 
             List<int> assetsImageByteSizeUpdated = [];
             assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
@@ -613,7 +630,7 @@ public class TotoTests
                 catalogChanges,
                 assetsDirectory,
                 folderToAssetsMappingUpdated[folder!],
-                _asset2Temp,
+                _asset2TempTrue,
                 folder!,
                 true,
                 ref increment);
