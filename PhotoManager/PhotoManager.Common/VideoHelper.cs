@@ -60,6 +60,11 @@ public static class VideoHelper
         {
             string firstFrameVideoPath = Path.Combine(destinationPath, firstFrameVideoName);
 
+            // Set the path to the extracted ffmpeg.exe, ffplay.exe, and ffprobe.exe files
+            string ffmpegBinPath = GetCommonProjectPath();
+
+            GlobalFFOptions.Configure(options => options.BinaryFolder = ffmpegBinPath);
+
             // Use FFMpegCore to extract the first frame
             FFMpegArguments
                 .FromFileInput(videoPath)
@@ -84,5 +89,41 @@ public static class VideoHelper
 
             return null;
         }
+    }
+
+    /// <summary>
+    /// Gets the path where are stored the Ffmpeg binaries, resolving correctly for both test and runtime contexts.
+    /// </summary>
+    /// <returns>The path to the Ffmpeg binaries.</returns>
+    private static string GetCommonProjectPath()
+    {
+        string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+        // Traverse up the directory structure until you find the "PhotoManager.Common" folder
+        string? commonProjectPath = FindProjectDirectory(baseDirectory, "PhotoManager.Common");
+
+        if (commonProjectPath == null)
+        {
+            throw new DirectoryNotFoundException("Could not find the PhotoManager.Common project directory.");
+        }
+
+        return Path.Combine(commonProjectPath, "Ffmpeg", "Bin");
+    }
+
+    private static string? FindProjectDirectory(string startPath, string projectFolderName)
+    {
+        DirectoryInfo? directoryInfo = new (startPath);
+
+        while (directoryInfo != null)
+        {
+            if (directoryInfo.GetDirectories(projectFolderName).Length > 0)
+            {
+                return Path.Combine(directoryInfo.FullName, projectFolderName);
+            }
+
+            directoryInfo = directoryInfo.Parent;
+        }
+
+        return null;
     }
 }

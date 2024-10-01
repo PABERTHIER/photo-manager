@@ -18,10 +18,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
-    private SyncAssetsService? _syncAssetsService;
-    private CatalogAssetsService? _catalogAssetsService;
-    private MoveAssetsService? _moveAssetsService;
-    private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
     private UserConfigurationService? _userConfigurationService;
     private BlobStorage? _blobStorage;
     private Database? _database;
@@ -234,11 +230,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
         AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        _catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        _moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
-        _syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, _moveAssetsService);
-        _findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
-        _application = new (_testableAssetRepository, _syncAssetsService, _catalogAssetsService, _moveAssetsService, _findDuplicatedAssetsService, _userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
+        _application = new (_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
         _applicationViewModel = new (_application);
     }
 
@@ -2960,7 +2956,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"TempAssetsDirectory_{Guid.NewGuid()}"); // Issues in the CI to corrupt image if same directory for each case
         string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
