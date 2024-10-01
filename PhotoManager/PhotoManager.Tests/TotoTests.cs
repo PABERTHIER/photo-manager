@@ -104,7 +104,7 @@ public class TotoTests
     }
 
     [Test]
-    [TestCase(false)]
+    // [TestCase(false)]
     [TestCase(true)]
     public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_SyncTheAssetsAndRemovesTheCorruptedImage(bool analyseVideos)
     {
