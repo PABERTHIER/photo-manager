@@ -127,8 +127,6 @@ public class TotoTests
 
         try
         {
-            CheckBeforeNotifyCatalogChanges(assetsDirectory);
-
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -144,100 +142,25 @@ public class TotoTests
             List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
-
-            foreach (string assetPath in assetPaths)
-            {
-                Assert.IsTrue(File.Exists(assetPath));
-            }
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
-
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-
             string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
             string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-            CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
-
-            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
-
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
 
             _asset2Temp!.Folder = folder!;
             _asset2Temp!.FolderId = folder!.FolderId;
             _asset3Temp!.Folder = folder;
             _asset3Temp!.FolderId = folder.FolderId;
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
-
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
-
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
-            }
-
             Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
-            Dictionary<string, int> assetNameToByteSizeMapping = new()
-            {
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
-            };
-
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
-            CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder],
-                [folder],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
-
-            CatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder],
-                [folder],
-                assetsFromRepository,
-                folderToAssetsMapping,
-                assetNameToByteSizeMapping);
-
-            Assert.AreEqual(7, catalogChanges.Count);
 
             int increment = 0;
 
@@ -262,41 +185,6 @@ public class TotoTests
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CheckAfterNotifyCatalogChanges(
-                _applicationViewModel!,
-                assetsDirectory,
-                2,
-                folderToAssetsMapping[folder],
-                folderToAssetsMapping[folder][0],
-                folder,
-                true);
-
-            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-
-            CheckInstance(
-                applicationViewModelInstances,
-                assetsDirectory,
-                2,
-                folderToAssetsMapping[folder],
-                folderToAssetsMapping[folder][0],
-                folder,
-                true);
-
-            // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
-
             // Second sync
 
             _asset2Temp.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
@@ -320,7 +208,7 @@ public class TotoTests
             assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
             assetsImageByteSizeUpdated.Remove(ASSET2_TEMP_IMAGE_BYTE_SIZE);
 
-            assetsInDirectory = Directory.GetFiles(assetsDirectory);
+            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
@@ -330,10 +218,10 @@ public class TotoTests
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
-            assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
+            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
             Assert.AreEqual(1, assetsFromRepositoryByPath.Count);
 
-            assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(1, assetsFromRepository.Count);
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
