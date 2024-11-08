@@ -30,4 +30,4 @@ jobs:
         run: dotnet build --no-restore PhotoManager/PhotoManager.sln
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal PhotoManager/PhotoManager.sln --filter "(FullyQualifiedName~ApplicationViewModelNotifyCatalogChangeTests)"
+        run: dotnet test --no-build --verbosity normal PhotoManager/PhotoManager.sln --filter "(FullyQualifiedName~TotoTests)"
