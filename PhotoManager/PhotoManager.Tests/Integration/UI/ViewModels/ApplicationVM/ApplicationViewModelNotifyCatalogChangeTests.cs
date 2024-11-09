@@ -3151,14 +3151,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Second sync
 
-            _asset2Temp.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
-            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
-
             // Corrupt image
             File.Copy(imagePath1ToCopy, imagePath1ToCopyTemp);
             ImageHelper.CreateInvalidImage(imagePath1ToCopyTemp, imagePath1ToCopy);
             File.Delete(imagePath1ToCopyTemp);
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
+
+            _asset2Temp.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
+            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
 
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
