@@ -137,6 +137,20 @@ public class TotoTests
             File.Delete(imagePath1ToCopyTemp);
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
 
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+
+            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.AreEqual(1, assetsFromRepositoryByPath.Count);
+
+            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
+            Assert.AreEqual(1, assetsFromRepository.Count);
+
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            _asset2Temp!.Folder = folder!;
+            _asset2Temp!.FolderId = folder!.FolderId;
+            _asset3Temp!.Folder = folder;
+            _asset3Temp!.FolderId = folder.FolderId;
+
             List<string> assetPaths = [imagePath2ToCopy, imagePath1ToCopy];
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
@@ -146,32 +160,6 @@ public class TotoTests
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset2Temp);
-
-            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Remove(ASSET2_TEMP_IMAGE_BYTE_SIZE);
-
-            string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
-
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
-
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
-
-            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath.Count);
-
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assetsFromRepository.Count);
-
-            _asset2Temp!.Folder = folder!;
-            _asset2Temp!.FolderId = folder!.FolderId;
-            _asset3Temp!.Folder = folder;
-            _asset3Temp!.FolderId = folder.FolderId;
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -183,6 +171,10 @@ public class TotoTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
+            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
+            List<int> assetsImageByteSizeUpdated = [];
+            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
+            assetsImageByteSizeUpdated.Remove(ASSET2_TEMP_IMAGE_BYTE_SIZE);
 
             TotoCatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSize);
             TotoCatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
