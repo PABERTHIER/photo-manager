@@ -109,8 +109,8 @@ public class TotoTests
 
             // Second sync
 
-            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
-            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
+            // _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
+            // File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
 
             // Corrupt image
             File.Copy(imagePath1ToCopy, imagePath1ToCopyTemp);
