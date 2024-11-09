@@ -2361,8 +2361,8 @@ public class ApplicationViewModelCatalogAssetsTests
     [TestCase(true)]
     public async Task CatalogAssets_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_SyncTheAssetsAndRemovesTheCorruptedImage(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"TempAssetsDirectory_{analyseVideos}"); // Issues in the CI to corrupt image if same directory for each case
-        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, $"Image 1_Temp_{analyseVideos}.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 

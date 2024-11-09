@@ -240,7 +240,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // ADD SECTION (Start) ------------------------------------------------------------------------------------------------
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExists_NotifiesChanges(bool analyseVideos)
@@ -440,7 +439,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExists_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -725,7 +723,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -984,7 +981,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
@@ -1170,7 +1166,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_NotifiesChangesButNotTheCorruptedImage(bool analyseVideos)
@@ -1370,7 +1365,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(true, 0)]
     [TestCase(true, 2)]
     [TestCase(true, 100)]
@@ -1492,7 +1486,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // UPDATE SECTION (Start) -------------------------------------------------------------------------------------------
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_NotifiesChanges(bool analyseVideos)
@@ -1859,7 +1852,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // TODO: It is not able to detect if a video has been updated
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -2270,7 +2262,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -2641,7 +2632,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
@@ -2966,8 +2956,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, $"TempAssetsDirectory_{analyseVideos}"); // Issues in the CI to corrupt image if same directory for each case
-        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, $"Image 1_Temp_{analyseVideos}.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -3307,7 +3297,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_NotifiesChanges(bool analyseVideos)
@@ -3677,7 +3666,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // DELETE SECTION (Start) -----------------------------------------------------------------------------------------
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_NotifiesChanges(bool analyseVideos)
@@ -4034,7 +4022,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -4447,7 +4434,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -4822,7 +4808,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_NotifiesChanges(bool analyseVideos)
@@ -5321,7 +5306,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
@@ -5644,7 +5628,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_NotifiesChanges(bool analyseVideos)
@@ -6332,7 +6315,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_NotifiesChanges(bool analyseVideos)
@@ -6733,7 +6715,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
@@ -7313,7 +7294,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // FULL SCENARIO SECTION (Start) --------------------------------------------------------------------------------
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -8072,7 +8052,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // TODO: Actually, video with same name are considered the same, need to evolve this
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -8812,7 +8791,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // TODO: Videos need to be in the same folder or at least in folder before the OutputFirstFrame (alphabetical order)
     [Test]
-    [Ignore("Temp ignore")]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_NotifiesChanges()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
@@ -9570,7 +9548,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // NO ASSET SECTION (Start) -----------------------------------------------------------------------------------
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(2)]
     [TestCase(100)]
     public async Task NotifyCatalogChange_NoAssetsAndRootCatalogFolderExists_NotifiesNoAssetChanges(int catalogBatchSize)
@@ -9694,7 +9671,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(2)]
     [TestCase(100)]
     public async Task NotifyCatalogChange_NoAssetsAndRootCatalogFolderDoesNotExist_NotifiesNoAssetChanges(int catalogBatchSize)
@@ -9814,7 +9790,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_RootCatalogFolderPointsToAFile_NotifiesNoAssetChanges(bool analyseVideos)
@@ -9936,7 +9911,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(0, true)]
     [TestCase(0, false)]
     [TestCase(2, true)]
@@ -10070,7 +10044,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     // BACKUP SECTION (Start) -----------------------------------------------------------------------------------
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_NotifiesChanges(bool analyseVideos)
@@ -10374,7 +10347,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_NotifiesChanges(bool analyseVideos)
@@ -10730,7 +10702,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_NotifiesChanges(bool analyseVideos)
@@ -11131,7 +11102,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [Test]
-    [Ignore("Temp ignore")]
     [TestCase(false)]
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsErrorAndNotifiesNoAssetChanges(bool analyseVideos)

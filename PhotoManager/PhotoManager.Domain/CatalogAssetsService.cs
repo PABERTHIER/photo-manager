@@ -336,10 +336,8 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
 
     private void CatalogUpdatedAssets(string directory, CatalogChangeCallback? callback, ref int cataloguedAssetsBatchCount, int batchSize, IEnumerable<string> updatedFileNames, CancellationToken? token = null)
     {
-        Console.WriteLine($"updatedFileNames count: {updatedFileNames.Count()}");
         foreach (string fileName in updatedFileNames)
         {
-            Console.WriteLine($"fileName: {fileName}");
             // TODO: Only batchSize has been tested, it has to wait the IsCancellationRequested rework to full test the condition
             if (cataloguedAssetsBatchCount >= batchSize || (token?.IsCancellationRequested ?? false))
             {
