@@ -6,7 +6,7 @@ public static class ImageHelper
     {
         // Copy the valid image to a new file
         File.Copy(validImagePath, invalidImagePath, overwrite: true);
-    
+
         bool isHeic = invalidImagePath.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
 
         // Open the new file in binary mode

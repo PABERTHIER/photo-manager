@@ -18,10 +18,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
-    private SyncAssetsService? _syncAssetsService;
-    private CatalogAssetsService? _catalogAssetsService;
-    private MoveAssetsService? _moveAssetsService;
-    private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
     private UserConfigurationService? _userConfigurationService;
     private BlobStorage? _blobStorage;
     private Database? _database;
@@ -234,11 +230,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
         AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        _catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        _moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
-        _syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, _moveAssetsService);
-        _findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
-        _application = new (_testableAssetRepository, _syncAssetsService, _catalogAssetsService, _moveAssetsService, _findDuplicatedAssetsService, _userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
+        _application = new (_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
         _applicationViewModel = new (_application);
     }
 
@@ -3145,14 +3141,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             // Second sync
 
-            _asset2Temp.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
-            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
-
             // Corrupt image
             File.Copy(imagePath1ToCopy, imagePath1ToCopyTemp);
             ImageHelper.CreateInvalidImage(imagePath1ToCopyTemp, imagePath1ToCopy);
             File.Delete(imagePath1ToCopyTemp);
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
+
+            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddMinutes(-10); // Because recreated with CreateInvalidImage() + minus 10 min to simulate update
+            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now);
 
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
