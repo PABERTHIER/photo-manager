@@ -109,14 +109,14 @@ public class TotoTests
 
             // Second sync
 
-            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddMinutes(-10); // Because recreated with CreateInvalidImage()
-            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now);
-
             // Corrupt image
             File.Copy(imagePath1ToCopy, imagePath1ToCopyTemp);
             ImageHelper.CreateInvalidImage(imagePath1ToCopyTemp, imagePath1ToCopy);
             File.Delete(imagePath1ToCopyTemp);
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
+
+            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddMinutes(-10); // Because recreated with CreateInvalidImage()
+            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges2 = [];
             await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges2.Add);
