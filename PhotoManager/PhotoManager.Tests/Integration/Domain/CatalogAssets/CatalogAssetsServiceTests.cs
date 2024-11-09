@@ -2502,8 +2502,8 @@ public class CatalogAssetsServiceTests
             File.Delete(imagePath1ToCopyTemp);
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
 
-            _asset2Temp.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
-            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
+            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddMinutes(-10); // Because recreated with CreateInvalidImage() + minus 10 min to simulate update
+            File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now);
 
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
