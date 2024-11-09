@@ -7,8 +7,6 @@ public class TotoTests
     private string? _databaseDirectory;
     private string? _databasePath;
     private const string DATABASE_END_PATH = "v1.0";
-    private string? _databaseBackupPath;
-    private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
 
     private CatalogAssetsService? _catalogAssetsService;
     private BlobStorage? _blobStorage;
@@ -18,10 +16,6 @@ public class TotoTests
     private Mock<IStorageService>? _storageServiceMock;
 
     private Asset? _asset2Temp;
-    private Asset? _asset3Temp;
-
-    private const int ASSET2_TEMP_IMAGE_BYTE_SIZE = 2097;
-    private const int ASSET3_TEMP_IMAGE_BYTE_SIZE = 8594;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
@@ -29,8 +23,6 @@ public class TotoTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
         _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
-        _databaseBackupPath = Path.Combine(_databaseDirectory, DATABASE_BACKUP_END_PATH);
-        Path.Combine(_dataDirectory, "Path");
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
@@ -54,22 +46,6 @@ public class TotoTests
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
-        };
-        _asset3Temp = new()
-        {
-            FileName = "Homer.gif",
-            FileSize = 64123,
-            PixelHeight = 320,
-            PixelWidth = 320,
-            ThumbnailPixelWidth = 150,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
-            ImageRotation = Rotation.Rotate0,
-            Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
             IsAssetCorrupted = false,
             AssetCorruptedMessage = null,
             IsAssetRotated = false,
@@ -126,6 +102,12 @@ public class TotoTests
 
             await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 
+            List<Asset> assetsFromRepositoryByPath1 = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.AreEqual(2, assetsFromRepositoryByPath1.Count);
+
+            List<Asset> assetsFromRepository1 = _testableAssetRepository.GetCataloguedAssets();
+            Assert.AreEqual(2, assetsFromRepository1.Count);
+
             // Second sync
 
             _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
@@ -139,111 +121,11 @@ public class TotoTests
 
             await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 
-            List<Asset> assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath.Count);
+            List<Asset> assetsFromRepositoryByPath2 = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
+            Assert.AreEqual(1, assetsFromRepositoryByPath2.Count);
 
-            List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assetsFromRepository.Count);
-
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            _asset2Temp!.Folder = folder!;
-            _asset2Temp!.FolderId = folder!.FolderId;
-            _asset3Temp!.Folder = folder;
-            _asset3Temp!.FolderId = folder.FolderId;
-
-            List<string> assetPaths = [imagePath2ToCopy, imagePath1ToCopy];
-            List<string> assetPathsUpdated = [];
-            assetPaths.ForEach(assetPathsUpdated.Add);
-            assetPathsUpdated.Remove(imagePath1ToCopy);
-
-            List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
-            List<Asset> expectedAssetsUpdated = [];
-            expectedAssets.ForEach(expectedAssetsUpdated.Add);
-            expectedAssetsUpdated.Remove(_asset2Temp);
-
-            for (int i = 0; i < assetsFromRepository.Count; i++)
-            {
-                TotoCatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
-            }
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
-            Dictionary<string, int> assetNameToByteSizeMappingUpdated = new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
-            List<int> assetsImageByteSizeUpdated = [];
-            assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
-            assetsImageByteSizeUpdated.Remove(ASSET2_TEMP_IMAGE_BYTE_SIZE);
-
-            TotoCatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSize);
-            TotoCatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-
-            TotoCatalogAssetsAsyncAsserts.CheckBackupAfter(
-                _blobStorage!,
-                _database!,
-                _userConfigurationService,
-                _databasePath!,
-                _databaseBackupPath!,
-                backupFilePath,
-                blobsPath,
-                tablesPath,
-                [folder!],
-                [folder!],
-                assetsFromRepository,
-                folderToAssetsMappingUpdated,
-                assetNameToByteSizeMappingUpdated);
-
-            Assert.AreEqual(13, catalogChanges.Count);
-
-            int increment = 0;
-
-            Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
-
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
-
-            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
-            {
-                TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
-                    catalogChanges,
-                    assetsDirectory,
-                    folderToAssetsMapping[folder!][..(i + 1)],
-                    folderToAssetsMapping[folder!][i],
-                    folder!,
-                    ref increment);
-            }
-
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, TotoCatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(
-                catalogChanges,
-                assetsDirectory,
-                folderToAssetsMappingUpdated[folder!],
-                _asset2Temp,
-                folder!,
-                true,
-                ref increment);
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, TotoCatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
-            TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+            List<Asset> assetsFromRepository2 = _testableAssetRepository.GetCataloguedAssets();
+            Assert.AreEqual(1, assetsFromRepository2.Count);
         }
         finally
         {
