@@ -116,40 +116,19 @@ public class TotoTests
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-
             string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
             string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
 
-            List<string> assetPaths = [imagePath2ToCopy, imagePath1ToCopy];
-            List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
-            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
-
-            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
-            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
-            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
-            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
-
-            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 
-            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-
-            _asset2Temp!.Folder = folder!;
-            _asset2Temp!.FolderId = folder!.FolderId;
-            _asset3Temp!.Folder = folder;
-            _asset3Temp!.FolderId = folder.FolderId;
-
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
-
             // Second sync
 
-            _asset2Temp.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
+            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now; // Because recreated with CreateInvalidImage()
             File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now.AddDays(10));
 
             // Corrupt image
@@ -158,14 +137,17 @@ public class TotoTests
             File.Delete(imagePath1ToCopyTemp);
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
 
+            List<string> assetPaths = [imagePath2ToCopy, imagePath1ToCopy];
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
             assetPathsUpdated.Remove(imagePath1ToCopy);
 
+            List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
             List<Asset> expectedAssetsUpdated = [];
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Remove(_asset2Temp);
 
+            List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
             List<int> assetsImageByteSizeUpdated = [];
             assetsImageByteSize.ForEach(assetsImageByteSizeUpdated.Add);
             assetsImageByteSizeUpdated.Remove(ASSET2_TEMP_IMAGE_BYTE_SIZE);
@@ -175,7 +157,7 @@ public class TotoTests
 
             await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
 
-            folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
@@ -186,6 +168,11 @@ public class TotoTests
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(1, assetsFromRepository.Count);
 
+            _asset2Temp!.Folder = folder!;
+            _asset2Temp!.FolderId = folder!.FolderId;
+            _asset3Temp!.Folder = folder;
+            _asset3Temp!.FolderId = folder.FolderId;
+
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 TotoCatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
@@ -193,6 +180,9 @@ public class TotoTests
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
+            string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
+            string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
 
             TotoCatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSize);
             TotoCatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -208,6 +198,8 @@ public class TotoTests
                 assetNameToByteSizeMappingUpdated);
 
             Assert.IsFalse(_testableAssetRepository.HasChanges());
+            string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
+            string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
 
             TotoCatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -231,6 +223,7 @@ public class TotoTests
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
             TotoCatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
 
             for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
             {
