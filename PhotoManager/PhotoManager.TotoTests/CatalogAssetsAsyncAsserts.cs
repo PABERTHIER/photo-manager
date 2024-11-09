@@ -2,7 +2,7 @@
 
 namespace PhotoManager.TotoTests;
 
-public static class CatalogAssetsAsyncAsserts
+public static class TotoCatalogAssetsAsyncAsserts
 {
     public const string CREATING_BACKUP_MESSAGE = "Creating catalog backup...";
     public const string UPDATING_BACKUP_MESSAGE = "Updating catalog backup...";
