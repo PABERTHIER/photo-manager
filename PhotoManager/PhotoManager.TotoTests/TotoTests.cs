@@ -98,9 +98,8 @@ public class TotoTests
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
 
-            List<CatalogChangeCallbackEventArgs> catalogChanges = [];
-
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            List<CatalogChangeCallbackEventArgs> catalogChanges1 = [];
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges1.Add);
 
             List<Asset> assetsFromRepositoryByPath1 = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
             Assert.AreEqual(2, assetsFromRepositoryByPath1.Count);
@@ -119,7 +118,8 @@ public class TotoTests
             File.Delete(imagePath1ToCopyTemp);
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
 
-            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges.Add);
+            List<CatalogChangeCallbackEventArgs> catalogChanges2 = [];
+            await _catalogAssetsService!.CatalogAssetsAsync(catalogChanges2.Add);
 
             List<Asset> assetsFromRepositoryByPath2 = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
             Assert.AreEqual(1, assetsFromRepositoryByPath2.Count);
