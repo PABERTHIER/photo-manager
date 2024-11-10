@@ -34,8 +34,8 @@
     </PropertyGroup>
 
     <!-- Check if the executables are missing, and if so, extract them -->
-    <ExtractRarFile Condition="!Exists('$(FfmpegExePath)')" RarFilePath="$(FfmpegRarPath)\ffmpeg.rar" DestinationFolder="$(FfmpegBinPath)" />
-    <ExtractRarFile Condition="!Exists('$(FfplayExePath)')" RarFilePath="$(FfmpegRarPath)\ffplay.rar" DestinationFolder="$(FfmpegBinPath)" />
-    <ExtractRarFile Condition="!Exists('$(FfprobeExePath)')" RarFilePath="$(FfmpegRarPath)\ffprobe.rar" DestinationFolder="$(FfmpegBinPath)" />
+    <ExtractRarFile Condition="!Exists('$(FfmpegExePath)')" RarFilePath="$(FfmpegRarPath)\ffmpeg.rar" DestinationPath="$(FfmpegBinPath)" />
+    <ExtractRarFile Condition="!Exists('$(FfplayExePath)')" RarFilePath="$(FfmpegRarPath)\ffplay.rar" DestinationPath="$(FfmpegBinPath)" />
+    <ExtractRarFile Condition="!Exists('$(FfprobeExePath)')" RarFilePath="$(FfmpegRarPath)\ffprobe.rar" DestinationPath="$(FfmpegBinPath)" />
   </Target>
 </Project>
