@@ -100,30 +100,22 @@ public static class VideoHelper
         string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
         // Traverse up the directory structure until you find the "PhotoManager.Common" folder
-        string? commonProjectPath = FindProjectDirectory(baseDirectory, "PhotoManager.Common");
-
-        if (commonProjectPath == null)
-        {
-            throw new DirectoryNotFoundException("Could not find the PhotoManager.Common project directory.");
-        }
+        string commonProjectPath = FindProjectDirectory(baseDirectory, "PhotoManager.Common");
 
         return Path.Combine(commonProjectPath, "Ffmpeg", "Bin");
     }
 
-    private static string? FindProjectDirectory(string startPath, string projectFolderName)
+    private static string FindProjectDirectory(string startPath, string projectFolderName)
     {
-        DirectoryInfo? directoryInfo = new (startPath);
+        DirectoryInfo directoryInfo = new (startPath);
 
-        while (directoryInfo != null)
+        // Traverse up the directory structure and return as soon as the project folder is found
+        while (directoryInfo.GetDirectories(projectFolderName).Length == 0)
         {
-            if (directoryInfo.GetDirectories(projectFolderName).Length > 0)
-            {
-                return Path.Combine(directoryInfo.FullName, projectFolderName);
-            }
-
-            directoryInfo = directoryInfo.Parent;
+            directoryInfo = directoryInfo.Parent!;
         }
 
-        return null;
+        // Since the project structure is fixed, we can assume this point will always find the directory
+        return Path.Combine(directoryInfo.FullName, projectFolderName);
     }
 }
