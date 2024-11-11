@@ -13,6 +13,9 @@
     <FixedDate>2024-06-07T00:00:00</FixedDate>
   </PropertyGroup>
   <ItemGroup>
+    <TestFiles Include="TestFiles\**\*.*" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="TestFiles\Homer.gif" />
     <None Remove="TestFiles\Homer.mp4" />
