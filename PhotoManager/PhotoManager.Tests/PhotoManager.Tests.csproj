@@ -10,7 +10,11 @@
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Product>PhotoManager</Product>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <FixedDate>2024-06-07T00:00:00</FixedDate>
   </PropertyGroup>
+  <ItemGroup>
+    <TestFiles Include="TestFiles\**\*.*" />
+  </ItemGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="TestFiles\Homer.gif" />
@@ -306,6 +310,15 @@
   <ItemGroup>
     <ProjectReference Include="..\PhotoManager.UI\PhotoManager.UI.csproj" />
   </ItemGroup>
+
+  <!-- Reference the custom MSBuild task -->
+  <UsingTask TaskName="SetFileDates" AssemblyFile="MSBuildTask\FileDateTask.dll" />
+
+  <!-- Apply the fixed date to the test files -->
+  <Target Name="SetFixedDate" AfterTargets="PreBuildEvent">
+    <SetFileDates Files="@(TestFiles)" Date="$(FixedDate)" />
+  </Target>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="rmdir /S /Q $(OutDir)TestFiles\ApplicationData\" />
   </Target>
