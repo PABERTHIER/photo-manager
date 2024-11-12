@@ -43,7 +43,7 @@ Even the database is stored in your computer.**
 Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-id).
 
 **Basic usage**: run the .exe file.
-**Advanced usage**: open the solution file `PhotoManager/PhotoManager.sln`, set `PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj` as the project to launch and run it.
+**Advanced usage**: open the solution file `PhotoManager\PhotoManager.sln`, set `PhotoManager\PhotoManager.UI\PhotoManager.UI.csproj` as the project to launch and run it.
 
 ## Installation instructions :man_teacher:
 
@@ -188,3 +188,29 @@ Improvements **WIP**.
 - [coverlet](https://github.com/coverlet-coverage/coverlet)
 - [ReportGenerator](https://github.com/danielpalme/ReportGenerator)
 - [FFMpegCore](https://github.com/rosenbjerg/FFMpegCore)
+
+## Transparency :handshake:
+
+This project has some versionned dll and rar files for its own good working.
+There are 3 rar files, located here: PhotoManager\PhotoManager.Common\Ffmpeg
+
+- **ffmpeg.rar**
+- **ffplay.rar**
+- **ffprobe.rar**
+
+They are used for the video duplicates detection feature and are here to ensure everyone has the same exact version (even for GitHub CI). That will prevent asset generation differences accross various versions.
+To add to that, without them, everyone who wants to use it will have to install on his own Ffmpeg and add the path to the .exe file to the env variables. With the rar file in the project, there is no need to do all of this (working only for Windows because these are .exe files in the end **WIP**).
+
+When the project is built for the first time, the three .exe files will be extracted from their rar file (in here: PhotoManager\PhotoManager.Common\Ffmpeg\Bin), done by the **FileExtractionTask.dll**.
+
+The FileExtractionTask.dll is located in here: PhotoManager\PhotoManager.Common\MSBuildTask
+Its goal is only to extract the content of a rar file.
+It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Common\PhotoManager.Common.csproj
+And this dll depends on **SharpCompress** library. To avoid the install of a nuGet just for that, it was better to just add the generated dll of that library.
+
+For the last dll, it is located here: PhotoManager\PhotoManager.Tests\MSBuildTask
+It is only used for the well working of the tests, accross each machine.
+The **FileDateTask.dll** is used to set a fixed date for every tests files used for integration testing.
+It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Tests\PhotoManager.Tests.csproj
+
+I've made a specific repo for the two customs dll, injected in the project: [photo-manager-tasks](https://github.com/PABERTHIER/photo-manager-tasks)
