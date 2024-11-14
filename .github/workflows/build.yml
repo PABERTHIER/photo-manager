@@ -12,22 +12,41 @@ jobs:
   build:
     runs-on: windows-latest
 
+    env:
+      PROJECT_NAME: PhotoManager/PhotoManager.sln
+      DOTNET_VERSION: 8.0.x
+
     steps:
+      # Checkout the code
       - uses: actions/checkout@v4
 
+      # Setup .NET SDK
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      # Cache NuGet packages for faster builds
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      # Display .NET version for confirmation
       - name: Display .NET version
         run: dotnet --info
 
+      # Restore dependencies
       - name: Restore dependencies
-        run: dotnet restore PhotoManager/PhotoManager.sln
+        run: dotnet restore ${{ env.PROJECT_NAME }}
 
+      # Build the project with Release configuration
       - name: Build
-        run: dotnet build --no-restore PhotoManager/PhotoManager.sln
+        run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
+      # Run tests with Release configuration
       - name: Test
-        run: dotnet test --no-build --verbosity normal PhotoManager/PhotoManager.sln
+        run: dotnet test --no-build --configuration Release --verbosity normal ${{ env.PROJECT_NAME }}
