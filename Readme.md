@@ -2,8 +2,8 @@
 
 ![PhotoManager](PhotoManager/Images/AppIcon.png)
 
-<!-- [![Test](https://github.com/PABERTHIER/photo-manager/actions/workflows/test.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/test.yml)
-[![Release](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml)
+[![Build & Test](https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml)
+<!-- [![Release](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml)
 [![CodeQL](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml) -->
 
 **I used this [repo](https://github.com/jpablodrexler/jp-photo-manager) as a base to shape my own PhotoManager with optimizations, new features, bugs fix...
@@ -29,7 +29,6 @@ Even the database is stored in your computer.**
 ## Upcoming :next_track_button:
 
 - 100% of code coverage.
-- Pipelines.
 - Progress bar.
 - Multithread.
 - Handling corrupted images and videos.

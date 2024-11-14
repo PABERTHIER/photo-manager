@@ -1,4 +1,4 @@
-name: Build & Test
+name: Continuous Integration
 
 on:
   push:
@@ -9,7 +9,8 @@ on:
       - '*'
 
 jobs:
-  build:
+  build-windows:
+    name: Windows Build
     runs-on: windows-latest
 
     env:
@@ -18,16 +19,17 @@ jobs:
 
     steps:
       # Checkout the code
-      - uses: actions/checkout@v4
+      - name: ⤵️ Checkout Source
+        uses: actions/checkout@v4
 
       # Setup .NET SDK
-      - name: Setup .NET SDK
+      - name: 🛠️ Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       # Cache NuGet packages for faster builds
-      - name: Cache NuGet packages
+      - name: 💾 Cache NuGet packages
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
@@ -36,7 +38,7 @@ jobs:
             nuget-${{ runner.os }}-
 
       # Display .NET version for confirmation
-      - name: Display .NET version
+      - name: 🖥️ Display .NET version
         run: dotnet --info
 
       # Restore dependencies
@@ -44,9 +46,23 @@ jobs:
         run: dotnet restore ${{ env.PROJECT_NAME }}
 
       # Build the project with Release configuration
-      - name: Build
+      - name: 🔨 Build
         run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
       # Run tests with Release configuration
-      - name: Test
+      - name: 🔨 Test
         run: dotnet test --no-build --configuration Release --verbosity normal ${{ env.PROJECT_NAME }}
+
+      - name: 💾 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Package
+          path: package
+
+      - name: 💾 Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test results (Windows)
+          path: test-results
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
