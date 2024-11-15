@@ -1,0 +1,59 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build-windows:
+    name: Windows Build
+    runs-on: windows-latest
+
+    env:
+      PROJECT_NAME: PhotoManager/PhotoManager.sln
+      DOTNET_VERSION: 8.0.x
+
+    steps:
+      # Step 1: Checkout the code
+      - name: ⤵️ Checkout Source
+        uses: actions/checkout@v4
+
+      # Step 2: Setup .NET SDK
+      - name: 🛠️ Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Step 3: Cache NuGet packages for faster builds
+      - name: 💾 Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      # Step 4: Display .NET version for confirmation
+      - name: 🖥️ Display .NET version
+        run: dotnet --info
+
+      # Step 5: Restore dependencies
+      - name: 🛠️ Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_NAME }}
+
+      # Step 6: Build the project with Release configuration
+      - name: 🔨 Build
+        run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
+
+      # Step 7: Run tests with Release configuration
+      - name: 🔨 Test
+        run: dotnet test --no-build --configuration Release --verbosity normal ${{ env.PROJECT_NAME }}
+
+      # TODO: Fix the current errors to use it
+      # Step 8: Run linting process
+      # - name: 🔨 Lint
+      #   run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
