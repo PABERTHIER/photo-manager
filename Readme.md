@@ -3,7 +3,7 @@
 ![PhotoManager](PhotoManager/Images/AppIcon.png)
 
 [![Build & Test](https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml)
-<!-- [![Release](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml) -->
+[![Release](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yaml)
 [![CodeQL](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml)
 
 **I used this [repo](https://github.com/jpablodrexler/jp-photo-manager) as a base to shape my own PhotoManager with optimizations, new features, bugs fix...

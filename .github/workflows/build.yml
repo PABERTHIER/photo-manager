@@ -18,17 +18,17 @@ jobs:
       DOTNET_VERSION: 8.0.x
 
     steps:
-      # Checkout the code
+      # Step 1: Checkout the code
       - name: ⤵️ Checkout Source
         uses: actions/checkout@v4
 
-      # Setup .NET SDK
+      # Step 2: Setup .NET SDK
       - name: 🛠️ Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      # Cache NuGet packages for faster builds
+      # Step 3: Cache NuGet packages for faster builds
       - name: 💾 Cache NuGet packages
         uses: actions/cache@v4
         with:
@@ -37,22 +37,23 @@ jobs:
           restore-keys: |
             nuget-${{ runner.os }}-
 
-      # Display .NET version for confirmation
+      # Step 4: Display .NET version for confirmation
       - name: 🖥️ Display .NET version
         run: dotnet --info
 
-      # Restore dependencies
+      # Step 5: Restore dependencies
       - name: 🛠️ Restore dependencies
         run: dotnet restore ${{ env.PROJECT_NAME }}
 
-      # Build the project with Release configuration
+      # Step 6: Build the project with Release configuration
       - name: 🔨 Build
         run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
-      # Run tests with Release configuration
+      # Step 7: Run tests with Release configuration
       - name: 🔨 Test
         run: dotnet test --no-build --configuration Release --verbosity normal ${{ env.PROJECT_NAME }}
 
       # TODO: Fix the current errors to use it
+      # Step 8: Run linting process
       # - name: 🔨 Lint
       #   run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
