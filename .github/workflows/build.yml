@@ -45,26 +45,10 @@ jobs:
       - name: 🛠️ Restore dependencies
         run: dotnet restore ${{ env.PROJECT_NAME }}
 
-      # Build the project with Release configuration and output results to 'package' folder
+      # Build the project with Release configuration
       - name: 🔨 Build
-        run: dotnet build --no-restore --configuration Release --output package ${{ env.PROJECT_NAME }}
+        run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
-      # Run tests with Release configuration and output results to 'test-results' folder
+      # Run tests with Release configuration
       - name: 🔨 Test
-        run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test-results/test-results.trx" ${{ env.PROJECT_NAME }}
-
-      # Upload build artifacts
-      - name: 💾 Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Package
-          path: package
-
-      # Upload test results
-      - name: 💾 Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: Test results (Windows)
-          path: test-results
-        # Use always() to always run this step to publish test results when there are test failures
-        if: ${{ always() }}
+        run: dotnet test --no-build --configuration Release --verbosity normal ${{ env.PROJECT_NAME }}
