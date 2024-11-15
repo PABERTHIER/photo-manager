@@ -52,3 +52,6 @@ jobs:
       # Run tests with Release configuration
       - name: 🔨 Test
         run: dotnet test --no-build --configuration Release --verbosity normal ${{ env.PROJECT_NAME }}
+
+      - name: 🔨 Lint
+        run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
