@@ -49,25 +49,25 @@ jobs:
       - name: 🔨 Build
         run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
-      # Step 7: Run tests and generate code coverage report
-      - name: 🔨 Test with Coverage
-        run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ApplicationViewModelNotifyCatalogChangeTests)"
+      # TODO: Fix the current errors to use it
+      # Step 7: Run linting process
+      # - name: 🔨 Lint
+      #   run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
 
-      # Step 8: List Test Results Directory
+      # Step 8: Run tests and generate code coverage report
+      - name: 🔨 Test with Coverage
+        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }}
+
+      # Step 9: List Test Results Directory
       - name: 📂 List Test Results Directory
         run: ls PhotoManager/PhotoManager.Tests/TestResults
 
-      # Step 9: Upload Coverage XML as Artifact
+      # Step 10: Upload Coverage XML as Artifact
       - name: 📂 Upload Coverage XML as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: PhotoManager/PhotoManager.Tests/TestResults/*/coverage.cobertura.xml
-
-      # TODO: Fix the current errors to use it + update location when clean up
-      # Step 10: Run linting process
-      # - name: 🔨 Lint
-      #   run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
 
       # Step 11: Upload test results as an artifact
       - name: 📂 Upload Test Results as Artifact
