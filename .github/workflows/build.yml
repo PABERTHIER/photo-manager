@@ -51,7 +51,7 @@ jobs:
 
       # Step 7: Run tests with Release configuration and generate code coverage report
       - name: 🔨 Test with Coverage
-        run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" ${{ env.PROJECT_NAME }}
+        run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./PhotoManager/PhotoManager.Tests/TestResults/ ${{ env.PROJECT_NAME }}
 
       # Step 8: List Test Results Directory
       - name: 📂 List Test Results Directory
