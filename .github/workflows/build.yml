@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: PhotoManager.Tests/TestResults/**/coverage.cobertura.xml
+          path: PhotoManager/PhotoManager.Tests/TestResults/**/coverage.cobertura.xml
 
       # TODO: Fix the current errors to use it
       # Step 10: Run linting process
