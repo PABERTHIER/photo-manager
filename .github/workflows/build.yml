@@ -53,20 +53,29 @@ jobs:
       - name: 🔨 Test with Coverage
         run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" ${{ env.PROJECT_NAME }}
 
+      # Step 8: List Test Results Directory
       - name: 📂 List Test Results Directory
         run: ls PhotoManager/PhotoManager.Tests/TestResults
 
+      # Step 9: Upload Coverage XML as Artifact
+      - name: 📂 Upload Coverage XML as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: PhotoManager.Tests/TestResults/**/coverage.cobertura.xml
+
       # TODO: Fix the current errors to use it
-      # Step 8: Run linting process
+      # Step 10: Run linting process
       # - name: 🔨 Lint
       #   run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
 
-      # Step 9: Upload coverage to Codecov
+      # Step 11: Upload coverage to Codecov
       - name: ☁️ Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: PhotoManager/PhotoManager.Tests/TestResults
           name: codecov-windows-latest
+          verbose: true
           fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
