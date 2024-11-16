@@ -49,9 +49,9 @@ jobs:
       - name: 🔨 Build
         run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
-      # Step 7: Run tests with Release configuration and generate code coverage report
+      # Step 7: Run tests and generate code coverage report
       - name: 🔨 Test with Coverage
-        run: dotnet test --configuration Release --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ApplicationViewModelNotifyCatalogChangeTests)"
+        run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ApplicationViewModelNotifyCatalogChangeTests)"
 
       # Step 8: List Test Results Directory
       - name: 📂 List Test Results Directory
