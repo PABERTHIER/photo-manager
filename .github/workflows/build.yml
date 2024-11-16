@@ -51,10 +51,9 @@ jobs:
 
       # Step 7: Run tests with Release configuration and generate code coverage report
       - name: 🔨 Test with Coverage
-        run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./PhotoManager/PhotoManager.Tests/TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ApplicationViewModelCatalogAssetsTests)"
-        # TODO: Remove the filter !!
+        run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./PhotoManager/PhotoManager.Tests/TestResults/coverage.cobertura.xml --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ApplicationViewModelNotifyCatalogChangeTests)"
 
-      # Step 8: List Test Results Directory
+      # Step 8: List the contents of the Test Results directory to confirm output
       - name: 📂 List Test Results Directory
         run: ls PhotoManager/PhotoManager.Tests/TestResults
 
@@ -63,19 +62,25 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          # path: PhotoManager/PhotoManager.Tests/TestResults/**/coverage.cobertura.xml
-          path: PhotoManager/PhotoManager.Tests/TestResults
+          path: PhotoManager/PhotoManager.Tests/TestResults/coverage.cobertura.xml
 
-      # TODO: Fix the current errors to use it
+      # TODO: Fix the current errors to use it + update location
       # Step 10: Run linting process
       # - name: 🔨 Lint
       #   run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
 
-      # Step 11: Upload coverage to Codecov
+      # Step 11: Upload test results as an artifact
+      - name: 📂 Upload Test Results as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: PhotoManager/PhotoManager.Tests/TestResults/test-results.trx
+
+      # Step 12: Upload coverage report to Codecov
       - name: ☁️ Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          directory: PhotoManager/PhotoManager.Tests/TestResults
+          files: PhotoManager/PhotoManager.Tests/TestResults/coverage.cobertura.xml
           name: codecov-windows-latest
           verbose: true
           fail_ci_if_error: true
