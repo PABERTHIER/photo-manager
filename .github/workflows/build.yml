@@ -63,8 +63,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           directory: PhotoManager/PhotoManager.Tests/TestResults
-          files: ./TestResults/**/coverage.cobertura.xml
-          flags: unittests
           name: codecov-windows-latest
           fail_ci_if_error: true
         env:
