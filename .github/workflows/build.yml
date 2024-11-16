@@ -51,22 +51,19 @@ jobs:
 
       # Step 7: Run tests with Release configuration and generate code coverage report
       - name: 🔨 Test with Coverage
-        run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./PhotoManager/PhotoManager.Tests/TestResults/coverage/coverage.cobertura.xml --logger "trx;LogFileName=./PhotoManager/PhotoManager.Tests/TestResults/test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ApplicationViewModelNotifyCatalogChangeTests)"
+        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ApplicationViewModelNotifyCatalogChangeTests)"
 
-      # Step 8: List the contents of the Test Results directory to confirm output
+      # Step 8: List Test Results Directory
       - name: 📂 List Test Results Directory
         run: ls PhotoManager/PhotoManager.Tests/TestResults
-
-      # Step 8-bis: List the contents of the Test Results directory to confirm output
-      - name: 📂 List Test Results/coverage Directory
-        run: ls PhotoManager/PhotoManager.Tests/TestResults/coverage
 
       # Step 9: Upload Coverage XML as Artifact
       - name: 📂 Upload Coverage XML as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: PhotoManager/PhotoManager.Tests/TestResults/coverage/coverage.cobertura.xml
+          # path: PhotoManager/PhotoManager.Tests/TestResults/**/coverage.cobertura.xml
+          path: PhotoManager/PhotoManager.Tests/TestResults
 
       # TODO: Fix the current errors to use it + update location
       # Step 10: Run linting process
@@ -84,7 +81,7 @@ jobs:
       - name: ☁️ Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: PhotoManager/PhotoManager.Tests/TestResults/coverage/coverage.cobertura.xml
+          files: PhotoManager/PhotoManager.Tests/TestResults/*/coverage.cobertura.xml
           name: codecov-windows-latest
           verbose: true
           fail_ci_if_error: true
