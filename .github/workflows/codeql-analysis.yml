@@ -1,0 +1,47 @@
+name: CodeQL Analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 1 * * 1" # Weekly scan on Mondays at 1 AM UTC
+
+jobs:
+  analyze:
+    name: Windows CodeQL Analysis
+    runs-on: windows-latest
+
+    env:
+      PROJECT_NAME: PhotoManager/PhotoManager.sln
+      DOTNET_VERSION: 8.0.x
+
+    steps:
+      # Step 1: Checkout the code
+      - name: ⤵️ Checkout Source
+        uses: actions/checkout@v4
+
+      # Step 2: Setup CodeQL for .NET
+      - name: 🛠️ Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+          # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
+          # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
+
+      # Step 3: Setup .NET SDK
+      - name: 🛠️ Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Step 4: Build the codebase for analysis
+      - name: 🔨 Build for CodeQL
+        run: dotnet build --configuration Release ${{ env.PROJECT_NAME }}
+
+      # Step 5: Run CodeQL analysis
+      - name: 🛡️ Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:csharp"

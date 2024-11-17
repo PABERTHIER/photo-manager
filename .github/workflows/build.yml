@@ -1,0 +1,89 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build-windows:
+    name: Windows Build
+    runs-on: windows-latest
+
+    env:
+      PROJECT_NAME: PhotoManager/PhotoManager.sln
+      PROJECT_TESTRESULTS_PATH: PhotoManager/PhotoManager.Tests/TestResults
+      DOTNET_VERSION: 8.0.x
+
+    steps:
+      # Step 1: Checkout the code
+      - name: ⤵️ Checkout Source
+        uses: actions/checkout@v4
+
+      # Step 2: Setup .NET SDK
+      - name: 🛠️ Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Step 3: Cache NuGet packages for faster builds
+      - name: 💾 Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      # Step 4: Display .NET version for confirmation
+      - name: 🖥️ Display .NET version
+        run: dotnet --info
+
+      # Step 5: Restore dependencies
+      - name: 🛠️ Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_NAME }}
+
+      # Step 6: Build the project with Release configuration
+      - name: 🔨 Build
+        run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
+
+      # TODO: Fix the current errors to use it
+      # Step 7: Run linting process
+      # - name: 🔨 Lint
+      #   run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
+
+      # Step 8: Run tests and generate code coverage report
+      - name: 🔨 Test with Coverage
+        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }}
+
+      # Step 9: List Test Results Directory
+      - name: 📂 List Test Results Directory
+        run: ls ${{ env.PROJECT_TESTRESULTS_PATH }}
+
+      # Step 10: Upload Coverage XML as Artifact
+      - name: 📂 Upload Coverage XML as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
+
+      # Step 11: Upload test results as an artifact
+      - name: 📂 Upload Test Results as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ${{ env.PROJECT_TESTRESULTS_PATH }}/test-results.trx
+
+      # Step 12: Upload coverage report to Codecov
+      - name: ☁️ Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
+          name: codecov-windows-latest
+          verbose: true
+          fail_ci_if_error: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
