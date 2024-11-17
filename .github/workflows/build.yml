@@ -15,6 +15,7 @@ jobs:
 
     env:
       PROJECT_NAME: PhotoManager/PhotoManager.sln
+      PROJECT_TESTRESULTS_PATH: PhotoManager/PhotoManager.Tests/TestResults
       DOTNET_VERSION: 8.0.x
 
     steps:
@@ -60,27 +61,27 @@ jobs:
 
       # Step 9: List Test Results Directory
       - name: 📂 List Test Results Directory
-        run: ls PhotoManager/PhotoManager.Tests/TestResults
+        run: ls ${{ env.PROJECT_TESTRESULTS_PATH }}
 
       # Step 10: Upload Coverage XML as Artifact
       - name: 📂 Upload Coverage XML as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: PhotoManager/PhotoManager.Tests/TestResults/*/coverage.cobertura.xml
+          path: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
 
       # Step 11: Upload test results as an artifact
       - name: 📂 Upload Test Results as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: PhotoManager/PhotoManager.Tests/TestResults/test-results.trx
+          path: ${{ env.PROJECT_TESTRESULTS_PATH }}/test-results.trx
 
       # Step 12: Upload coverage report to Codecov
       - name: ☁️ Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: PhotoManager/PhotoManager.Tests/TestResults/*/coverage.cobertura.xml
+          files: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
           name: codecov-windows-latest
           verbose: true
           fail_ci_if_error: true
