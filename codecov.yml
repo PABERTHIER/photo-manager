@@ -1,0 +1,58 @@
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: no
+  require_base: no
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+
+notifications:
+  commit:
+    status:
+      default:
+        target: "https://docs.codecov.io/docs/commit-status"
+        threshold: 1%
+        paths: []
+        informational: false
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: yes
+      macro: no
+
+codecov:
+  max_report_age: off
+  max_path_depth: 500
+
+comment_template: |
+  :rocket: **Code Coverage Report** for `{{ commit }}`
+
+  - **Coverage**: {{ diff_coverage }}% ({{ coverage_change }}% change)
+  - **Files**: {{ total_files }} with modifications
+  - **Hits**: {{ hits }} / {{ lines }} lines
+
+  {{#flags}}
+  {{#name}}
+  - Flag **{{ name }}**: {{ coverage }}%
+  {{/name}}
+  {{/flags}}
+
+  {{#reach}}
+  - **Reach**: Improved {{ diff_coverage }}% compared to base.
+  {{/reach}}
+
+  [View Full Report](https://codecov.io/{{ slug }}/commit/{{ commit }})
+
+  {{#threshold_exceeded}}
+  :warning: The threshold of {{ threshold }}% was exceeded by {{ diff }}%.
+  {{/threshold_exceeded}}
+
+  {{#is_new}}
+  :green_circle: This is a **newly added test**.
+  {{/is_new}}
