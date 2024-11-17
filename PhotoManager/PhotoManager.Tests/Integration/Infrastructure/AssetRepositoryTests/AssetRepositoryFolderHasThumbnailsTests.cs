@@ -15,7 +15,7 @@ public class AssetRepositoryFolderHasThumbnailsTests
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
@@ -28,7 +28,7 @@ public class AssetRepositoryFolderHasThumbnailsTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);

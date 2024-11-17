@@ -9,7 +9,7 @@ public class DatabaseFolderHasThumbnailsTests
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
@@ -20,7 +20,7 @@ public class DatabaseFolderHasThumbnailsTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }

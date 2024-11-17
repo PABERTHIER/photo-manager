@@ -6,7 +6,7 @@ public class VideoHelperTests
     private string? _dataDirectory;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }

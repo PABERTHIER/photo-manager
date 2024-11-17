@@ -11,7 +11,7 @@ public class AssetsComparatorTests
     private Asset? _asset4;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         _assetsComparator = new();
     }

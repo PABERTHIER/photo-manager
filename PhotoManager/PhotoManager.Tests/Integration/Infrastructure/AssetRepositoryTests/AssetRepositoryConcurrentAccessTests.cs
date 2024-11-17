@@ -20,7 +20,7 @@ public class AssetRepositoryConcurrentAccessTests
     private Asset? _asset3;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
@@ -35,7 +35,7 @@ public class AssetRepositoryConcurrentAccessTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);

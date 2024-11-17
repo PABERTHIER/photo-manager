@@ -9,7 +9,7 @@ public class BlobStorageTests
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
@@ -20,7 +20,7 @@ public class BlobStorageTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _blobStorage = new();
     }

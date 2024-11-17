@@ -18,7 +18,7 @@ public class AssetRepositoryLoadThumbnailTests
     private Asset? asset1;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
@@ -32,7 +32,7 @@ public class AssetRepositoryLoadThumbnailTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new (_configurationRootMock!.Object);

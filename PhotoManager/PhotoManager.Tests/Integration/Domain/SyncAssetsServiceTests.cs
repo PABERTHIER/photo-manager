@@ -18,7 +18,7 @@ public class SyncAssetsServiceTests
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         databasePath = Path.Combine(dataDirectory, "DatabaseTests");
@@ -33,7 +33,7 @@ public class SyncAssetsServiceTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new (_configurationRootMock!.Object);

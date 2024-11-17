@@ -7,7 +7,7 @@ public class BackupStorageTests
     private BackupStorage? _backupStorage;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 

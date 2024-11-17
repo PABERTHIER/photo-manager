@@ -20,7 +20,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     private Asset? asset5;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
@@ -35,7 +35,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);

@@ -17,7 +17,7 @@ public class DatabaseReadObjectListTests
     private readonly char semicolonSeparator = ';';
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
@@ -50,7 +50,7 @@ public class DatabaseReadObjectListTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }

@@ -9,7 +9,7 @@ public class ObjectListStorageTests
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
@@ -20,7 +20,7 @@ public class ObjectListStorageTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _objectListStorage = new ObjectListStorage();
     }

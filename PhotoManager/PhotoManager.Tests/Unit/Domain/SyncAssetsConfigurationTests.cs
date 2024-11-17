@@ -6,7 +6,7 @@ public class SyncAssetsConfigurationTests
     private SyncAssetsConfiguration? _syncAssetsConfiguration;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _syncAssetsConfiguration = new SyncAssetsConfiguration();
     }

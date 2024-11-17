@@ -46,7 +46,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private const int ASSET5_TEMP_IMAGE_BYTE_SIZE = 4779;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
@@ -63,7 +63,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _asset1 = new()
         {

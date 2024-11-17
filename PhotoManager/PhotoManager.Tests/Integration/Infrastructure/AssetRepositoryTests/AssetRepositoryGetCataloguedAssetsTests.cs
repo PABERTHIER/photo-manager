@@ -17,7 +17,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
     private Asset? asset2;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
@@ -30,7 +30,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
