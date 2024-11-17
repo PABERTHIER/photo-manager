@@ -51,16 +51,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 8: Upload Build Artifacts
-      - name: 💾 Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Build Artifacts
-          path: ./output
-
-      # Step 9: Upload ZIP File as Artifact
+      # Step 8: Upload ZIP File as Artifact
       - name: 💾 Upload ZIP File
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ZIP_NAME }}
           path: ./${{ env.ZIP_NAME }}
+
+      # Step 9: Upload Build Artifacts
+      - name: 💾 Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build Artifacts
+          path: ./output
