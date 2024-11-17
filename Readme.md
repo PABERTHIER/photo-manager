@@ -5,6 +5,7 @@
 [![Build & Test](https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml)
 [![Release](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml)
 [![CodeQL](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml)
+[![Coverage Status](https://codecov.io/gh/PABERTHIER/photo-manager/graph/badge.svg?token=DILR0QRXVN)](https://codecov.io/gh/PABERTHIER/photo-manager)
 
 **I used this [repo](https://github.com/jpablodrexler/jp-photo-manager) as a base to shape my own PhotoManager with optimizations, new features, bugs fix...
 Thank you jpablodrexler for your work :heart:**
