@@ -47,16 +47,18 @@ jobs:
       # Step 7: Create Release with GitHub CLI
       - name: 🏷️ Generate Release Notes
         id: generate_notes
+        shell: pwsh  # Specify PowerShell for GitHub Actions
         run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
-          CURRENT_TAG=${{ github.ref_name }}
-          echo "Previous tag: $PREV_TAG"
-          echo "Current tag: $CURRENT_TAG"
+          $prevTag = git describe --tags --abbrev=0 HEAD^
+          $currentTag = "${{ github.ref_name }}"
+          Write-Host "Previous tag: $prevTag"
+          Write-Host "Current tag: $currentTag"
           # Generate changelog between the previous and current tags
-          CHANGELOG=$(git log $PREV_TAG..HEAD --oneline --pretty=format:"- %s (%h)")
-          echo "$CHANGELOG"
+          $changelog = git log $prevTag..HEAD --oneline --pretty=format:"- %s (%h)"
+          Write-Host $changelog
           # Create the changelog message
-          echo -e "## Changelog\n\n$CHANGELOG\n\nFull Changelog: [$PREV_TAG...$CURRENT_TAG](${{ github.server_url }}/${{ github.repository }}/compare/$PREV_TAG...$CURRENT_TAG)" > release_notes.txt
+          $releaseNotes = "## Changelog`n`n$changelog`n`nFull Changelog: [$prevTag...$currentTag](${{ github.server_url }}/${{ github.repository }}/compare/$prevTag...$currentTag)"
+          $releaseNotes | Out-File -FilePath release_notes.txt -Encoding utf8
 
       # Step 8: Create Release with GitHub CLI
       - name: 🏷️ Create Release
