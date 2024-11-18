@@ -8,7 +8,7 @@ public class UserConfigurationServiceTests
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();

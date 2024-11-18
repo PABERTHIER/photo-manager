@@ -11,7 +11,7 @@ public class StorageServiceTests
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 

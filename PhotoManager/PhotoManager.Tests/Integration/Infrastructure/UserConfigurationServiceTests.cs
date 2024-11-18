@@ -9,7 +9,7 @@ public class UserConfigurationServiceTests
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         string configFilePath = Path.Combine(dataDirectory, "appsettings.json");

@@ -19,7 +19,7 @@ public class AssetRepositoryGetAssetsByPathTests
     private Asset? asset3;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
@@ -29,7 +29,7 @@ public class AssetRepositoryGetAssetsByPathTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(backupPath!);

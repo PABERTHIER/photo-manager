@@ -9,7 +9,7 @@ public class DatabaseDeleteOldBackupsTests
     private Mock<IBackupStorage>? _backupStorageMock;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
@@ -20,7 +20,7 @@ public class DatabaseDeleteOldBackupsTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         _backupStorageMock = new Mock<IBackupStorage>();
     }

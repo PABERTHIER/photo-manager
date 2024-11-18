@@ -59,7 +59,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     private readonly string miscAssetPHash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         backupPath = Path.Combine(dataDirectory, backupEndPath);
@@ -74,7 +74,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
     }
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
         Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);

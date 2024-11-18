@@ -24,7 +24,7 @@ public class ApplicationGetTotalFilesCountTests
     private Mock<IStorageService>? _storageServiceMock;
 
     [OneTimeSetUp]
-    public void OneTimeSetup()
+    public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
