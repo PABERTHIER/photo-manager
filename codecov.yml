@@ -1,21 +1,12 @@
-comment:
-  layout: "condensed_header, condensed_files, condensed_footer"
-  behavior: default
-  require_changes: false
-
 coverage:
   precision: 2
   round: down
   range: "70...100"
 
-parsers:
-  gcov:
-    branch_detection:
-      conditional: yes
-      loop: yes
-      method: yes
-      macro: no
+comment:
+  layout: "condensed_header, condensed_files, condensed_footer"
+  behavior: default
+  require_changes: false
 
 codecov:
   max_report_age: off
-  max_path_depth: 500
