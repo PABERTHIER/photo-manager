@@ -8,15 +8,6 @@ coverage:
   round: down
   range: "70...100"
 
-notifications:
-  commit:
-    status:
-      default:
-        target: "https://docs.codecov.io/docs/commit-status"
-        threshold: 1%
-        paths: []
-        informational: false
-
 parsers:
   gcov:
     branch_detection:
