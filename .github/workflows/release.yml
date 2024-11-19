@@ -47,28 +47,20 @@ jobs:
           Compress-Archive -Path ./output/* -DestinationPath ./${{ env.ZIP_NAME }}
 
       # Step 7: Create Release with GitHub CLI
-      - name: 🏷️ Generate Release Notes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-        run: |
-          gh release create "$tag" --repo="$GITHUB_REPOSITORY" --title="${GITHUB_REPOSITORY#*/} ${tag#v}" --generate-notes
-
-      # Step 8: Create Release with GitHub CLI
       - name: 🏷️ Create Release
         run: |
-          gh release create ${{ github.ref_name }} ./${{ env.ZIP_NAME }} --title "PhotoManager ${{ github.ref_name }}" --notes-file release_notes.txt --target ${{ github.sha }}
+          gh release create ${{ github.ref_name }} ./${{ env.ZIP_NAME }} --title "PhotoManager ${{ github.ref_name }}" --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 9: Upload ZIP File as Artifact
+      # Step 8: Upload ZIP File as Artifact
       - name: 💾 Upload ZIP File
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ZIP_NAME }}
           path: ./${{ env.ZIP_NAME }}
 
-      # Step 10: Upload Build Artifacts
+      # Step 9: Upload Build Artifacts
       - name: 💾 Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
