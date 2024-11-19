@@ -49,6 +49,11 @@ jobs:
         id: generate_notes
         shell: pwsh  # Specify PowerShell for GitHub Actions
         run: |
+          # Ensure the full history is fetched
+          git fetch --tags --all
+          # Debugging: List tags to verify order
+          Write-Host "List of tags:"
+          git tag --sort=-creatordate
           $prevTag = git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1)
           $currentTag = "${{ github.ref_name }}"
           Write-Host "Previous tag: $prevTag"
