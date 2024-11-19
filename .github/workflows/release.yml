@@ -49,12 +49,12 @@ jobs:
         id: generate_notes
         shell: pwsh  # Specify PowerShell for GitHub Actions
         run: |
-          $prevTag = git describe --tags --abbrev=0 HEAD^
+          $prevTag = git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1)
           $currentTag = "${{ github.ref_name }}"
           Write-Host "Previous tag: $prevTag"
           Write-Host "Current tag: $currentTag"
           # Generate changelog between the previous and current tags
-          $changelog = git log $prevTag..HEAD --oneline --pretty=format:"- %s (%h)"
+          $changelog = git log $prevTag..$currentTag --oneline --pretty=format:"- %s (%h)"
           Write-Host $changelog
           # Create the changelog message
           $releaseNotes = "## Changelog`n`n$changelog`n`nFull Changelog: [$prevTag...$currentTag](${{ github.server_url }}/${{ github.repository }}/compare/$prevTag...$currentTag)"
