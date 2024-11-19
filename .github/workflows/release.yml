@@ -20,6 +20,8 @@ jobs:
       # Step 1: Checkout the code
       - name: ⤵️ Checkout Source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures full history is fetched
 
       # Step 2: Setup .NET SDK
       - name: 🛠️ Setup .NET SDK
