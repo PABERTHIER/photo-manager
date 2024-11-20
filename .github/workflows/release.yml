@@ -20,6 +20,8 @@ jobs:
       # Step 1: Checkout the code
       - name: ⤵️ Checkout Source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures full history is fetched
 
       # Step 2: Setup .NET SDK
       - name: 🛠️ Setup .NET SDK
@@ -45,36 +47,20 @@ jobs:
           Compress-Archive -Path ./output/* -DestinationPath ./${{ env.ZIP_NAME }}
 
       # Step 7: Create Release with GitHub CLI
-      - name: 🏷️ Generate Release Notes
-        id: generate_notes
-        shell: pwsh  # Specify PowerShell for GitHub Actions
-        run: |
-          $prevTag = git describe --tags --abbrev=0 HEAD^
-          $currentTag = "${{ github.ref_name }}"
-          Write-Host "Previous tag: $prevTag"
-          Write-Host "Current tag: $currentTag"
-          # Generate changelog between the previous and current tags
-          $changelog = git log $prevTag..HEAD --oneline --pretty=format:"- %s (%h)"
-          Write-Host $changelog
-          # Create the changelog message
-          $releaseNotes = "## Changelog`n`n$changelog`n`nFull Changelog: [$prevTag...$currentTag](${{ github.server_url }}/${{ github.repository }}/compare/$prevTag...$currentTag)"
-          $releaseNotes | Out-File -FilePath release_notes.txt -Encoding utf8
-
-      # Step 8: Create Release with GitHub CLI
       - name: 🏷️ Create Release
         run: |
-          gh release create ${{ github.ref_name }} ./${{ env.ZIP_NAME }} --title "PhotoManager ${{ github.ref_name }}" --notes-file release_notes.txt --target ${{ github.sha }}
+          gh release create ${{ github.ref_name }} ./${{ env.ZIP_NAME }} --title "PhotoManager ${{ github.ref_name }}" --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 9: Upload ZIP File as Artifact
+      # Step 8: Upload ZIP File as Artifact
       - name: 💾 Upload ZIP File
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ZIP_NAME }}
           path: ./${{ env.ZIP_NAME }}
 
-      # Step 10: Upload Build Artifacts
+      # Step 9: Upload Build Artifacts
       - name: 💾 Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
