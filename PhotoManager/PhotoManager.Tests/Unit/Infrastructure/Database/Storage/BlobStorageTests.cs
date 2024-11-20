@@ -3,7 +3,8 @@
 [TestFixture]
 public class BlobStorageTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
+
     private BlobStorage? _blobStorage;
     private UserConfigurationService? _userConfigurationService;
     private Mock<IConfigurationRoot>? _configurationRootMock;
@@ -11,7 +12,7 @@ public class BlobStorageTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -30,7 +31,7 @@ public class BlobStorageTests
     [TestCase("f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin", 7, "1336.JPG")]
     public void ReadFromBinaryFile_FileExists_ReturnsDeserializedObject(string blobFileName, int countExpected, string keyContained)
     {
-        string blobFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0", _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobFileName);
+        string blobFilePath = Path.Combine(_dataDirectory!, "TestBackup\\v1.0", _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobFileName);
 
         Dictionary<string, byte[]>? deserializedObject = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 
@@ -43,7 +44,7 @@ public class BlobStorageTests
     [Test]
     public void ReadFromBinaryFile_FileDoesNotExist_ReturnsNull()
     {
-        string blobFilePath = Path.Combine(dataDirectory!, "TestBackup\\v1.0\\Blobs\\eacd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
+        string blobFilePath = Path.Combine(_dataDirectory!, "TestBackup\\v1.0\\Blobs\\eacd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
 
         Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 
@@ -53,7 +54,7 @@ public class BlobStorageTests
     [Test]
     public void ReadFromBinaryFile_FilePathIsInvalid_ReturnsNull()
     {
-        Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(dataDirectory!);
+        Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(_dataDirectory!);
 
         Assert.IsNull(result);
     }
@@ -71,14 +72,14 @@ public class BlobStorageTests
     [Test]
     public void WriteToBinaryFile_DataIsCorrect_WritesDataToFile()
     {
-        string binaryFilePath = Path.Combine(dataDirectory!, "abcd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
+        string binaryFilePath = Path.Combine(_dataDirectory!, "abcd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
 
         try
         {
             Dictionary<string, byte[]> data = new()
             {
-                { "Image1.jpg", new byte[] { 1, 2, 3 } },
-                { "Image2.png", new byte[] { 4, 5, 6 } }
+                { "Image1.jpg", [1, 2, 3]},
+                { "Image2.png", [4, 5, 6]}
             };
 
             _blobStorage!.WriteToBinaryFile(data, binaryFilePath);
@@ -100,7 +101,7 @@ public class BlobStorageTests
     [Test]
     public void WriteToBinaryFile_DataIsNull_ThrowsNullReferenceException()
     {
-        string binaryFilePath = Path.Combine(dataDirectory!, "bbcd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
+        string binaryFilePath = Path.Combine(_dataDirectory!, "bbcd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
 
         try
         {
@@ -120,11 +121,11 @@ public class BlobStorageTests
     [Test]
     public void WriteToBinaryFile_DataIsEmpty_WritesNothingInTheFile()
     {
-        string binaryFilePath = Path.Combine(dataDirectory!, "cbcd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
+        string binaryFilePath = Path.Combine(_dataDirectory!, "cbcd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
 
         try
         {
-            Dictionary<string, byte[]> data = new();
+            Dictionary<string, byte[]> data = [];
 
             _blobStorage!.WriteToBinaryFile(data, binaryFilePath);
 
@@ -145,13 +146,13 @@ public class BlobStorageTests
     {
         Dictionary<string, byte[]> data = new()
         {
-            { "Image1.jpg", new byte[] { 1, 2, 3 } },
-            { "Image2.png", new byte[] { 4, 5, 6 } }
+            { "Image1.jpg", [1, 2, 3]},
+            { "Image2.png", [4, 5, 6]}
         };
 
-        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _blobStorage!.WriteToBinaryFile(data, dataDirectory!));
+        UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _blobStorage!.WriteToBinaryFile(data, _dataDirectory!));
 
-        Assert.AreEqual($"Access to the path '{dataDirectory!}' is denied.", exception?.Message);
+        Assert.AreEqual($"Access to the path '{_dataDirectory!}' is denied.", exception?.Message);
     }
 
     [Test]
@@ -161,8 +162,8 @@ public class BlobStorageTests
 
         Dictionary<string, byte[]> data = new()
         {
-            { "Image1.jpg", new byte[] { 1, 2, 3 } },
-            { "Image2.png", new byte[] { 4, 5, 6 } }
+            { "Image1.jpg", [1, 2, 3]},
+            { "Image2.png", [4, 5, 6]}
         };
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _blobStorage!.WriteToBinaryFile(data, binaryFilePath!));

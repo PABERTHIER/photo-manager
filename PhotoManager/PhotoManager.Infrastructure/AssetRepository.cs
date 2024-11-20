@@ -34,12 +34,12 @@ public class AssetRepository : IAssetRepository
         _database = database;
         _storageService = storageService;
         _userConfigurationService = userConfigurationService;
-        assets = new List<Asset>();
-        folders = new List<Folder>();
+        assets = [];
+        folders = [];
         syncAssetsConfiguration = new SyncAssetsConfiguration();
-        recentTargetPaths = new List<string>();
+        recentTargetPaths = [];
         recentThumbnailsQueue = new Queue<string>();
-        Thumbnails = new Dictionary<string, Dictionary<string, byte[]>>();
+        Thumbnails = [];
         syncLock = new object();
         dataDirectory = _storageService.ResolveDataDirectory(_userConfigurationService.StorageSettings.StorageVersion);
         Initialize();
@@ -47,7 +47,7 @@ public class AssetRepository : IAssetRepository
 
     public Asset[] GetAssetsByPath(string directory)
     {
-        List<Asset> assetsList = new(); // TODO: Why array at the end ?
+        List<Asset> assetsList = []; // TODO: Why array at the end ?
         bool isNewFile = false;
 
         try
@@ -102,7 +102,7 @@ public class AssetRepository : IAssetRepository
         {
             Folder? folder = GetFolderById(asset.FolderId);
 
-            if (string.IsNullOrWhiteSpace(asset.Folder?.Path))
+            if (string.IsNullOrWhiteSpace(asset.Folder.Path))
             {
                 return; // TODO: log.Error($"The asset could not be added, folder is null, asset.FileName: {asset.FileName}");
             }
@@ -128,7 +128,7 @@ public class AssetRepository : IAssetRepository
         }
     }
 
-    public Folder AddFolder(string path) // Play this before anything else to register every folders
+    public Folder AddFolder(string path) // Play this before anything else to register every folder
     {
         Folder folder;
 
@@ -149,7 +149,7 @@ public class AssetRepository : IAssetRepository
 
     public bool FolderExists(string path)
     {
-        bool result = false;
+        bool result;
 
         lock (syncLock)
         {
@@ -171,7 +171,7 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
-    // TODO: Is HashSet the right think to do ? (Because it does not preserve the order)
+    // TODO: Is HashSet the right thing to do ? (Because it does not preserve the order)
     public HashSet<string> GetFoldersPath()
     {
         HashSet<string> folderPaths;
@@ -243,7 +243,7 @@ public class AssetRepository : IAssetRepository
 
     public List<Asset> GetCataloguedAssets()
     {
-        List<Asset>? cataloguedAssets = null;
+        List<Asset>? cataloguedAssets;
 
         lock (syncLock)
         {
@@ -256,7 +256,7 @@ public class AssetRepository : IAssetRepository
     // TODO: Improve it by having a Dict instead Dictionary<string, List<Asset>>
     public List<Asset> GetCataloguedAssetsByPath(string directory)
     {
-        List<Asset> cataloguedAssets = new();
+        List<Asset> cataloguedAssets = [];
 
         lock (syncLock)
         {
@@ -273,7 +273,7 @@ public class AssetRepository : IAssetRepository
 
     public bool IsAssetCatalogued(string directoryName, string fileName)
     {
-        bool result = false;
+        bool result;
 
         lock (syncLock)
         {
@@ -342,7 +342,7 @@ public class AssetRepository : IAssetRepository
 
     public bool HasChanges()
     {
-        bool result = false;
+        bool result;
 
         lock (syncLock)
         {
@@ -355,7 +355,7 @@ public class AssetRepository : IAssetRepository
     // TODO: Seems to be a dead method
     public bool ContainsThumbnail(string directoryName, string fileName)
     {
-        bool result = false;
+        bool result;
 
         lock (syncLock)
         {
@@ -429,7 +429,7 @@ public class AssetRepository : IAssetRepository
 
     public List<string> GetRecentTargetPaths()
     {
-        List<string> result = new();
+        List<string> result;
 
         lock (syncLock)
         {
@@ -452,7 +452,7 @@ public class AssetRepository : IAssetRepository
     {
         lock (syncLock)
         {
-            List<string> recentTargetPathsUpdated = new (recentTargetPaths);
+            List<string> recentTargetPathsUpdated = [..recentTargetPaths];
 
             if (recentTargetPathsUpdated.Contains(destinationFolder.Path))
             {
@@ -550,32 +550,32 @@ public class AssetRepository : IAssetRepository
         return _database.ReadObjectList(_userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
     }
 
-    private void WriteFolders(List<Folder> folders)
+    private void WriteFolders(List<Folder> foldersToWrite)
     {
-        _database.WriteObjectList(folders, _userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.WriteFunc);
+        _database.WriteObjectList(foldersToWrite, _userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.WriteFunc);
     }
 
-    private void WriteAssets(List<Asset> assets)
+    private void WriteAssets(List<Asset> assetsToWrite)
     {
-        _database.WriteObjectList(assets, _userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.WriteFunc);
+        _database.WriteObjectList(assetsToWrite, _userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.WriteFunc);
     }
 
-    private void WriteSyncAssetsDirectoriesDefinitions(List<SyncAssetsDirectoriesDefinition> definitions)
+    private void WriteSyncAssetsDirectoriesDefinitions(List<SyncAssetsDirectoriesDefinition> definitionsToWrite)
     {
         _database.WriteObjectList(
-            definitions,
+            definitionsToWrite,
             _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.WriteFunc);
     }
 
-    private void WriteRecentTargetPaths(List<string> recentTargetPaths)
+    private void WriteRecentTargetPaths(List<string> recentTargetPathsToWrite)
     {
-        _database.WriteObjectList(recentTargetPaths, _userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.WriteFunc);
+        _database.WriteObjectList(recentTargetPathsToWrite, _userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.WriteFunc);
     }
 
     private Dictionary<string, byte[]> GetThumbnails(Folder? folder, out bool isNewFile)
     {
         isNewFile = false;
-        Dictionary<string, byte[]>? thumbnails = new();
+        Dictionary<string, byte[]>? thumbnails = [];
 
         if (folder == null)
         {
@@ -586,7 +586,7 @@ public class AssetRepository : IAssetRepository
 
         if (thumbnails == null)
         {
-            thumbnails = new Dictionary<string, byte[]>();
+            thumbnails = [];
             isNewFile = true;
         }
 
@@ -622,7 +622,7 @@ public class AssetRepository : IAssetRepository
 
     private Folder? GetFolderById(Guid folderId)
     {
-        Folder? result = null;
+        Folder? result;
 
         lock (syncLock)
         {
@@ -634,7 +634,7 @@ public class AssetRepository : IAssetRepository
 
     private List<Asset> GetAssetsByFolderId(Guid folderId)
     {
-        List<Asset> result = new();
+        List<Asset> result;
 
         lock (syncLock)
         {
@@ -646,7 +646,7 @@ public class AssetRepository : IAssetRepository
 
     private Asset? GetAssetByFolderIdAndFileName(Guid folderId, string fileName)
     {
-        Asset? asset = null;
+        Asset? asset;
 
         lock (syncLock)
         {

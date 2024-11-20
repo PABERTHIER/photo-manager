@@ -16,16 +16,16 @@ public abstract class BaseCsvStorage
     {
         string[] fields = new string[Properties!.ColumnProperties.Length];
         int startIndex = 0;
-        int endIndex;
-        string quoteAndSeparator = string.Format("{0}{1}", QUOTE, Separator);
+        string quoteAndSeparator = $"{QUOTE}{Separator}";
 
         for (int i = 0; i < Properties.ColumnProperties.Length; i++)
         {
             bool escapeText = EscapeText(Properties.ColumnProperties[i].ColumnName);
 
+            int endIndex;
             if (escapeText)
             {
-                endIndex = line.IndexOf(quoteAndSeparator, startIndex);
+                endIndex = line.IndexOf(quoteAndSeparator, startIndex, StringComparison.Ordinal);
                 startIndex++;
             }
             else

@@ -6,8 +6,8 @@ public partial class SyncAssetsDirectoriesDefinition
 {
     public required string SourceDirectory { get; set; }
     public required string DestinationDirectory { get; set; }
-    public bool IncludeSubFolders { get; set; }
-    public bool DeleteAssetsNotInSource { get; set; }
+    public bool IncludeSubFolders { get; init; }
+    public bool DeleteAssetsNotInSource { get; init; }
 
     internal bool IsValid()
     {
@@ -21,7 +21,7 @@ public partial class SyncAssetsDirectoriesDefinition
         DestinationDirectory = NormalizeDirectory(DestinationDirectory);
     }
 
-    private string NormalizeDirectory(string directory)
+    private static string NormalizeDirectory(string directory)
     {
         bool isRemote = IsValidRemotePath(directory);
         string[] parts = directory.Split('\\', StringSplitOptions.RemoveEmptyEntries);
@@ -46,6 +46,6 @@ public partial class SyncAssetsDirectoriesDefinition
     [GeneratedRegex("^([A-Za-z])(:)(\\[A-Za-z0-9]*)*")]
     private static partial Regex LocalPathRegex();
 
-    [GeneratedRegex("^(\\\\)(\\[A-Za-z0-9]*)*")]
+    [GeneratedRegex(@"^(\\)(\[A-Za-z0-9]*)*")]
     private static partial Regex RemotePathRegex();
 }

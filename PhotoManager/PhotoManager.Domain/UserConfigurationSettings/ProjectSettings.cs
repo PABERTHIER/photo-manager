@@ -1,3 +1,3 @@
 ﻿namespace PhotoManager.Domain.UserConfigurationSettings;
 
-public record class ProjectSettings(string Name, string Owner);
+public record ProjectSettings(string Name, string Owner);

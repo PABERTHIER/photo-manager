@@ -3,10 +3,10 @@
 [TestFixture]
 public class MoveAssetsServiceTests
 {
-    private string? dataDirectory;
-    private string? databasePath;
-    private const string backupEndPath = "DatabaseTests\\v1.0";
-    private string? backupPath;
+    private string? _dataDirectory;
+    private string? _databasePath;
+    private string? _backupPath;
+    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private MoveAssetsService? _moveAssetsService;
     private UserConfigurationService? _userConfigurationService;
@@ -20,15 +20,15 @@ public class MoveAssetsServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        backupPath = Path.Combine(dataDirectory, backupEndPath);
-        databasePath = Path.Combine(dataDirectory, "DatabaseTests");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
+        _databasePath = Path.Combine(_dataDirectory, "DatabaseTests");
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
     }
 
@@ -47,15 +47,15 @@ public class MoveAssetsServiceTests
     [Test]
     public void MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsTrue_MoveSucceeds()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(dataDirectory!, "Image 6.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
             string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             Assert.IsTrue(File.Exists(sourceFilePath1));
@@ -63,18 +63,18 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath2));
             Assert.IsFalse(File.Exists(destinationFilePath2));
 
-            Folder sourceFolder = _assetRepository!.AddFolder(dataDirectory!);
+            Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
             _assetRepository!.SaveCatalog(destinationFolder);
 
-            Asset[] assetsInSource= _assetRepository!.GetAssetsByPath(dataDirectory!);
+            Asset[] assetsInSource= _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(2, assetsInSource.Length);
             Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
@@ -86,8 +86,8 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -98,8 +98,8 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(2, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2.FileName));
 
             List<Asset> cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -107,7 +107,7 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            Asset[] assets = { asset1, asset2 };
+            Asset[] assets = [asset1, asset2];
 
             bool hasBeenMoved = _moveAssetsService!.MoveAssets(assets, destinationFolder, true);
 
@@ -117,23 +117,23 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath2));
             Assert.IsTrue(File.Exists(destinationFilePath2));
 
-            assetsInSource = _assetRepository!.GetAssetsByPath(dataDirectory!);
+            assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(2, assetsInSource.Length);
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset2.FileName));
 
             assetsInDestination = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsNotEmpty(assetsInDestination);
             Assert.AreEqual(2, assetsInDestination.Length);
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -146,14 +146,14 @@ public class MoveAssetsServiceTests
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(2, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2.FileName));
 
             cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInDestination);
             Assert.AreEqual(2, cataloguedAssetsInDestination.Count);
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2.FileName));
 
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsNotEmpty(recentTargetPaths);
@@ -163,25 +163,25 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsFalse_MoveSucceeds()
     {
-        string sourceDirectory = Path.Combine(dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(dataDirectory!, "Image 6.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
             string newSourceFilePath1 = Path.Combine(sourceDirectory, "Image 6.jpg");
             string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string newSourceFilePath2 = Path.Combine(sourceDirectory, "Image 1.jpg");
             string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
 
@@ -225,8 +225,8 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -237,8 +237,8 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(2, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2.FileName));
 
             List<Asset> cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -246,7 +246,7 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            Asset[] assets = { asset1, asset2 };
+            Asset[] assets = [asset1, asset2];
 
             bool hasBeenMoved = _moveAssetsService!.MoveAssets(assets, destinationFolder, false);
 
@@ -262,14 +262,14 @@ public class MoveAssetsServiceTests
             assetsInDestination = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsNotEmpty(assetsInDestination);
             Assert.AreEqual(2, assetsInDestination.Length);
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -283,8 +283,8 @@ public class MoveAssetsServiceTests
             cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInDestination);
             Assert.AreEqual(2, cataloguedAssetsInDestination.Count);
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2.FileName));
 
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsNotEmpty(recentTargetPaths);
@@ -295,22 +295,22 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void MoveAssets_AssetsAreValidAndDestinationFolderNotCataloguedAndPreserveOriginalFilesIsTrue_MoveSucceeds()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(dataDirectory!, "Image 6.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
             string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             Assert.IsTrue(File.Exists(sourceFilePath1));
@@ -318,17 +318,17 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath2));
             Assert.IsFalse(File.Exists(destinationFilePath2));
 
-            Folder sourceFolder = _assetRepository!.AddFolder(dataDirectory!);
+            Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = new() { FolderId = Guid.NewGuid(), Path = destinationDirectory };
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
 
-            Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(dataDirectory!);
+            Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(2, assetsInSource.Length);
             Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
@@ -340,8 +340,8 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -352,8 +352,8 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(2, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2.FileName));
 
             List<Asset> cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -361,7 +361,7 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            Asset[] assets = { asset1, asset2 };
+            Asset[] assets = [asset1, asset2];
 
             bool hasBeenMoved = _moveAssetsService!.MoveAssets(assets, destinationFolder, true);
 
@@ -371,23 +371,23 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath2));
             Assert.IsTrue(File.Exists(destinationFilePath2));
 
-            assetsInSource = _assetRepository!.GetAssetsByPath(dataDirectory!);
+            assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(2, assetsInSource.Length);
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset2.FileName));
 
             assetsInDestination = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsNotEmpty(assetsInDestination);
             Assert.AreEqual(2, assetsInDestination.Length);
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             Folder? newDestinationFolder = _assetRepository.GetFolderByPath(destinationFolder.Path);
             Assert.IsNotNull(newDestinationFolder);
@@ -403,14 +403,14 @@ public class MoveAssetsServiceTests
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(2, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2.FileName));
 
             cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInDestination);
             Assert.AreEqual(2, cataloguedAssetsInDestination.Count);
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2.FileName));
 
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsNotEmpty(recentTargetPaths);
@@ -420,25 +420,25 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void MoveAssets_AssetsAreValidAndDestinationFolderNotCataloguedAndPreserveOriginalFilesIsFalse_MoveSucceeds()
     {
-        string sourceDirectory = Path.Combine(dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(dataDirectory!, "Image 6.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
             string newSourceFilePath1 = Path.Combine(sourceDirectory, "Image 6.jpg");
             string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string newSourceFilePath2 = Path.Combine(sourceDirectory, "Image 1.jpg");
             string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
 
@@ -481,8 +481,8 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -493,8 +493,8 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(2, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2.FileName));
 
             List<Asset> cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -502,7 +502,7 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            Asset[] assets = { asset1, asset2 };
+            Asset[] assets = [asset1, asset2];
 
             bool hasBeenMoved = _moveAssetsService!.MoveAssets(assets, destinationFolder, false);
 
@@ -518,14 +518,14 @@ public class MoveAssetsServiceTests
             assetsInDestination = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsNotEmpty(assetsInDestination);
             Assert.AreEqual(2, assetsInDestination.Length);
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             Folder? newDestinationFolder = _assetRepository.GetFolderByPath(destinationFolder.Path);
             Assert.IsNotNull(newDestinationFolder);
@@ -542,8 +542,8 @@ public class MoveAssetsServiceTests
             cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInDestination);
             Assert.AreEqual(2, cataloguedAssetsInDestination.Count);
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2.FileName));
 
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsNotEmpty(recentTargetPaths);
@@ -554,7 +554,7 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -563,7 +563,7 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_AssetsAreValidButDirectoryIsInReadOnlyMode_DoesNotMoveAndReturnFalse(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "NoMoveDirectory");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "NoMoveDirectory");
 
         try
         {
@@ -572,22 +572,22 @@ public class MoveAssetsServiceTests
             // Deny write access to the directory
             DirectoryHelper.DenyWriteAccess(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             Assert.IsTrue(File.Exists(sourceFilePath));
             Assert.IsFalse(File.Exists(destinationFilePath));
 
-            Folder sourceFolder = _assetRepository!.AddFolder(dataDirectory!);
+            Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 1.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 1.jpg");
             Assert.IsNotNull(asset1);
 
             _assetRepository!.SaveCatalog(sourceFolder);
             _assetRepository!.SaveCatalog(destinationFolder);
 
-            Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(dataDirectory!);
+            Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(1, assetsInSource.Length);
             Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
@@ -597,7 +597,7 @@ public class MoveAssetsServiceTests
 
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -607,7 +607,7 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(1, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
 
             List<Asset> cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -615,7 +615,7 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            Asset[] assets = { asset1 };
+            Asset[] assets = [asset1];
 
             bool hasBeenMoved = _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile);
 
@@ -623,16 +623,16 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath));
             Assert.IsFalse(File.Exists(destinationFilePath));
 
-            assetsInSource = _assetRepository!.GetAssetsByPath(dataDirectory!);
+            assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(1, assetsInSource.Length);
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1.FileName));
 
             assetsInDestination = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsEmpty(assetsInDestination);
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
 
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -642,7 +642,7 @@ public class MoveAssetsServiceTests
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(1, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
 
             cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -652,9 +652,9 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
 
-            // Allow write access to the directory
+            // Allow to write access to the directory
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(destinationDirectory, true);
@@ -664,18 +664,18 @@ public class MoveAssetsServiceTests
     [Test]
     public void MoveAssets_AssetIsInTheDestinationButNotInTheSourceAndPreserveOriginalFilesIsTrue_ThrowsFileNotFoundException()
     {
-        string sourceDirectory = Path.Combine(dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(dataDirectory!, "Image 6.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
             string newSourceFilePath1 = Path.Combine(sourceDirectory, "Image 6.jpg");
             string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string newSourceFilePath2 = Path.Combine(sourceDirectory, "Image 1.jpg");
             string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
 
@@ -720,8 +720,8 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -732,19 +732,19 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(1, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
 
             List<Asset> cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInDestination);
             Assert.AreEqual(1, cataloguedAssetsInDestination.Count);
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2.FileName));
 
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            asset2!.Folder = new() { Path = sourceDirectory }; // Asset will be in the dest and not in the source
+            asset2.Folder = new() { Path = sourceDirectory }; // Asset will be in the dest and not in the source
 
-            Asset[] assets = { asset1, asset2 };
+            Asset[] assets = [asset1, asset2];
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, false));
             Assert.AreEqual($"File does not exist: '{newSourceFilePath2}'.", exception?.Message);
@@ -757,18 +757,18 @@ public class MoveAssetsServiceTests
             assetsInSource = _assetRepository!.GetAssetsByPath(sourceDirectory);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(1, assetsInSource.Length);
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1.FileName));
 
             assetsInDestination = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsNotEmpty(assetsInDestination);
             Assert.AreEqual(1, assetsInDestination.Length);
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -776,15 +776,16 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.FolderId));
 
+            // TODO: Is it good now ?
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
-            Assert.IsNotEmpty(assetsInSource);
-            Assert.AreEqual(1, assetsInSource.Length);
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
+            Assert.IsNotEmpty(cataloguedAssetsInSource);
+            Assert.AreEqual(1, cataloguedAssetsInSource.Count);
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
 
             cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInDestination);
             Assert.AreEqual(1, cataloguedAssetsInDestination.Count);
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2.FileName));
 
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
@@ -793,22 +794,22 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsTrueAndRecentTargetPathAlreadyAdded_MoveSucceeds()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(dataDirectory!, "Image 6.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
             string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             Assert.IsTrue(File.Exists(sourceFilePath1));
@@ -816,21 +817,21 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath2));
             Assert.IsFalse(File.Exists(destinationFilePath2));
 
-            Folder sourceFolder = _assetRepository!.AddFolder(dataDirectory!);
+            Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
             string fakeRecentTargetPath = Path.Combine(destinationDirectory, "fake");
-            _assetRepository.SaveRecentTargetPaths(new List<string> { fakeRecentTargetPath, destinationDirectory });
+            _assetRepository.SaveRecentTargetPaths([fakeRecentTargetPath, destinationDirectory]);
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 6.jpg");
             Assert.IsNotNull(asset1);
-            Asset? asset2 = _assetCreationService!.CreateAsset(dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 1.jpg");
             Assert.IsNotNull(asset2);
 
             _assetRepository!.SaveCatalog(sourceFolder);
             _assetRepository!.SaveCatalog(destinationFolder);
 
-            Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(dataDirectory!);
+            Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(2, assetsInSource.Length);
             Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
@@ -842,8 +843,8 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
 
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -854,8 +855,8 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(2, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2.FileName));
 
             List<Asset> cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -866,7 +867,7 @@ public class MoveAssetsServiceTests
             Assert.AreEqual(fakeRecentTargetPath, recentTargetPaths[0]);
             Assert.AreEqual(destinationFolder.Path, recentTargetPaths[1]);
 
-            Asset[] assets = { asset1, asset2 };
+            Asset[] assets = [asset1, asset2];
 
             bool hasBeenMoved = _moveAssetsService!.MoveAssets(assets, destinationFolder, true);
 
@@ -876,23 +877,23 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath2));
             Assert.IsTrue(File.Exists(destinationFilePath2));
 
-            assetsInSource = _assetRepository!.GetAssetsByPath(dataDirectory!);
+            assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(2, assetsInSource.Length);
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset2.FileName));
 
             assetsInDestination = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsNotEmpty(assetsInDestination);
             Assert.AreEqual(2, assetsInDestination.Length);
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(assetsInDestination.Any(x => x.FileName == asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2.FileName));
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1!.FileName));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset1.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset2.FileName));
 
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -905,14 +906,14 @@ public class MoveAssetsServiceTests
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(2, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset2.FileName));
 
             cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInDestination);
             Assert.AreEqual(2, cataloguedAssetsInDestination.Count);
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1!.FileName));
-            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2!.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset1.FileName));
+            Assert.IsTrue(cataloguedAssetsInDestination.Any(x => x.FileName == asset2.FileName));
 
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsNotEmpty(recentTargetPaths);
@@ -923,7 +924,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -932,13 +933,13 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_SameSourceAndDestination_DoesNotMoveFileAndReturnsTrue(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
@@ -956,16 +957,16 @@ public class MoveAssetsServiceTests
 
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset!.FileName));
 
-            bool hasBeenMoved = _moveAssetsService!.MoveAssets(new Asset[] { asset }, sourceFolder, preserveOriginalFile);
+            bool hasBeenMoved = _moveAssetsService!.MoveAssets([asset], sourceFolder, preserveOriginalFile);
             Assert.IsTrue(hasBeenMoved);
 
             Assert.IsTrue(File.Exists(destinationFilePath));
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset.FileName));
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -974,18 +975,18 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_DifferentFileNameBetweenSourceAndDestination_ThrowsFileNotFoundException(bool preserveOriginalFile)
     {
-        string sourceDirectory = Path.Combine(dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            string assetOldFileName = "Image 1.jpg";
-            string assetNewFileName = "Image 2.jpg";
+            const string assetOldFileName = "Image 1.jpg";
+            const string assetNewFileName = "Image 2.jpg";
 
-            string sourceFilePath = Path.Combine(dataDirectory!, assetOldFileName);
+            string sourceFilePath = Path.Combine(_dataDirectory!, assetOldFileName);
             string newSourceFilePath = Path.Combine(sourceDirectory, assetOldFileName);
             string destinationFilePath = Path.Combine(destinationDirectory, assetNewFileName);
 
@@ -1013,7 +1014,7 @@ public class MoveAssetsServiceTests
             Assert.IsEmpty(assetsInDestination);
 
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset!.FileName));
-            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset!.FileName));
+            Assert.IsFalse(_assetRepository!.ContainsThumbnail(destinationFolder.Path, asset.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
@@ -1023,7 +1024,7 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(1, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset.FileName));
 
             List<Asset> cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -1032,7 +1033,7 @@ public class MoveAssetsServiceTests
             Assert.IsEmpty(recentTargetPaths);
 
             asset.FileName = assetNewFileName;
-            Asset[] assets = { asset };
+            Asset[] assets = [asset];
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
 
@@ -1058,7 +1059,7 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder!.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder.FolderId));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -1075,7 +1076,7 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1084,16 +1085,16 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_DifferentFileNameAndSameSourceAndDestination_MovesFileAndReturnsTrue(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string assetOldFileName = "Image 1.jpg";
-            string assetNewFileName = "Image 2.jpg";
+            const string assetOldFileName = "Image 1.jpg";
+            const string assetNewFileName = "Image 2.jpg";
 
-            string sourceFilePath = Path.Combine(dataDirectory!, assetOldFileName);
+            string sourceFilePath = Path.Combine(_dataDirectory!, assetOldFileName);
             string destinationFilePath = Path.Combine(destinationDirectory, assetOldFileName);
             string newDestinationFilePath = Path.Combine(destinationDirectory, assetNewFileName);
 
@@ -1126,13 +1127,13 @@ public class MoveAssetsServiceTests
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(1, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset!.FileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset.FileName));
 
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
             asset.FileName = assetNewFileName;
-            Asset[] assets = { asset };
+            Asset[] assets = [asset];
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, sourceFolder, preserveOriginalFile));
 
@@ -1151,7 +1152,7 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder!.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder.FolderId));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -1164,7 +1165,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1177,7 +1178,7 @@ public class MoveAssetsServiceTests
         {
             Asset[]? assets = null;
 
-            Folder destinationFolder = new() { Path = dataDirectory! };
+            Folder destinationFolder = new() { Path = _dataDirectory! };
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
 
@@ -1186,7 +1187,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1197,18 +1198,18 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset[]? assets = Array.Empty<Asset>();
+            Asset[] assets = [];
 
-            Folder destinationFolder = new() { Path = dataDirectory! };
+            Folder destinationFolder = new() { Path = _dataDirectory! };
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
 
             Assert.AreEqual("assets cannot be null or empty. (Parameter 'assets')", exception?.Message);
             Assert.AreEqual(nameof(assets), exception?.ParamName);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1219,21 +1220,21 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new Folder() { Path = dataDirectory! } };
+            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty };
             Asset? asset2 = null;
-            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new Folder() { Path = dataDirectory! } };
-            Asset[] assets = { asset1, asset2!, asset3 };
+            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty };
+            Asset[] assets = [asset1, asset2!, asset3];
 
-            Folder destinationFolder = new() { Path = dataDirectory! };
+            Folder destinationFolder = new() { Path = _dataDirectory! };
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
 
             Assert.AreEqual("asset cannot be null. (Parameter 'asset')", exception?.Message);
             Assert.AreEqual("asset", exception?.ParamName);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1246,21 +1247,21 @@ public class MoveAssetsServiceTests
         {
             Folder? folder = null;
 
-            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new Folder() { Path = dataDirectory! } };
-            Asset? asset2 = new() { Folder = folder! };
-            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new Folder() { Path = dataDirectory! } };
-            Asset[] assets = { asset1, asset2, asset3 };
+            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty };
+            Asset asset2 = new() { FileName = "NonExistentFile.jpg", Folder = folder!, Hash = string.Empty };
+            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty };
+            Asset[] assets = [asset1, asset2, asset3];
 
-            Folder destinationFolder = new() { Path = dataDirectory! };
+            Folder destinationFolder = new() { Path = _dataDirectory! };
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
 
             Assert.AreEqual("asset.Folder cannot be null. (Parameter 'Folder')", exception?.Message);
             Assert.AreEqual(nameof(Folder), exception?.ParamName);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1271,18 +1272,18 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset[] assets = new Asset[] { new() { Folder = new() { Path = dataDirectory! } } };
+            Asset[] assets = [new() { FileName = "NonExistentFile.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty }];
 
             Folder? destinationFolder = null;
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets!, destinationFolder!, preserveOriginalFile));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder!, preserveOriginalFile));
 
             Assert.AreEqual("destinationFolder cannot be null. (Parameter 'destinationFolder')", exception?.Message);
             Assert.AreEqual(nameof(destinationFolder), exception?.ParamName);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1291,48 +1292,49 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_FileDoesNotExist_ThrowsFileNotFoundException(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(dataDirectory!, "NonExistentFile.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "NonExistentFile.jpg");
 
             Assert.IsFalse(File.Exists(sourceFilePath));
             Assert.IsFalse(File.Exists(destinationFilePath));
 
-            Folder sourceFolder = _assetRepository!.AddFolder(dataDirectory!);
+            Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
             Asset asset = new()
             {
                 FileName = "NonExistentFile.jpg",
                 Folder = sourceFolder,
-                FolderId = sourceFolder.FolderId
+                FolderId = sourceFolder.FolderId,
+                Hash = string.Empty
             };
 
-            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(new Asset[] { asset }, destinationFolder, preserveOriginalFile));
+            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets([asset], destinationFolder, preserveOriginalFile));
             Assert.AreEqual($"File does not exist: '{sourceFilePath}'.", exception?.Message);
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void DeleteAssets_AssetsAreValid_DeletesAssetsAndSavesCatalog()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(dataDirectory!, "Image 6.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
             string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath1, destinationFilePath1);
@@ -1341,7 +1343,7 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath1));
             Assert.IsTrue(File.Exists(destinationFilePath1));
 
-            string sourceFilePath2 = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath2, destinationFilePath2);
@@ -1363,14 +1365,14 @@ public class MoveAssetsServiceTests
             Assert.AreEqual(1, assetsInRepository.Length);
             Assert.AreEqual(asset!.FileName, assetsInRepository[0].FileName);
 
-            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset!.FileName));
+            Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset.FileName));
 
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.AreEqual(asset!.FileName, assetsInDb[0].FileName);
+            Assert.AreEqual(asset.FileName, assetsInDb[0].FileName);
 
-            _moveAssetsService!.DeleteAssets(new Asset[] { asset });
+            _moveAssetsService!.DeleteAssets([asset]);
 
             Assert.IsFalse(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset.FileName));
 
@@ -1386,7 +1388,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1404,7 +1406,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1413,16 +1415,16 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset[]? assets = Array.Empty<Asset>();
+            Asset[] assets = [];
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
 
             Assert.AreEqual("assets cannot be null or empty. (Parameter 'assets')", exception?.Message);
             Assert.AreEqual(nameof(assets), exception?.ParamName);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1431,19 +1433,19 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new Folder() { Path = dataDirectory! } };
+            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty };
             Asset? asset2 = null;
-            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new Folder() { Path = dataDirectory! } };
-            Asset[] assets = { asset1, asset2!, asset3 };
+            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty };
+            Asset[] assets = [asset1, asset2!, asset3];
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
 
             Assert.AreEqual("asset cannot be null. (Parameter 'asset')", exception?.Message);
             Assert.AreEqual("asset", exception?.ParamName);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1454,19 +1456,19 @@ public class MoveAssetsServiceTests
         {
             Folder? folder = null;
 
-            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new Folder() { Path = dataDirectory! } };
-            Asset? asset2 = new() { Folder = folder! };
-            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new Folder() { Path = dataDirectory! } };
-            Asset[] assets = { asset1, asset2, asset3 };
+            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty };
+            Asset asset2 = new() { FileName = "NonExistentFile.jpg", Folder = folder!, Hash = string.Empty };
+            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new() { Path = _dataDirectory! }, Hash = string.Empty };
+            Asset[] assets = [asset1, asset2, asset3];
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
 
             Assert.AreEqual("asset.Folder cannot be null. (Parameter 'Folder')", exception?.Message);
             Assert.AreEqual(nameof(Folder), exception?.ParamName);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1475,30 +1477,30 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Folder folder = new() { Path = dataDirectory! };
-            Asset asset = new() { FileName = "NonExistentFile.jpg", Folder = folder };
-            Asset[] assets = { asset };
+            Folder folder = new() { Path = _dataDirectory! };
+            Asset asset = new() { FileName = "NonExistentFile.jpg", Folder = folder, Hash = string.Empty };
+            Asset[] assets = [asset];
 
-            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.DeleteAssets(assets!));
+            FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.DeleteAssets(assets));
 
             Assert.AreEqual($"File does not exist: '{asset.FullPath}'.", exception?.Message);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_SourceAndDestinationAreValid_CopiesFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
@@ -1510,23 +1512,23 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_SourceAndDestinationAreValidButDirectoryIsInReadOnlyMode_DoesNotCopyAndReturnFalse()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "NoCopyDirectory");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "NoCopyDirectory");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            // Deny write access to the directory
+            // Deny to write access to the directory
             DirectoryHelper.DenyWriteAccess(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
@@ -1537,9 +1539,9 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
 
-            // Allow write access to the directory
+            // Allow to write access to the directory
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(destinationDirectory, true);
@@ -1549,7 +1551,7 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SourceFilePathIsADirectory_DoesNotCopyAndReturnFalse()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
@@ -1557,14 +1559,14 @@ public class MoveAssetsServiceTests
 
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
-            bool hasBeenCopied = _moveAssetsService!.CopyAsset(dataDirectory!, destinationFilePath); // Access denied when source file path is a directory -> UnauthorizedAccessException
+            bool hasBeenCopied = _moveAssetsService!.CopyAsset(_dataDirectory!, destinationFilePath); // Access denied when source file path is a directory -> UnauthorizedAccessException
 
             Assert.IsFalse(hasBeenCopied);
             Assert.IsFalse(File.Exists(destinationFilePath));
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1572,8 +1574,8 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_DestinationFilePathIsADirectory_DoesNotCopyAndThrowsIOException()
     {
-        string sourceDirectory = Path.Combine(dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
         try
         {
@@ -1584,7 +1586,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1592,13 +1594,13 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SameSourceAndDestination_DoesNotCopyFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
@@ -1615,20 +1617,20 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_DifferentFileNameBetweenSourceAndDestination_CopiesFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 2.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
@@ -1640,20 +1642,20 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_DifferentFileNameAndSameSourceAndDestination_CopiesFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
@@ -1674,20 +1676,20 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_FileInSourceDoesNotExist_DoesNotCopyFileAndThrowsFileNotFoundException()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string nonExistentFilePath = Path.Combine(dataDirectory!, "NonExistentFile.jpg");
+            string nonExistentFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image.jpg");
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.CopyAsset(nonExistentFilePath, destinationFilePath));
@@ -1698,15 +1700,15 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_SourceDoesNotExist_DoesNotCopyFileAndThrowsDirectoryNotFoundException()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
-        string nonExistentSource = Path.Combine(dataDirectory!, "toto");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string nonExistentSource = Path.Combine(_dataDirectory!, "toto");
 
         try
         {
@@ -1723,18 +1725,18 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_DestinationDoesNotExist_CopiesFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
@@ -1746,7 +1748,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1755,8 +1757,8 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            string sourceFilePath = Path.Combine(dataDirectory!, "NonExistentFile.jpg");
-            string destinationFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
+            string destinationFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -1766,14 +1768,14 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_SourceIsEmpty_ThrowsArgumentException()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
@@ -1788,7 +1790,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1797,23 +1799,23 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string destinationFilePath = string.Empty;
 
-            bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath!);
+            bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
             Assert.IsFalse(hasBeenCopied);
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
     [Test]
     public void CopyAsset_SourceIsNull_ThrowsArgumentNullException()
     {
-        string destinationDirectory = Path.Combine(dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
         try
         {
@@ -1828,7 +1830,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1838,7 +1840,7 @@ public class MoveAssetsServiceTests
         try
         {
             string? sourceFilePath = null;
-            string destinationFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string destinationFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath!, destinationFilePath);
 
@@ -1846,7 +1848,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 
@@ -1855,7 +1857,7 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            string sourceFilePath = Path.Combine(dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string? destinationFilePath = null;
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath!);
@@ -1864,7 +1866,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(databasePath!, true);
+            Directory.Delete(_databasePath!, true);
         }
     }
 }

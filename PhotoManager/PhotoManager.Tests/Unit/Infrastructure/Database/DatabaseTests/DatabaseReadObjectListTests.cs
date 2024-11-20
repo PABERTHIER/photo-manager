@@ -3,50 +3,50 @@
 [TestFixture]
 public class DatabaseReadObjectListTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
 
-    private string? csvEscapedTextWithSemicolon;
-    private string? csvUnescapedTextWithSemicolon;
-    private string? csvEscapedTextWithPipe;
-    private string? csvUnescapedTextWithPipe;
-    private string? csvSomeUnescapedTextWithPipe;
-    private string? csvInvalid;
-    private readonly char semicolonSeparator = ';';
+    private string? _csvEscapedTextWithSemicolon;
+    private string? _csvUnescapedTextWithSemicolon;
+    private string? _csvEscapedTextWithPipe;
+    private string? _csvUnescapedTextWithPipe;
+    private string? _csvSomeUnescapedTextWithPipe;
+    private string? _csvInvalid;
+    private const char SEMICOLON_SEPARATOR = ';';
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
         _userConfigurationService = new (configurationRootMock.Object);
 
-        csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"FileSize\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"AssetCorruptedMessage\";\"IsAssetCorrupted\";\"AssetRotatedMessage\";\"IsAssetRotated\"\r\n" +
+        _csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"FileSize\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"AssetCorruptedMessage\";\"IsAssetCorrupted\";\"AssetRotatedMessage\";\"IsAssetRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"363888\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\";\"\";\"false\";\"\";\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175816_3.jpg\";\"343633\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\";\"The asset is corrupted\";\"true\";\"The asset has been rotated\";\"true\"\r\n";
 
-        csvUnescapedTextWithSemicolon = "FolderId;FileName;FileSize;ImageRotation;PixelWidth;PixelHeight;ThumbnailPixelWidth;ThumbnailPixelHeight;ThumbnailCreationDateTime;Hash;AssetCorruptedMessage;IsAssetCorrupted;AssetRotatedMessage;IsAssetRotated\r\n" +
+        _csvUnescapedTextWithSemicolon = "FolderId;FileName;FileSize;ImageRotation;PixelWidth;PixelHeight;ThumbnailPixelWidth;ThumbnailPixelHeight;ThumbnailCreationDateTime;Hash;AssetCorruptedMessage;IsAssetCorrupted;AssetRotatedMessage;IsAssetRotated\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a;20200720175810_3.jpg;363888;Rotate0;1920;1080;200;112;8/19/2023 11:26:09;4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4;;false;;false\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a;20200720175816_3.jpg;343633;Rotate0;1920;1080;200;112;8/19/2023 11:26:09;0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124;The asset is corrupted;true;The asset has been rotated;true\r\n";
 
-        csvEscapedTextWithPipe = "\"FolderId\"|\"FileName\"|\"FileSize\"|\"ImageRotation\"|\"PixelWidth\"|\"PixelHeight\"|\"ThumbnailPixelWidth\"|\"ThumbnailPixelHeight\"|\"ThumbnailCreationDateTime\"|\"Hash\"|\"AssetCorruptedMessage\"|\"IsAssetCorrupted\"|\"AssetRotatedMessage\"|\"IsAssetRotated\"\r\n" +
+        _csvEscapedTextWithPipe = "\"FolderId\"|\"FileName\"|\"FileSize\"|\"ImageRotation\"|\"PixelWidth\"|\"PixelHeight\"|\"ThumbnailPixelWidth\"|\"ThumbnailPixelHeight\"|\"ThumbnailCreationDateTime\"|\"Hash\"|\"AssetCorruptedMessage\"|\"IsAssetCorrupted\"|\"AssetRotatedMessage\"|\"IsAssetRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|\"20200720175810_3.jpg\"|\"363888\"|\"Rotate0\"|\"1920\"|\"1080\"|\"200\"|\"112\"|\"8/19/2023 11:26:09\"|\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\"|\"\"|\"false\"|\"\"|\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|\"20200720175816_3.jpg\"|\"343633\"|\"Rotate0\"|\"1920\"|\"1080\"|\"200\"|\"112\"|\"8/19/2023 11:26:09\"|\"0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\"|\"The asset is corrupted\"|\"true\"|\"The asset has been rotated\"|\"true\"\r\n";
 
-        csvUnescapedTextWithPipe = "FolderId|FileName|FileSize|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|AssetCorruptedMessage|IsAssetCorrupted|AssetRotatedMessage|IsAssetRotated\r\n" +
+        _csvUnescapedTextWithPipe = "FolderId|FileName|FileSize|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|AssetCorruptedMessage|IsAssetCorrupted|AssetRotatedMessage|IsAssetRotated\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a|20200720175810_3.jpg|363888|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4||false||false\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a|20200720175816_3.jpg|343633|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124|The asset is corrupted|true|The asset has been rotated|true\r\n";
 
-        csvSomeUnescapedTextWithPipe = "\"FolderId\"|FileName|FileSize|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|AssetCorruptedMessage|IsAssetCorrupted|AssetRotatedMessage|\"IsAssetRotated\"\r\n" +
+        _csvSomeUnescapedTextWithPipe = "\"FolderId\"|FileName|FileSize|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|AssetCorruptedMessage|IsAssetCorrupted|AssetRotatedMessage|\"IsAssetRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|20200720175810_3.jpg|363888|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4||false||\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|20200720175816_3.jpg|343633|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124|The asset is corrupted|true|The asset has been rotated|\"true\"\r\n";
 
-        csvInvalid = "FolderId|FileSize\r\n" + "1920|false|toto\r\n";
+        _csvInvalid = "FolderId|FileSize\r\n" + "1920|false|toto\r\n";
     }
 
     [SetUp]
@@ -60,31 +60,22 @@ public class DatabaseReadObjectListTests
     [TestCase("UnescapedText", false)]
     public void ReadObjectList_AllColumnsAndSemicolonSeparator_ReturnsAssets(string csvType, bool escapeText)
     {
-        string csv;
-
-        if (csvType == "EscapedText")
-        {
-            csv = csvEscapedTextWithSemicolon!;
-        }
-        else
-        {
-            csv = csvUnescapedTextWithSemicolon!;
-        }
+        string csv = csvType == "EscapedText" ? _csvEscapedTextWithSemicolon! : _csvUnescapedTextWithSemicolon!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, semicolonSeparator, filePath, csv, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, SEMICOLON_SEPARATOR, filePath, csv, tableName, escapeText);
 
-            Asserts(assets, filePath, csv!);
+            Asserts(assets, filePath, csv);
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -93,41 +84,32 @@ public class DatabaseReadObjectListTests
     [TestCase("UnescapedText", false)]
     public void ReadObjectList_AllColumnsAndPipeSeparator_ReturnsAssets(string csvType, bool escapeText)
     {
-        string csv;
-
-        if (csvType == "EscapedText")
-        {
-            csv = csvEscapedTextWithPipe!;
-        }
-        else
-        {
-            csv = csvUnescapedTextWithPipe!;
-        }
+        string csv = csvType == "EscapedText" ? _csvEscapedTextWithPipe! : _csvUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
             List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
 
-            Asserts(assets, filePath, csv!);
+            Asserts(assets, filePath, csv);
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
     [Test]
     public void ReadObjectList_AllColumnsAndPipeSeparatorEscapedTextWithoutDataTableProperties_ThrowsArgumentException()
     {
-        string csv = csvEscapedTextWithPipe!;
+        string csv = _csvEscapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
@@ -151,17 +133,17 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
     [Test]
     public void ReadObjectList_AllColumnsAndPipeSeparatorUnescapedTextWithoutDataTableProperties_ReturnsAssets()
     {
-        string csv = csvUnescapedTextWithPipe!;
+        string csv = _csvUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -176,22 +158,22 @@ public class DatabaseReadObjectListTests
 
             List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
-            Asserts(assets, filePath, csv!);
+            Asserts(assets, filePath, csv);
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
     [Test]
     public void ReadObjectList_SomeColumnsWithEscapedTextAndPipeSeparator_ReturnsAssets()
     {
-        string csv = csvSomeUnescapedTextWithPipe!;
+        string csv = _csvSomeUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -207,43 +189,43 @@ public class DatabaseReadObjectListTests
             _database!.SetDataTableProperties(new DataTableProperties
             {
                 TableName = tableName,
-                ColumnProperties = new ColumnProperties[]
-                {
-                    new ColumnProperties { ColumnName = "FolderId", EscapeText = true },
-                    new ColumnProperties { ColumnName = "FileName", EscapeText = false },
-                    new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
-                    new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
-                    new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
-                    new ColumnProperties { ColumnName = "Hash", EscapeText = false },
-                    new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                    new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                    new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
-                    new ColumnProperties { ColumnName = "IsAssetRotated", EscapeText = true }
-                }
+                ColumnProperties =
+                [
+                    new() { ColumnName = "FolderId", EscapeText = true },
+                    new() { ColumnName = "FileName", EscapeText = false },
+                    new() { ColumnName = "FileSize", EscapeText = false },
+                    new() { ColumnName = "ImageRotation", EscapeText = false },
+                    new() { ColumnName = "PixelWidth", EscapeText = false },
+                    new() { ColumnName = "PixelHeight", EscapeText = false },
+                    new() { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
+                    new() { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
+                    new() { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
+                    new() { ColumnName = "Hash", EscapeText = false },
+                    new() { ColumnName = "AssetCorruptedMessage", EscapeText = false },
+                    new() { ColumnName = "IsAssetCorrupted", EscapeText = false },
+                    new() { ColumnName = "AssetRotatedMessage", EscapeText = false },
+                    new() { ColumnName = "IsAssetRotated", EscapeText = true }
+                ]
             });
 
             List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
-            Asserts(assets, filePath, csv!);
+            Asserts(assets, filePath, csv);
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
     [Test]
     public void ReadObjectList_SomeColumnsInvalidsAndPipeSeparator_ReturnsAssets()
     {
-        string csv = csvUnescapedTextWithPipe!;
+        string csv = _csvUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -259,33 +241,33 @@ public class DatabaseReadObjectListTests
             _database!.SetDataTableProperties(new DataTableProperties
             {
                 TableName = tableName,
-                ColumnProperties = new ColumnProperties[]
-                {
-                    new ColumnProperties { ColumnName = "FolderId", EscapeText = false },
-                    new ColumnProperties { ColumnName = "Toto", EscapeText = false },
-                    new ColumnProperties { ColumnName = "FileSize", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ImageRotation", EscapeText = false },
-                    new ColumnProperties { ColumnName = "PixelWidth", EscapeText = false },
-                    new ColumnProperties { ColumnName = "PixelHeight", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
-                    new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
-                    new ColumnProperties { ColumnName = "Tutu", EscapeText = false },
-                    new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                    new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                    new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = false },
-                    new ColumnProperties { ColumnName = "Tata", EscapeText = false }
-                }
+                ColumnProperties =
+                [
+                    new() { ColumnName = "FolderId", EscapeText = false },
+                    new() { ColumnName = "Toto", EscapeText = false },
+                    new() { ColumnName = "FileSize", EscapeText = false },
+                    new() { ColumnName = "ImageRotation", EscapeText = false },
+                    new() { ColumnName = "PixelWidth", EscapeText = false },
+                    new() { ColumnName = "PixelHeight", EscapeText = false },
+                    new() { ColumnName = "ThumbnailPixelWidth", EscapeText = false },
+                    new() { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
+                    new() { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
+                    new() { ColumnName = "Tutu", EscapeText = false },
+                    new() { ColumnName = "AssetCorruptedMessage", EscapeText = false },
+                    new() { ColumnName = "IsAssetCorrupted", EscapeText = false },
+                    new() { ColumnName = "AssetRotatedMessage", EscapeText = false },
+                    new() { ColumnName = "Tata", EscapeText = false }
+                ]
             });
 
             List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);
 
-            Asserts(assets, filePath, csv!);
+            Asserts(assets, filePath, csv);
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -297,7 +279,7 @@ public class DatabaseReadObjectListTests
         string? csv = null;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -309,7 +291,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -321,7 +303,7 @@ public class DatabaseReadObjectListTests
         string csv = string.Empty;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -333,7 +315,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -342,10 +324,10 @@ public class DatabaseReadObjectListTests
     [TestCase(false)]
     public void ReadObjectList_CsvIsIncorrectPipeSeparator_ThrowsArgumentException(bool escapeText)
     {
-        string csv = csvInvalid!;
+        string csv = _csvInvalid!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
@@ -365,16 +347,16 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
     [Test]
     public void ReadObjectList_FuncIsNull_ThrowsArgumentException()
     {
-        string csv = csvUnescapedTextWithPipe!;
+        string csv = _csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         Func<string[], Asset>? nullFunc = null;
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
@@ -405,16 +387,16 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
     [Test]
     public void ReadObjectList_ErrorInObjectListStorage_ThrowsArgumentException()
     {
-        string csv = csvUnescapedTextWithPipe!;
+        string csv = _csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
@@ -426,9 +408,9 @@ public class DatabaseReadObjectListTests
         {
             Mock<IObjectListStorage> objectListStorageMock = new();
             objectListStorageMock.Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(), It.IsAny<Diagnostics>())).Throws(new Exception());
-            PhotoManager.Infrastructure.Database.Database? database = new (objectListStorageMock.Object, new BlobStorage(), new BackupStorage());
+            PhotoManager.Infrastructure.Database.Database database = new (objectListStorageMock.Object, new BlobStorage(), new BackupStorage());
 
-            database!.Initialize(
+            database.Initialize(
                 directoryPath,
                 _userConfigurationService!.StorageSettings.Separator,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
@@ -436,19 +418,19 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            database!.SetDataTableProperties(new DataTableProperties
+            database.SetDataTableProperties(new DataTableProperties
             {
                 TableName = tableName,
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
             });
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => database.ReadObjectList(tableName, AssetConfigs.ReadFunc));
             Assert.AreEqual(exceptionMessage, exception?.Message);
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -465,23 +447,23 @@ public class DatabaseReadObjectListTests
         _database!.SetDataTableProperties(new DataTableProperties
         {
             TableName = tableName,
-            ColumnProperties = new ColumnProperties[]
-            {
-                new ColumnProperties { ColumnName = "FolderId", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "FileName", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "FileSize", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "ImageRotation", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "PixelWidth", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "PixelHeight", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "ThumbnailPixelWidth", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "ThumbnailPixelHeight", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "ThumbnailCreationDateTime", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "Hash", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "AssetCorruptedMessage", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "IsAssetCorrupted", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "AssetRotatedMessage", EscapeText = escapeText },
-                new ColumnProperties { ColumnName = "IsAssetRotated", EscapeText = escapeText }
-            }
+            ColumnProperties =
+            [
+                new() { ColumnName = "FolderId", EscapeText = escapeText },
+                new() { ColumnName = "FileName", EscapeText = escapeText },
+                new() { ColumnName = "FileSize", EscapeText = escapeText },
+                new() { ColumnName = "ImageRotation", EscapeText = escapeText },
+                new() { ColumnName = "PixelWidth", EscapeText = escapeText },
+                new() { ColumnName = "PixelHeight", EscapeText = escapeText },
+                new() { ColumnName = "ThumbnailPixelWidth", EscapeText = escapeText },
+                new() { ColumnName = "ThumbnailPixelHeight", EscapeText = escapeText },
+                new() { ColumnName = "ThumbnailCreationDateTime", EscapeText = escapeText },
+                new() { ColumnName = "Hash", EscapeText = escapeText },
+                new() { ColumnName = "AssetCorruptedMessage", EscapeText = escapeText },
+                new() { ColumnName = "IsAssetCorrupted", EscapeText = escapeText },
+                new() { ColumnName = "AssetRotatedMessage", EscapeText = escapeText },
+                new() { ColumnName = "IsAssetRotated", EscapeText = escapeText }
+            ]
         });
 
         List<Asset> assets = _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc);

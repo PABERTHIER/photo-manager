@@ -13,8 +13,11 @@ public class PixelSizeConverterTests
         PixelSizeConverter pixelSizeConverter = new();
         Asset asset = new()
         {
+            Folder = new() { Path = "" },
+            FileName = "toto.jpg",
             PixelWidth = width,
-            PixelHeight = height
+            PixelHeight = height,
+            Hash = string.Empty
         };
         object? parameter = null;
 
@@ -39,7 +42,7 @@ public class PixelSizeConverterTests
     public void Convert_NonAssetValue_ReturnsEmptyString()
     {
         PixelSizeConverter pixelSizeConverter = new();
-        string input = "Not an Asset object";
+        const string input = "Not an Asset object";
         object? parameter = null;
 
         object result = pixelSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);

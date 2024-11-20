@@ -67,6 +67,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     {
         _asset1 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1_duplicate.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -83,6 +84,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset2 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 9.png",
             FileSize = 126277,
             PixelHeight = 720,
@@ -99,6 +101,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset3 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 9_duplicate.png",
             FileSize = 126277,
             PixelHeight = 720,
@@ -115,6 +118,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset4 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image_11.heic",
             FileSize = 1411940,
             PixelHeight = 4032,
@@ -131,6 +135,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset1Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1_duplicate_copied.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -147,6 +152,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset2Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -163,6 +169,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset3Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Homer.gif",
             FileSize = 64123,
             PixelHeight = 320,
@@ -179,6 +186,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset4Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Homer.jpg",
             FileSize = 6599,
             PixelHeight = 180,
@@ -195,6 +203,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset5Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "HomerDuplicated.jpg",
             FileSize = 6599,
             PixelHeight = 180,
@@ -7165,8 +7174,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Folder? folder2Updated = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.IsNull(folder2Updated);
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingFourthSync = new();
-            Dictionary<string, int> assetNameToByteSizeMappingFourthSync = new();
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingFourthSync = [];
+            Dictionary<string, int> assetNameToByteSizeMappingFourthSync = [];
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -11243,8 +11252,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<Folder> folderRemovedEvents)
         NotifyPropertyChangedEvents()
     {
-        List<string> notifyPropertyChangedEvents = new();
-        List<ApplicationViewModel> applicationViewModelInstances = new();
+        List<string> notifyPropertyChangedEvents = [];
+        List<ApplicationViewModel> applicationViewModelInstances = [];
 
         _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
         {
@@ -11252,14 +11261,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             applicationViewModelInstances.Add((ApplicationViewModel)sender!);
         };
 
-        List<Folder> folderAddedEvents = new();
+        List<Folder> folderAddedEvents = [];
 
         _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
-        List<Folder> folderRemovedEvents = new();
+        List<Folder> folderRemovedEvents = [];
 
         _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
         {

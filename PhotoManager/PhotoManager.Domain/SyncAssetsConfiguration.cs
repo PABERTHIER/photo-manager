@@ -2,12 +2,7 @@
 
 public class SyncAssetsConfiguration
 {
-    public SyncAssetsConfiguration()
-    {
-        Definitions = [];
-    }
-
-    public List<SyncAssetsDirectoriesDefinition> Definitions { get; }
+    public List<SyncAssetsDirectoriesDefinition> Definitions { get; } = [];
 
     // TODO: transform to fluent to have syncConfiguration.Validate().Normalize()
     public void Validate() // ISyncAssetsConfiguration Validate();

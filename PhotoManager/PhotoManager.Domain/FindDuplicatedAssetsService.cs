@@ -2,10 +2,6 @@
 
 public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStorageService storageService, IUserConfigurationService userConfigurationService) : IFindDuplicatedAssetsService
 {
-    private readonly IAssetRepository _assetRepository = assetRepository;
-    private readonly IStorageService _storageService = storageService;
-    private readonly IUserConfigurationService _userConfigurationService = userConfigurationService;
-
     /// <summary>
     /// Detects duplicated assets in the catalog.
     /// </summary>
@@ -14,11 +10,11 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
     public List<List<Asset>> GetDuplicatedAssets()
     {
         List<List<Asset>> duplicatedAssetsSets = [];
-        List<Asset> assets = new (_assetRepository.GetCataloguedAssets());
+        List<Asset> assets = [..assetRepository.GetCataloguedAssets()];
 
-        if (_userConfigurationService.AssetSettings.DetectThumbnails && _userConfigurationService.HashSettings.UsingPHash)
+        if (userConfigurationService.AssetSettings.DetectThumbnails && userConfigurationService.HashSettings.UsingPHash)
         {
-            return GetDuplicatesBetweenOriginalAndThumbnail(assets, _userConfigurationService.HashSettings.PHashThreshold);
+            return GetDuplicatesBetweenOriginalAndThumbnail(assets, userConfigurationService.HashSettings.PHashThreshold);
         }
 
         List<IGrouping<string, Asset>> assetGroups = assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1).ToList();
@@ -26,12 +22,12 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
         foreach (IGrouping<string, Asset> group in assetGroups)
         {
             List<Asset> duplicatedSet = [.. group];
-            duplicatedSet.RemoveAll(asset => !_storageService.FileExists(asset.FullPath));
+            duplicatedSet.RemoveAll(asset => !storageService.FileExists(asset.FullPath));
 
             if (duplicatedSet.Count > 1)
             {
                 duplicatedAssetsSets.Add(duplicatedSet);
-                _storageService.UpdateAssetsFileDateTimeProperties(duplicatedSet);
+                storageService.UpdateAssetsFileDateTimeProperties(duplicatedSet);
             }
         }
 
@@ -50,7 +46,7 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
         // Create a dictionary to store assets by their Hash values
         Dictionary<string, List<Asset>> assetDictionary = [];
 
-        assets.RemoveAll(asset => !_storageService.FileExists(asset.FullPath));
+        assets.RemoveAll(asset => !storageService.FileExists(asset.FullPath));
 
         for (int i = 0; i < assets.Count; i++)
         {
@@ -91,7 +87,7 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
         {
             if (assetSet.Count > 1)
             {
-                _storageService.UpdateAssetsFileDateTimeProperties(assetSet);
+                storageService.UpdateAssetsFileDateTimeProperties(assetSet);
                 duplicatedAssetsSets.Add(assetSet);
             }
         }

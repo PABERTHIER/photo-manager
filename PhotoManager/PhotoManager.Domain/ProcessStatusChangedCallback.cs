@@ -4,5 +4,5 @@ public delegate void ProcessStatusChangedCallback(ProcessStatusChangedCallbackEv
 
 public class ProcessStatusChangedCallbackEventArgs
 {
-    public string NewStatus { get; set; }
+    public required string NewStatus { get; init; }
 }

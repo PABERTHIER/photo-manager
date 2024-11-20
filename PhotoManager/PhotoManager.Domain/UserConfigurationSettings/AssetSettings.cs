@@ -1,6 +1,6 @@
 ﻿namespace PhotoManager.Domain.UserConfigurationSettings;
 
-public record class AssetSettings(
+public record AssetSettings(
     bool AnalyseVideos,
     string AssetCorruptedMessage,
     string AssetRotatedMessage,

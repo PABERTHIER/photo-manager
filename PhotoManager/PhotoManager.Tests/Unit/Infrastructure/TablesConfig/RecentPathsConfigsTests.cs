@@ -17,10 +17,10 @@ public class RecentPathsConfigsTests
     [Test]
     public void ReadFunc_ValidValues_ParsesStringArrayIntoRecentPath()
     {
-        string[] validValues = new string[]
-        {
+        string[] validValues =
+        [
             "D:\\folder\\newFolder"
-        };
+        ];
 
         string recentPath = RecentPathsConfigs.ReadFunc(validValues);
 
@@ -31,11 +31,11 @@ public class RecentPathsConfigsTests
     [Test]
     public void ReadFunc_TooManyValues_ParsesStringArrayIntoRecentPath()
     {
-        string[] tooManyValues = new string[]
-        {
+        string[] tooManyValues =
+        [
             "D:\\folder\\newFolder1",
             "D:\\folder\\newFolder2"
-        };
+        ];
 
         string recentPath = RecentPathsConfigs.ReadFunc(tooManyValues);
 
@@ -56,9 +56,9 @@ public class RecentPathsConfigsTests
     [Test]
     public void ReadFunc_EmptyArray_ThrowsIndexOutOfRangeException()
     {
-        string[] emptyArrray = Array.Empty<string>();
+        string[] emptyArray = [];
 
-        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => RecentPathsConfigs.ReadFunc(emptyArrray));
+        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => RecentPathsConfigs.ReadFunc(emptyArray));
 
         Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
     }
@@ -66,7 +66,7 @@ public class RecentPathsConfigsTests
     [Test]
     public void WriteFunc_RecentPathWithValidValues_ConvertsRecentPathPropertiesToIndexInArray()
     {
-        string recentPath = "D:\\folder\\newFolder";
+        const string recentPath = "D:\\folder\\newFolder";
 
         object result = RecentPathsConfigs.WriteFunc(recentPath, 0);
 
@@ -76,7 +76,7 @@ public class RecentPathsConfigsTests
     [Test]
     public void WriteFunc_IndexOutOfRange_ThrowsArgumentOutOfRangeException()
     {
-        string recentPath = "D:\\folder\\newFolder";
+        const string recentPath = "D:\\folder\\newFolder";
 
         ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => RecentPathsConfigs.WriteFunc(recentPath, 2));
 

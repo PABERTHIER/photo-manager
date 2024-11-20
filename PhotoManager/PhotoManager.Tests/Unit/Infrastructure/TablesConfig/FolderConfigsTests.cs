@@ -3,7 +3,7 @@
 [TestFixture]
 public class FolderConfigsTests
 {
-    private readonly Guid folderId = Guid.NewGuid();
+    private readonly Guid _folderId = Guid.NewGuid();
 
     [Test]
     public void ConfigureDataTable_ReturnsCorrectColumnNames()
@@ -20,34 +20,34 @@ public class FolderConfigsTests
     [Test]
     public void ReadFunc_ValidValues_ParsesStringArrayIntoFolder()
     {
-        string[] validValues = new string[]
-        {
-            folderId.ToString(),
+        string[] validValues =
+        [
+            _folderId.ToString(),
             "D:\\folder\\newFolder"
-        };
+        ];
 
         Folder folder = FolderConfigs.ReadFunc(validValues);
 
         Assert.IsNotNull(folder);
-        Assert.AreEqual(folderId, folder.FolderId);
+        Assert.AreEqual(_folderId, folder.FolderId);
         Assert.AreEqual("D:\\folder\\newFolder", folder.Path);
     }
 
     [Test]
     public void ReadFunc_TooManyValues_ParsesStringArrayIntoFolder()
     {
-        string[] tooManyValues = new string[]
-        {
-            folderId.ToString(),
+        string[] tooManyValues =
+        [
+            _folderId.ToString(),
             "D:\\folder\\newFolder",
             "toto",
             "15"
-        };
+        ];
 
         Folder folder = FolderConfigs.ReadFunc(tooManyValues);
 
         Assert.IsNotNull(folder);
-        Assert.AreEqual(folderId, folder.FolderId);
+        Assert.AreEqual(_folderId, folder.FolderId);
         Assert.AreEqual("D:\\folder\\newFolder", folder.Path);
     }
 
@@ -64,9 +64,9 @@ public class FolderConfigsTests
     [Test]
     public void ReadFunc_EmptyArray_ThrowsIndexOutOfRangeException()
     {
-        string[] emptyArrray = Array.Empty<string>();
+        string[] emptyArray = [];
 
-        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => FolderConfigs.ReadFunc(emptyArrray));
+        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => FolderConfigs.ReadFunc(emptyArray));
 
         Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
     }
@@ -76,7 +76,7 @@ public class FolderConfigsTests
     {
         Folder folder = new()
         {
-            FolderId = folderId,
+            FolderId = _folderId,
             Path = "D:\\folder\\newFolder"
         };
 
@@ -86,7 +86,7 @@ public class FolderConfigsTests
             result[i] = FolderConfigs.WriteFunc(folder, i);
         }
 
-        Assert.AreEqual(folderId, result[0]);
+        Assert.AreEqual(_folderId, result[0]);
         Assert.AreEqual("D:\\folder\\newFolder", result[1]);
     }
 
@@ -113,7 +113,7 @@ public class FolderConfigsTests
     {
         Folder folder = new()
         {
-            FolderId = folderId,
+            FolderId = _folderId,
             Path = "D:\\folder\\newFolder"
         };
 

@@ -44,7 +44,7 @@ public class FileSizeConverterTests
     public void Convert_NonNumberInputType_ReturnsFileSize()
     {
         FileSizeConverter fileSizeConverter = new();
-        string input = "12345";
+        const string input = "12345";
         object? parameter = null;
 
         object result = fileSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);
@@ -56,7 +56,7 @@ public class FileSizeConverterTests
     public void Convert_InvalidFormat_ThrowsFormatException()
     {
         FileSizeConverter fileSizeConverter = new();
-        string input = "abc";
+        const string input = "abc";
         object? parameter = null;
 
         FormatException? exception = Assert.Throws<FormatException>(() =>

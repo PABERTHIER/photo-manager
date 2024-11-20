@@ -3,12 +3,12 @@
 [TestFixture]
 public class FolderTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
     }
 
     [Test]
@@ -20,8 +20,8 @@ public class FolderTests
     [TestCase("TestFolder\\TestSubFolder1", "TestFolder\\TestSubFolder2", false)]
     public void IsParentOf_PathIsValid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2, bool expected)
     {
-        Folder parentFolder1 = new() { Path = Path.Combine(dataDirectory!, parentFolderSubPath1) };
-        Folder childFolder2 = new() { Path = Path.Combine(dataDirectory!, childFolderSubPath2) };
+        Folder parentFolder1 = new() { Path = Path.Combine(_dataDirectory!, parentFolderSubPath1) };
+        Folder childFolder2 = new() { Path = Path.Combine(_dataDirectory!, childFolderSubPath2) };
 
         bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
 
@@ -47,7 +47,7 @@ public class FolderTests
     public void IsParentOf_PathIsNull_ReturnsFalse()
     {
         Folder folder = new() { Path = null! };
-        Folder childFolder = new() { Path = Path.Combine(dataDirectory!, "TestFolder") };
+        Folder childFolder = new() { Path = Path.Combine(_dataDirectory!, "TestFolder") };
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);
 
@@ -57,7 +57,7 @@ public class FolderTests
     [Test]
     public void IsParentOf_ChildPathIsNull_ReturnsFalse()
     {
-        Folder folder = new() { Path = dataDirectory! };
+        Folder folder = new() { Path = _dataDirectory! };
         Folder childFolder = new() { Path = null! };
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);

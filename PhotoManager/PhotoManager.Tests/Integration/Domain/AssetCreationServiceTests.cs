@@ -517,6 +517,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -594,6 +595,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 10 portrait.png",
             FileSize = 153318,
             PixelHeight = 1280,
@@ -670,6 +672,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image_11.heic",
             FileSize = 1411940,
             PixelHeight = 4032,
@@ -734,6 +737,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -857,6 +861,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -991,6 +996,7 @@ public class AssetCreationServiceTests
         {
             Asset expectedAsset = new()
             {
+                Folder = new() { Path = "" },
                 FileName = corruptedAssetFileName,
                 FileSize = fileSize,
                 PixelHeight = pixelHeight,
@@ -1808,6 +1814,7 @@ public class AssetCreationServiceTests
 
             Asset expectedAsset = new()
             {
+                Folder = new() { Path = "" },
                 FileName = firstFrameFileName,
                 FileSize = 29857,
                 PixelHeight = 720,
