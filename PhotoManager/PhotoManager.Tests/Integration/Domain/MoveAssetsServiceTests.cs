@@ -776,7 +776,6 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
             Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.FolderId));
 
-            // TODO: Is it good now ?
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(1, cataloguedAssetsInSource.Count);
