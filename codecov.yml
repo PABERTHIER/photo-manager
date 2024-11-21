@@ -1,5 +1,13 @@
 codecov:
-    require_ci_to_pass: yes
+  require_ci_to_pass: yes
+  max_report_age: off
+  max_path_depth: 500
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: false
+  require_base: false
 
 coverage:
     precision: 2
@@ -8,13 +16,39 @@ coverage:
 
 parsers:
   gcov:
-        branch_detection:
-            conditional: yes
-            loop: yes
-            method: no
-            macro: no
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: yes
+      macro: no
 
-comment:
-    layout: "header,diff"
-    behavior: default
-    require_changes: false
+notifications:
+  commit:
+    status:
+      default:
+        target: "https://docs.codecov.io/docs/commit-status"
+        threshold: 1%
+        paths: []
+        informational: false
+
+
+comment_template: |
+  :rocket: **Code Coverage Report** for `{{ commit }}`
+  - **Coverage**: {{ diff_coverage }}% ({{ coverage_change }}% change)
+  - **Files**: {{ total_files }} with modifications
+  - **Hits**: {{ hits }} / {{ lines }} lines
+  {{#flags}}
+  {{#name}}
+  - Flag **{{ name }}**: {{ coverage }}%
+  {{/name}}
+  {{/flags}}
+  {{#reach}}
+  - **Reach**: Improved {{ diff_coverage }}% compared to base.
+  {{/reach}}
+  [View Full Report](https://codecov.io/{{ slug }}/commit/{{ commit }})
+  {{#threshold_exceeded}}
+  :warning: The threshold of {{ threshold }}% was exceeded by {{ diff }}%.
+  {{/threshold_exceeded}}
+  {{#is_new}}
+  :green_circle: This is a **newly added test**.
+  {{/is_new}}
