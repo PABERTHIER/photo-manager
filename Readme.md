@@ -189,6 +189,10 @@ Improvements **WIP**.
 - [ReportGenerator](https://github.com/danielpalme/ReportGenerator)
 - [FFMpegCore](https://github.com/rosenbjerg/FFMpegCore)
 
+## Code coverage :bar_chart:
+
+[![codecov](https://codecov.io/github/PABERTHIER/photo-manager/graphs/sunburst.svg?token=DILR0QRXVN)](https://codecov.io/github/PABERTHIER/photo-manager)
+
 ## Transparency :handshake:
 
 This project has some versionned dll and rar files for its own good working.
