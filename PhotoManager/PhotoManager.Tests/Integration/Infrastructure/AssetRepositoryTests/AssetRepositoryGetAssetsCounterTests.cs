@@ -9,7 +9,7 @@ public class AssetRepositoryGetAssetsCounterTests
     private string? _backupPath;
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
-    private IAssetRepository? _assetRepository;
+    private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -35,10 +35,11 @@ public class AssetRepositoryGetAssetsCounterTests
     {
         PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
 
         _asset1 = new()
         {
+            Folder = new() { Path = "" },
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
             FileSize = 363888,
@@ -56,6 +57,7 @@ public class AssetRepositoryGetAssetsCounterTests
         };
         _asset2 = new()
         {
+            Folder = new() { Path = "" },
             FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = "Image 9.png",
             FileSize = 4602393,
@@ -73,6 +75,7 @@ public class AssetRepositoryGetAssetsCounterTests
         };
         _asset3 = new()
         {
+            Folder = new() { Path = "" },
             FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
             FileName = "Image_11.heic",
             FileSize = 2247285,
@@ -93,7 +96,7 @@ public class AssetRepositoryGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_AssetsExist_ReturnsNumberOfAssets()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
@@ -159,7 +162,7 @@ public class AssetRepositoryGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_NoAsset_Returns0()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
@@ -180,7 +183,7 @@ public class AssetRepositoryGetAssetsCounterTests
     [Test]
     public void GetAssetsCounter_ConcurrentAccess_AssetsAreHandledSafely()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try

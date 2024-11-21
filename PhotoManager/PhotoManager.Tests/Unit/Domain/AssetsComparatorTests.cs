@@ -22,6 +22,7 @@ public class AssetsComparatorTests
         _asset1 = new()
         {
             FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
@@ -39,6 +40,7 @@ public class AssetsComparatorTests
         _asset2 = new()
         {
             FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
+            Folder = new() { Path = "" },
             FileName = "Image 9.png",
             FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
@@ -55,6 +57,7 @@ public class AssetsComparatorTests
         };
         _asset3 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Homer.gif",
             FileSize = 64123,
             PixelHeight = 320,
@@ -71,6 +74,7 @@ public class AssetsComparatorTests
         };
         _asset4 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image_11.heic",
             FileSize = 1411940,
             PixelHeight = 4032,
@@ -93,10 +97,10 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file6.jpg" },
-            new Asset { FileName = "file7.png" },
-            new Asset { FileName = "file8.gif" },
-            new Asset { FileName = "file9.heic" }
+            new() { Folder = new() { Path = "" }, FileName = "file6.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file7.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file8.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file9.heic", Hash = string.Empty }
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -111,12 +115,12 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file1.jpg" },
-            new Asset { FileName = "file4.heic" },
-            new Asset { FileName = "file6.jpg" },
-            new Asset { FileName = "file7.png" },
-            new Asset { FileName = "file8.gif" },
-            new Asset { FileName = "file9.heic" }
+            new() { Folder = new() { Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file4.heic", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file6.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file7.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file8.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file9.heic", Hash = string.Empty }
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -131,11 +135,11 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file1.jpg" },
-            new Asset { FileName = "file2.png" },
-            new Asset { FileName = "file3.gif" },
-            new Asset { FileName = "file4.heic" },
-            new Asset { FileName = "file5.mp4" }
+            new() { Folder = new() { Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file2.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file3.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file4.heic", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -149,11 +153,11 @@ public class AssetsComparatorTests
         string[] fileNames = [];
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file1.jpg" },
-            new Asset { FileName = "file2.png" },
-            new Asset { FileName = "file3.gif" },
-            new Asset { FileName = "file4.heic" },
-            new Asset { FileName = "file5.mp4" }
+            new() { Folder = new() { Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file2.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file3.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file4.heic", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -167,11 +171,11 @@ public class AssetsComparatorTests
         string[]? fileNames = null;
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file1.jpg" },
-            new Asset { FileName = "file2.png" },
-            new Asset { FileName = "file3.gif" },
-            new Asset { FileName = "file4.heic" },
-            new Asset { FileName = "file5.mp4" }
+            new() { Folder = new() { Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file2.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file3.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file4.heic", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
         ];
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNames(fileNames!, cataloguedAssets));
@@ -389,10 +393,10 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file6.jpg" },
-            new Asset { FileName = "file7.png" },
-            new Asset { FileName = "file8.gif" },
-            new Asset { FileName = "file9.heic" }
+            new() { Folder = new() { Path = "" }, FileName = "file6.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file7.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file8.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file9.heic", Hash = string.Empty }
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -407,11 +411,11 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file1.jpg" },
-            new Asset { FileName = "file6.jpg" },
-            new Asset { FileName = "file7.png" },
-            new Asset { FileName = "file8.gif" },
-            new Asset { FileName = "file9.heic" }
+            new() { Folder = new() { Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file6.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file7.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file8.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file9.heic", Hash = string.Empty }
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -426,11 +430,11 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file1.jpg" },
-            new Asset { FileName = "file2.png" },
-            new Asset { FileName = "file3.gif" },
-            new Asset { FileName = "file4.heic" },
-            new Asset { FileName = "file5.mp4" }
+            new() { Folder = new() { Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file2.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file3.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file4.heic", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -444,11 +448,11 @@ public class AssetsComparatorTests
         string[] fileNames = [];
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file1.jpg" },
-            new Asset { FileName = "file2.png" },
-            new Asset { FileName = "file3.gif" },
-            new Asset { FileName = "file4.heic" },
-            new Asset { FileName = "file5.mp4" }
+            new() { Folder = new() { Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file2.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file3.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file4.heic", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -463,11 +467,11 @@ public class AssetsComparatorTests
         string[]? fileNames = null;
         List<Asset> cataloguedAssets =
         [
-            new Asset { FileName = "file1.jpg" },
-            new Asset { FileName = "file2.png" },
-            new Asset { FileName = "file3.gif" },
-            new Asset { FileName = "file4.heic" },
-            new Asset { FileName = "file5.mp4" }
+            new() { Folder = new() { Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file2.png", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file3.gif", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file4.heic", Hash = string.Empty },
+            new() { Folder = new() { Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
         ];
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNames(fileNames!, cataloguedAssets));

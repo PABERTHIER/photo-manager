@@ -26,7 +26,7 @@ public class Database : IDatabase
         BlobsDirectory = string.Empty;
         BackupsDirectory = string.Empty;
         Diagnostics = new Diagnostics();
-        DataTablePropertiesDictionary = new();
+        DataTablePropertiesDictionary = [];
     }
 
     public void Initialize(string dataDirectory, char separator, string tablesFolderName, string blobsFolderName)
@@ -36,7 +36,7 @@ public class Database : IDatabase
         BlobsDirectory = GetBlobsDirectory(blobsFolderName);
         BackupsDirectory = GetBackupsDirectory();
         Separator = separator;
-        DataTablePropertiesDictionary = new Dictionary<string, DataTableProperties>();
+        DataTablePropertiesDictionary = [];
         InitializeDirectory();
     }
 
@@ -57,7 +57,7 @@ public class Database : IDatabase
             throw new ArgumentNullException(nameof(ColumnProperties.ColumnName), "All column properties should have a ColumnName");
         }
 
-        IGrouping<string, ColumnProperties>? group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName).Where(g => g.Count() > 1).FirstOrDefault();
+        IGrouping<string, ColumnProperties>? group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName).FirstOrDefault(g => g.Count() > 1);
 
         if (group != null)
         {
@@ -158,8 +158,8 @@ public class Database : IDatabase
     public void DeleteOldBackups(ushort backupsToKeep)
     {
         string[] filesPaths = _backupStorage.GetBackupFilesPaths(BackupsDirectory);
-        filesPaths = filesPaths.OrderBy(f => f).ToArray();
-        List<string> deletedBackupFilePaths = new();
+        filesPaths = [.. filesPaths.OrderBy(f => f)];
+        List<string> deletedBackupFilePaths = [];
 
         for (int i = 0; i < filesPaths.Length - backupsToKeep; i++)
         {

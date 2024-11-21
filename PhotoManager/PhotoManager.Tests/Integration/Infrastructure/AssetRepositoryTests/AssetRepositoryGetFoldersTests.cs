@@ -6,8 +6,8 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 public class AssetRepositoryGetFoldersTests
 {
     private string? _dataDirectory;
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
     private string? _backupPath;
+    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
@@ -31,13 +31,13 @@ public class AssetRepositoryGetFoldersTests
     {
         PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
     }
 
     [Test]
     public void GetFolders_Folders_ReturnsCorrectFolders()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
@@ -68,7 +68,7 @@ public class AssetRepositoryGetFoldersTests
     [Test]
     public void GetFolders_NoFolders_ReturnsEmptyArray()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
@@ -89,7 +89,7 @@ public class AssetRepositoryGetFoldersTests
     [Test]
     public void GetFolders_ConcurrentAccess_FoldersAreHandledSafely()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try

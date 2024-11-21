@@ -152,7 +152,7 @@ public class SyncAssetsConfigurationTests
     public void Validate_DefinitionsAreInvalid_RemovesAllDefinitions()
     {
         _syncAssetsConfiguration!.Definitions.Add(new() { SourceDirectory = "Invalid1\\Path", DestinationDirectory = "Invalid2\\Path" });
-        _syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = "http://www.some-site.com", DestinationDirectory = "ftp://some-location.com" });
+        _syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = "https://www.some-site.com", DestinationDirectory = "ftp://some-location.com" });
         _syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = "Invalid@Value.com", DestinationDirectory = "Invalid@Value.com" });
         _syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = "", DestinationDirectory = "" });
         _syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = "", DestinationDirectory = null! });

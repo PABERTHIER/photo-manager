@@ -6,23 +6,23 @@ public static class AssetConfigs
 {
     public static ColumnProperties[] ConfigureDataTable()
     {
-        return new ColumnProperties[]
-        {
-            new ColumnProperties { ColumnName = "FolderId" },
-            new ColumnProperties { ColumnName = "FileName" },
-            new ColumnProperties { ColumnName = "FileSize" },
-            new ColumnProperties { ColumnName = "ImageRotation" },
-            new ColumnProperties { ColumnName = "PixelWidth" },
-            new ColumnProperties { ColumnName = "PixelHeight" },
-            new ColumnProperties { ColumnName = "ThumbnailPixelWidth" },
-            new ColumnProperties { ColumnName = "ThumbnailPixelHeight" },
-            new ColumnProperties { ColumnName = "ThumbnailCreationDateTime" },
-            new ColumnProperties { ColumnName = "Hash" },
-            new ColumnProperties { ColumnName = "AssetCorruptedMessage" },
-            new ColumnProperties { ColumnName = "IsAssetCorrupted" },
-            new ColumnProperties { ColumnName = "AssetRotatedMessage" },
-            new ColumnProperties { ColumnName = "IsAssetRotated" }
-        };
+        return
+        [
+            new() { ColumnName = "FolderId" },
+            new() { ColumnName = "FileName" },
+            new() { ColumnName = "FileSize" },
+            new() { ColumnName = "ImageRotation" },
+            new() { ColumnName = "PixelWidth" },
+            new() { ColumnName = "PixelHeight" },
+            new() { ColumnName = "ThumbnailPixelWidth" },
+            new() { ColumnName = "ThumbnailPixelHeight" },
+            new() { ColumnName = "ThumbnailCreationDateTime" },
+            new() { ColumnName = "Hash" },
+            new() { ColumnName = "AssetCorruptedMessage" },
+            new() { ColumnName = "IsAssetCorrupted" },
+            new() { ColumnName = "AssetRotatedMessage" },
+            new() { ColumnName = "IsAssetRotated" }
+        ];
     }
 
     public static Asset ReadFunc(string[] values)
@@ -37,6 +37,7 @@ public static class AssetConfigs
         return new Asset
         {
             FolderId = new Guid(values[0]),
+            Folder = new() { Path = "" }, // Initialised later
             FileName = values[1],
             FileSize = long.Parse(values[2]),
             ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), values[3]),

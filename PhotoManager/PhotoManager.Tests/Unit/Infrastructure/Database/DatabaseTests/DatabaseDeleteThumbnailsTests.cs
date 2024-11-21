@@ -3,7 +3,7 @@
 [TestFixture]
 public class DatabaseDeleteThumbnailsTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
@@ -11,7 +11,7 @@ public class DatabaseDeleteThumbnailsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -29,7 +29,7 @@ public class DatabaseDeleteThumbnailsTests
     public void DeleteThumbnails_BlobExists_DeleteFile()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
@@ -56,7 +56,7 @@ public class DatabaseDeleteThumbnailsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -64,7 +64,7 @@ public class DatabaseDeleteThumbnailsTests
     public void DeleteThumbnails_BlobDoesNotExist_DoesNotDeleteFile()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
 
         try
@@ -84,7 +84,7 @@ public class DatabaseDeleteThumbnailsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 }

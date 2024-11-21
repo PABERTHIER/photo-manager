@@ -1,6 +1,6 @@
 ﻿namespace PhotoManager.Domain.UserConfigurationSettings;
 
-public record class PathSettings(
+public record PathSettings(
     string AssetsDirectory,
     string BackupPath,
     string ExemptedFolderPath,

@@ -352,7 +352,7 @@ public static class CatalogAssetsAsyncAsserts
 
         Assert.AreEqual(expectedAsset.FileName, assetFromDatabase.FileName);
         Assert.AreEqual(folderId, assetFromDatabase.FolderId);
-        Assert.IsNull(assetFromDatabase.Folder);  // Not saved in Db, loaded at the runtime
+        Assert.AreEqual(string.Empty, assetFromDatabase.Folder.Path);  // Not saved in Db, loaded at the runtime
         Assert.AreEqual(expectedAsset.FileSize, assetFromDatabase.FileSize);
         Assert.AreEqual(expectedAsset.PixelWidth, assetFromDatabase.PixelWidth);
         Assert.AreEqual(expectedAsset.PixelHeight, assetFromDatabase.PixelHeight);

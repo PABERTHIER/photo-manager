@@ -143,14 +143,14 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder }
+                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
             ];
 
-            Asset newAsset = new() { FileName = "NewImage.jpg", ImageData = new BitmapImage(), Folder = folder };
+            Asset newAsset = new() { FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder };
             const string statusMessage = "Creating thumbnail for NewImage.jpg";
 
             _applicationViewModel!.SetAssets(assets);
@@ -193,14 +193,14 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder }
+                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
             ];
 
-            Asset newAsset = new() { FileName = "NewImage.jpg", ImageData = new BitmapImage(), Folder = folder };
+            Asset newAsset = new() { FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder };
             const string statusMessage = "Creating thumbnail for NewImage.jpg";
 
             _applicationViewModel!.SetAssets(assets);
@@ -243,11 +243,11 @@ public class ApplicationViewModelTests
 
             List<Asset> cataloguedAssets =
             [
-                new Asset {FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder},
-                new Asset {FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder},
-                new Asset {FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder},
-                new Asset {FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder},
-                new Asset {FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder}
+                new() {FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder},
+                new() {FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder},
+                new() {FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder},
+                new() {FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder},
+                new() {FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder}
             ];
 
             const string statusMessage = "Creating thumbnail for Image 5.jpg";
@@ -289,7 +289,7 @@ public class ApplicationViewModelTests
             Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             Asset[] assets = [];
-            Asset newAsset = new() { FileName = "NewImage.jpg", ImageData = new BitmapImage(), Folder = folder };
+            Asset newAsset = new() { FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder };
 
             _applicationViewModel!.SetAssets(assets);
 
@@ -322,15 +322,15 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder }
+                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
             ];
 
             Folder newFolder = new() { Path = @"D:\NewFolder" };
-            Asset newAsset = new() { FileName = "NewImage.jpg", ImageData = new BitmapImage(), Folder = newFolder };
+            Asset newAsset = new() { FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = newFolder };
 
             _applicationViewModel!.SetAssets(assets);
 
@@ -368,18 +368,18 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder }
+                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
             ];
 
-            Asset newAsset = new() { FileName = "NewImage.jpg", ImageData = new BitmapImage(), Folder = null };
+            Asset newAsset = new() { Folder = new() { Path = "" }, FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage() };
 
             _applicationViewModel!.SetAssets(assets);
 
-            _applicationViewModel!.NotifyCatalogChange(null);
+            _applicationViewModel!.NotifyCatalogChange(null!);
 
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
@@ -433,23 +433,24 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder }
+                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
             ];
 
             Asset newAsset = new()
             {
                 FileName = fileName,
+                Hash = string.Empty,
                 ImageData = new BitmapImage(),
                 Folder = new Folder { FolderId = folderId, Path = folderPath }
             };
 
             _applicationViewModel!.SetAssets(assets);
 
-            _applicationViewModel!.NotifyCatalogChange(null);
+            _applicationViewModel!.NotifyCatalogChange(null!);
 
             _applicationViewModel!.NotifyCatalogChange(new CatalogChangeCallbackEventArgs
             {
@@ -492,11 +493,11 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder }
+                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
             ];
 
             const string statusMessage = "Removing thumbnail for Image 3.jpg";
@@ -543,11 +544,11 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -583,11 +584,11 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -621,11 +622,11 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -659,11 +660,11 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -742,11 +743,11 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder }
+                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -776,14 +777,14 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), Folder = folder },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), Folder = folder }
+                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
+                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
             ];
 
-            Asset assetNotInList = new() { FileName = "ImageNotInList.jpg", ImageData = new BitmapImage(), Folder = folder };
+            Asset assetNotInList = new() { FileName = "ImageNotInList.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder };
 
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.ViewerPosition = 4;
@@ -820,11 +821,11 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -853,7 +854,7 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -885,7 +886,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.ViewerPosition = -1;
 
-            _applicationViewModel!.RemoveAssets(null);
+            _applicationViewModel!.RemoveAssets(null!);
 
             Assert.AreEqual(-1, _applicationViewModel!.ViewerPosition);
             Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
@@ -906,10 +907,10 @@ public class ApplicationViewModelTests
 
         try
         {
-            _applicationViewModel!.SetAssets(null);
+            _applicationViewModel!.SetAssets(null!);
             _applicationViewModel!.ViewerPosition = -1;
 
-            _applicationViewModel!.RemoveAssets(null);
+            _applicationViewModel!.RemoveAssets(null!);
 
             Assert.AreEqual(-1, _applicationViewModel!.ViewerPosition);
             Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
@@ -938,11 +939,11 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.Product = "PhotoManager";
@@ -969,7 +970,7 @@ public class ApplicationViewModelTests
 
         try
         {
-            Asset[] assets = null;
+            Asset[] assets = null!;
 
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
@@ -1027,9 +1028,11 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset
+                new()
                 {
+                    Folder = new() { Path = "" },
                     FileName = "Image 1.jpg",
+                    Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileSize = 2048,
                     FileCreationDateTime = DateTime.Now,
@@ -1062,11 +1065,11 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.Undefined);
@@ -1099,11 +1102,11 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage() },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage() }
+                new() { Folder = new() { Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
+                new() { Folder = new() { Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
             ];
 
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.Undefined);
@@ -1153,11 +1156,46 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2010, 2, 1) },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2010, 1, 1) },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2010, 8, 1) }
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 5.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 2.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 1.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2010, 2, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 3.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2010, 1, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 4.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2010, 8, 1)
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -1188,11 +1226,46 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2010, 2, 1) },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2010, 1, 1) },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), ThumbnailCreationDateTime = new DateTime(2010, 8, 1) }
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 5.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 2.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 1.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2010, 2, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 3.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2010, 1, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 4.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    ThumbnailCreationDateTime = new DateTime(2010, 8, 1)
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -1241,11 +1314,46 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2010, 2, 1) },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2010, 1, 1) },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2010, 8, 1) }
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 5.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 2.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 1.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2010, 2, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 3.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2010, 1, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 4.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2010, 8, 1)
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -1276,11 +1384,46 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2010, 2, 1) },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2010, 1, 1) },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), FileCreationDateTime = new DateTime(2010, 8, 1) }
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 5.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 2.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 1.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2010, 2, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 3.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2010, 1, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 4.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileCreationDateTime = new DateTime(2010, 8, 1)
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -1329,11 +1472,46 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2010, 2, 1) },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2010, 1, 1) },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2010, 8, 1) }
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 5.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 2.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 1.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2010, 2, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 3.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2010, 1, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 4.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2010, 8, 1)
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -1364,11 +1542,46 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2020, 6, 1) },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2010, 2, 1) },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2010, 1, 1) },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), FileModificationDateTime = new DateTime(2010, 8, 1) }
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 5.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 2.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2020, 6, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 1.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2010, 2, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 3.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2010, 1, 1)
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 4.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileModificationDateTime = new DateTime(2010, 8, 1)
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -1415,11 +1628,46 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), FileSize = 2048 },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), FileSize = 2048 },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), FileSize = 2020 },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), FileSize = 2000 },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), FileSize = 2030 }
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 5.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2048
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 2.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2048
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 1.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2020
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 3.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2000
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 4.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2030
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -1450,11 +1698,46 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new Asset { FileName = "Image 5.jpg", ImageData = new BitmapImage(), FileSize = 2048 },
-                new Asset { FileName = "Image 2.jpg", ImageData = new BitmapImage(), FileSize = 2048 },
-                new Asset { FileName = "Image 1.jpg", ImageData = new BitmapImage(), FileSize = 2020 },
-                new Asset { FileName = "Image 3.jpg", ImageData = new BitmapImage(), FileSize = 2000 },
-                new Asset { FileName = "Image 4.jpg", ImageData = new BitmapImage(), FileSize = 2030 }
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 5.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2048
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 2.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2048
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 1.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2020
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 3.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2000
+                },
+                new()
+                {
+                    Folder = new() { Path = "" },
+                    FileName = "Image 4.jpg",
+                    Hash = string.Empty,
+                    ImageData = new BitmapImage(),
+                    FileSize = 2030
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);

@@ -3,16 +3,16 @@
 [TestFixture]
 public class AssetConfigsTests
 {
-    private readonly Guid folderId = Guid.NewGuid();
-    private string[]? validValues;
-    private string[]? tooManyValues;
+    private readonly Guid _folderId = Guid.NewGuid();
+    private string[]? _validValues;
+    private string[]? _tooManyValues;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        validValues = new string[]
-        {
-            folderId.ToString(),
+        _validValues =
+        [
+            _folderId.ToString(),
             "Image 1.jpg",
             "1000",
             "0",
@@ -26,11 +26,11 @@ public class AssetConfigsTests
             "True",
             null!,
             "False"
-        };
+        ];
 
-        tooManyValues = new string[]
-        {
-            folderId.ToString(),
+        _tooManyValues =
+        [
+            _folderId.ToString(),
             "Image 1.jpg",
             "1000",
             "0",
@@ -46,7 +46,7 @@ public class AssetConfigsTests
             "False",
             "False",
             "False"
-        };
+        ];
     }
 
     [Test]
@@ -76,10 +76,10 @@ public class AssetConfigsTests
     [Test]
     public void ReadFunc_ValidValues_ParsesStringArrayIntoAsset()
     {
-        Asset asset = AssetConfigs.ReadFunc(validValues!);
+        Asset asset = AssetConfigs.ReadFunc(_validValues!);
 
         Assert.IsNotNull(asset);
-        Assert.AreEqual(folderId, asset.FolderId);
+        Assert.AreEqual(_folderId, asset.FolderId);
         Assert.AreEqual("Image 1.jpg", asset.FileName);
         Assert.AreEqual(1000, asset.FileSize);
         Assert.AreEqual(Rotation.Rotate0, asset.ImageRotation);
@@ -98,10 +98,10 @@ public class AssetConfigsTests
     [Test]
     public void ReadFunc_TooManyValues_ParsesStringArrayIntoAsset()
     {
-        Asset asset = AssetConfigs.ReadFunc(tooManyValues!);
+        Asset asset = AssetConfigs.ReadFunc(_tooManyValues!);
 
         Assert.IsNotNull(asset);
-        Assert.AreEqual(folderId, asset.FolderId);
+        Assert.AreEqual(_folderId, asset.FolderId);
         Assert.AreEqual("Image 1.jpg", asset.FileName);
         Assert.AreEqual(1000, asset.FileSize);
         Assert.AreEqual(Rotation.Rotate0, asset.ImageRotation);
@@ -130,9 +130,9 @@ public class AssetConfigsTests
     [Test]
     public void ReadFunc_EmptyArray_ThrowsIndexOutOfRangeException()
     {
-        string[] emptyArrray = Array.Empty<string>();
+        string[] emptyArray = [];
 
-        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => AssetConfigs.ReadFunc(emptyArrray));
+        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => AssetConfigs.ReadFunc(emptyArray));
 
         Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
     }
@@ -140,9 +140,9 @@ public class AssetConfigsTests
     [Test]
     public void ReadFunc_InvalidValues_ThrowsFormatException()
     {
-        string[] invalidValues = new string[]
-        {
-            folderId.ToString(),
+        string[] invalidValues =
+        [
+            _folderId.ToString(),
             "Image 1.jpg",
             "toto",
             "0",
@@ -156,7 +156,7 @@ public class AssetConfigsTests
             "15",
             null!,
             "False"
-        };
+        ];
 
         FormatException? exception = Assert.Throws<FormatException>(() => AssetConfigs.ReadFunc(invalidValues));
 
@@ -168,7 +168,8 @@ public class AssetConfigsTests
     {
         Asset asset = new()
         {
-            FolderId = folderId,
+            FolderId = _folderId,
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 1000,
             ImageRotation = Rotation.Rotate0,
@@ -190,7 +191,7 @@ public class AssetConfigsTests
             result[i] = AssetConfigs.WriteFunc(asset, i);
         }
 
-        Assert.AreEqual(folderId, result[0]);
+        Assert.AreEqual(_folderId, result[0]);
         Assert.AreEqual("Image 1.jpg", result[1]);
         Assert.AreEqual(1000, result[2]);
         Assert.AreEqual(Rotation.Rotate0, result[3]);
@@ -211,7 +212,9 @@ public class AssetConfigsTests
     {
         Asset asset = new()
         {
-            FolderId = folderId,
+            FolderId = _folderId,
+            Folder = new() { Path = "" },
+            FileName = "toto.jpg",
             ThumbnailCreationDateTime = new DateTime(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = "The asset is corrupted",
@@ -225,8 +228,8 @@ public class AssetConfigsTests
             result[i] = AssetConfigs.WriteFunc(asset, i);
         }
 
-        Assert.AreEqual(folderId, result[0]);
-        Assert.AreEqual(null, result[1]);
+        Assert.AreEqual(_folderId, result[0]);
+        Assert.AreEqual("toto.jpg", result[1]);
         Assert.AreEqual(0, result[2]);
         Assert.AreEqual(Rotation.Rotate0, result[3]);
         Assert.AreEqual(0, result[4]);
@@ -246,7 +249,8 @@ public class AssetConfigsTests
     {
         Asset asset = new()
         {
-            FolderId = folderId,
+            FolderId = _folderId,
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 1000,
             ImageRotation = Rotation.Rotate0,
