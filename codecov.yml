@@ -19,3 +19,30 @@ parsers:
       loop: yes
       method: yes
       macro: no
+
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+  individual_components:
+    - component_id: module_ui
+      name: UI
+      paths:
+        - PhotoManager/PhotoManager.UI/**
+    - component_id: module_application
+      name: Application
+      paths:
+        - PhotoManager/PhotoManager.Application/**
+    - component_id: module_domain
+      name: Domain
+      paths:
+        - PhotoManager/PhotoManager.Domain/**
+    - component_id: module_infrastructure
+      name: Infrastructure
+      paths:
+        - PhotoManager/PhotoManager.Infrastructure/**
+    - component_id: module_common
+      name: Common
+      paths:
+        - PhotoManager/PhotoManager.Common/**
