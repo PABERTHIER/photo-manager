@@ -20,13 +20,13 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     [Test]
     public void ReadFunc_ValidValues_ParsesStringArrayIntoSyncAssetsDirectoriesDefinition()
     {
-        string[] validValues = new string[]
-        {
+        string[] validValues =
+        [
             "D:\\source\\newFolder",
             "D:\\destination\\newFolder",
             "False",
             "True"
-        };
+        ];
 
         SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(validValues);
 
@@ -40,15 +40,15 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     [Test]
     public void ReadFunc_TooManyValues_ParsesStringArrayIntoSyncAssetsDirectoriesDefinition()
     {
-        string[] tooManyValues = new string[]
-        {
+        string[] tooManyValues =
+        [
             "D:\\source\\newFolder",
             "D:\\destination\\newFolder",
             "False",
             "True",
             "toto",
             "15"
-        };
+        ];
 
         SyncAssetsDirectoriesDefinition syncAssetsDirectoriesDefinition = SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(tooManyValues);
 
@@ -72,9 +72,9 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     [Test]
     public void ReadFunc_EmptyArray_ThrowsIndexOutOfRangeException()
     {
-        string[] emptyArrray = Array.Empty<string>();
+        string[] emptyArray = [];
 
-        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(emptyArrray));
+        IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(emptyArray));
 
         Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
     }
@@ -82,13 +82,13 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
     [Test]
     public void ReadFunc_InvalidValues_ThrowsFormatException()
     {
-        string[] invalidValues = new string[]
-        {
+        string[] invalidValues =
+        [
             "D:\\source\\newFolder",
             "D:\\destination\\newFolder",
             "15",
             "False"
-        };
+        ];
 
         FormatException? exception = Assert.Throws<FormatException>(() => SyncAssetsDirectoriesDefinitionConfigs.ReadFunc(invalidValues));
 

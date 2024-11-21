@@ -3,7 +3,7 @@
 [TestFixture]
 public class DatabaseDeleteOldBackupsTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     private UserConfigurationService? _userConfigurationService;
     private Mock<IBackupStorage>? _backupStorageMock;
@@ -11,7 +11,7 @@ public class DatabaseDeleteOldBackupsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -28,23 +28,23 @@ public class DatabaseDeleteOldBackupsTests
     [Test]
     public void DeleteOldBackups_ExcessBackups_SuccessfullyDeletesBackups()
     {
-        ushort backupsToKeep = 3;
-        string path1 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230404.zip");
-        string path2 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230304.zip");
-        string path3 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230204.zip");
-        string path4 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230104.zip");
-        string path5 = Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230504.zip");
+        const ushort backupsToKeep = 3;
+        string path1 = Path.Combine(_dataDirectory!, "DatabaseTests_Backups", "20230404.zip");
+        string path2 = Path.Combine(_dataDirectory!, "DatabaseTests_Backups", "20230304.zip");
+        string path3 = Path.Combine(_dataDirectory!, "DatabaseTests_Backups", "20230204.zip");
+        string path4 = Path.Combine(_dataDirectory!, "DatabaseTests_Backups", "20230104.zip");
+        string path5 = Path.Combine(_dataDirectory!, "DatabaseTests_Backups", "20230504.zip");
 
-        string[] filesPath = new string[]
-        {
+        string[] filesPath =
+        [
             path1,
             path2,
             path3,
             path4,
             path5
-        };
+        ];
 
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
 
         try
         {
@@ -73,22 +73,22 @@ public class DatabaseDeleteOldBackupsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
     [Test]
     public void DeleteOldBackups_NoExcessBackups_NothingDeleted()
     {
-        ushort backupsToKeep = 3;
-        string[] filesPath = new string[]
-        {
-            Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230404.zip"),
-            Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230304.zip"),
-            Path.Combine(dataDirectory!, "DatabaseTests_Backups", "20230204.zip")
-        };
+        const ushort backupsToKeep = 3;
+        string[] filesPath =
+        [
+            Path.Combine(_dataDirectory!, "DatabaseTests_Backups", "20230404.zip"),
+            Path.Combine(_dataDirectory!, "DatabaseTests_Backups", "20230304.zip"),
+            Path.Combine(_dataDirectory!, "DatabaseTests_Backups", "20230204.zip")
+        ];
 
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
 
         try
         {
@@ -110,7 +110,7 @@ public class DatabaseDeleteOldBackupsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 }

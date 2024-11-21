@@ -44,6 +44,7 @@ public class AssetRepositoryConcurrentAccessTests
         _asset1 = new()
         {
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
@@ -61,6 +62,7 @@ public class AssetRepositoryConcurrentAccessTests
         _asset2 = new()
         {
             FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
+            Folder = new() { Path = "" },
             FileName = "Image 9.png",
             FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
@@ -78,6 +80,7 @@ public class AssetRepositoryConcurrentAccessTests
         _asset3 = new()
         {
             FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
+            Folder = new() { Path = "" },
             FileName = "Image_11.heic",
             FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
@@ -100,6 +103,7 @@ public class AssetRepositoryConcurrentAccessTests
         Asset asset4 = new()
         {
             FolderId = new Guid("cf9293ad-d835-4126-8a76-17c7bbfe626e"),
+            Folder = new() { Path = "" },
             FileName = "Image 2.jpg",
             FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
@@ -117,6 +121,7 @@ public class AssetRepositoryConcurrentAccessTests
         Asset asset5 = new()
         {
             FolderId = new Guid("1e3c2274-bc11-482a-a7b4-e86e5aeb17f1"),
+            Folder = new() { Path = "" },
             FileName = "Image 3.jpg",
             FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
@@ -132,7 +137,7 @@ public class AssetRepositoryConcurrentAccessTests
             IsAssetRotated = true
         };
 
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try

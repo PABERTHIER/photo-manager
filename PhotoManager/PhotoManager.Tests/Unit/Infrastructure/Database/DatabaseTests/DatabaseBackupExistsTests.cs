@@ -3,7 +3,7 @@
 [TestFixture]
 public class DatabaseBackupExistsTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
@@ -11,7 +11,7 @@ public class DatabaseBackupExistsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -30,7 +30,7 @@ public class DatabaseBackupExistsTests
     {
         DateTime backupDate = DateTime.Now;
 
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
 
         try
         {
@@ -49,7 +49,7 @@ public class DatabaseBackupExistsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -58,7 +58,7 @@ public class DatabaseBackupExistsTests
     {
         DateTime backupDate = DateTime.Now;
 
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
 
         try
         {
@@ -75,7 +75,7 @@ public class DatabaseBackupExistsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 }

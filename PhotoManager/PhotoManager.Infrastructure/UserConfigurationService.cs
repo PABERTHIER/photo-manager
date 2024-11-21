@@ -32,7 +32,7 @@ public class UserConfigurationService : IUserConfigurationService
 
     public void SetAsWallpaper(Asset asset, WallpaperStyle style)
     {
-        RegistryKey? key = Registry.CurrentUser?.OpenSubKey(@"Control Panel\Desktop", true);
+        RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
 
         switch (style)
         {
@@ -102,10 +102,7 @@ public class UserConfigurationService : IUserConfigurationService
 
     public string[] GetRootCatalogFolderPaths()
     {
-        List<string> rootPaths = new()
-        {
-            PathSettings.AssetsDirectory
-        };
+        List<string> rootPaths = [PathSettings.AssetsDirectory];
 
         return rootPaths.ToArray();
     }

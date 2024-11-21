@@ -3,17 +3,17 @@
 [TestFixture]
 public class DatabaseWriteBlobTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
 
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
 
-    private readonly char semicolonSeparator = ';';
+    private const char SEMICOLON_SEPARATOR = ';';
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -31,19 +31,19 @@ public class DatabaseWriteBlobTests
     public void WriteBlob_BlobToWriteIsCorrectAndSemicolonSeparator_WritesBlob()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { "Image1.jpg", new byte[] { 1, 2, 3 } },
-            { "Image2.png", new byte[] { 4, 5, 6 } }
+            { "Image1.jpg", [1, 2, 3]},
+            { "Image2.png", [4, 5, 6]}
         };
 
         try
         {
             _database!.Initialize(
                 directoryPath,
-                semicolonSeparator,
+                SEMICOLON_SEPARATOR,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
@@ -67,7 +67,7 @@ public class DatabaseWriteBlobTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -75,12 +75,12 @@ public class DatabaseWriteBlobTests
     public void WriteBlob_BlobToWriteIsCorrectAndPipeSeparator_WritesBlob()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { "Image1.jpg", new byte[] { 1, 2, 3 } },
-            { "Image2.png", new byte[] { 4, 5, 6 } }
+            { "Image1.jpg", [1, 2, 3]},
+            { "Image2.png", [4, 5, 6]}
         };
 
         try
@@ -111,7 +111,7 @@ public class DatabaseWriteBlobTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -119,7 +119,7 @@ public class DatabaseWriteBlobTests
     public void WriteBlob_BlobToWriteIsNullAndPipeSeparator_ThrowsNullReferenceException()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]>? blobToWrite = null;
 
@@ -141,7 +141,7 @@ public class DatabaseWriteBlobTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 
@@ -149,9 +149,9 @@ public class DatabaseWriteBlobTests
     public void WriteBlob_BlobToWriteIsEmptyAndPipeSeparator_WritesNothingInTheFile()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
-        string directoryPath = Path.Combine(dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
-        Dictionary<string, byte[]> blobToWrite = new();
+        Dictionary<string, byte[]> blobToWrite = [];
 
         try
         {
@@ -175,7 +175,7 @@ public class DatabaseWriteBlobTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
         }
     }
 }

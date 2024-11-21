@@ -5,14 +5,14 @@ namespace PhotoManager.Tests.Integration.Infrastructure;
 [TestFixture]
 public class UserConfigurationServiceTests
 {
-    private string? dataDirectory;
+    private string? _dataDirectory;
     private UserConfigurationService? _userConfigurationService;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        string configFilePath = Path.Combine(dataDirectory, "appsettings.json");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        string configFilePath = Path.Combine(_dataDirectory, "appsettings.json");
 
         IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile(configFilePath, optional: false, reloadOnChange: true);
         IConfigurationRoot configuration = builder.Build();
@@ -30,8 +30,8 @@ public class UserConfigurationServiceTests
     [TestCase(WallpaperStyle.Fill, "10", "0")]
     public void SetAsWallpaper_ValidStyleAndTile_RegistersExpectedValues(WallpaperStyle style, string expectedStyleValue, string expectedTileValue)
     {
-        Folder folder = new() { Path = dataDirectory! };
-        Asset asset = new() { Folder = folder, FileName = "NonExistentFile.jpg" }; // Not giving an existing file to prevent the wallpaper to be changed
+        Folder folder = new() { Path = _dataDirectory! };
+        Asset asset = new() { Folder = folder, FileName = "NonExistentFile.jpg", Hash = string.Empty }; // Not giving an existing file to prevent the wallpaper to be changed
 
         // Set up a StringWriter to capture console output
         StringWriter stringWriter = new();
@@ -226,7 +226,7 @@ public class UserConfigurationServiceTests
         Assert.IsNotNull(assetsDirectory);
         Assert.IsNotNull(firstFrameVideosPath);
 
-        Assert.AreEqual(Path.Combine(assetsDirectory!, "OutputVideoFirstFrame"), firstFrameVideosPath);
+        Assert.AreEqual(Path.Combine(assetsDirectory, "OutputVideoFirstFrame"), firstFrameVideosPath);
         Assert.AreEqual(Path.Combine("E:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"), firstFrameVideosPath);
     }
 

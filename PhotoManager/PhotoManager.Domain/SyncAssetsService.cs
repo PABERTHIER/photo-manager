@@ -6,17 +6,12 @@ public class SyncAssetsService(
     IAssetsComparator assetsComparator,
     IMoveAssetsService moveAssetsService) : ISyncAssetsService
 {
-    private readonly IAssetRepository _assetRepository = assetRepository;
-    private readonly IStorageService _storageService = storageService;
-    private readonly IAssetsComparator _assetsComparator = assetsComparator;
-    private readonly IMoveAssetsService _moveAssetsService = moveAssetsService;
-
     public async Task<List<SyncAssetsResult>> ExecuteAsync(ProcessStatusChangedCallback callback)
     {
         return await Task.Run(() =>
         {
             List<SyncAssetsResult> result = [];
-            SyncAssetsConfiguration configuration = _assetRepository.GetSyncAssetsConfiguration();
+            SyncAssetsConfiguration configuration = assetRepository.GetSyncAssetsConfiguration();
 
             foreach (SyncAssetsDirectoriesDefinition definition in configuration.Definitions)
             {
@@ -46,7 +41,7 @@ public class SyncAssetsService(
             DestinationDirectory = destinationDirectory
         };
 
-        if (!_storageService.FolderExists(sourceDirectory))
+        if (!storageService.FolderExists(sourceDirectory))
         {
             syncAssetsResult.Message = $"Source directory '{sourceDirectory}' not found.";
             result.Add(syncAssetsResult);
@@ -55,14 +50,14 @@ public class SyncAssetsService(
         {
             try
             {
-                if (!_storageService.FolderExists(destinationDirectory))
+                if (!storageService.FolderExists(destinationDirectory))
                 {
-                    _storageService.CreateDirectory(destinationDirectory);
+                    storageService.CreateDirectory(destinationDirectory);
                 }
 
-                string[] sourceFileNames = _storageService.GetFileNames(sourceDirectory);
-                string[] destinationFileNames = _storageService.GetFileNames(destinationDirectory);
-                string[] newFileNames = _assetsComparator.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
+                string[] sourceFileNames = storageService.GetFileNames(sourceDirectory);
+                string[] destinationFileNames = storageService.GetFileNames(destinationDirectory);
+                string[] newFileNames = assetsComparator.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
                 newFileNames = GetFilesNotAlreadyInDestinationSubDirectories(newFileNames, destinationDirectory);
 
                 foreach (string newFileName in newFileNames)
@@ -70,7 +65,7 @@ public class SyncAssetsService(
                     string sourceFilePath = Path.Combine(sourceDirectory, newFileName);
                     string destinationFilePath = Path.Combine(destinationDirectory, newFileName);
 
-                    if (_moveAssetsService.CopyAsset(sourceFilePath, destinationFilePath))
+                    if (moveAssetsService.CopyAsset(sourceFilePath, destinationFilePath))
                     {
                         syncAssetsResult.SyncedImages++;
                         callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"'{sourceFilePath}' => '{destinationFilePath}'" });
@@ -79,12 +74,12 @@ public class SyncAssetsService(
 
                 if (deleteAssetsNotInSource)
                 {
-                    string[] deletedFileNames = _assetsComparator.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
+                    string[] deletedFileNames = assetsComparator.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
                     foreach (string deletedImage in deletedFileNames)
                     {
                         string destinationPath = Path.Combine(destinationDirectory, deletedImage);
-                        _storageService.DeleteFile(destinationDirectory, deletedImage);
+                        storageService.DeleteFile(destinationDirectory, deletedImage);
                         syncAssetsResult.SyncedImages++;
                         callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"Deleted '{destinationPath}'" });
                     }
@@ -101,19 +96,16 @@ public class SyncAssetsService(
 
                 if (includeSubFolders)
                 {
-                    List<DirectoryInfo> subdirectories = _storageService.GetSubDirectories(sourceDirectory);
+                    List<DirectoryInfo> subdirectories = storageService.GetSubDirectories(sourceDirectory);
 
-                    if (subdirectories != null)
+                    for (int i = 0; i < subdirectories.Count; i++)
                     {
-                        foreach (DirectoryInfo subdir in subdirectories)
-                        {
-                            Execute(subdir.FullName,
-                                Path.Combine(destinationDirectory, subdir.Name),
-                                includeSubFolders,
-                                deleteAssetsNotInSource,
-                                callback,
-                                result);
-                        }
+                        Execute(subdirectories[i].FullName,
+                            Path.Combine(destinationDirectory, subdirectories[i].Name),
+                            includeSubFolders,
+                            deleteAssetsNotInSource,
+                            callback,
+                            result);
                     }
                 }
             }
@@ -127,15 +119,12 @@ public class SyncAssetsService(
 
     private string[] GetFilesNotAlreadyInDestinationSubDirectories(string[] newFileNames, string destinationDirectory)
     {
-        List<DirectoryInfo> destinationSubDirectories = _storageService.GetRecursiveSubDirectories(destinationDirectory);
+        List<DirectoryInfo> destinationSubDirectories = storageService.GetRecursiveSubDirectories(destinationDirectory);
 
-        if (destinationSubDirectories != null)
+        for (int i = 0; i < destinationSubDirectories.Count; i++)
         {
-            foreach (DirectoryInfo dir in destinationSubDirectories)
-            {
-                string[] destinationFileNames = _storageService.GetFileNames(dir.FullName);
-                newFileNames = _assetsComparator.GetNewFileNamesToSync(newFileNames, destinationFileNames);
-            }
+            string[] destinationFileNames = storageService.GetFileNames(destinationSubDirectories[i].FullName);
+            newFileNames = assetsComparator.GetNewFileNamesToSync(newFileNames, destinationFileNames);
         }
 
         return newFileNames;

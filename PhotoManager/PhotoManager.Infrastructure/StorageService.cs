@@ -13,7 +13,7 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
 
     public List<DirectoryInfo> GetRecursiveSubDirectories(string directoryPath)
     {
-        List<DirectoryInfo> result = new();
+        List<DirectoryInfo> result = [];
         GetRecursiveSubDirectories(directoryPath, result);
 
         return result;

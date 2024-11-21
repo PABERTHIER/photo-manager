@@ -5,25 +5,25 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryGetSubFoldersTests
 {
-    private string? dataDirectory;
-    private const string backupEndPath = "DatabaseTests\\v1.0";
-    private string? backupPath;
+    private string? _dataDirectory;
+    private string? _backupPath;
+    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
-    private IAssetRepository? _assetRepository;
+    private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        backupPath = Path.Combine(dataDirectory, backupEndPath);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
     }
 
     [SetUp]
@@ -31,19 +31,19 @@ public class AssetRepositoryGetSubFoldersTests
     {
         PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
     }
 
     [Test]
     public void GetSubFolders_ParentHasSubFolders_ReturnsMatchingSubFolders()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string parentFolderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
 
             string childFolderPath1 = Path.Combine(parentFolderPath1, "TestSubFolder1");
             string childFolderPath2 = Path.Combine(parentFolderPath2, "TestSubFolder2");
@@ -80,7 +80,7 @@ public class AssetRepositoryGetSubFoldersTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -88,13 +88,13 @@ public class AssetRepositoryGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentHasNoSubFolders_ReturnsEmptyArray()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string parentFolderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
 
             Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
@@ -109,7 +109,7 @@ public class AssetRepositoryGetSubFoldersTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -117,13 +117,13 @@ public class AssetRepositoryGetSubFoldersTests
     [Test]
     public void GetSubFolders_NoFoldersRegistered_ReturnsEmptyArray()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string parentFolderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
 
             Folder parentFolder1 = new() { Path = parentFolderPath1 };
             Folder parentFolder2 = new() { Path = parentFolderPath2 };
@@ -138,7 +138,7 @@ public class AssetRepositoryGetSubFoldersTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -146,14 +146,14 @@ public class AssetRepositoryGetSubFoldersTests
     [Test]
     public void GetSubFolders_ParentFolderIsNull_ThrowsArgumentException()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             Folder? parentFolder1 = null;
 
-            string parentFolderPath2 = Path.Combine(dataDirectory!, "TestFolder2");
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
 
             _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the Where on folders
 
@@ -165,7 +165,7 @@ public class AssetRepositoryGetSubFoldersTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }

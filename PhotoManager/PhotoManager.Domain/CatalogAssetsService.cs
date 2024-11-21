@@ -91,7 +91,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
             {
                 // If the catalog background process is cancelled, there is a risk that it happens while saving the catalog files.
                 // This could result in the files being damaged.
-                // Therefore the application saves the files before the task is completely shut down.
+                // Therefore, the application saves the files before the task is completely shut down.
 
                 // TODO: Test if _currentFolderPath is good & SaveCatalog performed correctly
                 Folder? currentFolder = _assetRepository.GetFolderByPath(_currentFolderPath);

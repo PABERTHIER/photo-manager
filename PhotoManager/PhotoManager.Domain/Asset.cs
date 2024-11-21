@@ -2,25 +2,24 @@
 
 public class Asset
 {
-    // TODO: use instead Folder.FolderId ? -> if done, update tests
-    // TODO: property required
+    // TODO: compose -> one readonly struct for Pixel, for ThumbnailPixel and object for FileDateTime to begin
     public Guid FolderId { get; set; }
-    public Folder Folder { get; set; }
-    public string FileName { get; set; }
-    public long FileSize { get; set; }
-    public int PixelWidth { get; set; }
-    public int PixelHeight { get; set; }
-    public int ThumbnailPixelWidth { get; set; }
-    public int ThumbnailPixelHeight { get; set; }
-    public Rotation ImageRotation { get; set; }
+    public required Folder Folder { get; set; }
+    public required string FileName { get; set; }
+    public long FileSize { get; init; }
+    public int PixelWidth { get; init; }
+    public int PixelHeight { get; init; }
+    public int ThumbnailPixelWidth { get; init; }
+    public int ThumbnailPixelHeight { get; init; }
+    public Rotation ImageRotation { get; init; }
     public DateTime ThumbnailCreationDateTime { get; set; }
-    public string Hash { get; set; }
+    public required string Hash { get; set; }
     public BitmapImage? ImageData { get; set; }
-    public string FullPath => Folder != null ? Path.Combine(Folder.Path, FileName) : FileName;
+    public string FullPath => Path.Combine(Folder.Path, FileName);
     public DateTime FileCreationDateTime { get; set; }
     public DateTime FileModificationDateTime { get; set; }
-    public bool IsAssetCorrupted { get; set; }
+    public bool IsAssetCorrupted { get; init; }
     public string? AssetCorruptedMessage { get; set; }
-    public bool IsAssetRotated { get; set; }
+    public bool IsAssetRotated { get; init; }
     public string? AssetRotatedMessage { get; set; }
 }

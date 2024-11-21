@@ -5,25 +5,25 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryWriteBackupTests
 {
-    private string? dataDirectory;
-    private const string backupEndPath = "DatabaseTests\\v1.0";
-    private string? backupPath;
+    private string? _dataDirectory;
+    private string? _backupPath;
+    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
-    private IAssetRepository? _assetRepository;
+    private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        backupPath = Path.Combine(dataDirectory, backupEndPath);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(backupPath!);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath!);
     }
 
     [SetUp]
@@ -31,19 +31,19 @@ public class AssetRepositoryWriteBackupTests
     {
         PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
     }
 
     [Test]
     public void WriteBackup_BackupWrittenAndMoreBackupsToKeep_WritesBackupAndDoesNotDeleteOldBackups()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.IsFalse(File.Exists(backupFilePath));
             Assert.IsFalse(_assetRepository!.BackupExists());
@@ -53,14 +53,14 @@ public class AssetRepositoryWriteBackupTests
             Assert.IsTrue(File.Exists(backupFilePath));
             Assert.IsTrue(_assetRepository!.BackupExists());
 
-            int filesInBackupDirectory = Directory.GetFiles(backupPath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_backupPath! + "_Backups").Length;
             Assert.AreEqual(1, filesInBackupDirectory);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -76,13 +76,13 @@ public class AssetRepositoryWriteBackupTests
         UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
         AssetRepository assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
 
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.IsFalse(File.Exists(backupFilePath));
             Assert.IsFalse(assetRepository.BackupExists());
@@ -92,14 +92,14 @@ public class AssetRepositoryWriteBackupTests
             Assert.IsFalse(File.Exists(backupFilePath));
             Assert.IsFalse(assetRepository.BackupExists());
 
-            int filesInBackupDirectory = Directory.GetFiles(backupPath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_backupPath! + "_Backups").Length;
             Assert.AreEqual(0, filesInBackupDirectory);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -107,13 +107,13 @@ public class AssetRepositoryWriteBackupTests
     [Test]
     public void WriteBackup_BackupWrittenTwiceAndMoreBackupsToKeep_WritesBackupOnceAndDoesNotDeleteOldBackups()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.IsFalse(File.Exists(backupFilePath));
             Assert.IsFalse(_assetRepository!.BackupExists());
@@ -124,14 +124,14 @@ public class AssetRepositoryWriteBackupTests
             Assert.IsTrue(File.Exists(backupFilePath));
             Assert.IsTrue(_assetRepository!.BackupExists());
 
-            int filesInBackupDirectory = Directory.GetFiles(backupPath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_backupPath! + "_Backups").Length;
             Assert.AreEqual(1, filesInBackupDirectory);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -139,13 +139,13 @@ public class AssetRepositoryWriteBackupTests
     [Test]
     public void WriteBackup_ConcurrentAccess_BackupsAreHandledSafely()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
             DateTime backupDate = DateTime.Now;
-            string backupFilePath = Path.Combine(backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
+            string backupFilePath = Path.Combine(_backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
 
             Assert.IsFalse(File.Exists(backupFilePath));
             Assert.IsFalse(_assetRepository!.BackupExists());
@@ -160,14 +160,14 @@ public class AssetRepositoryWriteBackupTests
             Assert.IsTrue(File.Exists(backupFilePath));
             Assert.IsTrue(_assetRepository!.BackupExists());
 
-            int filesInBackupDirectory = Directory.GetFiles(backupPath! + "_Backups").Length;
+            int filesInBackupDirectory = Directory.GetFiles(_backupPath! + "_Backups").Length;
             Assert.AreEqual(1, filesInBackupDirectory);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }

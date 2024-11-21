@@ -5,26 +5,26 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 [TestFixture]
 public class AssetRepositoryAddFolderTests
 {
-    private string? dataDirectory;
-    private const string backupEndPath = "DatabaseTests\\v1.0";
-    private string? backupPath;
-    private readonly Guid defaultGuid = Guid.Empty;
+    private string? _dataDirectory;
+    private string? _backupPath;
+    private readonly Guid _defaultGuid = Guid.Empty;
+    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
-    private IAssetRepository? _assetRepository;
+    private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        backupPath = Path.Combine(dataDirectory, backupEndPath);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
     }
 
     [SetUp]
@@ -32,28 +32,28 @@ public class AssetRepositoryAddFolderTests
     {
         PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new AssetRepository(database, _storageServiceMock!.Object, userConfigurationService);
+        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
     }
 
     [Test]
     public void AddFolder_DifferentPaths_AddsFoldersToList()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
-            string folderPath2 = Path.Combine(dataDirectory!, "TestFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
+            string folderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
             Assert.AreEqual(folderPath1, addedFolder1.Path);
-            Assert.IsFalse(addedFolder1.FolderId == defaultGuid);
+            Assert.IsFalse(addedFolder1.FolderId == _defaultGuid);
 
             Assert.AreEqual(folderPath2, addedFolder2.Path);
-            Assert.IsFalse(addedFolder2.FolderId == defaultGuid);
+            Assert.IsFalse(addedFolder2.FolderId == _defaultGuid);
 
             Assert.AreNotEqual(addedFolder1.Path, addedFolder2.Path);
             Assert.AreNotEqual(addedFolder1.FolderId, addedFolder2.FolderId);
@@ -84,7 +84,7 @@ public class AssetRepositoryAddFolderTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -92,21 +92,21 @@ public class AssetRepositoryAddFolderTests
     [Test]
     public void AddFolder_SamePath_AddsFoldersToList()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
+            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath1);
 
             Assert.AreEqual(folderPath1, addedFolder1.Path);
-            Assert.IsFalse(addedFolder1.FolderId == defaultGuid);
+            Assert.IsFalse(addedFolder1.FolderId == _defaultGuid);
 
             Assert.AreEqual(folderPath1, addedFolder2.Path);
-            Assert.IsFalse(addedFolder2.FolderId == defaultGuid);
+            Assert.IsFalse(addedFolder2.FolderId == _defaultGuid);
 
             Assert.AreEqual(addedFolder1.Path, addedFolder2.Path);
             Assert.AreNotEqual(addedFolder1.FolderId, addedFolder2.FolderId);
@@ -137,7 +137,7 @@ public class AssetRepositoryAddFolderTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -145,16 +145,16 @@ public class AssetRepositoryAddFolderTests
     [Test]
     public void AddFolder_ConcurrentAccess_FoldersAreHandledSafely()
     {
-        List<Reactive.Unit> assetsUpdatedEvents = new();
+        List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath1 = Path.Combine(dataDirectory!, "TestFolder1");
-            string folderPath2 = Path.Combine(dataDirectory!, "TestFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
+            string folderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
 
-            Folder addedFolder1 = new() { Path = dataDirectory! };
-            Folder addedFolder2 = new() { Path = dataDirectory! };
+            Folder addedFolder1 = new() { Path = _dataDirectory! };
+            Folder addedFolder2 = new() { Path = _dataDirectory! };
 
             // Simulate concurrent access
             Parallel.Invoke(
@@ -163,10 +163,10 @@ public class AssetRepositoryAddFolderTests
             );
 
             Assert.AreEqual(folderPath1, addedFolder1.Path);
-            Assert.IsFalse(addedFolder1.FolderId == defaultGuid);
+            Assert.IsFalse(addedFolder1.FolderId == _defaultGuid);
 
             Assert.AreEqual(folderPath2, addedFolder2.Path);
-            Assert.IsFalse(addedFolder2.FolderId == defaultGuid);
+            Assert.IsFalse(addedFolder2.FolderId == _defaultGuid);
 
             Assert.AreNotEqual(addedFolder1.Path, addedFolder2.Path);
             Assert.AreNotEqual(addedFolder1.FolderId, addedFolder2.FolderId);
@@ -201,7 +201,7 @@ public class AssetRepositoryAddFolderTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
             assetsUpdatedSubscription.Dispose();
         }
     }

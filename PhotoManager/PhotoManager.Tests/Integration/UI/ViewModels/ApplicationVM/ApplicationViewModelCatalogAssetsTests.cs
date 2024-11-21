@@ -62,6 +62,7 @@ public class ApplicationViewModelCatalogAssetsTests
     {
         _asset1 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1_duplicate.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -78,6 +79,7 @@ public class ApplicationViewModelCatalogAssetsTests
         };
         _asset2 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 9.png",
             FileSize = 126277,
             PixelHeight = 720,
@@ -94,6 +96,7 @@ public class ApplicationViewModelCatalogAssetsTests
         };
         _asset3 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 9_duplicate.png",
             FileSize = 126277,
             PixelHeight = 720,
@@ -110,6 +113,7 @@ public class ApplicationViewModelCatalogAssetsTests
         };
         _asset4 = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image_11.heic",
             FileSize = 1411940,
             PixelHeight = 4032,
@@ -126,6 +130,7 @@ public class ApplicationViewModelCatalogAssetsTests
         };
         _asset1Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1_duplicate_copied.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -142,6 +147,7 @@ public class ApplicationViewModelCatalogAssetsTests
         };
         _asset2Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 29857,
             PixelHeight = 720,
@@ -158,6 +164,7 @@ public class ApplicationViewModelCatalogAssetsTests
         };
         _asset3Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Homer.gif",
             FileSize = 64123,
             PixelHeight = 320,
@@ -174,6 +181,7 @@ public class ApplicationViewModelCatalogAssetsTests
         };
         _asset4Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "Homer.jpg",
             FileSize = 6599,
             PixelHeight = 180,
@@ -190,6 +198,7 @@ public class ApplicationViewModelCatalogAssetsTests
         };
         _asset5Temp = new()
         {
+            Folder = new() { Path = "" },
             FileName = "HomerDuplicated.jpg",
             FileSize = 6599,
             PixelHeight = 180,
@@ -5530,8 +5539,8 @@ public class ApplicationViewModelCatalogAssetsTests
             Folder? folder2Updated = _testableAssetRepository!.GetFolderByPath(tempDirectory);
             Assert.IsNull(folder2Updated);
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingFourthSync = new();
-            Dictionary<string, int> assetNameToByteSizeMappingFourthSync = new();
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingFourthSync = [];
+            Dictionary<string, int> assetNameToByteSizeMappingFourthSync = [];
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 

@@ -17,7 +17,9 @@ public class FileNameConverterTests
         FileNameConverter fileNameConverter = new();
         Asset asset = new()
         {
+            Folder = new() { Path = "" },
             FileName = name,
+            Hash = string.Empty
         };
 
         object? parameter = null;
@@ -42,7 +44,7 @@ public class FileNameConverterTests
     public void Convert_InputValueType_ReturnsInputValue()
     {
         FileNameConverter fileNameConverter = new();
-        int input = 123;
+        const int input = 123;
         object? parameter = null;
 
         object result = fileNameConverter.Convert(input, typeof(int), parameter!, CultureInfo.InvariantCulture);

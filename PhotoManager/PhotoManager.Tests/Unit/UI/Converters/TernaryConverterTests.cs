@@ -13,9 +13,11 @@ public class TernaryConverterTests
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
         {
-            FileName = "toto",
+            Folder = new() { Path = "" },
+            FileName = "toto.jpg",
             IsAssetCorrupted = assertion,
             AssetCorruptedMessage = message,
+            Hash = string.Empty
         };
 
         object[] converterParameters = [asset.IsAssetCorrupted, asset.AssetCorruptedMessage];
@@ -34,9 +36,11 @@ public class TernaryConverterTests
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
         {
-            FileName = "toto",
+            Folder = new() { Path = "" },
+            FileName = "toto.jpg",
             IsAssetRotated = assertion,
             AssetRotatedMessage = message,
+            Hash = string.Empty
         };
 
         object[] converterParameters = [asset.IsAssetRotated, asset.AssetRotatedMessage];

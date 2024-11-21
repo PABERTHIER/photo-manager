@@ -6,7 +6,7 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
 {
     public List<T> ReadObjectList<T>(string dataFilePath, Func<string[], T> mapObjectFromCsvFields, Diagnostics diagnostics)
     {
-        List<T> list = new();
+        List<T> list = [];
         
         if (File.Exists(dataFilePath))
         {
@@ -28,8 +28,7 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
 
     private List<T> GetObjectListFromCsv<T>(string csv, Func<string[], T> mapObjectFromCsvFields)
     {
-        List<T> list = new();
-        bool hasRecord;
+        List<T> list = [];
 
         using (StringReader reader = new (csv))
         {
@@ -40,10 +39,9 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
                 return list;
             }
 
+            bool hasRecord;
             if (Properties != null)
             {
-                string[] headers = GetValuesFromCsvLine(line);
-
                 do
                 {
                     line = reader.ReadLine();
@@ -64,8 +62,6 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
             }
             else
             {
-                string[] headers = line.Split(Separator);
-
                 do
                 {
                     line = reader.ReadLine();

@@ -542,7 +542,7 @@ public class StorageServiceTests
     public void FileExists_ExistingFile_ReturnsTrue()
     {
         Folder folder = new() { Path = _dataDirectory! };
-        Asset asset = new() { FileName = "Image 1.jpg" };
+        Asset asset = new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty };
 
         bool exists = _storageService!.FileExists(folder, asset);
 
@@ -553,7 +553,7 @@ public class StorageServiceTests
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
         Folder folder = new() { Path = _dataDirectory! };
-        Asset asset = new() { FileName = "NonExistent.jpg" };
+        Asset asset = new() { Folder = new() { Path = "" }, FileName = "NonExistent.jpg", Hash = string.Empty };
 
         bool exists = _storageService!.FileExists(folder, asset);
 
@@ -566,7 +566,7 @@ public class StorageServiceTests
     public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string path, string fileName, string exceptionParameter)
     {
         Folder folder = new() { Path = path };
-        Asset asset = new() { FileName = fileName };
+        Asset asset = new() { Folder = new() { Path = "" }, FileName = fileName, Hash = string.Empty };
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.FileExists(folder, asset));
 
@@ -668,11 +668,11 @@ public class StorageServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new() { Folder = folder, FileName = fileName1 };
-            Asset asset2 = new() { Folder = folder, FileName = fileName2 };
-            Asset asset3 = new() { Folder = folder, FileName = fileName3 };
-            Asset asset4 = new() { Folder = folder, FileName = fileName4 };
-            Asset asset5 = new() { Folder = folder, FileName = fileName5 };
+            Asset asset1 = new() { Folder = folder, FileName = fileName1, Hash = string.Empty };
+            Asset asset2 = new() { Folder = folder, FileName = fileName2, Hash = string.Empty };
+            Asset asset3 = new() { Folder = folder, FileName = fileName3, Hash = string.Empty };
+            Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
+            Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
 
             Assert.AreEqual(DateTime.MinValue, asset1.FileCreationDateTime.Date);
             Assert.AreEqual(DateTime.MinValue, asset1.FileModificationDateTime.Date);
@@ -721,82 +721,6 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void UpdateAssetsFileDateTimeProperties_FolderIsNull_DoesNotPopulateAssetsDates()
-    {
-        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
-
-        try
-        {
-            Directory.CreateDirectory(destinationPath);
-
-            const string fileName1 = "Homer.gif";
-            const string fileName2 = "Image 1.jpg";
-            const string fileName3 = "Image 9.png";
-            const string fileName4 = "Image_11.heic";
-            const string fileName5 = "nonexistent.jpg";
-
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
-            string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, fileName2);
-            string destinationFilePath2 = Path.Combine(destinationPath, fileName2);
-            string sourceFilePath3 = Path.Combine(_dataDirectory!, fileName3);
-            string destinationFilePath3 = Path.Combine(destinationPath, fileName3);
-            string sourceFilePath4 = Path.Combine(_dataDirectory!, fileName4);
-            string destinationFilePath4 = Path.Combine(destinationPath, fileName4);
-
-            File.Copy(sourceFilePath1, destinationFilePath1);
-            File.Copy(sourceFilePath2, destinationFilePath2);
-            File.Copy(sourceFilePath3, destinationFilePath3);
-            File.Copy(sourceFilePath4, destinationFilePath4);
-
-            Folder? folder = null;
-
-            DateTime creationTime = default;
-            DateTime modificationTime = default;
-            DateTime oldDateTime = DateTime.Now.AddDays(-1);
-
-            File.SetLastWriteTime(destinationFilePath1, oldDateTime);
-            File.SetLastWriteTime(destinationFilePath2, oldDateTime);
-            File.SetLastWriteTime(destinationFilePath3, oldDateTime);
-            File.SetLastWriteTime(destinationFilePath4, oldDateTime);
-
-            Asset asset1 = new() { Folder = folder!, FileName = fileName1 };
-            Asset asset2 = new() { Folder = folder!, FileName = fileName2 };
-            Asset asset3 = new() { Folder = folder!, FileName = fileName3 };
-            Asset asset4 = new() { Folder = folder!, FileName = fileName4 };
-            Asset asset5 = new() { Folder = folder!, FileName = fileName5 };
-
-            Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset1.FileModificationDateTime.Date);
-            Assert.AreEqual(creationTime.Date, asset2.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset2.FileModificationDateTime.Date);
-            Assert.AreEqual(creationTime.Date, asset3.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset3.FileModificationDateTime.Date);
-            Assert.AreEqual(creationTime.Date, asset4.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset4.FileModificationDateTime.Date);
-            Assert.AreEqual(creationTime.Date, asset5.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset5.FileModificationDateTime.Date);
-
-            _storageService!.UpdateAssetsFileDateTimeProperties([asset1, asset2, asset3, asset4, asset5]);
-
-            Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset1.FileModificationDateTime.Date);
-            Assert.AreEqual(creationTime.Date, asset2.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset2.FileModificationDateTime.Date);
-            Assert.AreEqual(creationTime.Date, asset3.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset3.FileModificationDateTime.Date);
-            Assert.AreEqual(creationTime.Date, asset4.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset4.FileModificationDateTime.Date);
-            Assert.AreEqual(creationTime.Date, asset5.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset5.FileModificationDateTime.Date);
-        }
-        finally
-        {
-            Directory.Delete(destinationPath, true);
-        }
-    }
-
-    [Test]
     public void UpdateAssetsFileDateTimeProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
@@ -837,11 +761,11 @@ public class StorageServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new() { Folder = folder, FileName = fileName1 };
-            Asset asset2 = new() { Folder = folder, FileName = fileName2 };
-            Asset asset3 = new() { Folder = folder, FileName = fileName3 };
-            Asset asset4 = new() { Folder = folder, FileName = fileName4 };
-            Asset asset5 = new() { Folder = folder, FileName = fileName5 };
+            Asset asset1 = new() { Folder = folder, FileName = fileName1, Hash = string.Empty };
+            Asset asset2 = new() { Folder = folder, FileName = fileName2, Hash = string.Empty };
+            Asset asset3 = new() { Folder = folder, FileName = fileName3, Hash = string.Empty };
+            Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
+            Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
 
             Assert.AreEqual(creationTime.Date, asset1.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset1.FileModificationDateTime.Date);
@@ -914,11 +838,11 @@ public class StorageServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new() { Folder = folder, FileName = fileName1 };
-            Asset asset2 = new() { Folder = folder, FileName = fileName2 };
+            Asset asset1 = new() { Folder = folder, FileName = fileName1, Hash = string.Empty };
+            Asset asset2 = new() { Folder = folder, FileName = fileName2, Hash = string.Empty };
             Asset? asset3 = null;
-            Asset asset4 = new() { Folder = folder, FileName = fileName4 };
-            Asset asset5 = new() { Folder = folder, FileName = fileName5 };
+            Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
+            Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
 
             Assert.AreEqual(DateTime.MinValue, asset1.FileCreationDateTime.Date);
             Assert.AreEqual(DateTime.MinValue, asset1.FileModificationDateTime.Date);
@@ -971,7 +895,7 @@ public class StorageServiceTests
 
             File.SetLastWriteTime(destinationFilePath, oldDateTime);
 
-            Asset asset = new() { Folder = folder, FileName = fileName };
+            Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
 
             Assert.AreEqual(DateTime.MinValue, asset.FileCreationDateTime.Date);
             Assert.AreEqual(DateTime.MinValue, asset.FileModificationDateTime.Date);
@@ -999,50 +923,10 @@ public class StorageServiceTests
             const string fileName = "nonexistent.jpg";
 
             Folder folder = new() { Path = destinationPath };
-            Asset asset = new() { Folder = folder, FileName = fileName };
+            Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
 
             DateTime creationTime = default;
             DateTime modificationTime = default;
-
-            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
-
-            _storageService!.UpdateAssetFileDateTimeProperties(asset);
-
-            Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
-        }
-        finally
-        {
-            Directory.Delete(destinationPath, true);
-        }
-    }
-
-    [Test]
-    public void UpdateAssetFileDateTimeProperties_FolderIsNull_DoesNotPopulateAssetDates()
-    {
-        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
-
-        try
-        {
-            Directory.CreateDirectory(destinationPath);
-
-            const string fileName = "Image 1.jpg";
-
-            string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
-            string destinationFilePath = Path.Combine(destinationPath, fileName);
-
-            File.Copy(sourceFilePath, destinationFilePath);
-
-            Folder? folder = null;
-
-            DateTime creationTime = default;
-            DateTime modificationTime = default;
-            DateTime oldDateTime = DateTime.Now.AddDays(-1);
-
-            File.SetLastWriteTime(destinationFilePath, oldDateTime);
-
-            Asset asset = new() { Folder = folder!, FileName = fileName };
 
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);
@@ -1083,7 +967,7 @@ public class StorageServiceTests
 
             File.SetLastWriteTime(destinationFilePath, oldDateTime);
 
-            Asset asset = new() { Folder = folder, FileName = fileName };
+            Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
 
             Assert.AreEqual(creationTime.Date, asset.FileCreationDateTime.Date);
             Assert.AreEqual(modificationTime.Date, asset.FileModificationDateTime.Date);

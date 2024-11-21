@@ -196,7 +196,7 @@ public class UserConfigurationServiceTests
         Assert.IsNotNull(assetsDirectory);
         Assert.IsNotNull(firstFrameVideosPath);
 
-        Assert.AreEqual(Path.Combine(assetsDirectory!, "OutputVideoFirstFrame"), firstFrameVideosPath);
+        Assert.AreEqual(Path.Combine(assetsDirectory, "OutputVideoFirstFrame"), firstFrameVideosPath);
         Assert.AreEqual(Path.Combine("C:\\Path\\OutputVideoFirstFrame"), firstFrameVideosPath);
     }
 
