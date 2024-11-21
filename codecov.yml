@@ -3,7 +3,7 @@ codecov:
   max_report_age: off
 
 comment:
-  layout: "condensed_header, condensed_files, condensed_footer"
+  layout: "header, diff, flags, components, files, footer"
   behavior: default
   require_changes: false
 
