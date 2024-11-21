@@ -79,7 +79,7 @@ jobs:
 
       # Step 12: Upload coverage report to Codecov
       - name: ☁️ Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v4
         with:
           files: ${{ env.PROJECT_TESTRESULTS_PATH }}/*/coverage.cobertura.xml
           name: codecov-windows-latest
