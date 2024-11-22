@@ -561,9 +561,10 @@ public class MoveAssetsServiceTests
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void MoveAssets_AssetsAreValidButDirectoryIsInReadOnlyMode_DoesNotMoveAndReturnFalse(bool preserveOriginalFile)
+    public void MoveAssets_AssetsAreValidButDirectoryIsInReadOnlyMode_ReturnFalseAndLogsItAndDoesNotMoveFile(bool preserveOriginalFile)
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, "NoMoveDirectory");
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -623,6 +624,12 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(sourceFilePath));
             Assert.IsFalse(File.Exists(destinationFilePath));
 
+            string expectedExceptionMessage = $"Access to the path '{destinationFilePath}' is denied.";
+            string[] messages = [$"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
+
             assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(1, assetsInSource.Length);
@@ -658,6 +665,7 @@ public class MoveAssetsServiceTests
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(destinationDirectory, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
@@ -930,9 +938,10 @@ public class MoveAssetsServiceTests
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public void MoveAssets_SameSourceAndDestination_DoesNotMoveFileAndReturnsTrue(bool preserveOriginalFile)
+    public void MoveAssets_SameSourceAndDestination_ReturnsTrueAndLogsItAndDoesNotMoveFile(bool preserveOriginalFile)
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -961,11 +970,17 @@ public class MoveAssetsServiceTests
 
             Assert.IsTrue(File.Exists(destinationFilePath));
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset.FileName));
+
+            string[] messages = [$"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(_databasePath!, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
@@ -1516,9 +1531,10 @@ public class MoveAssetsServiceTests
     }
 
     [Test]
-    public void CopyAsset_SourceAndDestinationAreValidButDirectoryIsInReadOnlyMode_DoesNotCopyAndReturnFalse()
+    public void CopyAsset_SourceAndDestinationAreValidButDirectoryIsInReadOnlyMode_ReturnFalseAndLogsItAndDoesNotCopyFile()
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, "NoCopyDirectory");
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -1535,6 +1551,12 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(hasBeenCopied);
             Assert.IsTrue(File.Exists(sourceFilePath));
             Assert.IsFalse(File.Exists(destinationFilePath));
+
+            string expectedExceptionMessage = $"Access to the path '{destinationFilePath}' is denied.";
+            string[] messages = [$"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
@@ -1544,13 +1566,15 @@ public class MoveAssetsServiceTests
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
 
             Directory.Delete(destinationDirectory, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
     [Test]
-    public void CopyAsset_SourceFilePathIsADirectory_DoesNotCopyAndReturnFalse()
+    public void CopyAsset_SourceFilePathIsADirectory_ReturnFalseAndLogsItAndDoesNotCopyFile()
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -1562,11 +1586,18 @@ public class MoveAssetsServiceTests
 
             Assert.IsFalse(hasBeenCopied);
             Assert.IsFalse(File.Exists(destinationFilePath));
+
+            string expectedExceptionMessage = $"Access to the path '{_dataDirectory}' is denied.";
+            string[] messages = [$"Cannot copy '{_dataDirectory}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {expectedExceptionMessage}"];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(_databasePath!, true);
             Directory.Delete(destinationDirectory, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
@@ -1591,9 +1622,10 @@ public class MoveAssetsServiceTests
     }
 
     [Test]
-    public void CopyAsset_SameSourceAndDestination_DoesNotCopyFileAndReturnsTrue()
+    public void CopyAsset_SameSourceAndDestination_ReturnsTrueAndLogsItAndDoesNotCopyFile()
     {
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -1612,11 +1644,17 @@ public class MoveAssetsServiceTests
 
             Assert.IsTrue(hasBeenCopied);
             Assert.IsTrue(File.Exists(destinationFilePath));
+
+            string[] messages = [$"Cannot copy '{destinationFilePath}' into '{destinationFilePath}' because the file already exists in the destination."];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(_databasePath!, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
@@ -1752,8 +1790,10 @@ public class MoveAssetsServiceTests
     }
 
     [Test]
-    public void CopyAsset_FileInSourceDoesNotExistButExistsInTheDestination_DoesNotCopyFileAndReturnsFalse()
+    public void CopyAsset_FileInSourceDoesNotExistButExistsInTheDestination_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
+        LoggingAssertsService loggingAssertsService = new();
+
         try
         {
             string sourceFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
@@ -1764,10 +1804,16 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(hasBeenCopied);
             Assert.IsFalse(File.Exists(sourceFilePath));
             Assert.IsTrue(File.Exists(destinationFilePath));
+
+            string[] messages = [$"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination."];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(_databasePath!, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
@@ -1794,8 +1840,10 @@ public class MoveAssetsServiceTests
     }
 
     [Test]
-    public void CopyAsset_DestinationIsEmpty_DoesNotCopyFileAndReturnsFalse()
+    public void CopyAsset_DestinationIsEmpty_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
+        LoggingAssertsService loggingAssertsService = new();
+
         try
         {
             string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -1804,10 +1852,16 @@ public class MoveAssetsServiceTests
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
             Assert.IsFalse(hasBeenCopied);
+
+            string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(_databasePath!, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
@@ -1834,8 +1888,10 @@ public class MoveAssetsServiceTests
     }
 
     [Test]
-    public void CopyAsset_SourceIsNullButFileExistsInDestination_DoesNotCopyFileAndReturnsFalse()
+    public void CopyAsset_SourceIsNullButFileExistsInDestination_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
+        LoggingAssertsService loggingAssertsService = new();
+
         try
         {
             string? sourceFilePath = null;
@@ -1844,16 +1900,24 @@ public class MoveAssetsServiceTests
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath!, destinationFilePath);
 
             Assert.IsFalse(hasBeenCopied);
+
+            string[] messages = [$"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination."];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(_databasePath!, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
     [Test]
-    public void CopyAsset_DestinationIsNull_DoesNotCopyFileAndReturnsFalse()
+    public void CopyAsset_DestinationIsNull_ReturnsFalseAndLogsItAndDoesNotCopyFile()
     {
+        LoggingAssertsService loggingAssertsService = new();
+
         try
         {
             string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -1862,10 +1926,16 @@ public class MoveAssetsServiceTests
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath!);
 
             Assert.IsFalse(hasBeenCopied);
+
+            string[] messages = [$"Cannot copy '{sourceFilePath}' because the destination path is null or empty."];
+            Type typeOfService = typeof(MoveAssetsService);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(_databasePath!, true);
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 }

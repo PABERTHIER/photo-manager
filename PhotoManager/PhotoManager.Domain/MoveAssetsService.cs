@@ -1,4 +1,7 @@
-﻿namespace PhotoManager.Domain;
+﻿using log4net;
+using System.Reflection;
+
+namespace PhotoManager.Domain;
 
 public class MoveAssetsService(
     IAssetRepository assetRepository,
@@ -6,6 +9,8 @@ public class MoveAssetsService(
     IAssetCreationService assetCreationService)
     : IMoveAssetsService
 {
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles)
     {
         if (destinationFolder == null)
@@ -16,7 +21,7 @@ public class MoveAssetsService(
         ValidateParameters(assets);
 
         bool result = false;
-        Folder? folder = assetRepository.GetFolderByPath(destinationFolder.Path); // If the folder is null, it means is not present in the catalog
+        Folder? folder = assetRepository.GetFolderByPath(destinationFolder.Path); // If the folder is null, it means it is not present in the catalog
 
         // TODO: IF THE DESTINATION FOLDER IS NEW, THE FOLDER NAVIGATION CONTROL SHOULD DISPLAY IT WHEN THE USER GOES BACK TO THE MAIN WINDOW.
         bool isDestinationFolderInCatalog = folder != null;
@@ -78,7 +83,7 @@ public class MoveAssetsService(
     {
         if (string.IsNullOrWhiteSpace(destinationFilePath))
         {
-            // TODO: Log the destinationFolderPath is null or empty
+            Log.Error($"Cannot copy '{sourceFilePath}' because the destination path is null or empty.");
             return false;
         }
 
@@ -123,7 +128,7 @@ public class MoveAssetsService(
         {
             if (storageService.FileExists(destinationFilePath))
             {
-                // TODO: Log the file already exists in the destination
+                Log.Error($"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination.");
                 return storageService.FileExists(sourceFilePath);
             }
 
@@ -158,9 +163,9 @@ public class MoveAssetsService(
         {
             throw new ArgumentException("The value cannot be an empty string.", nameof(sourceFilePath));
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO: Log the file could not be copied: source file path invalid (path to directory and not file), insufficient permissions, disk space issues, or file locking problems ?
+            Log.Error($"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' due to insufficient permissions, disk space issues, or file locking problems, Message: {ex.Message}");
             return false;
         }
     }
