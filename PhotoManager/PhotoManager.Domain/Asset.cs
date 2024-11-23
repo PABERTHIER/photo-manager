@@ -2,15 +2,12 @@
 
 public class Asset
 {
-    // TODO: compose -> one readonly struct for Pixel, for ThumbnailPixel and object for FileDateTime to begin
+    // TODO: compose -> one readonly struct for File and another one for corruption ?
     public Guid FolderId { get; set; }
     public required Folder Folder { get; set; }
     public required string FileName { get; set; }
     public long FileSize { get; init; }
-    public int PixelWidth { get; init; }
-    public int PixelHeight { get; init; }
-    public int ThumbnailPixelWidth { get; init; }
-    public int ThumbnailPixelHeight { get; init; }
+    public Pixel Pixel { get; init; }
     public Rotation ImageRotation { get; init; }
     public DateTime ThumbnailCreationDateTime { get; set; }
     public required string Hash { get; set; }

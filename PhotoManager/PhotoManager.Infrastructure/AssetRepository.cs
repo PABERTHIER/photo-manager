@@ -72,7 +72,7 @@ public class AssetRepository : IAssetRepository
                         {
                             if (Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail) && thumbnail.ContainsKey(asset.FileName))
                             {
-                                asset.ImageData = _storageService.LoadBitmapThumbnailImage(thumbnail[asset.FileName], asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
+                                asset.ImageData = _storageService.LoadBitmapThumbnailImage(thumbnail[asset.FileName], asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
                             }
                         }
 

@@ -43,10 +43,11 @@ public class AssetRepositoryGetCataloguedAssetsTests
             FileName = "Image 1.jpg",
             FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1920,
-            PixelHeight = 1080,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1920, Height = 1080 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = null,
@@ -61,10 +62,11 @@ public class AssetRepositoryGetCataloguedAssetsTests
             FileName = "Image 9.png",
             FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
-            PixelWidth = 6000,
-            PixelHeight = 6120,
-            ThumbnailPixelWidth = 147,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 6000, Height = 6120 },
+                Thumbnail = new() { Width = 147, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
             AssetCorruptedMessage = null,

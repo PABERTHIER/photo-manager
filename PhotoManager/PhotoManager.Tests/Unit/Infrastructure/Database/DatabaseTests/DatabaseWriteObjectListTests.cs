@@ -118,10 +118,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
@@ -138,10 +139,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
@@ -191,10 +193,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
@@ -211,10 +214,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
@@ -284,10 +288,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
@@ -304,10 +309,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
@@ -418,10 +424,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
@@ -438,10 +445,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
@@ -495,10 +503,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175810_3.jpg",
                     FileSize = 363888,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
@@ -515,10 +524,11 @@ public class DatabaseWriteObjectListTests
                     FileName = "20200720175816_3.jpg",
                     FileSize = 343633,
                     ImageRotation = Rotation.Rotate0,
-                    PixelWidth = 1920,
-                    PixelHeight = 1080,
-                    ThumbnailPixelWidth = 200,
-                    ThumbnailPixelHeight = 112,
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1920, Height = 1080 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
@@ -567,10 +577,11 @@ public class DatabaseWriteObjectListTests
                 FileName = "20200720175810_3.jpg",
                 FileSize = 363888,
                 ImageRotation = Rotation.Rotate0,
-                PixelWidth = 1920,
-                PixelHeight = 1080,
-                ThumbnailPixelWidth = 200,
-                ThumbnailPixelHeight = 112,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1920, Height = 1080 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
                 ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                 Hash =
                     "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
@@ -587,10 +598,11 @@ public class DatabaseWriteObjectListTests
                 FileName = "20200720175816_3.jpg",
                 FileSize = 343633,
                 ImageRotation = Rotation.Rotate0,
-                PixelWidth = 1920,
-                PixelHeight = 1080,
-                ThumbnailPixelWidth = 200,
-                ThumbnailPixelHeight = 112,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1920, Height = 1080 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
                 ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
                 Hash =
                     "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",

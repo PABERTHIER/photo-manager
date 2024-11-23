@@ -290,10 +290,10 @@ public static class CatalogAssetsAsyncAsserts
         Assert.AreEqual(folder.FolderId, asset.FolderId);
         Assert.AreEqual(folder, asset.Folder);
         Assert.AreEqual(expectedAsset.FileSize, asset.FileSize);
-        Assert.AreEqual(expectedAsset.PixelWidth, asset.PixelWidth);
-        Assert.AreEqual(expectedAsset.PixelHeight, asset.PixelHeight);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelWidth, asset.ThumbnailPixelWidth);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelHeight, asset.ThumbnailPixelHeight);
+        Assert.AreEqual(expectedAsset.Pixel.Asset.Width, asset.Pixel.Asset.Width);
+        Assert.AreEqual(expectedAsset.Pixel.Asset.Height, asset.Pixel.Asset.Height);
+        Assert.AreEqual(expectedAsset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Width);
+        Assert.AreEqual(expectedAsset.Pixel.Thumbnail.Height, asset.Pixel.Thumbnail.Height);
         Assert.AreEqual(expectedAsset.ImageRotation, asset.ImageRotation);
         Assert.AreEqual(actualDate, asset.ThumbnailCreationDateTime.Date);
         Assert.AreEqual(expectedAsset.Hash, asset.Hash);
@@ -354,10 +354,10 @@ public static class CatalogAssetsAsyncAsserts
         Assert.AreEqual(folderId, assetFromDatabase.FolderId);
         Assert.AreEqual(string.Empty, assetFromDatabase.Folder.Path);  // Not saved in Db, loaded at the runtime
         Assert.AreEqual(expectedAsset.FileSize, assetFromDatabase.FileSize);
-        Assert.AreEqual(expectedAsset.PixelWidth, assetFromDatabase.PixelWidth);
-        Assert.AreEqual(expectedAsset.PixelHeight, assetFromDatabase.PixelHeight);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelWidth, assetFromDatabase.ThumbnailPixelWidth);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelHeight, assetFromDatabase.ThumbnailPixelHeight);
+        Assert.AreEqual(expectedAsset.Pixel.Asset.Width, assetFromDatabase.Pixel.Asset.Width);
+        Assert.AreEqual(expectedAsset.Pixel.Asset.Height, assetFromDatabase.Pixel.Asset.Height);
+        Assert.AreEqual(expectedAsset.Pixel.Thumbnail.Width, assetFromDatabase.Pixel.Thumbnail.Width);
+        Assert.AreEqual(expectedAsset.Pixel.Thumbnail.Height, assetFromDatabase.Pixel.Thumbnail.Height);
         Assert.AreEqual(expectedAsset.ImageRotation, assetFromDatabase.ImageRotation);
         Assert.AreEqual(actualDate, assetFromDatabase.ThumbnailCreationDateTime.Date);
         Assert.AreEqual(expectedAsset.Hash, assetFromDatabase.Hash);

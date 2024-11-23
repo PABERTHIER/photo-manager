@@ -65,10 +65,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "Image 1_duplicate.jpg",
             FileSize = 29857,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
@@ -82,10 +83,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "Image 9.png",
             FileSize = 126277,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             ImageRotation = Rotation.Rotate0,
             Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
@@ -99,10 +101,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "Image 9_duplicate.png",
             FileSize = 126277,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             ImageRotation = Rotation.Rotate0,
             Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
@@ -116,10 +119,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "Image_11.heic",
             FileSize = 1411940,
-            PixelHeight = 4032,
-            PixelWidth = 3024,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 3024, Height = 4032 },
+                Thumbnail = new() { Width = 112, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             ImageRotation = Rotation.Rotate0,
             Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
@@ -133,10 +137,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "Image 1_duplicate_copied.jpg",
             FileSize = 29857,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
@@ -150,10 +155,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
             FileSize = 29857,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
@@ -167,10 +173,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "Homer.gif",
             FileSize = 64123,
-            PixelHeight = 320,
-            PixelWidth = 320,
-            ThumbnailPixelWidth = 150,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 320, Height = 320 },
+                Thumbnail = new() { Width = 150, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             ImageRotation = Rotation.Rotate0,
             Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
@@ -184,10 +191,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "Homer.jpg",
             FileSize = 6599,
-            PixelHeight = 180,
-            PixelWidth = 320,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 320, Height = 180 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
@@ -201,10 +209,11 @@ public class CatalogAssetsServiceTests
             Folder = new() { Path = "" },
             FileName = "HomerDuplicated.jpg",
             FileSize = 6599,
-            PixelHeight = 180,
-            PixelWidth = 320,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 320, Height = 180 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
@@ -8519,10 +8528,10 @@ public class CatalogAssetsServiceTests
         Assert.AreEqual(folder.FolderId, asset.FolderId);
         Assert.AreEqual(folder, asset.Folder);
         Assert.AreEqual(expectedAsset.FileSize, asset.FileSize);
-        Assert.AreEqual(expectedAsset.PixelWidth, asset.PixelWidth);
-        Assert.AreEqual(expectedAsset.PixelHeight, asset.PixelHeight);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelWidth, asset.ThumbnailPixelWidth);
-        Assert.AreEqual(expectedAsset.ThumbnailPixelHeight, asset.ThumbnailPixelHeight);
+        Assert.AreEqual(expectedAsset.Pixel.Asset.Width, asset.Pixel.Asset.Width);
+        Assert.AreEqual(expectedAsset.Pixel.Asset.Height, asset.Pixel.Asset.Height);
+        Assert.AreEqual(expectedAsset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Width);
+        Assert.AreEqual(expectedAsset.Pixel.Thumbnail.Height, asset.Pixel.Thumbnail.Height);
         Assert.AreEqual(expectedAsset.ImageRotation, asset.ImageRotation);
         Assert.AreEqual(actualDate, asset.ThumbnailCreationDateTime.Date);
         Assert.AreEqual(expectedAsset.Hash, asset.Hash);

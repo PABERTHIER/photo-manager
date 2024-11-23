@@ -83,10 +83,10 @@ public class AssetConfigsTests
         Assert.AreEqual("Image 1.jpg", asset.FileName);
         Assert.AreEqual(1000, asset.FileSize);
         Assert.AreEqual(Rotation.Rotate0, asset.ImageRotation);
-        Assert.AreEqual(1920, asset.PixelWidth);
-        Assert.AreEqual(1080, asset.PixelHeight);
-        Assert.AreEqual(120, asset.ThumbnailPixelWidth);
-        Assert.AreEqual(60, asset.ThumbnailPixelHeight);
+        Assert.AreEqual(1920, asset.Pixel.Asset.Width);
+        Assert.AreEqual(1080, asset.Pixel.Asset.Height);
+        Assert.AreEqual(120, asset.Pixel.Thumbnail.Width);
+        Assert.AreEqual(60, asset.Pixel.Thumbnail.Height);
         Assert.AreEqual(new DateTime(2023, 12, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset.Hash);
         Assert.AreEqual("The asset is corrupted", asset.AssetCorruptedMessage);
@@ -105,10 +105,10 @@ public class AssetConfigsTests
         Assert.AreEqual("Image 1.jpg", asset.FileName);
         Assert.AreEqual(1000, asset.FileSize);
         Assert.AreEqual(Rotation.Rotate0, asset.ImageRotation);
-        Assert.AreEqual(1920, asset.PixelWidth);
-        Assert.AreEqual(1080, asset.PixelHeight);
-        Assert.AreEqual(120, asset.ThumbnailPixelWidth);
-        Assert.AreEqual(60, asset.ThumbnailPixelHeight);
+        Assert.AreEqual(1920, asset.Pixel.Asset.Width);
+        Assert.AreEqual(1080, asset.Pixel.Asset.Height);
+        Assert.AreEqual(120, asset.Pixel.Thumbnail.Width);
+        Assert.AreEqual(60, asset.Pixel.Thumbnail.Height);
         Assert.AreEqual(new DateTime(2023, 12, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset.Hash);
         Assert.AreEqual("The asset is corrupted", asset.AssetCorruptedMessage);
@@ -173,10 +173,11 @@ public class AssetConfigsTests
             FileName = "Image 1.jpg",
             FileSize = 1000,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1920,
-            PixelHeight = 1080,
-            ThumbnailPixelWidth = 120,
-            ThumbnailPixelHeight = 60,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1920, Height = 1080 },
+                Thumbnail = new() { Width = 120, Height = 60 }
+            },
             ThumbnailCreationDateTime = new DateTime(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = "The asset is corrupted",
@@ -254,10 +255,11 @@ public class AssetConfigsTests
             FileName = "Image 1.jpg",
             FileSize = 1000,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1920,
-            PixelHeight = 1080,
-            ThumbnailPixelWidth = 120,
-            ThumbnailPixelHeight = 60,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1920, Height = 1080 },
+                Thumbnail = new() { Width = 120, Height = 60 }
+            },
             ThumbnailCreationDateTime = new DateTime(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = "The asset is corrupted",

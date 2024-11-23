@@ -219,10 +219,11 @@ public class AssetCreationService(
             FolderId = folder.FolderId,
             Folder = folder,
             FileSize = new FileInfo(imagePath).Length,
-            PixelWidth = originalDecodeWidth,
-            PixelHeight = originalDecodeHeight,
-            ThumbnailPixelWidth = thumbnailDecodeWidth,
-            ThumbnailPixelHeight = thumbnailDecodeHeight,
+            Pixel = new()
+            {
+                Asset = new() { Width = originalDecodeWidth, Height = originalDecodeHeight },
+                Thumbnail = new() { Width = thumbnailDecodeWidth, Height = thumbnailDecodeHeight}
+            },
             ImageRotation = rotation,
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = assetHashCalculatorService.CalculateHash(imageBytes, imagePath),

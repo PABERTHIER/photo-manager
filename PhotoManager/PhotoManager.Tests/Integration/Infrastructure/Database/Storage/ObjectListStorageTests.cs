@@ -80,10 +80,10 @@ public class ObjectListStorageTests
         Assert.AreEqual(new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9"), asset.FolderId);
         Assert.AreEqual(2986996, asset.FileSize);
         Assert.AreEqual(Rotation.Rotate270, asset.ImageRotation);
-        Assert.AreEqual(3072, asset.PixelWidth);
-        Assert.AreEqual(4080, asset.PixelHeight);
-        Assert.AreEqual(113, asset.ThumbnailPixelWidth);
-        Assert.AreEqual(150, asset.ThumbnailPixelHeight);
+        Assert.AreEqual(3072, asset.Pixel.Asset.Width);
+        Assert.AreEqual(4080, asset.Pixel.Asset.Height);
+        Assert.AreEqual(113, asset.Pixel.Thumbnail.Width);
+        Assert.AreEqual(150, asset.Pixel.Thumbnail.Height);
         Assert.AreEqual(new DateTime(2023, 8, 25, 12, 01, 21), asset.ThumbnailCreationDateTime);
         Assert.AreEqual(string.Empty, asset.AssetCorruptedMessage);
         Assert.AreEqual(false, asset.IsAssetCorrupted);
@@ -376,10 +376,11 @@ public class ObjectListStorageTests
                 FileName = "1336.JPG",
                 FileSize = 4526710,
                 ImageRotation = Rotation.Rotate0,
-                PixelWidth = 4032,
-                PixelHeight = 3024,
-                ThumbnailPixelWidth = 200,
-                ThumbnailPixelHeight = 150,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 4032, Height = 3024 },
+                    Thumbnail = new() { Width = 200, Height = 150 }
+                },
                 ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 05),
                 Hash =
                     "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa",
@@ -396,10 +397,11 @@ public class ObjectListStorageTests
                 FileName = "1452.DNG",
                 FileSize = 5286168,
                 ImageRotation = Rotation.Rotate90,
-                PixelWidth = 4032,
-                PixelHeight = 3024,
-                ThumbnailPixelWidth = 200,
-                ThumbnailPixelHeight = 150,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 4032, Height = 3024 },
+                    Thumbnail = new() { Width = 200, Height = 150 }
+                },
                 ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 05),
                 Hash =
                     "e9680ad893bee9471a55421c0ea30075723f3ad274caec6300f7ce44adefb8a68b1a4f65ea25543a39f60d63af1681eca61bfb6b6f18d38c8dbb0672e2018e58",

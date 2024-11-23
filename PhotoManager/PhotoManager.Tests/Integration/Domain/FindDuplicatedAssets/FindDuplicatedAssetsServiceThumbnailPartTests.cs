@@ -98,10 +98,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_BottomLeftPart.JPG",
             FileSize = 1119873,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 2016,
-            PixelHeight = 1512,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 2016, Height = 1512 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -116,10 +117,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_BottomPart.JPG",
             FileSize = 2172866,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 4032,
-            PixelHeight = 1512,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 75,
+            Pixel = new()
+            {
+                Asset = new() { Width = 4032, Height = 1512 },
+                Thumbnail = new() { Width = 200, Height = 75 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -134,10 +136,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_BottomRightPart.JPG",
             FileSize = 1061673,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 2016,
-            PixelHeight = 1512,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 2016, Height = 1512 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -152,10 +155,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_LeftPart.JPG",
             FileSize = 1475892,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 2016,
-            PixelHeight = 3024,
-            ThumbnailPixelWidth = 100,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 2016, Height = 3024 },
+                Thumbnail = new() { Width = 100, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -170,10 +174,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_Original.JPG",
             FileSize = 4526710,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 4032,
-            PixelHeight = 3024,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 4032, Height = 3024 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -188,10 +193,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_RightPart.JPG",
             FileSize = 1437903,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 2016,
-            PixelHeight = 3024,
-            ThumbnailPixelWidth = 100,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 2016, Height = 3024 },
+                Thumbnail = new() { Width = 100, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -206,10 +212,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_TopLeftPart.JPG",
             FileSize = 362012,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 2016,
-            PixelHeight = 1512,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 2016, Height = 1512 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -224,10 +231,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_TopPart.JPG",
             FileSize = 737269,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 4032,
-            PixelHeight = 1512,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 75,
+            Pixel = new()
+            {
+                Asset = new() { Width = 4032, Height = 1512 },
+                Thumbnail = new() { Width = 200, Height = 75 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -242,10 +250,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "1336_TopRightPart.JPG",
             FileSize = 383508,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 2016,
-            PixelHeight = 1512,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
+            Pixel = new()
+            {
+                Asset = new() { Width = 2016, Height = 1512 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
@@ -260,10 +269,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
             FileName = "Image 1.jpg",
             FileSize = 29857,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1280,
-            PixelHeight = 720,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
