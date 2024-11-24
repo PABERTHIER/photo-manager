@@ -362,8 +362,6 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
                 continue;
             }
 
-            _storageService.UpdateAssetFileDateTimeProperties(updatedAsset);
-
             string fullPath = Path.Combine(directory, fileName);
             callback?.Invoke(new CatalogChangeCallbackEventArgs
             {

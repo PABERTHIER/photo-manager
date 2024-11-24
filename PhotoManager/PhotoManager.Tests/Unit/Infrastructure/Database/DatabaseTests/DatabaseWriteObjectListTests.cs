@@ -123,7 +123,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
                     AssetCorruptedMessage = null,
@@ -144,7 +144,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
                     AssetCorruptedMessage = "The asset is corrupted",
@@ -198,7 +198,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
                     AssetCorruptedMessage = null,
@@ -219,7 +219,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
                     AssetCorruptedMessage = "The asset is corrupted",
@@ -293,7 +293,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
                     AssetCorruptedMessage = null,
@@ -314,7 +314,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
                     AssetCorruptedMessage = "The asset is corrupted",
@@ -429,7 +429,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
                     AssetCorruptedMessage = null,
@@ -450,7 +450,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
                     AssetCorruptedMessage = "The asset is corrupted",
@@ -508,7 +508,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
                     AssetCorruptedMessage = null,
@@ -529,7 +529,7 @@ public class DatabaseWriteObjectListTests
                         Asset = new() { Width = 1920, Height = 1080 },
                         Thumbnail = new() { Width = 200, Height = 112 }
                     },
-                    ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                    ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                     Hash =
                         "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
                     AssetCorruptedMessage = "The asset is corrupted",
@@ -582,7 +582,7 @@ public class DatabaseWriteObjectListTests
                     Asset = new() { Width = 1920, Height = 1080 },
                     Thumbnail = new() { Width = 200, Height = 112 }
                 },
-                ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                 Hash =
                     "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
                 AssetCorruptedMessage = null,
@@ -603,7 +603,7 @@ public class DatabaseWriteObjectListTests
                     Asset = new() { Width = 1920, Height = 1080 },
                     Thumbnail = new() { Width = 200, Height = 112 }
                 },
-                ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 09),
+                ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 09),
                 Hash =
                     "0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124",
                 AssetCorruptedMessage = "The asset is corrupted",

@@ -6,10 +6,11 @@ public class ApplicationCatalogAssetsAsyncTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
     private string? _databaseBackupPath;
-    private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
     private string? _defaultAssetsDirectory;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
+    private const string DATABASE_END_PATH = "v1.0";
+    private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
 
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
@@ -70,7 +71,12 @@ public class ApplicationCatalogAssetsAsyncTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
             IsAssetCorrupted = false,
@@ -88,7 +94,12 @@ public class ApplicationCatalogAssetsAsyncTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
             IsAssetCorrupted = false,
@@ -106,7 +117,12 @@ public class ApplicationCatalogAssetsAsyncTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
             IsAssetCorrupted = false,
@@ -124,7 +140,12 @@ public class ApplicationCatalogAssetsAsyncTests
                 Asset = new() { Width = 3024, Height = 4032 },
                 Thumbnail = new() { Width = 112, Height = 150 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
             IsAssetCorrupted = false,
@@ -142,7 +163,12 @@ public class ApplicationCatalogAssetsAsyncTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
             IsAssetCorrupted = false,
@@ -160,7 +186,12 @@ public class ApplicationCatalogAssetsAsyncTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
             IsAssetCorrupted = false,
@@ -178,7 +209,12 @@ public class ApplicationCatalogAssetsAsyncTests
                 Asset = new() { Width = 320, Height = 320 },
                 Thumbnail = new() { Width = 150, Height = 150 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
             IsAssetCorrupted = false,
@@ -195,6 +231,11 @@ public class ApplicationCatalogAssetsAsyncTests
             {
                 Asset = new() { Width = 320, Height = 180 },
                 Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
@@ -213,6 +254,11 @@ public class ApplicationCatalogAssetsAsyncTests
             {
                 Asset = new() { Width = 320, Height = 180 },
                 Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
@@ -1441,8 +1487,8 @@ public class ApplicationCatalogAssetsAsyncTests
 
             // Second sync
 
-            _asset1Temp.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
-            File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.ThumbnailCreationDateTime);
+            _asset1Temp.FileDateTime = _asset1Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileDateTime.Modification);
 
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
@@ -2024,8 +2070,8 @@ public class ApplicationCatalogAssetsAsyncTests
 
             // Second sync
 
-            _asset4Temp!.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
-            File.SetLastWriteTime(videoPath1ToCopy, _asset4Temp.ThumbnailCreationDateTime);
+            _asset4Temp!.FileDateTime = _asset4Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(videoPath1ToCopy, _asset4Temp.FileDateTime.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(3, assetsInDirectory.Length);
@@ -2274,8 +2320,8 @@ public class ApplicationCatalogAssetsAsyncTests
                 { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            _asset2Temp.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
-            File.SetLastWriteTime(imagePath1ToCopy, _asset2Temp.ThumbnailCreationDateTime);
+            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath1ToCopy, _asset2Temp.FileDateTime.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
@@ -2524,7 +2570,8 @@ public class ApplicationCatalogAssetsAsyncTests
             File.Delete(imagePath1ToCopyTemp);
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
 
-            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddMinutes(-10); // Because recreated with CreateInvalidImage() + minus 10 min to simulate update
+            // Because recreated with CreateInvalidImage() + minus 10 min to simulate update
+            _asset2Temp!.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddMinutes(-10) };
             File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now);
 
             List<string> assetPathsUpdated = [];
@@ -2792,8 +2839,8 @@ public class ApplicationCatalogAssetsAsyncTests
 
             CatalogAssetsAsyncAsserts.RemoveDatabaseBackup([folder], blobsPath, tablesPath, backupFilePath);
 
-            _asset1Temp.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
-            File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.ThumbnailCreationDateTime);
+            _asset1Temp.FileDateTime = _asset1Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileDateTime.Modification);
 
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
@@ -5946,8 +5993,8 @@ public class ApplicationCatalogAssetsAsyncTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
-            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.ThumbnailCreationDateTime);
+            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileDateTime.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
@@ -6441,8 +6488,8 @@ public class ApplicationCatalogAssetsAsyncTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
-            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.ThumbnailCreationDateTime);
+            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileDateTime.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
@@ -6931,8 +6978,8 @@ public class ApplicationCatalogAssetsAsyncTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
-            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.ThumbnailCreationDateTime);
+            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileDateTime.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {

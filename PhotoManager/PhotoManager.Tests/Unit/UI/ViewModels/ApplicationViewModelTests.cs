@@ -9,6 +9,7 @@ public class ApplicationViewModelTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string DATABASE_END_PATH = "v1.0";
 
     private ApplicationViewModel? _applicationViewModel;
@@ -1035,8 +1036,11 @@ public class ApplicationViewModelTests
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileSize = 2048,
-                    FileCreationDateTime = DateTime.Now,
-                    FileModificationDateTime = DateTime.Now,
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
                     ThumbnailCreationDateTime = DateTime.Now
                 }
             ];
@@ -1162,7 +1166,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 5.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2020, 6, 1)
                 },
                 new()
                 {
@@ -1170,7 +1179,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 2.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2020, 6, 1)
                 },
                 new()
                 {
@@ -1178,7 +1192,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 1.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2010, 2, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2010, 2, 1)
                 },
                 new()
                 {
@@ -1186,7 +1205,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 3.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2010, 1, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2010, 1, 1)
                 },
                 new()
                 {
@@ -1194,7 +1218,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 4.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2010, 8, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2010, 8, 1)
                 }
             ];
 
@@ -1232,7 +1261,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 5.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2020, 6, 1)
                 },
                 new()
                 {
@@ -1240,7 +1274,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 2.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2020, 6, 1)
                 },
                 new()
                 {
@@ -1248,7 +1287,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 1.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2010, 2, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2010, 2, 1)
                 },
                 new()
                 {
@@ -1256,7 +1300,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 3.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2010, 1, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2010, 1, 1)
                 },
                 new()
                 {
@@ -1264,7 +1313,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 4.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    ThumbnailCreationDateTime = new DateTime(2010, 8, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = DateTime.Now,
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = new (2010, 8, 1)
                 }
             ];
 
@@ -1320,7 +1374,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 5.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2020, 6, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 },
                 new()
                 {
@@ -1328,7 +1387,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 2.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2020, 6, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 },
                 new()
                 {
@@ -1336,7 +1400,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 1.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2010, 2, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 2, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 },
                 new()
                 {
@@ -1344,7 +1413,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 3.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2010, 1, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 1, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 },
                 new()
                 {
@@ -1352,7 +1426,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 4.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2010, 8, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 8, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 }
             ];
 
@@ -1390,7 +1469,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 5.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2020, 6, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 },
                 new()
                 {
@@ -1398,7 +1482,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 2.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2020, 6, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 },
                 new()
                 {
@@ -1406,7 +1495,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 1.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2010, 2, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 2, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 },
                 new()
                 {
@@ -1414,7 +1508,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 3.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2010, 1, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 1, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 },
                 new()
                 {
@@ -1422,7 +1521,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 4.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileCreationDateTime = new DateTime(2010, 8, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 8, 1),
+                        Modification = _expectedFileModificationDateTime
+                    },
+                    ThumbnailCreationDateTime = DateTime.Now
                 }
             ];
 
@@ -1478,7 +1582,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 5.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2020, 5, 1),
+                        Modification = new (2020, 6, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2020, 5, 1)
                 },
                 new()
                 {
@@ -1486,7 +1595,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 2.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2020, 5, 1),
+                        Modification = new (2020, 6, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2020, 5, 1)
                 },
                 new()
                 {
@@ -1494,7 +1608,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 1.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2010, 2, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 1, 1),
+                        Modification = new (2010, 2, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2010, 1, 1)
                 },
                 new()
                 {
@@ -1502,7 +1621,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 3.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2010, 1, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2009, 1, 1),
+                        Modification = new (2010, 1, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2009, 1, 1)
                 },
                 new()
                 {
@@ -1510,7 +1634,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 4.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2010, 8, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 7, 1),
+                        Modification = new (2010, 8, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2010, 7, 1)
                 }
             ];
 
@@ -1548,7 +1677,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 5.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2020, 5, 1),
+                        Modification = new (2020, 6, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2020, 5, 1)
                 },
                 new()
                 {
@@ -1556,7 +1690,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 2.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2020, 6, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2020, 5, 1),
+                        Modification = new (2020, 6, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2020, 5, 1)
                 },
                 new()
                 {
@@ -1564,7 +1703,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 1.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2010, 2, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 1, 1),
+                        Modification = new (2010, 2, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2010, 1, 1)
                 },
                 new()
                 {
@@ -1572,7 +1716,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 3.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2010, 1, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2009, 1, 1),
+                        Modification = new (2010, 1, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2009, 1, 1)
                 },
                 new()
                 {
@@ -1580,7 +1729,12 @@ public class ApplicationViewModelTests
                     FileName = "Image 4.jpg",
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
-                    FileModificationDateTime = new DateTime(2010, 8, 1)
+                    FileDateTime = new()
+                    {
+                        Creation = new (2010, 7, 1),
+                        Modification = new (2010, 8, 1)
+                    },
+                    ThumbnailCreationDateTime = new (2010, 7, 1)
                 }
             ];
 

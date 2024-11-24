@@ -5,6 +5,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
 {
     private string? _dataDirectory;
     private string? _backupPath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private AssetRepository? _assetRepository;
@@ -78,7 +79,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
                 Asset = new() { Width = 43, Height = 32 },
                 Thumbnail = new() { Width = 200, Height = 149 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -97,7 +103,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
                 Asset = new() { Width = 4032, Height = 3024 },
                 Thumbnail = new() { Width = 200, Height = 150 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -116,7 +127,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
                 Asset = new() { Width = 4032, Height = 3024 },
                 Thumbnail = new() { Width = 200, Height = 150 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -135,7 +151,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
                 Asset = new() { Width = 591, Height = 443 },
                 Thumbnail = new() { Width = 200, Height = 150 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -154,7 +175,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,

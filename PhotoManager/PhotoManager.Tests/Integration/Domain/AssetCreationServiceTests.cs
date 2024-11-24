@@ -6,6 +6,7 @@ public class AssetCreationServiceTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string DATABASE_END_PATH = "v1.0";
 
     private AssetCreationService? _assetCreationService;
@@ -128,6 +129,7 @@ public class AssetCreationServiceTests
                 pixelHeight,
                 thumbnailPixelWidth,
                 thumbnailPixelHeight,
+                _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
                 isAssetCorrupted,
@@ -225,6 +227,7 @@ public class AssetCreationServiceTests
                 pixelHeight,
                 thumbnailPixelWidth,
                 thumbnailPixelHeight,
+                _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
                 isAssetCorrupted,
@@ -322,6 +325,7 @@ public class AssetCreationServiceTests
                 pixelHeight,
                 thumbnailPixelWidth,
                 thumbnailPixelHeight,
+                _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
                 isAssetCorrupted,
@@ -419,6 +423,7 @@ public class AssetCreationServiceTests
                 pixelHeight,
                 thumbnailPixelWidth,
                 thumbnailPixelHeight,
+                _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
                 isAssetCorrupted,
@@ -482,6 +487,7 @@ public class AssetCreationServiceTests
                 pixelHeight,
                 thumbnailPixelWidth,
                 thumbnailPixelHeight,
+                _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
                 isAssetCorrupted,
@@ -525,6 +531,12 @@ public class AssetCreationServiceTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
             },
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
             IsAssetCorrupted = false,
@@ -561,6 +573,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Pixel.Asset.Height,
                 expectedAsset.Pixel.Thumbnail.Width,
                 expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileDateTime.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
                 expectedAsset.IsAssetCorrupted,
@@ -604,6 +617,12 @@ public class AssetCreationServiceTests
                 Asset = new() { Width = 720, Height = 1280 },
                 Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
             },
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94",
             IsAssetCorrupted = false,
@@ -640,6 +659,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Pixel.Asset.Height,
                 expectedAsset.Pixel.Thumbnail.Width,
                 expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileDateTime.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
                 expectedAsset.IsAssetCorrupted,
@@ -682,6 +702,12 @@ public class AssetCreationServiceTests
                 Asset = new() { Width = 3024, Height = 4032 },
                 Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
             },
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
             IsAssetCorrupted = false,
@@ -718,6 +744,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Pixel.Asset.Height,
                 expectedAsset.Pixel.Thumbnail.Width,
                 expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileDateTime.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
                 expectedAsset.IsAssetCorrupted,
@@ -748,6 +775,12 @@ public class AssetCreationServiceTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
             IsAssetCorrupted = false,
@@ -786,6 +819,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Pixel.Asset.Height,
                 expectedAsset.Pixel.Thumbnail.Width,
                 expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileDateTime.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
                 expectedAsset.IsAssetCorrupted,
@@ -814,6 +848,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Pixel.Asset.Height,
                 expectedAsset.Pixel.Thumbnail.Width,
                 expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileDateTime.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
                 expectedAsset.IsAssetCorrupted,
@@ -873,6 +908,12 @@ public class AssetCreationServiceTests
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
             IsAssetCorrupted = false,
@@ -911,6 +952,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Pixel.Asset.Height,
                 expectedAsset.Pixel.Thumbnail.Width,
                 expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileDateTime.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
                 expectedAsset.IsAssetCorrupted,
@@ -1009,6 +1051,12 @@ public class AssetCreationServiceTests
                     Asset = new() { Width = pixelWidth, Height = pixelHeight },
                     Thumbnail = new() { Width = thumbnailPixelWidth, Height = thumbnailPixelHeight }
                 },
+                FileDateTime = new()
+                {
+                    Creation = DateTime.Now,
+                    Modification = _expectedFileModificationDateTime
+                },
+                ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = imageRotation,
                 Hash = hash,
                 IsAssetCorrupted = true,
@@ -1051,6 +1099,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Pixel.Asset.Height,
                 expectedAsset.Pixel.Thumbnail.Width,
                 expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileDateTime.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
                 expectedAsset.IsAssetCorrupted,
@@ -1507,6 +1556,7 @@ public class AssetCreationServiceTests
                 pixelHeight,
                 thumbnailPixelWidth,
                 thumbnailPixelHeight,
+                DateTime.Now.Date,
                 imageRotation,
                 hash,
                 isAssetCorrupted,
@@ -1733,6 +1783,7 @@ public class AssetCreationServiceTests
                 pixelHeight,
                 thumbnailPixelWidth,
                 thumbnailPixelHeight,
+                DateTime.Now.Date,
                 imageRotation,
                 hash,
                 isAssetCorrupted,
@@ -1828,7 +1879,12 @@ public class AssetCreationServiceTests
                     Asset = new() { Width = 1280, Height = 720 },
                     Thumbnail = new() { Width = 200, Height = 112 }
                 },
-                ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+                FileDateTime = new()
+                {
+                    Creation = DateTime.Now,
+                    Modification = _expectedFileModificationDateTime
+                },
+                ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = Rotation.Rotate0,
                 Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
                 IsAssetCorrupted = false,
@@ -1850,6 +1906,7 @@ public class AssetCreationServiceTests
                 expectedAsset.Pixel.Asset.Height,
                 expectedAsset.Pixel.Thumbnail.Width,
                 expectedAsset.Pixel.Thumbnail.Height,
+                expectedAsset.FileDateTime.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
                 expectedAsset.IsAssetCorrupted,
@@ -1957,6 +2014,7 @@ public class AssetCreationServiceTests
                 pixelHeight,
                 thumbnailPixelWidth,
                 thumbnailPixelHeight,
+                _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
                 isAssetCorrupted,
@@ -1972,6 +2030,7 @@ public class AssetCreationServiceTests
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
+
             if (analyseVideos)
             {
                 Directory.Delete(firstFrameVideosPath, true);
@@ -1980,22 +2039,8 @@ public class AssetCreationServiceTests
     }
 
     [Test]
-    [TestCase("Image 1.jpg", 29857, 720, 1280, 200, 112, Rotation.Rotate0, "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9", false, null, false, null, 2097, true)]
-    public void CreateAsset_PictureAndIsVideoIsTrueAndAnalyseVideosIsTrue_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset(
-        string fileName,
-        long fileSize,
-        int pixelHeight,
-        int pixelWidth,
-        int thumbnailPixelWidth,
-        int thumbnailPixelHeight,
-        Rotation imageRotation,
-        string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
-        int imageByteSize,
-        bool analyseVideos)
+    [TestCase("Image 1.jpg", true)]
+    public void CreateAsset_PictureAndIsVideoIsTrueAndAnalyseVideosIsTrue_ReturnsNullAndDoesNotCreateFirstFrameAndDoesNotCreateAsset(        string fileName, bool analyseVideos)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, analyseVideos);
 
@@ -2029,6 +2074,7 @@ public class AssetCreationServiceTests
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
+
             if (analyseVideos)
             {
                 Directory.Delete(firstFrameVideosPath, true);
@@ -2270,6 +2316,7 @@ public class AssetCreationServiceTests
         int pixelHeight,
         int thumbnailPixelWidth,
         int thumbnailPixelHeight,
+        DateTime fileModificationDateTime,
         Rotation imageRotation,
         string hash,
         bool isAssetCorrupted,
@@ -2278,7 +2325,6 @@ public class AssetCreationServiceTests
         string? assetRotatedMessage)
     {
         DateTime actualDate = DateTime.Now.Date;
-        DateTime minDate = DateTime.MinValue.Date;
 
         Assert.AreEqual(fileName, asset.FileName);
         Assert.AreEqual(folder.FolderId, asset.FolderId);
@@ -2298,11 +2344,11 @@ public class AssetCreationServiceTests
         Assert.AreEqual(imagePath, asset.FullPath);
         Assert.AreEqual(folderPath, asset.Folder.Path);
         Assert.IsNull(asset.ImageData); // Set above, not in this method
-        Assert.AreEqual(minDate, asset.FileCreationDateTime); // Set above, not in this method
-        Assert.AreEqual(minDate, asset.FileModificationDateTime); // Set above, not in this method
+        Assert.AreEqual(actualDate, asset.FileDateTime.Creation.Date);
+        Assert.AreEqual(fileModificationDateTime.Date, asset.FileDateTime.Modification.Date);
     }
 
-    private void AssertCataloguedAssetAndThumbnailValidity(Asset asset, Folder folder, IReadOnlyDictionary<string, Dictionary<string, byte[]>> thumbnails, int imageByteSize)
+    private void AssertCataloguedAssetAndThumbnailValidity(Asset asset, Folder folder, Dictionary<string, Dictionary<string, byte[]>> thumbnails, int imageByteSize)
     {
         List<Asset> assetsFromRepository = _testableAssetRepository!.GetCataloguedAssets();
         Assert.AreEqual(1, assetsFromRepository.Count);

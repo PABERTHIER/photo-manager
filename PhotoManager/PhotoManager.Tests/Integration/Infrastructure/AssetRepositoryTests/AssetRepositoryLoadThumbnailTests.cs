@@ -7,6 +7,7 @@ public class AssetRepositoryLoadThumbnailTests
 {
     private string? _dataDirectory;
     private string? _backupPath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private TestableAssetRepository? _testableAssetRepository;
@@ -50,7 +51,12 @@ public class AssetRepositoryLoadThumbnailTests
                 Asset = new() { Width = 1920, Height = 1080 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            FileDateTime = new()
+            {
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -201,7 +207,7 @@ public class AssetRepositoryLoadThumbnailTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = testableAssetRepository.GetThumbnails();
             Assert.IsEmpty(thumbnails);
 
-            BitmapImage? bitmapImage = testableAssetRepository!.LoadThumbnail(
+            BitmapImage? bitmapImage = testableAssetRepository.LoadThumbnail(
                 _dataDirectory!,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,

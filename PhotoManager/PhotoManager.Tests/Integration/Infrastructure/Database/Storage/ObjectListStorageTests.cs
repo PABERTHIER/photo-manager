@@ -381,7 +381,7 @@ public class ObjectListStorageTests
                     Asset = new() { Width = 4032, Height = 3024 },
                     Thumbnail = new() { Width = 200, Height = 150 }
                 },
-                ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 05),
+                ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 05),
                 Hash =
                     "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa",
                 AssetCorruptedMessage = null,
@@ -402,7 +402,7 @@ public class ObjectListStorageTests
                     Asset = new() { Width = 4032, Height = 3024 },
                     Thumbnail = new() { Width = 200, Height = 150 }
                 },
-                ThumbnailCreationDateTime = new DateTime(2023, 8, 19, 11, 26, 05),
+                ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 05),
                 Hash =
                     "e9680ad893bee9471a55421c0ea30075723f3ad274caec6300f7ce44adefb8a68b1a4f65ea25543a39f60d63af1681eca61bfb6b6f18d38c8dbb0672e2018e58",
                 AssetCorruptedMessage = null,

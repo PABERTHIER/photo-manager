@@ -79,11 +79,6 @@ public class AssetRepository : IAssetRepository
                         // Removes assets with no thumbnails
                         assetsList.RemoveAll(asset => asset.ImageData == null);
                     }
-
-                    foreach (Asset asset in assetsList)
-                    {
-                        _storageService.UpdateAssetFileDateTimeProperties(asset);
-                    }
                 }
             }
         }
@@ -525,7 +520,15 @@ public class AssetRepository : IAssetRepository
         folders = ReadFolders();
         syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
         recentTargetPaths = ReadRecentTargetPaths();
-        assets.ForEach(a => a.Folder = GetFolderById(a.FolderId) ?? new() { Path = Path.Combine("FolderNotFound", a.FolderId.ToString(), a.FileName) });
+
+        for (int i = 0; i < assets.Count; i++)
+        {
+            // TODO: Improve the mapping for perf
+            assets[i].Folder = GetFolderById(assets[i].FolderId)!; // If the folder is not found, that means the DB has been modified manually
+
+            // Not saved in DB because it is computed each time to detect file update
+            _storageService.UpdateAssetFileDateTimeProperties(assets[i]);
+        }
     }
 
     private List<Folder> ReadFolders()

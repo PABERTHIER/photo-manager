@@ -223,14 +223,14 @@ public class ApplicationViewModel : BaseViewModel
 
                 case SortCriteria.FileCreationDateTime:
                     cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileCreationDateTime).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileCreationDateTime).ThenByDescending(a => a.FileName).ToArray();
+                        cataloguedAssets.OrderBy(a => a.FileDateTime.Creation).ThenBy(a => a.FileName).ToArray() :
+                        cataloguedAssets.OrderByDescending(a => a.FileDateTime.Creation).ThenByDescending(a => a.FileName).ToArray();
                     break;
 
                 case SortCriteria.FileModificationDateTime:
                     cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileModificationDateTime).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileModificationDateTime).ThenByDescending(a => a.FileName).ToArray();
+                        cataloguedAssets.OrderBy(a => a.FileDateTime.Modification).ThenBy(a => a.FileName).ToArray() :
+                        cataloguedAssets.OrderByDescending(a => a.FileDateTime.Modification).ThenByDescending(a => a.FileName).ToArray();
                     break;
 
                 case SortCriteria.FileSize:

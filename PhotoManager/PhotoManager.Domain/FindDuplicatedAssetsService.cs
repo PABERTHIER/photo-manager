@@ -10,7 +10,7 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
     public List<List<Asset>> GetDuplicatedAssets()
     {
         List<List<Asset>> duplicatedAssetsSets = [];
-        List<Asset> assets = [..assetRepository.GetCataloguedAssets()];
+        List<Asset> assets = assetRepository.GetCataloguedAssets();
 
         if (userConfigurationService.AssetSettings.DetectThumbnails && userConfigurationService.HashSettings.UsingPHash)
         {
@@ -21,13 +21,12 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
 
         foreach (IGrouping<string, Asset> group in assetGroups)
         {
-            List<Asset> duplicatedSet = [.. group];
+            List<Asset> duplicatedSet = [..group];
             duplicatedSet.RemoveAll(asset => !storageService.FileExists(asset.FullPath));
 
             if (duplicatedSet.Count > 1)
             {
                 duplicatedAssetsSets.Add(duplicatedSet);
-                storageService.UpdateAssetsFileDateTimeProperties(duplicatedSet);
             }
         }
 
@@ -57,19 +56,17 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
             bool addedToSet = false;
 
             // Check if the asset dictionary contains entries with similar Hash values
-            foreach (KeyValuePair<string, List<Asset>> kvp in assetDictionary)
+            foreach ((string? hash2, List<Asset>? assetsAdded) in assetDictionary)
             {
-                string hash2 = kvp.Key;
-
                 // Calculate the Hamming distance between the Hash values
                 int hammingDistance = HashingHelper.CalculateHammingDistance(hash1, hash2);
 
                 // If the Hamming distance is below the threshold, add the asset to the duplicates list
                 if (hammingDistance <= threshold)
                 {
-                    if (!kvp.Value.Contains(asset1))
+                    if (!assetsAdded.Contains(asset1))
                     {
-                        kvp.Value.Add(asset1);
+                        assetsAdded.Add(asset1);
                         addedToSet = true;
                     }
                 }
@@ -87,7 +84,6 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
         {
             if (assetSet.Count > 1)
             {
-                storageService.UpdateAssetsFileDateTimeProperties(assetSet);
                 duplicatedAssetsSets.Add(assetSet);
             }
         }
