@@ -212,23 +212,16 @@ public class AssetCreationService(
     {
         // directoryName comes from folder in assetRepository or CatalogExistingFolder that registers the folder if not in assetRepository
         Folder folder = assetRepository.GetFolderByPath(directoryName)!;
-        FileInfo fileInfo = new (imagePath);
 
         Asset asset = new()
         {
             FileName = Path.GetFileName(imagePath),
             FolderId = folder.FolderId,
             Folder = folder,
-            FileSize = fileInfo.Length,
             Pixel = new()
             {
                 Asset = new() { Width = originalDecodeWidth, Height = originalDecodeHeight },
                 Thumbnail = new() { Width = thumbnailDecodeWidth, Height = thumbnailDecodeHeight}
-            },
-            FileDateTime = new()
-            {
-                Creation = fileInfo.CreationTime,
-                Modification = fileInfo.LastWriteTime
             },
             ImageRotation = rotation,
             ThumbnailCreationDateTime = DateTime.Now,
@@ -239,6 +232,7 @@ public class AssetCreationService(
             AssetRotatedMessage = isAssetRotated ? userConfigurationService.AssetSettings.AssetRotatedMessage : null,
         };
 
+        storageService.UpdateAssetFileProperties(asset);
         assetRepository.AddAsset(asset, thumbnailBuffer);
 
         return asset;

@@ -527,7 +527,7 @@ public class AssetRepository : IAssetRepository
             assets[i].Folder = GetFolderById(assets[i].FolderId)!; // If the folder is not found, that means the DB has been modified manually
 
             // Not saved in DB because it is computed each time to detect file update
-            _storageService.UpdateAssetFileDateTimeProperties(assets[i]);
+            _storageService.UpdateAssetFileProperties(assets[i]);
         }
     }
 

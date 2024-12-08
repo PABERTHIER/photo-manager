@@ -223,20 +223,20 @@ public class ApplicationViewModel : BaseViewModel
 
                 case SortCriteria.FileCreationDateTime:
                     cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileDateTime.Creation).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileDateTime.Creation).ThenByDescending(a => a.FileName).ToArray();
+                        cataloguedAssets.OrderBy(a => a.FileProperties.Creation).ThenBy(a => a.FileName).ToArray() :
+                        cataloguedAssets.OrderByDescending(a => a.FileProperties.Creation).ThenByDescending(a => a.FileName).ToArray();
                     break;
 
                 case SortCriteria.FileModificationDateTime:
                     cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileDateTime.Modification).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileDateTime.Modification).ThenByDescending(a => a.FileName).ToArray();
+                        cataloguedAssets.OrderBy(a => a.FileProperties.Modification).ThenBy(a => a.FileName).ToArray() :
+                        cataloguedAssets.OrderByDescending(a => a.FileProperties.Modification).ThenByDescending(a => a.FileName).ToArray();
                     break;
 
                 case SortCriteria.FileSize:
                     cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileSize).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileSize).ThenByDescending(a => a.FileName).ToArray();
+                        cataloguedAssets.OrderBy(a => a.FileProperties.Size).ThenBy(a => a.FileName).ToArray() :
+                        cataloguedAssets.OrderByDescending(a => a.FileProperties.Size).ThenByDescending(a => a.FileName).ToArray();
                     break;
             }
         }

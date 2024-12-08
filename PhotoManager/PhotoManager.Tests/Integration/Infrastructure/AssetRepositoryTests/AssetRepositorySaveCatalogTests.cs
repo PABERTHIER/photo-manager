@@ -43,15 +43,15 @@ public class AssetRepositorySaveCatalogTests
             Folder = new() { Path = "" },
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
-            FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 1920, Height = 1080 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 363888,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -159,7 +159,7 @@ public class AssetRepositorySaveCatalogTests
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
 
-            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Never);
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileProperties(It.IsAny<Asset>()), Times.Never);
         }
         finally
         {
@@ -257,7 +257,13 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.AreEqual(1, assets.Count);
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);
-            Assert.IsTrue(asset?.FileName == _asset1.FileName && asset.FolderId == _asset1.FolderId);
+            Assert.AreEqual(_asset1.FileName, asset?.FileName);
+            Assert.AreEqual(_asset1.FolderId, asset?.FolderId);
+            // TODO: When ResolveDataDirectory has been removed from StorageService
+            // // Before and after ?
+            // Assert.AreEqual(0, asset?.FileProperties.Size);
+            // Assert.AreEqual(DateTime.MinValue, asset?.FileProperties.Creation);
+            // Assert.AreEqual(DateTime.MinValue, asset?.FileProperties.Modification);
 
             Assert.AreEqual(2, syncAssetsDirectoriesDefinitions.Count);
             Assert.IsTrue(syncAssetsDirectoriesDefinitions.Any(x => x.SourceDirectory == "C:\\Toto\\Screenshots"));
@@ -268,7 +274,7 @@ public class AssetRepositorySaveCatalogTests
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
             Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
 
-            _storageServiceMock!.Verify(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()), Times.Exactly(1));
+            _storageServiceMock!.Verify(x => x.UpdateAssetFileProperties(It.IsAny<Asset>()), Times.Exactly(1));
         }
         finally
         {

@@ -630,7 +630,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void UpdateAssetsFileDateTimeProperties_SomeFilesExist_PopulatesAssetsDates()
+    public void UpdateAssetsFileProperties_SomeFilesExist_PopulatesAssetsFileProperties()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -674,29 +674,39 @@ public class StorageServiceTests
             Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
             Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
 
-            Assert.AreEqual(DateTime.MinValue, asset1.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset1.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset2.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset2.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset3.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset3.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset1.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset2.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset2.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset2.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset3.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset3.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset3.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset4.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset5.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Modification.Date);
 
-            _storageService!.UpdateAssetsFileDateTimeProperties([asset1, asset2, asset3, asset4, asset5]);
+            _storageService!.UpdateAssetsFileProperties([asset1, asset2, asset3, asset4, asset5]);
 
-            Assert.AreEqual(creationTime.Date, asset1.FileDateTime.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset1.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset2.FileDateTime.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset2.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset3.FileDateTime.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset3.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset4.FileDateTime.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset4.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileDateTime.Modification.Date);
+            Assert.AreEqual(64123, asset1.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
+            Assert.AreEqual(oldDateTime.Date, asset1.FileProperties.Modification.Date);
+            Assert.AreEqual(29857, asset2.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset2.FileProperties.Creation.Date);
+            Assert.AreEqual(oldDateTime.Date, asset2.FileProperties.Modification.Date);
+            Assert.AreEqual(126277, asset3.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset3.FileProperties.Creation.Date);
+            Assert.AreEqual(oldDateTime.Date, asset3.FileProperties.Modification.Date);
+            Assert.AreEqual(1411940, asset4.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset4.FileProperties.Creation.Date);
+            Assert.AreEqual(oldDateTime.Date, asset4.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset5.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Modification.Date);
         }
         finally
         {
@@ -705,23 +715,23 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void UpdateAssetsFileDateTimeProperties_AssetsIsEmpty_DoesNothing()
+    public void UpdateAssetsFileProperties_AssetsIsEmpty_DoesNothing()
     {
-        _storageService!.UpdateAssetsFileDateTimeProperties([]);
+        _storageService!.UpdateAssetsFileProperties([]);
     }
 
     [Test]
-    public void UpdateAssetsFileDateTimeProperties_AssetsIsNull_ThrowsNullReferenceException()
+    public void UpdateAssetsFileProperties_AssetsIsNull_ThrowsNullReferenceException()
     {
         List<Asset>? assets = null;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetsFileDateTimeProperties(assets!));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetsFileProperties(assets!));
 
         Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
     }
 
     [Test]
-    public void UpdateAssetsFileDateTimeProperties_FilePathIsNull_ThrowsArgumentNullException()
+    public void UpdateAssetsFileProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -767,31 +777,41 @@ public class StorageServiceTests
             Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
             Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
 
-            Assert.AreEqual(creationTime.Date, asset1.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset1.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset2.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset2.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset3.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset3.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset4.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset4.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset5.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset5.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset1.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset1.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset2.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset2.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset2.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset3.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset3.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset3.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset4.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset4.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset4.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset5.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset5.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset5.FileProperties.Modification.Date);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.UpdateAssetsFileDateTimeProperties([asset1, asset2, asset3, asset4, asset5]));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.UpdateAssetsFileProperties([asset1, asset2, asset3, asset4, asset5]));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
 
-            Assert.AreEqual(creationTime.Date, asset1.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset1.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset2.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset2.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset3.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset3.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset4.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset4.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset5.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset5.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset1.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset1.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset2.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset2.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset2.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset3.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset3.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset3.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset4.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset4.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset4.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset5.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset5.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset5.FileProperties.Modification.Date);
         }
         finally
         {
@@ -800,7 +820,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void UpdateAssetsFileDateTimeProperties_OneAssetIsNull_ThrowsNullReferenceException()
+    public void UpdateAssetsFileProperties_OneAssetIsNull_ThrowsNullReferenceException()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -844,27 +864,35 @@ public class StorageServiceTests
             Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
             Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
 
-            Assert.AreEqual(DateTime.MinValue, asset1.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset1.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset2.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset2.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset1.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset2.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset2.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset2.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset4.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset5.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Modification.Date);
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetsFileDateTimeProperties([asset1, asset2, asset3!, asset4, asset5]));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetsFileProperties([asset1, asset2, asset3!, asset4, asset5]));
 
             Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
 
-            Assert.AreEqual(creationTime.Date, asset1.FileDateTime.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset1.FileDateTime.Modification.Date);
-            Assert.AreEqual(creationTime.Date, asset2.FileDateTime.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset2.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileDateTime.Modification.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileDateTime.Modification.Date);
+            Assert.AreEqual(64123, asset1.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
+            Assert.AreEqual(oldDateTime.Date, asset1.FileProperties.Modification.Date);
+            Assert.AreEqual(29857, asset2.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset2.FileProperties.Creation.Date);
+            Assert.AreEqual(oldDateTime.Date, asset2.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset4.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Modification.Date);
+            Assert.AreEqual(0, asset5.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Modification.Date);
         }
         finally
         {
@@ -873,7 +901,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void UpdateAssetFileDateTimeProperties_FileExists_PopulatesAssetDates()
+    public void UpdateAssetFileProperties_FileExists_PopulatesAssetDates()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -897,13 +925,15 @@ public class StorageServiceTests
 
             Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
 
-            Assert.AreEqual(DateTime.MinValue, asset.FileDateTime.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset.FileProperties.Size);
+            Assert.AreEqual(DateTime.MinValue, asset.FileProperties.Creation.Date);
+            Assert.AreEqual(DateTime.MinValue, asset.FileProperties.Modification.Date);
 
-            _storageService!.UpdateAssetFileDateTimeProperties(asset);
+            _storageService!.UpdateAssetFileProperties(asset);
 
-            Assert.AreEqual(creationTime.Date, asset.FileDateTime.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset.FileDateTime.Modification.Date);
+            Assert.AreEqual(29857, asset.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
+            Assert.AreEqual(oldDateTime.Date, asset.FileProperties.Modification.Date);
         }
         finally
         {
@@ -912,7 +942,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void UpdateAssetFileDateTimeProperties_FileDoesNotExist_DoesNotPopulateAssetDates()
+    public void UpdateAssetFileProperties_FileDoesNotExist_DoesNotPopulateAssetDates()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -928,13 +958,15 @@ public class StorageServiceTests
             DateTime creationTime = default;
             DateTime modificationTime = default;
 
-            Assert.AreEqual(creationTime.Date, asset.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileProperties.Modification.Date);
 
-            _storageService!.UpdateAssetFileDateTimeProperties(asset);
+            _storageService!.UpdateAssetFileProperties(asset);
 
-            Assert.AreEqual(creationTime.Date, asset.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileProperties.Modification.Date);
         }
         finally
         {
@@ -943,7 +975,7 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void UpdateAssetFileDateTimeProperties_FilePathIsNull_ThrowsArgumentNullException()
+    public void UpdateAssetFileProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
         string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
 
@@ -969,15 +1001,17 @@ public class StorageServiceTests
 
             Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
 
-            Assert.AreEqual(creationTime.Date, asset.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileProperties.Modification.Date);
 
-            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.UpdateAssetFileDateTimeProperties(asset));
+            ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.UpdateAssetFileProperties(asset));
 
             Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
 
-            Assert.AreEqual(creationTime.Date, asset.FileDateTime.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileDateTime.Modification.Date);
+            Assert.AreEqual(0, asset.FileProperties.Size);
+            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
+            Assert.AreEqual(modificationTime.Date, asset.FileProperties.Modification.Date);
         }
         finally
         {
@@ -986,11 +1020,11 @@ public class StorageServiceTests
     }
 
     [Test]
-    public void UpdateAssetFileDateTimeProperties_AssetIsNull_ThrowsNullReferenceException()
+    public void UpdateAssetFileProperties_AssetIsNull_ThrowsNullReferenceException()
     {
         Asset? asset = null;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetFileDateTimeProperties(asset!));
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetFileProperties(asset!));
 
         Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
     }

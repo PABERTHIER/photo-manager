@@ -44,7 +44,7 @@ public class AssetsComparator : IAssetsComparator
 
     private static Func<Asset, bool> IsUpdatedAsset()
     {
-        return a => a.FileDateTime.Creation > a.ThumbnailCreationDateTime || a.FileDateTime.Modification > a.ThumbnailCreationDateTime;
+        return a => a.FileProperties.Creation > a.ThumbnailCreationDateTime || a.FileProperties.Modification > a.ThumbnailCreationDateTime;
     }
 
     private static (string[], string[]) GetImageAndVideoNamesList(string[] fileNames)

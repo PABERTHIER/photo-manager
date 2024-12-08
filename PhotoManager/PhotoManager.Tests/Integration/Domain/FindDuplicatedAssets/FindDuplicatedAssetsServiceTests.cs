@@ -47,15 +47,15 @@ public class FindDuplicatedAssetsServiceTests
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
-            FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 1920, Height = 1080 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 363888,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -71,15 +71,15 @@ public class FindDuplicatedAssetsServiceTests
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 9.png",
-            FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = 6000, Height = 6120 },
                 Thumbnail = new() { Width = 147, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 4602393,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -95,15 +95,15 @@ public class FindDuplicatedAssetsServiceTests
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 1_duplicate.jpg",
-            FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 1920, Height = 1080 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 363888,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -119,15 +119,15 @@ public class FindDuplicatedAssetsServiceTests
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 9_duplicate.png",
-            FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = 6000, Height = 6120 },
                 Thumbnail = new() { Width = 147, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 4602393,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -143,15 +143,15 @@ public class FindDuplicatedAssetsServiceTests
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image_11.heic",
-            FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 3024, Height = 4032 },
                 Thumbnail = new() { Width = 112, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 2247285,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },

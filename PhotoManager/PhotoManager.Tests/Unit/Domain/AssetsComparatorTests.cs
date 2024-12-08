@@ -28,13 +28,13 @@ public class AssetsComparatorTests
             FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
-            FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 1920, Height = 1080 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
+            FileProperties = new() { Size = 363888 },
             ThumbnailCreationDateTime = _oldDateTime1,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = null,
@@ -47,13 +47,13 @@ public class AssetsComparatorTests
             FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
             Folder = new() { Path = "" },
             FileName = "Image 9.png",
-            FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 700 },
                 Thumbnail = new() { Width = 147, Height = 150 }
             },
+            FileProperties = new() { Size = 4602393 },
             ThumbnailCreationDateTime = _oldDateTime2,
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
             AssetCorruptedMessage = null,
@@ -65,12 +65,12 @@ public class AssetsComparatorTests
         {
             Folder = new() { Path = "" },
             FileName = "Homer.gif",
-            FileSize = 64123,
             Pixel = new()
             {
                 Asset = new() { Width = 320, Height = 320 },
                 Thumbnail = new() { Width = 150, Height = 150 }
             },
+            FileProperties = new() { Size = 64123 },
             ThumbnailCreationDateTime = _oldDateTime1,
             ImageRotation = Rotation.Rotate0,
             Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
@@ -83,12 +83,12 @@ public class AssetsComparatorTests
         {
             Folder = new() { Path = "" },
             FileName = "Image_11.heic",
-            FileSize = 1411940,
             Pixel = new()
             {
                 Asset = new() { Width = 4032, Height = 3024 },
                 Thumbnail = new() { Width = 112, Height = 150 }
             },
+            FileProperties = new() { Size = 1411940 },
             ThumbnailCreationDateTime = _oldDateTime2,
             ImageRotation = Rotation.Rotate0,
             Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
@@ -325,22 +325,22 @@ public class AssetsComparatorTests
     {
         string[] expectedFileNames = [_asset1!.FileName, _asset2!.FileName, _asset3!.FileName, _asset4!.FileName];
 
-        _asset1.FileDateTime = new()
+        _asset1.FileProperties = new()
         {
             Creation = DateTime.Now,
             Modification = _oldDateTime2
         };
-        _asset2.FileDateTime = new()
+        _asset2.FileProperties = new()
         {
             Creation = _oldDateTime3,
             Modification = DateTime.Now
         };
-        _asset3.FileDateTime = new()
+        _asset3.FileProperties = new()
         {
             Creation = DateTime.Now,
             Modification = _oldDateTime2
         };
-        _asset4.FileDateTime = new()
+        _asset4.FileProperties = new()
         {
             Creation = _oldDateTime3,
             Modification = DateTime.Now
@@ -357,22 +357,22 @@ public class AssetsComparatorTests
     [Test]
     public void GetUpdatedFileNames_ThumbnailCreationDateTimeIsSameAsFileCreationOrModificationDateTime_ReturnsEmptyArray()
     {
-        _asset1!.FileDateTime = new()
+        _asset1!.FileProperties = new()
         {
             Creation = _oldDateTime2,
             Modification = _oldDateTime1
         };
-        _asset2!.FileDateTime = new()
+        _asset2!.FileProperties = new()
         {
             Creation = _oldDateTime2,
             Modification = _oldDateTime3
         };
-        _asset3!.FileDateTime = new()
+        _asset3!.FileProperties = new()
         {
             Creation = _oldDateTime1,
             Modification = _oldDateTime2
         };
-        _asset4!.FileDateTime = new()
+        _asset4!.FileProperties = new()
         {
             Creation = _oldDateTime3,
             Modification = _oldDateTime2

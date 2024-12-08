@@ -72,15 +72,15 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Path = "" },
             FileName = "Image_1336_Mini.JPG",
-            FileSize = 1586,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 43, Height = 32 },
                 Thumbnail = new() { Width = 200, Height = 149 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 1586,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -96,15 +96,15 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Path = "" },
             FileName = "Image_1336_Original.JPG",
-            FileSize = 4526710,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 4032, Height = 3024 },
                 Thumbnail = new() { Width = 200, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 4526710,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -120,15 +120,15 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Path = "" },
             FileName = "Image_1336_ShitQuality.JPG",
-            FileSize = 370819,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 4032, Height = 3024 },
                 Thumbnail = new() { Width = 200, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 370819,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -144,15 +144,15 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Path = "" },
             FileName = "Image_1336_Small.JPG",
-            FileSize = 53227,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 591, Height = 443 },
                 Thumbnail = new() { Width = 200, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 53227,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -168,15 +168,15 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
-            FileSize = 29857,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 29857,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },

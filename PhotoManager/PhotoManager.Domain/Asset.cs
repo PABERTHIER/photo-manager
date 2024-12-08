@@ -6,8 +6,7 @@ public class Asset
     public required Folder Folder { get; set; }
     public required string FileName { get; set; }
     public string FullPath => Path.Combine(Folder.Path, FileName);
-    public long FileSize { get; init; }
-    public FileDateTime FileDateTime { get; set; }
+    public FileProperties FileProperties { get; set; }
     public Pixel Pixel { get; init; }
     public Rotation ImageRotation { get; init; }
     public required string Hash { get; set; }

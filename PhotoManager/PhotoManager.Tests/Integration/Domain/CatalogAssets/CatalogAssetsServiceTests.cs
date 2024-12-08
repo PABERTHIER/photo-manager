@@ -65,14 +65,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 1_duplicate.jpg",
-            FileSize = 29857,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 29857,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -88,14 +88,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 9.png",
-            FileSize = 126277,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 126277,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -111,14 +111,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 9_duplicate.png",
-            FileSize = 126277,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 126277,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -134,14 +134,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "Image_11.heic",
-            FileSize = 1411940,
             Pixel = new()
             {
                 Asset = new() { Width = 3024, Height = 4032 },
                 Thumbnail = new() { Width = 112, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 1411940,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -157,14 +157,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 1_duplicate_copied.jpg",
-            FileSize = 29857,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 29857,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -180,14 +180,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
-            FileSize = 29857,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 29857,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -203,14 +203,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "Homer.gif",
-            FileSize = 64123,
             Pixel = new()
             {
                 Asset = new() { Width = 320, Height = 320 },
                 Thumbnail = new() { Width = 150, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 64123,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -226,14 +226,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "Homer.jpg",
-            FileSize = 6599,
             Pixel = new()
             {
                 Asset = new() { Width = 320, Height = 180 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 6599,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
@@ -249,14 +249,14 @@ public class CatalogAssetsServiceTests
         {
             Folder = new() { Path = "" },
             FileName = "HomerDuplicated.jpg",
-            FileSize = 6599,
             Pixel = new()
             {
                 Asset = new() { Width = 320, Height = 180 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 6599,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
@@ -1483,8 +1483,8 @@ public class CatalogAssetsServiceTests
 
             // Second sync
 
-            _asset1Temp.FileDateTime = _asset1Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
-            File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileDateTime.Modification);
+            _asset1Temp.FileProperties = _asset1Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileProperties.Modification);
 
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
@@ -2066,8 +2066,8 @@ public class CatalogAssetsServiceTests
 
             // Second sync
 
-            _asset4Temp!.FileDateTime = _asset4Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
-            File.SetLastWriteTime(videoPath1ToCopy, _asset4Temp.FileDateTime.Modification);
+            _asset4Temp!.FileProperties = _asset4Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(videoPath1ToCopy, _asset4Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(3, assetsInDirectory.Length);
@@ -2316,8 +2316,8 @@ public class CatalogAssetsServiceTests
                 { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
-            File.SetLastWriteTime(imagePath1ToCopy, _asset2Temp.FileDateTime.Modification);
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath1ToCopy, _asset2Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
@@ -2567,7 +2567,7 @@ public class CatalogAssetsServiceTests
             Assert.IsTrue(File.Exists(imagePath1ToCopy));
 
             // Because recreated with CreateInvalidImage() + minus 10 min to simulate update
-            _asset2Temp!.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddMinutes(-10) };
+            _asset2Temp!.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddMinutes(-10) };
             File.SetLastWriteTime(imagePath1ToCopy, DateTime.Now);
 
             List<string> assetPathsUpdated = [];
@@ -2835,8 +2835,8 @@ public class CatalogAssetsServiceTests
 
             CatalogAssetsAsyncAsserts.RemoveDatabaseBackup([folder], blobsPath, tablesPath, backupFilePath);
 
-            _asset1Temp.FileDateTime = _asset1Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
-            File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileDateTime.Modification);
+            _asset1Temp.FileProperties = _asset1Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(destinationFilePathToCopy, _asset1Temp.FileProperties.Modification);
 
             List<string> assetPathsUpdated = [];
             assetPaths.ForEach(assetPathsUpdated.Add);
@@ -5989,8 +5989,8 @@ public class CatalogAssetsServiceTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
-            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileDateTime.Modification);
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
@@ -6484,8 +6484,8 @@ public class CatalogAssetsServiceTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
-            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileDateTime.Modification);
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
@@ -6974,8 +6974,8 @@ public class CatalogAssetsServiceTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
-            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileDateTime.Modification);
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
@@ -8574,7 +8574,7 @@ public class CatalogAssetsServiceTests
         Assert.AreEqual(expectedAsset.FileName, asset.FileName);
         Assert.AreEqual(folder.FolderId, asset.FolderId);
         Assert.AreEqual(folder, asset.Folder);
-        Assert.AreEqual(expectedAsset.FileSize, asset.FileSize);
+        Assert.AreEqual(expectedAsset.FileProperties.Size, asset.FileProperties.Size);
         Assert.AreEqual(expectedAsset.Pixel.Asset.Width, asset.Pixel.Asset.Width);
         Assert.AreEqual(expectedAsset.Pixel.Asset.Height, asset.Pixel.Asset.Height);
         Assert.AreEqual(expectedAsset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Width);
@@ -8588,8 +8588,8 @@ public class CatalogAssetsServiceTests
         Assert.AreEqual(expectedAsset.AssetRotatedMessage, asset.AssetRotatedMessage);
         Assert.AreEqual(assetPath, asset.FullPath);
         Assert.AreEqual(folderPath, asset.Folder.Path);
-        Assert.AreEqual(actualDate, asset.FileDateTime.Creation.Date);
-        Assert.AreEqual(expectedAsset.FileDateTime.Modification.Date, asset.FileDateTime.Modification.Date);
+        Assert.AreEqual(actualDate, asset.FileProperties.Creation.Date);
+        Assert.AreEqual(expectedAsset.FileProperties.Modification.Date, asset.FileProperties.Modification.Date);
 
         Assert.IsNull(asset.ImageData); // Set above, not in this method
     }

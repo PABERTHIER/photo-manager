@@ -65,14 +65,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 1_duplicate.jpg",
-            FileSize = 29857,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 29857,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -88,14 +88,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 9.png",
-            FileSize = 126277,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 126277,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -111,14 +111,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 9_duplicate.png",
-            FileSize = 126277,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 126277,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -134,14 +134,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "Image_11.heic",
-            FileSize = 1411940,
             Pixel = new()
             {
                 Asset = new() { Width = 3024, Height = 4032 },
                 Thumbnail = new() { Width = 112, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 1411940,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -157,14 +157,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 1_duplicate_copied.jpg",
-            FileSize = 29857,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 29857,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -180,14 +180,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
-            FileSize = 29857,
             Pixel = new()
             {
                 Asset = new() { Width = 1280, Height = 720 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 29857,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -203,14 +203,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "Homer.gif",
-            FileSize = 64123,
             Pixel = new()
             {
                 Asset = new() { Width = 320, Height = 320 },
                 Thumbnail = new() { Width = 150, Height = 150 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 64123,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -226,14 +226,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "Homer.jpg",
-            FileSize = 6599,
             Pixel = new()
             {
                 Asset = new() { Width = 320, Height = 180 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 6599,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -249,14 +249,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         {
             Folder = new() { Path = "" },
             FileName = "HomerDuplicated.jpg",
-            FileSize = 6599,
             Pixel = new()
             {
                 Asset = new() { Width = 320, Height = 180 },
                 Thumbnail = new() { Width = 200, Height = 112 }
             },
-            FileDateTime = new()
+            FileProperties = new()
             {
+                Size = 6599,
                 Creation = DateTime.Now,
                 Modification = _expectedFileModificationDateTime
             },
@@ -598,8 +598,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp.FileDateTime = _asset2Temp.FileDateTime with { Modification = DateTime.Now.AddDays(10) };
-            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileDateTime.Modification);
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 

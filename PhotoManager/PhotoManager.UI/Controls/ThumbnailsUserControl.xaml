@@ -31,9 +31,9 @@
                             <DropShadowEffect/>
                         </Image.Effect>
                     </Image>
-                    <Label Grid.Row="0" Grid.Column="1" Foreground="#FFFFFFFF" Content="{Binding FileName, Converter={StaticResource FileNameConverter}}" VerticalContentAlignment="Center"/>
+                    <Label Grid.Row="0" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding FileName, Converter={StaticResource FileNameConverter}}" VerticalContentAlignment="Center"/>
                     <Label Grid.Row="1" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding Converter={StaticResource PixelSizeConverter}}" VerticalContentAlignment="Center"/>
-                    <Label Grid.Row="2" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding FileSize, Converter={StaticResource FileSizeConverter}}" VerticalContentAlignment="Center"/>
+                    <Label Grid.Row="2" Grid.Column="1" Foreground="#FFFFFFFF" Content="{ Binding FileProperties.Size, Converter={StaticResource FileSizeConverter}}" VerticalContentAlignment="Center"/>
 
                     <Label Grid.Row="0" Grid.Column="2" Foreground="#FFFFFFFF" VerticalContentAlignment="Center">
                         <Label.Content>
