@@ -15,8 +15,10 @@ public class PixelSizeConverterTests
         {
             Folder = new() { Path = "" },
             FileName = "toto.jpg",
-            PixelWidth = width,
-            PixelHeight = height,
+            Pixel = new()
+            {
+                Asset = new() { Width = width, Height = height }
+            },
             Hash = string.Empty
         };
         object? parameter = null;

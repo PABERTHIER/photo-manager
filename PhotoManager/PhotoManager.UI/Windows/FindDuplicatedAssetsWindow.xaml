@@ -58,9 +58,9 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Path" Binding="{Binding Asset.FullPath}" Width="800"/>
                 <DataGridTextColumn Header="Image size" Binding="{ Binding Asset, Converter={StaticResource PixelSizeConverter}}" Width="100"/>
-                <DataGridTextColumn Header="File size" Binding="{ Binding Asset.FileSize, Converter={StaticResource FileSizeConverter}}" Width="60"/>
-                <DataGridTextColumn Header="File created" Binding="{ Binding Asset.FileCreationDateTime}" Width="150"/>
-                <DataGridTextColumn Header="File last modified" Binding="{ Binding Asset.FileModificationDateTime}" Width="150"/>
+                <DataGridTextColumn Header="File size" Binding="{ Binding Asset.FileProperties.Size, Converter={StaticResource FileSizeConverter}}" Width="60"/>
+                <DataGridTextColumn Header="File created" Binding="{ Binding Asset.FileProperties.Creation}" Width="150"/>
+                <DataGridTextColumn Header="File last modified" Binding="{ Binding Asset.FileProperties.Modification}" Width="150"/>
                 <DataGridTemplateColumn Header="Actions" Width="50">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

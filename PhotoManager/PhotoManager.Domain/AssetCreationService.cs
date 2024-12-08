@@ -218,11 +218,11 @@ public class AssetCreationService(
             FileName = Path.GetFileName(imagePath),
             FolderId = folder.FolderId,
             Folder = folder,
-            FileSize = new FileInfo(imagePath).Length,
-            PixelWidth = originalDecodeWidth,
-            PixelHeight = originalDecodeHeight,
-            ThumbnailPixelWidth = thumbnailDecodeWidth,
-            ThumbnailPixelHeight = thumbnailDecodeHeight,
+            Pixel = new()
+            {
+                Asset = new() { Width = originalDecodeWidth, Height = originalDecodeHeight },
+                Thumbnail = new() { Width = thumbnailDecodeWidth, Height = thumbnailDecodeHeight}
+            },
             ImageRotation = rotation,
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = assetHashCalculatorService.CalculateHash(imageBytes, imagePath),
@@ -232,6 +232,7 @@ public class AssetCreationService(
             AssetRotatedMessage = isAssetRotated ? userConfigurationService.AssetSettings.AssetRotatedMessage : null,
         };
 
+        storageService.UpdateAssetFileProperties(asset);
         assetRepository.AddAsset(asset, thumbnailBuffer);
 
         return asset;

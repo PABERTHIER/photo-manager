@@ -5,6 +5,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 {
     private string? _dataDirectory;
     private string? _backupPath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
@@ -48,13 +49,19 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
-            FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1920,
-            PixelHeight = 1080,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1920, Height = 1080 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 363888,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -66,13 +73,19 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 9.png",
-            FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
-            PixelWidth = 6000,
-            PixelHeight = 6120,
-            ThumbnailPixelWidth = 147,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 6000, Height = 6120 },
+                Thumbnail = new() { Width = 147, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 4602393,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -84,13 +97,19 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 1_duplicate.jpg",
-            FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1920,
-            PixelHeight = 1080,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1920, Height = 1080 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 363888,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -102,13 +121,19 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 9_duplicate.png",
-            FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
-            PixelWidth = 6000,
-            PixelHeight = 6120,
-            ThumbnailPixelWidth = 147,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 6000, Height = 6120 },
+                Thumbnail = new() { Width = 147, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 4602393,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -120,13 +145,19 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image_11.heic",
-            FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 3024,
-            PixelHeight = 4032,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 3024, Height = 4032 },
+                Thumbnail = new() { Width = 112, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 2247285,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "a92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
             AssetCorruptedMessage = "The asset is corrupted",
             IsAssetCorrupted = true,
@@ -138,40 +169,13 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_DuplicatedAssetsFound_ReturnsListOfDuplicatedSets()
     {
-        string destinationPath1 = Path.Combine(_dataDirectory!, "Duplicates\\DestinationToCopy1");
-        string destinationPath2 = Path.Combine(_dataDirectory!, "Duplicates\\DestinationToCopy2");
-
         try
         {
-            Directory.CreateDirectory(destinationPath1);
-            Directory.CreateDirectory(destinationPath2);
-
             string sourcePath1 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
             string sourcePath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
 
-            string asset1DestinationPath = Path.Combine(destinationPath1, _asset1!.FileName);
-            string asset2DestinationPath = Path.Combine(destinationPath2, _asset2!.FileName);
-            string asset3DestinationPath = Path.Combine(destinationPath2, _asset3!.FileName);
-            string asset4DestinationPath = Path.Combine(destinationPath2, _asset4!.FileName);
-            string asset5DestinationPath = Path.Combine(destinationPath2, _asset5!.FileName);
-
-            File.Copy(Path.Combine(sourcePath1, _asset1!.FileName), asset1DestinationPath);
-            File.Copy(Path.Combine(sourcePath2, _asset2!.FileName), asset2DestinationPath);
-            File.Copy(Path.Combine(sourcePath2, _asset3!.FileName), asset3DestinationPath);
-            File.Copy(Path.Combine(sourcePath2, _asset4!.FileName), asset4DestinationPath);
-            File.Copy(Path.Combine(sourcePath2, _asset5!.FileName), asset5DestinationPath);
-
-            DateTime oldDateTime1 = DateTime.Now.AddDays(-1);
-            DateTime oldDateTime2 = DateTime.Now.AddDays(-5);
-
-            File.SetLastWriteTime(asset1DestinationPath, oldDateTime1);
-            File.SetLastWriteTime(asset2DestinationPath, oldDateTime1);
-            File.SetLastWriteTime(asset3DestinationPath, oldDateTime2);
-            File.SetLastWriteTime(asset4DestinationPath, oldDateTime2);
-            File.SetLastWriteTime(asset5DestinationPath, oldDateTime1);
-
-            Folder folder1 = new() { Path = destinationPath1 };
-            Folder folder2 = new() { Path = destinationPath2 };
+            Folder folder1 = new() { Path = sourcePath1 };
+            Folder folder2 = new() { Path = sourcePath2 };
 
             _asset1!.Folder = folder1;
             _asset1.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
@@ -207,16 +211,10 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Asset? duplicatedAsset1 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset1.FileName);
             Asset? duplicatedAsset3 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
 
-            DateTime actualDate = DateTime.Now.Date;
-
             Assert.IsNotNull(duplicatedAsset1);
             Assert.IsNotNull(duplicatedAsset3);
             Assert.AreEqual(_asset1.FileName, duplicatedAsset1!.FileName);
-            Assert.AreEqual(actualDate, duplicatedAsset1.FileCreationDateTime.Date);
-            Assert.AreEqual(oldDateTime1.Date, duplicatedAsset1.FileModificationDateTime.Date);
             Assert.AreEqual(_asset3.FileName, duplicatedAsset3!.FileName);
-            Assert.AreEqual(actualDate, duplicatedAsset3.FileCreationDateTime.Date);
-            Assert.AreEqual(oldDateTime2.Date, duplicatedAsset3.FileModificationDateTime.Date);
 
             Asset? duplicatedAsset2 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
             Asset? duplicatedAsset4 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset4.FileName);
@@ -224,52 +222,24 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Assert.IsNotNull(duplicatedAsset2);
             Assert.IsNotNull(duplicatedAsset4);
             Assert.AreEqual(_asset2.FileName, duplicatedAsset2!.FileName);
-            Assert.AreEqual(actualDate, duplicatedAsset2.FileCreationDateTime.Date);
-            Assert.AreEqual(oldDateTime1.Date, duplicatedAsset2.FileModificationDateTime.Date);
             Assert.AreEqual(_asset4.FileName, duplicatedAsset4!.FileName);
-            Assert.AreEqual(actualDate, duplicatedAsset4.FileCreationDateTime.Date);
-            Assert.AreEqual(oldDateTime2.Date, duplicatedAsset4.FileModificationDateTime.Date);
         }
         finally
         {
             Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
-            Directory.Delete(destinationPath1, true);
-            Directory.Delete(destinationPath2, true);
         }
     }
 
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_MultiplesAssetsSameHash_ReturnsListOfDuplicatedSets()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, "Duplicates\\DestinationToCopy");
-
         try
         {
-            Directory.CreateDirectory(destinationPath);
-
             const string hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960";
 
             string sourcePath = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
 
-            string asset2DestinationPath = Path.Combine(destinationPath, _asset2!.FileName);
-            string asset3DestinationPath = Path.Combine(destinationPath, _asset3!.FileName);
-            string asset4DestinationPath = Path.Combine(destinationPath, _asset4!.FileName);
-            string asset5DestinationPath = Path.Combine(destinationPath, _asset5!.FileName);
-
-            File.Copy(Path.Combine(sourcePath, _asset2!.FileName), asset2DestinationPath);
-            File.Copy(Path.Combine(sourcePath, _asset3!.FileName), asset3DestinationPath);
-            File.Copy(Path.Combine(sourcePath, _asset4!.FileName), asset4DestinationPath);
-            File.Copy(Path.Combine(sourcePath, _asset5!.FileName), asset5DestinationPath);
-
-            DateTime oldDateTime1 = DateTime.Now.AddDays(-1);
-            DateTime oldDateTime2 = DateTime.Now.AddDays(-5);
-
-            File.SetLastWriteTime(asset2DestinationPath, oldDateTime1);
-            File.SetLastWriteTime(asset3DestinationPath, oldDateTime2);
-            File.SetLastWriteTime(asset4DestinationPath, oldDateTime2);
-            File.SetLastWriteTime(asset5DestinationPath, oldDateTime1);
-
-            Folder folder = new() { Path = destinationPath };
+            Folder folder = new() { Path = sourcePath };
 
             _asset2!.Folder = folder;
             _asset2.Hash = hash;
@@ -302,33 +272,19 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Asset? duplicatedAsset4 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset4.FileName);
             Asset? duplicatedAsset5 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset5.FileName);
 
-            DateTime actualDate = DateTime.Now.Date;
-
             Assert.IsNotNull(duplicatedAsset2);
             Assert.IsNotNull(duplicatedAsset3);
             Assert.IsNotNull(duplicatedAsset4);
             Assert.IsNotNull(duplicatedAsset5);
 
             Assert.AreEqual(_asset2.FileName, duplicatedAsset2!.FileName);
-            Assert.AreEqual(actualDate, duplicatedAsset2.FileCreationDateTime.Date);
-            Assert.AreEqual(oldDateTime1.Date, duplicatedAsset2.FileModificationDateTime.Date);
-
             Assert.AreEqual(_asset3.FileName, duplicatedAsset3!.FileName);
-            Assert.AreEqual(actualDate, duplicatedAsset3.FileCreationDateTime.Date);
-            Assert.AreEqual(oldDateTime2.Date, duplicatedAsset3.FileModificationDateTime.Date);
-
             Assert.AreEqual(_asset4.FileName, duplicatedAsset4!.FileName);
-            Assert.AreEqual(actualDate, duplicatedAsset4.FileCreationDateTime.Date);
-            Assert.AreEqual(oldDateTime2.Date, duplicatedAsset4.FileModificationDateTime.Date);
-
             Assert.AreEqual(_asset5.FileName, duplicatedAsset5!.FileName);
-            Assert.AreEqual(actualDate, duplicatedAsset5.FileCreationDateTime.Date);
-            Assert.AreEqual(oldDateTime1.Date, duplicatedAsset5.FileModificationDateTime.Date);
         }
         finally
         {
             Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
-            Directory.Delete(destinationPath, true);
         }
     }
     

@@ -13,7 +13,7 @@ public class PixelSizeConverter : IValueConverter
 
         if (value != null)
         {
-            result = value is Asset asset ? $"{asset.PixelWidth}x{asset.PixelHeight} pixels" : "";
+            result = value is Asset asset ? $"{asset.Pixel.Asset.Width}x{asset.Pixel.Asset.Height} pixels" : "";
         }
 
         return result;

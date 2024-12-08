@@ -5,6 +5,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
 {
     private string? _dataDirectory;
     private string? _backupPath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private AssetRepository? _assetRepository;
@@ -71,13 +72,19 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Path = "" },
             FileName = "Image_1336_Mini.JPG",
-            FileSize = 1586,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 43,
-            PixelHeight = 32,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 149,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 43, Height = 32 },
+                Thumbnail = new() { Width = 200, Height = 149 }
+            },
+            FileProperties = new()
+            {
+                Size = 1586,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -89,13 +96,19 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Path = "" },
             FileName = "Image_1336_Original.JPG",
-            FileSize = 4526710,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 4032,
-            PixelHeight = 3024,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 4032, Height = 3024 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 4526710,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -107,13 +120,19 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Path = "" },
             FileName = "Image_1336_ShitQuality.JPG",
-            FileSize = 370819,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 4032,
-            PixelHeight = 3024,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 4032, Height = 3024 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 370819,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -125,13 +144,19 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Path = "" },
             FileName = "Image_1336_Small.JPG",
-            FileSize = 53227,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 591,
-            PixelHeight = 443,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 591, Height = 443 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 53227,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -143,13 +168,19 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
-            FileSize = 29857,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1280,
-            PixelHeight = 720,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 29857,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
