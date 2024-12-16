@@ -1046,8 +1046,23 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            asset.FileName = assetNewFileName;
-            Asset[] assets = [asset];
+            Asset newAsset = new()
+            {
+                FolderId = asset.FolderId,
+                Folder = asset.Folder,
+                FileName = assetNewFileName,
+                FileProperties = asset.FileProperties,
+                Pixel = asset.Pixel,
+                ImageRotation = asset.ImageRotation,
+                Hash = asset.Hash,
+                ImageData = asset.ImageData,
+                ThumbnailCreationDateTime  = asset.ThumbnailCreationDateTime,
+                IsAssetCorrupted = asset.IsAssetCorrupted,
+                AssetCorruptedMessage = asset.AssetCorruptedMessage,
+                IsAssetRotated = asset.IsAssetRotated,
+                AssetRotatedMessage = asset.AssetRotatedMessage
+            };
+            Asset[] assets = [newAsset];
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, destinationFolder, preserveOriginalFile));
 
@@ -1059,7 +1074,7 @@ public class MoveAssetsServiceTests
             assetsInSource = _assetRepository!.GetAssetsByPath(sourceDirectory);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(1, assetsInSource.Length);
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == assetNewFileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset.FileName));
 
             assetsInDestination = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsEmpty(assetsInDestination);
@@ -1078,7 +1093,7 @@ public class MoveAssetsServiceTests
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(1, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == assetNewFileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset.FileName));
 
             cataloguedAssetsInDestination = _assetRepository!.GetCataloguedAssetsByPath(destinationFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInDestination);
@@ -1146,8 +1161,23 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            asset.FileName = assetNewFileName;
-            Asset[] assets = [asset];
+            Asset newAsset = new()
+            {
+                FolderId = asset.FolderId,
+                Folder = asset.Folder,
+                FileName = assetNewFileName,
+                FileProperties = asset.FileProperties,
+                Pixel = asset.Pixel,
+                ImageRotation = asset.ImageRotation,
+                Hash = asset.Hash,
+                ImageData = asset.ImageData,
+                ThumbnailCreationDateTime  = asset.ThumbnailCreationDateTime,
+                IsAssetCorrupted = asset.IsAssetCorrupted,
+                AssetCorruptedMessage = asset.AssetCorruptedMessage,
+                IsAssetRotated = asset.IsAssetRotated,
+                AssetRotatedMessage = asset.AssetRotatedMessage
+            };
+            Asset[] assets = [newAsset];
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.MoveAssets(assets, sourceFolder, preserveOriginalFile));
 
@@ -1159,7 +1189,7 @@ public class MoveAssetsServiceTests
             assetsInSource = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.IsNotEmpty(assetsInSource);
             Assert.AreEqual(1, assetsInSource.Length);
-            Assert.IsTrue(assetsInSource.Any(x => x.FileName == assetNewFileName));
+            Assert.IsTrue(assetsInSource.Any(x => x.FileName == asset.FileName));
 
             Assert.IsTrue(_assetRepository!.ContainsThumbnail(sourceFolder.Path, assetOldFileName));
 
@@ -1171,7 +1201,7 @@ public class MoveAssetsServiceTests
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
             Assert.AreEqual(1, cataloguedAssetsInSource.Count);
-            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == assetNewFileName));
+            Assert.IsTrue(cataloguedAssetsInSource.Any(x => x.FileName == asset.FileName));
 
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);

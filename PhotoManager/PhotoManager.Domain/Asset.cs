@@ -4,7 +4,7 @@ public class Asset
 {
     public Guid FolderId { get; set; }
     public required Folder Folder { get; set; }
-    public required string FileName { get; set; }
+    public required string FileName { get; init; }
     public string FullPath => Path.Combine(Folder.Path, FileName);
     public FileProperties FileProperties { get; set; }
     public Pixel Pixel { get; init; }
