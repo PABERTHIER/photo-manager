@@ -7,6 +7,7 @@ public class AssetRepositoryConcurrentAccessTests
 {
     private string? _dataDirectory;
     private string? _backupPath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private TestableAssetRepository? _testableAssetRepository;
@@ -31,7 +32,6 @@ public class AssetRepositoryConcurrentAccessTests
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
-        _storageServiceMock.Setup(x => x.UpdateAssetFileDateTimeProperties(It.IsAny<Asset>()));
     }
 
     [SetUp]
@@ -46,13 +46,19 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Path = "" },
             FileName = "Image 1.jpg",
-            FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1920,
-            PixelHeight = 1080,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1920, Height = 1080 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 363888,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -64,13 +70,19 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
             Folder = new() { Path = "" },
             FileName = "Image 9.png",
-            FileSize = 4602393,
             ImageRotation = Rotation.Rotate90,
-            PixelWidth = 6000,
-            PixelHeight = 6120,
-            ThumbnailPixelWidth = 147,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 6000, Height = 6120 },
+                Thumbnail = new() { Width = 147, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 4602393,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
             AssetCorruptedMessage = null,
             IsAssetCorrupted = false,
@@ -82,13 +94,19 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
             Folder = new() { Path = "" },
             FileName = "Image_11.heic",
-            FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 3024,
-            PixelHeight = 4032,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 3024, Height = 4032 },
+                Thumbnail = new() { Width = 112, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 2247285,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "a92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
             AssetCorruptedMessage = "The asset is corrupted",
             IsAssetCorrupted = true,
@@ -105,13 +123,19 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new Guid("cf9293ad-d835-4126-8a76-17c7bbfe626e"),
             Folder = new() { Path = "" },
             FileName = "Image 2.jpg",
-            FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 3024,
-            PixelHeight = 4032,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 3024, Height = 4032 },
+                Thumbnail = new() { Width = 112, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 2247285,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "b92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
             AssetCorruptedMessage = "The asset is corrupted",
             IsAssetCorrupted = true,
@@ -123,13 +147,19 @@ public class AssetRepositoryConcurrentAccessTests
             FolderId = new Guid("1e3c2274-bc11-482a-a7b4-e86e5aeb17f1"),
             Folder = new() { Path = "" },
             FileName = "Image 3.jpg",
-            FileSize = 2247285,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 3024,
-            PixelHeight = 4032,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 3024, Height = 4032 },
+                Thumbnail = new() { Width = 112, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 2247285,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "c92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
             AssetCorruptedMessage = "The asset is corrupted",
             IsAssetCorrupted = true,

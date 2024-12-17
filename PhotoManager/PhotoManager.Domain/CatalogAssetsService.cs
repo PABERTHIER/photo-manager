@@ -194,7 +194,7 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
 
         CatalogNewAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, fileNames, token);
 
-        _storageService.UpdateAssetsFileDateTimeProperties(_cataloguedAssetsByPath);
+        _storageService.UpdateAssetsFileProperties(_cataloguedAssetsByPath);
         string[] updatedFileNames = _assetsComparator.GetUpdatedFileNames(_cataloguedAssetsByPath);
 
         CatalogUpdatedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, updatedFileNames, token);
@@ -361,8 +361,6 @@ public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
 
                 continue;
             }
-
-            _storageService.UpdateAssetFileDateTimeProperties(updatedAsset);
 
             string fullPath = Path.Combine(directory, fileName);
             callback?.Invoke(new CatalogChangeCallbackEventArgs
