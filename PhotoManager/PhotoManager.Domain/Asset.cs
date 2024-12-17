@@ -13,7 +13,7 @@ public class Asset
     public BitmapImage? ImageData { get; set; }
     public DateTime ThumbnailCreationDateTime { get; init; }
     public bool IsAssetCorrupted { get; init; }
-    public string? AssetCorruptedMessage { get; set; }
+    public string? AssetCorruptedMessage { get; init; }
     public bool IsAssetRotated { get; init; }
-    public string? AssetRotatedMessage { get; set; }
+    public string? AssetRotatedMessage { get; init; }
 }

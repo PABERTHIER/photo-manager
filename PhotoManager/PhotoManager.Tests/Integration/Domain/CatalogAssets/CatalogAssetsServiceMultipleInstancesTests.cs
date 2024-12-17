@@ -623,10 +623,10 @@ public class CatalogAssetsServiceMultipleInstancesTests
             };
 
             // Because stored in the DB and null is converted into an empty string
-            _asset4!.AssetCorruptedMessage = string.Empty;
-            _asset4!.AssetRotatedMessage = string.Empty;
-            _asset3Temp!.AssetCorruptedMessage = string.Empty;
-            _asset3Temp!.AssetRotatedMessage = string.Empty;
+            // _asset4!.AssetCorruptedMessage = string.Empty;
+            // _asset4!.AssetRotatedMessage = string.Empty;
+            // _asset3Temp!.AssetCorruptedMessage = string.Empty;
+            // _asset3Temp!.AssetRotatedMessage = string.Empty;
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
