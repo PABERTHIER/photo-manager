@@ -175,11 +175,11 @@ public class FindDuplicatedAssetsServiceTests
             Folder folder1 = new() { Path = sourcePath1 };
             Folder folder2 = new() { Path = sourcePath2 };
 
-            _asset1!.Folder = folder1;
-            _asset2!.Folder = folder2;
-            _asset3!.Folder = folder2;
-            _asset4!.Folder = folder2;
-            _asset5!.Folder = folder2;
+            _asset1 = _asset1!.WithFolder(folder1);
+            _asset2 = _asset2!.WithFolder(folder2);
+            _asset3 = _asset3!.WithFolder(folder2);
+            _asset4 = _asset4!.WithFolder(folder2);
+            _asset5 = _asset5!.WithFolder(folder2);
 
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
@@ -233,14 +233,10 @@ public class FindDuplicatedAssetsServiceTests
 
             Folder folder = new() { Path = sourcePath };
 
-            _asset2!.Folder = folder;
-            _asset2.Hash = hash;
-            _asset3!.Folder = folder;
-            _asset3.Hash = hash;
-            _asset4!.Folder = folder;
-            _asset4.Hash = hash;
-            _asset5!.Folder = folder;
-            _asset5.Hash = hash;
+            _asset2 = _asset2!.WithFolder(folder).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
 
             byte[] assetData = [1, 2, 3];
 
@@ -290,8 +286,8 @@ public class FindDuplicatedAssetsServiceTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset3!.Folder = folder2;
+            _asset1 = _asset1!.WithFolder(folder1);
+            _asset3 = _asset3!.WithFolder(folder2);
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -319,11 +315,11 @@ public class FindDuplicatedAssetsServiceTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset2!.Folder = folder2;
-            _asset3!.Folder = folder2;
-            _asset4!.Folder = folder2;
-            _asset5!.Folder = folder2;
+            _asset1 = _asset1!.WithFolder(folder1);
+            _asset2 = _asset2!.WithFolder(folder2);
+            _asset3 = _asset3!.WithFolder(folder2);
+            _asset4 = _asset4!.WithFolder(folder2);
+            _asset5 = _asset5!.WithFolder(folder2);
 
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
@@ -368,8 +364,8 @@ public class FindDuplicatedAssetsServiceTests
 
             Folder folder = new() { Path = folderPath };
 
-            _asset1!.Folder = folder;
-            _asset2!.Folder = folder;
+            _asset1 = _asset1!.WithFolder(folder);
+            _asset2 = _asset2!.WithFolder(folder);
 
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];

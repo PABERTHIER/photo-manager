@@ -74,8 +74,9 @@ public class AssetRepositoryLoadThumbnailTests
         try
         {
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, [1, 2, 3]);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
@@ -291,8 +292,9 @@ public class AssetRepositoryLoadThumbnailTests
         try
         {
             Guid folderId = Guid.NewGuid();
-            _asset1!.Folder = new Folder() { FolderId = folderId, Path = _dataDirectory! };
-            _asset1!.FolderId = folderId;
+
+            _asset1 = _asset1!.WithFolder(new() { FolderId = folderId, Path = _dataDirectory! });
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
@@ -387,8 +389,9 @@ public class AssetRepositoryLoadThumbnailTests
         {
             string? directoryName = null;
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
@@ -424,8 +427,9 @@ public class AssetRepositoryLoadThumbnailTests
         try
         {
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.AreEqual(1, assetsUpdatedEvents.Count);
@@ -456,8 +460,9 @@ public class AssetRepositoryLoadThumbnailTests
         try
         {
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, [1, 2, 3]);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();

@@ -101,11 +101,10 @@ public class AssetRepositoryAddAssetTests
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath);
             Folder folder2 = new() { Path = folderPath };
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
-            _asset2!.Folder = folder2;
+            _asset2 = _asset2!.WithFolder(folder2);
             byte[] assetData2 = [];
 
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
@@ -155,11 +154,10 @@ public class AssetRepositoryAddAssetTests
             Folder folder1 = new() { Path = folderPath };
             Folder folder2 = new() { Path = folderPath };
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
-            _asset2!.Folder = folder2;
+            _asset2 = _asset2!.WithFolder(folder2);
             byte[] assetData2 = [];
 
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
@@ -207,8 +205,7 @@ public class AssetRepositoryAddAssetTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
 
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
@@ -250,8 +247,7 @@ public class AssetRepositoryAddAssetTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
 
             Dictionary<string, byte[]> blobToWrite = new()
@@ -310,8 +306,7 @@ public class AssetRepositoryAddAssetTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = testableAssetRepository.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
 
             List<Asset> assets = testableAssetRepository.GetCataloguedAssets();
@@ -345,8 +340,7 @@ public class AssetRepositoryAddAssetTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = new() { Path = folderPath };
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
 
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
@@ -452,8 +446,7 @@ public class AssetRepositoryAddAssetTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
             byte[]? assetData = null;
 
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
@@ -497,11 +490,10 @@ public class AssetRepositoryAddAssetTests
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath);
             Folder folder2 = new() { Path = folderPath };
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
-            _asset2!.Folder = folder2;
+            _asset2 = _asset2!.WithFolder(folder2);
             byte[] assetData2 = [];
 
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();

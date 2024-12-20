@@ -99,8 +99,9 @@ public class AssetRepositoryDeleteFolderTests
         {
             Directory.CreateDirectory(folderPath);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
@@ -154,8 +155,8 @@ public class AssetRepositoryDeleteFolderTests
         {
             Directory.CreateDirectory(folderPath);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
 
@@ -199,8 +200,8 @@ public class AssetRepositoryDeleteFolderTests
         {
             Directory.CreateDirectory(folderPath);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
 
@@ -249,8 +250,8 @@ public class AssetRepositoryDeleteFolderTests
         {
             Directory.CreateDirectory(folderPath);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
 
@@ -335,8 +336,9 @@ public class AssetRepositoryDeleteFolderTests
         {
             Directory.CreateDirectory(folderPath);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());

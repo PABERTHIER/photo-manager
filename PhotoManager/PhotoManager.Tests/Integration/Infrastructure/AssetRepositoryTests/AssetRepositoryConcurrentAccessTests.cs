@@ -182,16 +182,13 @@ public class AssetRepositoryConcurrentAccessTests
             Folder folder3 = new() { FolderId = Guid.NewGuid(), Path = folderPath3 };
             Folder folder4 = new() { FolderId = Guid.NewGuid(), Path = folderPath4 };
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
-            _asset2!.Folder = folder1;
-            _asset2!.FolderId = folder1.FolderId;
+            _asset2 = _asset2!.WithFolder(folder1);
             byte[] assetData2 = [];
 
-            _asset3!.Folder = folder2;
-            _asset3!.FolderId = folder2.FolderId;
+            _asset3 = _asset3!.WithFolder(folder2);
             byte[] assetData3 = [4, 5, 6];
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
@@ -229,12 +226,11 @@ public class AssetRepositoryConcurrentAccessTests
             string folderPath6 = Path.Combine(_dataDirectory!, "NewFolder6");
             Folder folder5 = _testableAssetRepository!.AddFolder(folderPath5);
             Folder folder6 = _testableAssetRepository!.AddFolder(folderPath6);
-            asset4.Folder = folder5;
-            asset4.FolderId = folder5.FolderId;
+
+            asset4 = asset4.WithFolder(folder5);
             byte[] assetData4 = [1, 2, 3];
 
-            asset5.Folder = folder6;
-            asset5.FolderId = folder6.FolderId;
+            asset5 = asset5.WithFolder(folder6);
             byte[] assetData5 = [];
 
             _testableAssetRepository.AddAsset(asset4, assetData4);

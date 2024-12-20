@@ -177,16 +177,15 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Folder folder1 = new() { Path = sourcePath1 };
             Folder folder2 = new() { Path = sourcePath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            _asset2!.Folder = folder2;
-            _asset2.Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
-            _asset3!.Folder = folder2;
-            _asset3.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            _asset4!.Folder = folder2;
-            _asset4.Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
-            _asset5!.Folder = folder2;
-            _asset5.Hash = "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056";
+            const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
+            const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
+            const string hash3 = "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056";
+
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+            _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
+            _asset4 = _asset4!.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
@@ -241,14 +240,10 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             Folder folder = new() { Path = sourcePath };
 
-            _asset2!.Folder = folder;
-            _asset2.Hash = hash;
-            _asset3!.Folder = folder;
-            _asset3.Hash = hash;
-            _asset4!.Folder = folder;
-            _asset4.Hash = hash;
-            _asset5!.Folder = folder;
-            _asset5.Hash = hash;
+            _asset2 = _asset2!.WithFolder(folder).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
 
             byte[] assetData = [1, 2, 3];
 
@@ -299,10 +294,10 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            _asset3!.Folder = folder2;
-            _asset3.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
+            const string hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
+
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -330,16 +325,15 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            _asset2!.Folder = folder2;
-            _asset2.Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
-            _asset3!.Folder = folder2;
-            _asset3.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            _asset4!.Folder = folder2;
-            _asset4.Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
-            _asset5!.Folder = folder2;
-            _asset5.Hash = "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056";
+            const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
+            const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
+            const string hash3 = "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056";
+
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+            _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
+            _asset4 = _asset4!.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
@@ -384,10 +378,11 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             Folder folder = new() { Path = folderPath };
 
-            _asset1!.Folder = folder;
-            _asset1.Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            _asset2!.Folder = folder;
-            _asset2.Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
+            const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
+            const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
+
+            _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
+            _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);
 
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];

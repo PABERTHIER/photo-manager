@@ -78,8 +78,8 @@ public class AssetRepositorySaveCatalogTests
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _assetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_assetRepository.HasChanges());
@@ -182,8 +182,8 @@ public class AssetRepositorySaveCatalogTests
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _assetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_assetRepository.HasChanges());
@@ -295,8 +295,8 @@ public class AssetRepositorySaveCatalogTests
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _assetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_assetRepository.HasChanges());
@@ -413,8 +413,8 @@ public class AssetRepositorySaveCatalogTests
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _assetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_assetRepository.HasChanges());

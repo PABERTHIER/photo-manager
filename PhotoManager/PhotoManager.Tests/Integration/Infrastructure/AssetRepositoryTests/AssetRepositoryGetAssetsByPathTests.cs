@@ -128,16 +128,13 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
-            _asset2!.Folder = folder1;
-            _asset2!.FolderId = folder1.FolderId;
+            _asset2 = _asset2!.WithFolder(folder1);
             byte[] assetData2 = [];
 
-            _asset3!.Folder = folder2;
-            _asset3!.FolderId = folder2.FolderId;
+            _asset3 = _asset3!.WithFolder(folder2);
             byte[] assetData3 = [4, 5, 6];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -218,8 +215,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
             Folder folder1 = testableAssetRepository.AddFolder(folderPath1);
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
             List<Asset> cataloguedAssets = testableAssetRepository.GetCataloguedAssets();
@@ -275,8 +271,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
 
-            _asset1!.Folder = new() { FolderId = folder1.FolderId, Path = folderPath2 };
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(new() { FolderId = folder1.FolderId, Path = folderPath2 });
             byte[] assetData1 = [1, 2, 3];
 
             _database!.WriteBlob(blobToWrite, _asset1!.Folder.ThumbnailsFilename);
@@ -341,8 +336,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
 
-            _asset1!.Folder = new() { Path = folderPath2 };
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(new() { FolderId = folder1.FolderId, Path = folderPath2 });
             byte[] assetData1 = [1, 2, 3];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -434,8 +428,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Guid folderId = Guid.NewGuid();
             Folder folder1 = new() { Path = folderPath, FolderId = folderId };
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -607,8 +600,7 @@ public class AssetRepositoryGetAssetsByPathTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder1");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData1 = [1, 2, 3];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -665,12 +657,10 @@ public class AssetRepositoryGetAssetsByPathTests
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
             Folder folder1 = testableAssetRepository.AddFolder(folderPath1);
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
-            _asset2!.Folder = folder1;
-            _asset2!.FolderId = folder1.FolderId;
+            _asset2 = _asset2!.WithFolder(folder1);
             byte[] assetData2 = [];
 
             List<Asset> cataloguedAssets = testableAssetRepository.GetCataloguedAssets();
@@ -733,16 +723,13 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 
-            _asset1!.Folder = folder1;
-            _asset1!.FolderId = folder1.FolderId;
+            _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
 
-            _asset2!.Folder = folder1;
-            _asset2!.FolderId = folder1.FolderId;
+            _asset2 = _asset2!.WithFolder(folder1);
             byte[] assetData2 = [];
 
-            _asset3!.Folder = folder2;
-            _asset3!.FolderId = folder2.FolderId;
+            _asset3 = _asset3!.WithFolder(folder2);
             byte[] assetData3 = [4, 5, 6];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();

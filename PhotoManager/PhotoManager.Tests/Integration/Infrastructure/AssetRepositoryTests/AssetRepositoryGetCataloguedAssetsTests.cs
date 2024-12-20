@@ -98,14 +98,8 @@ public class AssetRepositoryGetCataloguedAssetsTests
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
 
-            _asset1!.Folder = new()
-            {
-                Path = folderPath1
-            };
-            _asset2!.Folder = new()
-            {
-                Path = folderPath2
-            };
+            _asset1 = _asset1!.WithFolder(new() { Path = folderPath1 });
+            _asset2 = _asset2!.WithFolder(new() { Path = folderPath2 });
 
             _assetRepository!.AddAsset(_asset1!, []);
             _assetRepository!.AddAsset(_asset2!, []);
@@ -166,14 +160,8 @@ public class AssetRepositoryGetCataloguedAssetsTests
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
 
-            _asset1!.Folder = new()
-            {
-                Path = folderPath1
-            };
-            _asset2!.Folder = new()
-            {
-                Path = folderPath2
-            };
+            _asset1 = _asset1!.WithFolder(new() { Path = folderPath1 });
+            _asset2 = _asset2!.WithFolder(new() { Path = folderPath2 });
 
             _assetRepository!.AddAsset(_asset1!, []);
             _assetRepository!.AddAsset(_asset2!, []);

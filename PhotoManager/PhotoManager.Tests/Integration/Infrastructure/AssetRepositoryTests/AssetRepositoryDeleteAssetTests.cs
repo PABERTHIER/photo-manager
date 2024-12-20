@@ -78,8 +78,8 @@ public class AssetRepositoryDeleteAssetTests
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
             _testableAssetRepository!.AddFolder(folderPath2);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName));
@@ -183,8 +183,8 @@ public class AssetRepositoryDeleteAssetTests
 
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName));
@@ -243,8 +243,8 @@ public class AssetRepositoryDeleteAssetTests
             };
 
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+
+            _asset1 = _asset1!.WithFolder(addedFolder1);
 
             List<Asset> assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.IsEmpty(assets);
@@ -290,8 +290,8 @@ public class AssetRepositoryDeleteAssetTests
 
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName));
@@ -346,8 +346,8 @@ public class AssetRepositoryDeleteAssetTests
 
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName));
@@ -430,8 +430,8 @@ public class AssetRepositoryDeleteAssetTests
             Folder addedFolder1 = _testableAssetRepository!.AddFolder(folderPath1);
             _testableAssetRepository!.AddFolder(folderPath2);
 
-            _asset1!.Folder = addedFolder1;
-            _asset1!.FolderId = addedFolder1.FolderId;
+            _asset1 = _asset1!.WithFolder(addedFolder1);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.IsAssetCatalogued(folderPath1, _asset1.FileName));

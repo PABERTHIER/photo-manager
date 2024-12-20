@@ -271,20 +271,13 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = ASSET1_K_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ASSET2_K_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = ASSET3_K_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = ASSET4_K_ORIGINAL_HASH;
-            _asset5!.Folder = folder1;
-            _asset5.Hash = ASSET8_K_HASH;
-            _asset6!.Folder = folder1;
-            _asset6.Hash = ASSET_THUMBNAIL_HASH;
-            _asset7!.Folder = folder2;
-            _asset7.Hash = MISC_ASSET_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1_K_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET2_K_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(ASSET3_K_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET4_K_ORIGINAL_HASH);
+            _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET8_K_HASH);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET_THUMBNAIL_HASH);
+            _asset7 = _asset7!.WithFolder(folder2).WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -335,20 +328,13 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = ASSET1_K_MD5_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ASSET2_K_MD5_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = ASSET3_K_MD5_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = ASSET4_K_ORIGINAL_MD5_HASH;
-            _asset5!.Folder = folder1;
-            _asset5.Hash = ASSET8_K_MD5_HASH;
-            _asset6!.Folder = folder1;
-            _asset6.Hash = ASSET_THUMBNAIL_MD5_HASH;
-            _asset7!.Folder = folder2;
-            _asset7.Hash = MISC_ASSET_MD5_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1_K_MD5_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET2_K_MD5_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(ASSET3_K_MD5_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET4_K_ORIGINAL_MD5_HASH);
+            _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET8_K_MD5_HASH);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET_THUMBNAIL_MD5_HASH);
+            _asset7 = _asset7!.WithFolder(folder2).WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -399,20 +385,13 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = ASSET1_K_D_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ASSET2_K_D_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = ASSET3_K_D_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = ASSET4_K_ORIGINAL_D_HASH;
-            _asset5!.Folder = folder1;
-            _asset5.Hash = ASSET8_K_D_HASH;
-            _asset6!.Folder = folder1;
-            _asset6.Hash = ASSET_THUMBNAIL_D_HASH;
-            _asset7!.Folder = folder2;
-            _asset7.Hash = MISC_ASSET_D_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1_K_D_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET2_K_D_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(ASSET3_K_D_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET4_K_ORIGINAL_D_HASH);
+            _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET8_K_D_HASH);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET_THUMBNAIL_D_HASH);
+            _asset7 = _asset7!.WithFolder(folder2).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -465,20 +444,13 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = ASSET1_K_P_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ASSET2_K_P_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = ASSET3_K_P_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = ASSET4_K_ORIGINAL_P_HASH;
-            _asset5!.Folder = folder1;
-            _asset5.Hash = ASSET8_K_P_HASH;
-            _asset6!.Folder = folder1;
-            _asset6.Hash = ASSET_THUMBNAIL_P_HASH;
-            _asset7!.Folder = folder2;
-            _asset7.Hash = MISC_ASSET_P_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1_K_P_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET2_K_P_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(ASSET3_K_P_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET4_K_ORIGINAL_P_HASH);
+            _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET8_K_P_HASH);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET_THUMBNAIL_P_HASH);
+            _asset7 = _asset7!.WithFolder(folder2).WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 

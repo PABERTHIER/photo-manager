@@ -122,12 +122,10 @@ public class AssetRepositoryGetAssetsCounterTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _assetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
-            _asset2!.Folder = folder;
-            _asset2!.FolderId = folder.FolderId;
-            _asset3!.Folder = folder;
-            _asset3!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+            _asset2 = _asset2!.WithFolder(folder);
+            _asset3 = _asset3!.WithFolder(folder);
 
             Assert.IsEmpty(assetsUpdatedEvents);
 
@@ -209,12 +207,10 @@ public class AssetRepositoryGetAssetsCounterTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _assetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
-            _asset2!.Folder = folder;
-            _asset2!.FolderId = folder.FolderId;
-            _asset3!.Folder = folder;
-            _asset3!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+            _asset2 = _asset2!.WithFolder(folder);
+            _asset3 = _asset3!.WithFolder(folder);
 
             _assetRepository.AddAsset(_asset1!, []);
             _assetRepository.AddAsset(_asset2!, []);

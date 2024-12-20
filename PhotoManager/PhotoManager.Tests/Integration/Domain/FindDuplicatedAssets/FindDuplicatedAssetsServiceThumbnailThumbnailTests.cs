@@ -213,16 +213,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = MINI_ASSET_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ORIGINAL_ASSET_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = SHIT_QUALITY_ASSET_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = SMALL_ASSET_HASH;
-            _asset5!.Folder = folder2;
-            _asset5.Hash = MISC_ASSET_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(MINI_ASSET_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ORIGINAL_ASSET_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(SHIT_QUALITY_ASSET_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_HASH);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -271,16 +266,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = MINI_ASSET_MD5_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ORIGINAL_ASSET_MD5_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = SHIT_QUALITY_ASSET_MD5_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = SMALL_ASSET_MD5_HASH;
-            _asset5!.Folder = folder2;
-            _asset5.Hash = MISC_ASSET_MD5_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(MINI_ASSET_MD5_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ORIGINAL_ASSET_MD5_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(SHIT_QUALITY_ASSET_MD5_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_MD5_HASH);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -329,16 +319,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = MINI_ASSET_D_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ORIGINAL_ASSET_D_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = SHIT_QUALITY_ASSET_D_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = SMALL_ASSET_D_HASH;
-            _asset5!.Folder = folder2;
-            _asset5.Hash = MISC_ASSET_D_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(MINI_ASSET_D_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ORIGINAL_ASSET_D_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(SHIT_QUALITY_ASSET_D_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_D_HASH);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -389,16 +374,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             Folder folder1 = new() { Path = folderPath1 };
             Folder folder2 = new() { Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = MINI_ASSET_P_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ORIGINAL_ASSET_P_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = SHIT_QUALITY_ASSET_P_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = SMALL_ASSET_P_HASH;
-            _asset5!.Folder = folder2;
-            _asset5.Hash = MISC_ASSET_P_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(MINI_ASSET_P_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ORIGINAL_ASSET_P_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(SHIT_QUALITY_ASSET_P_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_P_HASH);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 

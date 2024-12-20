@@ -750,7 +750,7 @@ public class MoveAssetsServiceTests
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
             Assert.IsEmpty(recentTargetPaths);
 
-            asset2.Folder = new() { Path = sourceDirectory }; // Asset will be in the dest and not in the source
+            asset2 = asset2.WithFolder(new() { Path = sourceDirectory }); // Asset will be in the dest and not in the source
 
             Asset[] assets = [asset1, asset2];
 
