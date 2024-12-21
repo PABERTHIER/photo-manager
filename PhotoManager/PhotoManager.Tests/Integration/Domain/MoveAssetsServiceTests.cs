@@ -1057,10 +1057,7 @@ public class MoveAssetsServiceTests
                 Hash = asset.Hash,
                 ImageData = asset.ImageData,
                 ThumbnailCreationDateTime  = asset.ThumbnailCreationDateTime,
-                IsAssetCorrupted = asset.IsAssetCorrupted,
-                AssetCorruptedMessage = asset.AssetCorruptedMessage,
-                IsAssetRotated = asset.IsAssetRotated,
-                AssetRotatedMessage = asset.AssetRotatedMessage
+                Metadata = asset.Metadata,
             };
             Asset[] assets = [newAsset];
 
@@ -1172,10 +1169,7 @@ public class MoveAssetsServiceTests
                 Hash = asset.Hash,
                 ImageData = asset.ImageData,
                 ThumbnailCreationDateTime  = asset.ThumbnailCreationDateTime,
-                IsAssetCorrupted = asset.IsAssetCorrupted,
-                AssetCorruptedMessage = asset.AssetCorruptedMessage,
-                IsAssetRotated = asset.IsAssetRotated,
-                AssetRotatedMessage = asset.AssetRotatedMessage
+                Metadata = asset.Metadata
             };
             Asset[] assets = [newAsset];
 

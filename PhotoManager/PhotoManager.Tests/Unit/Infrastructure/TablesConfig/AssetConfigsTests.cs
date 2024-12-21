@@ -65,10 +65,10 @@ public class AssetConfigsTests
         Assert.AreEqual("ThumbnailPixelHeight", columns[6].ColumnName);
         Assert.AreEqual("ThumbnailCreationDateTime", columns[7].ColumnName);
         Assert.AreEqual("Hash", columns[8].ColumnName);
-        Assert.AreEqual("AssetCorruptedMessage", columns[9].ColumnName);
-        Assert.AreEqual("IsAssetCorrupted", columns[10].ColumnName);
-        Assert.AreEqual("AssetRotatedMessage", columns[11].ColumnName);
-        Assert.AreEqual("IsAssetRotated", columns[12].ColumnName);
+        Assert.AreEqual("CorruptedMessage", columns[9].ColumnName);
+        Assert.AreEqual("IsCorrupted", columns[10].ColumnName);
+        Assert.AreEqual("RotatedMessage", columns[11].ColumnName);
+        Assert.AreEqual("IsRotated", columns[12].ColumnName);
     }
 
     [Test]
@@ -86,10 +86,10 @@ public class AssetConfigsTests
         Assert.AreEqual(60, asset.Pixel.Thumbnail.Height);
         Assert.AreEqual(new DateTime(2023, 12, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset.Hash);
-        Assert.AreEqual("The asset is corrupted", asset.AssetCorruptedMessage);
-        Assert.IsTrue(asset.IsAssetCorrupted);
-        Assert.AreEqual(null, asset.AssetRotatedMessage);
-        Assert.IsFalse(asset.IsAssetRotated);
+        Assert.IsTrue(asset.Metadata.Corrupted.IsTrue);
+        Assert.AreEqual("The asset is corrupted", asset.Metadata.Corrupted.Message);
+        Assert.IsFalse(asset.Metadata.Rotated.IsTrue);
+        Assert.AreEqual(null, asset.Metadata.Rotated.Message);
     }
 
     [Test]
@@ -107,10 +107,10 @@ public class AssetConfigsTests
         Assert.AreEqual(60, asset.Pixel.Thumbnail.Height);
         Assert.AreEqual(new DateTime(2023, 12, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset.Hash);
-        Assert.AreEqual("The asset is corrupted", asset.AssetCorruptedMessage);
-        Assert.IsTrue(asset.IsAssetCorrupted);
-        Assert.AreEqual(null, asset.AssetRotatedMessage);
-        Assert.IsFalse(asset.IsAssetRotated);
+        Assert.IsTrue(asset.Metadata.Corrupted.IsTrue);
+        Assert.AreEqual("The asset is corrupted", asset.Metadata.Corrupted.Message);
+        Assert.IsFalse(asset.Metadata.Rotated.IsTrue);
+        Assert.AreEqual(null, asset.Metadata.Rotated.Message);
     }
 
     [Test]
@@ -175,10 +175,11 @@ public class AssetConfigsTests
             FileProperties = new() { Size = 1000 },
             ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
-            AssetCorruptedMessage = "The asset is corrupted",
-            IsAssetCorrupted = true,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
         object[] result = new object[13];
@@ -212,9 +213,11 @@ public class AssetConfigsTests
             FileName = "toto.jpg",
             ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
-            AssetCorruptedMessage = "The asset is corrupted",
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { Message = "The asset is corrupted" },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
         object[] result = new object[13];
@@ -255,10 +258,11 @@ public class AssetConfigsTests
             FileProperties = new() { Size = 1000 },
             ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
-            AssetCorruptedMessage = "The asset is corrupted",
-            IsAssetCorrupted = true,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
         ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => AssetConfigs.WriteFunc(asset, 15));

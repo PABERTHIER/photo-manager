@@ -3,8 +3,8 @@
 public static class UserConfigurationKeys
 {
     public const string ANALYSE_VIDEOS = "appsettings:Asset:AnalyseVideos";
-    public const string ASSET_CORRUPTED_MESSAGE = "appsettings:Asset:AssetCorruptedMessage";
-    public const string ASSET_ROTATED_MESSAGE = "appsettings:Asset:AssetRotatedMessage";
+    public const string ASSET_CORRUPTED_MESSAGE = "appsettings:Asset:CorruptedMessage";
+    public const string ASSET_ROTATED_MESSAGE = "appsettings:Asset:RotatedMessage";
     public const string CATALOG_BATCH_SIZE = "appsettings:Asset:CatalogBatchSize";
     public const string CATALOG_COOLDOWN_MINUTES = "appsettings:Asset:CatalogCooldownMinutes";
     public const string CORRUPTED_IMAGE_ORIENTATION = "appsettings:Asset:CorruptedImageOrientation";

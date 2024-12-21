@@ -58,10 +58,11 @@ public class AssetRepositoryLoadThumbnailTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
     }
 

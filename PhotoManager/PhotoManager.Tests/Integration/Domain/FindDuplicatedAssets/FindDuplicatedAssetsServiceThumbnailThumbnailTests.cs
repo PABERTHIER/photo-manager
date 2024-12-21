@@ -86,10 +86,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset2 = new()
         {
@@ -110,10 +111,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset3 = new()
         {
@@ -134,10 +136,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset4 = new()
         {
@@ -158,10 +161,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset5 = new() // Another asset completely different from the actual asset
         {
@@ -182,10 +186,11 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
     }
 

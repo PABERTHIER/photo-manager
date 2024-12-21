@@ -77,21 +77,21 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void AssetCorruptedMessage_CorrectValue_ReturnsAssetCorruptedMessageValue()
+    public void CorruptedMessage_CorrectValue_ReturnsCorruptedMessageValue()
     {
-        string assetCorruptedMessage = _userConfigurationService!.AssetSettings.AssetCorruptedMessage;
+        string corruptedMessage = _userConfigurationService!.AssetSettings.CorruptedMessage;
 
-        Assert.IsNotNull(assetCorruptedMessage);
-        Assert.AreEqual("The asset is corrupted", assetCorruptedMessage);
+        Assert.IsNotNull(corruptedMessage);
+        Assert.AreEqual("The asset is corrupted", corruptedMessage);
     }
 
     [Test]
-    public void AssetRotatedMessage_CorrectValue_ReturnsAssetRotatedMessageValue()
+    public void RotatedMessage_CorrectValue_ReturnsRotatedMessageValue()
     {
-        string assetRotatedMessage = _userConfigurationService!.AssetSettings.AssetRotatedMessage;
+        string rotatedMessage = _userConfigurationService!.AssetSettings.RotatedMessage;
 
-        Assert.IsNotNull(assetRotatedMessage);
-        Assert.AreEqual("The asset has been rotated", assetRotatedMessage);
+        Assert.IsNotNull(rotatedMessage);
+        Assert.AreEqual("The asset has been rotated", rotatedMessage);
     }
 
     [Test]

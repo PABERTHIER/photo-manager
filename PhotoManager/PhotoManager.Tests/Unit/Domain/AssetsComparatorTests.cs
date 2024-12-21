@@ -37,10 +37,11 @@ public class AssetsComparatorTests
             FileProperties = new() { Size = 363888 },
             ThumbnailCreationDateTime = _oldDateTime1,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset2 = new()
         {
@@ -56,10 +57,11 @@ public class AssetsComparatorTests
             FileProperties = new() { Size = 4602393 },
             ThumbnailCreationDateTime = _oldDateTime2,
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset3 = new()
         {
@@ -74,10 +76,11 @@ public class AssetsComparatorTests
             ThumbnailCreationDateTime = _oldDateTime1,
             ImageRotation = Rotation.Rotate0,
             Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset4 = new()
         {
@@ -92,10 +95,11 @@ public class AssetsComparatorTests
             ThumbnailCreationDateTime = _oldDateTime2,
             ImageRotation = Rotation.Rotate0,
             Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
     }
 

@@ -2,8 +2,8 @@
 
 public record AssetSettings(
     bool AnalyseVideos,
-    string AssetCorruptedMessage,
-    string AssetRotatedMessage,
+    string CorruptedMessage,
+    string RotatedMessage,
     int CatalogBatchSize,
     ushort CatalogCooldownMinutes,
     ushort CorruptedImageOrientation,

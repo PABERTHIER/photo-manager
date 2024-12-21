@@ -26,23 +26,23 @@ public class DatabaseReadObjectListTests
 
         _userConfigurationService = new (configurationRootMock.Object);
 
-        _csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"AssetCorruptedMessage\";\"IsAssetCorrupted\";\"AssetRotatedMessage\";\"IsAssetRotated\"\r\n" +
+        _csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"CorruptedMessage\";\"IsCorrupted\";\"RotatedMessage\";\"IsRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\";\"\";\"false\";\"\";\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175816_3.jpg\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\";\"The asset is corrupted\";\"true\";\"The asset has been rotated\";\"true\"\r\n";
 
-        _csvUnescapedTextWithSemicolon = "FolderId;FileName;ImageRotation;PixelWidth;PixelHeight;ThumbnailPixelWidth;ThumbnailPixelHeight;ThumbnailCreationDateTime;Hash;AssetCorruptedMessage;IsAssetCorrupted;AssetRotatedMessage;IsAssetRotated\r\n" +
+        _csvUnescapedTextWithSemicolon = "FolderId;FileName;ImageRotation;PixelWidth;PixelHeight;ThumbnailPixelWidth;ThumbnailPixelHeight;ThumbnailCreationDateTime;Hash;CorruptedMessage;IsCorrupted;RotatedMessage;IsRotated\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a;20200720175810_3.jpg;Rotate0;1920;1080;200;112;8/19/2023 11:26:09;4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4;;false;;false\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a;20200720175816_3.jpg;Rotate0;1920;1080;200;112;8/19/2023 11:26:09;0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124;The asset is corrupted;true;The asset has been rotated;true\r\n";
 
-        _csvEscapedTextWithPipe = "\"FolderId\"|\"FileName\"|\"ImageRotation\"|\"PixelWidth\"|\"PixelHeight\"|\"ThumbnailPixelWidth\"|\"ThumbnailPixelHeight\"|\"ThumbnailCreationDateTime\"|\"Hash\"|\"AssetCorruptedMessage\"|\"IsAssetCorrupted\"|\"AssetRotatedMessage\"|\"IsAssetRotated\"\r\n" +
+        _csvEscapedTextWithPipe = "\"FolderId\"|\"FileName\"|\"ImageRotation\"|\"PixelWidth\"|\"PixelHeight\"|\"ThumbnailPixelWidth\"|\"ThumbnailPixelHeight\"|\"ThumbnailCreationDateTime\"|\"Hash\"|\"CorruptedMessage\"|\"IsCorrupted\"|\"RotatedMessage\"|\"IsRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|\"20200720175810_3.jpg\"|\"Rotate0\"|\"1920\"|\"1080\"|\"200\"|\"112\"|\"8/19/2023 11:26:09\"|\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\"|\"\"|\"false\"|\"\"|\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|\"20200720175816_3.jpg\"|\"Rotate0\"|\"1920\"|\"1080\"|\"200\"|\"112\"|\"8/19/2023 11:26:09\"|\"0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124\"|\"The asset is corrupted\"|\"true\"|\"The asset has been rotated\"|\"true\"\r\n";
 
-        _csvUnescapedTextWithPipe = "FolderId|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|AssetCorruptedMessage|IsAssetCorrupted|AssetRotatedMessage|IsAssetRotated\r\n" +
+        _csvUnescapedTextWithPipe = "FolderId|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|CorruptedMessage|IsCorrupted|RotatedMessage|IsRotated\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a|20200720175810_3.jpg|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4||false||false\r\n" +
             "876283c6-780e-4ad5-975c-be63044c087a|20200720175816_3.jpg|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124|The asset is corrupted|true|The asset has been rotated|true\r\n";
 
-        _csvSomeUnescapedTextWithPipe = "\"FolderId\"|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|AssetCorruptedMessage|IsAssetCorrupted|AssetRotatedMessage|\"IsAssetRotated\"\r\n" +
+        _csvSomeUnescapedTextWithPipe = "\"FolderId\"|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|CorruptedMessage|IsCorrupted|RotatedMessage|\"IsRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|20200720175810_3.jpg|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4||false||\"false\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\"|20200720175816_3.jpg|Rotate0|1920|1080|200|112|8/19/2023 11:26:09|0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124|The asset is corrupted|true|The asset has been rotated|\"true\"\r\n";
 
@@ -200,10 +200,10 @@ public class DatabaseReadObjectListTests
                     new() { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
                     new() { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
                     new() { ColumnName = "Hash", EscapeText = false },
-                    new() { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                    new() { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                    new() { ColumnName = "AssetRotatedMessage", EscapeText = false },
-                    new() { ColumnName = "IsAssetRotated", EscapeText = true }
+                    new() { ColumnName = "CorruptedMessage", EscapeText = false },
+                    new() { ColumnName = "IsCorrupted", EscapeText = false },
+                    new() { ColumnName = "RotatedMessage", EscapeText = false },
+                    new() { ColumnName = "IsRotated", EscapeText = true }
                 ]
             });
 
@@ -251,9 +251,9 @@ public class DatabaseReadObjectListTests
                     new() { ColumnName = "ThumbnailPixelHeight", EscapeText = false },
                     new() { ColumnName = "ThumbnailCreationDateTime", EscapeText = false },
                     new() { ColumnName = "Tutu", EscapeText = false },
-                    new() { ColumnName = "AssetCorruptedMessage", EscapeText = false },
-                    new() { ColumnName = "IsAssetCorrupted", EscapeText = false },
-                    new() { ColumnName = "AssetRotatedMessage", EscapeText = false },
+                    new() { ColumnName = "CorruptedMessage", EscapeText = false },
+                    new() { ColumnName = "IsCorrupted", EscapeText = false },
+                    new() { ColumnName = "RotatedMessage", EscapeText = false },
                     new() { ColumnName = "Tata", EscapeText = false }
                 ]
             });
@@ -456,10 +456,10 @@ public class DatabaseReadObjectListTests
                 new() { ColumnName = "ThumbnailPixelHeight", EscapeText = escapeText },
                 new() { ColumnName = "ThumbnailCreationDateTime", EscapeText = escapeText },
                 new() { ColumnName = "Hash", EscapeText = escapeText },
-                new() { ColumnName = "AssetCorruptedMessage", EscapeText = escapeText },
-                new() { ColumnName = "IsAssetCorrupted", EscapeText = escapeText },
-                new() { ColumnName = "AssetRotatedMessage", EscapeText = escapeText },
-                new() { ColumnName = "IsAssetRotated", EscapeText = escapeText }
+                new() { ColumnName = "CorruptedMessage", EscapeText = escapeText },
+                new() { ColumnName = "IsCorrupted", EscapeText = escapeText },
+                new() { ColumnName = "RotatedMessage", EscapeText = escapeText },
+                new() { ColumnName = "IsRotated", EscapeText = escapeText }
             ]
         });
 
@@ -482,10 +482,10 @@ public class DatabaseReadObjectListTests
         Assert.AreEqual(112, asset1.Pixel.Thumbnail.Height);
         Assert.AreEqual(new DateTime(2023, 8, 19, 11, 26, 09), asset1.ThumbnailCreationDateTime);
         Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset1.Hash);
-        Assert.AreEqual("", asset1.AssetCorruptedMessage);
-        Assert.AreEqual(false, asset1.IsAssetCorrupted);
-        Assert.AreEqual("", asset1.AssetRotatedMessage);
-        Assert.AreEqual(false, asset1.IsAssetRotated);
+        Assert.AreEqual(false, asset1.Metadata.Corrupted.IsTrue);
+        Assert.AreEqual("", asset1.Metadata.Corrupted.Message);
+        Assert.AreEqual(false, asset1.Metadata.Rotated.IsTrue);
+        Assert.AreEqual("", asset1.Metadata.Rotated.Message);
 
         Asset asset2 = assets[1];
         Assert.AreEqual(new Guid("876283c6-780e-4ad5-975c-be63044c087a"), asset2.FolderId);
@@ -497,10 +497,10 @@ public class DatabaseReadObjectListTests
         Assert.AreEqual(112, asset2.Pixel.Thumbnail.Height);
         Assert.AreEqual(new DateTime(2023, 8, 19, 11, 26, 09), asset2.ThumbnailCreationDateTime);
         Assert.AreEqual("0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124", asset2.Hash);
-        Assert.AreEqual("The asset is corrupted", asset2.AssetCorruptedMessage);
-        Assert.AreEqual(true, asset2.IsAssetCorrupted);
-        Assert.AreEqual("The asset has been rotated", asset2.AssetRotatedMessage);
-        Assert.AreEqual(true, asset2.IsAssetRotated);
+        Assert.AreEqual(true, asset2.Metadata.Corrupted.IsTrue);
+        Assert.AreEqual("The asset is corrupted", asset2.Metadata.Corrupted.Message);
+        Assert.AreEqual(true, asset2.Metadata.Rotated.IsTrue);
+        Assert.AreEqual("The asset has been rotated", asset2.Metadata.Rotated.Message);
 
         Assert.AreEqual(filePath, _database!.Diagnostics.LastReadFilePath);
         Assert.AreEqual(csv, _database!.Diagnostics.LastReadFileRaw);

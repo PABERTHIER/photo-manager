@@ -17,10 +17,10 @@ public static class AssetConfigs
             new() { ColumnName = "ThumbnailPixelHeight" },
             new() { ColumnName = "ThumbnailCreationDateTime" },
             new() { ColumnName = "Hash" },
-            new() { ColumnName = "AssetCorruptedMessage" },
-            new() { ColumnName = "IsAssetCorrupted" },
-            new() { ColumnName = "AssetRotatedMessage" },
-            new() { ColumnName = "IsAssetRotated" }
+            new() { ColumnName = "CorruptedMessage" },
+            new() { ColumnName = "IsCorrupted" },
+            new() { ColumnName = "RotatedMessage" },
+            new() { ColumnName = "IsRotated" }
         ];
     }
 
@@ -46,10 +46,11 @@ public static class AssetConfigs
             },
             ThumbnailCreationDateTime = thumbnailCreationDateTime,
             Hash = values[8],
-            AssetCorruptedMessage = values[9],
-            IsAssetCorrupted = bool.Parse(values[10]),
-            AssetRotatedMessage = values[11],
-            IsAssetRotated = bool.Parse(values[12])
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = bool.Parse(values[10]), Message = values[9] },
+                Rotated = new() { IsTrue = bool.Parse(values[12]), Message = values[11] }
+            }
         };
     }
 
@@ -66,10 +67,10 @@ public static class AssetConfigs
             6 => a.Pixel.Thumbnail.Height,
             7 => a.ThumbnailCreationDateTime.ToString("M/dd/yyyy HH:mm:ss"),
             8 => a.Hash,
-            9 => a.AssetCorruptedMessage!,
-            10 => a.IsAssetCorrupted,
-            11 => a.AssetRotatedMessage!,
-            12 => a.IsAssetRotated,
+            9 => a.Metadata.Corrupted.Message!,
+            10 => a.Metadata.Corrupted.IsTrue,
+            11 => a.Metadata.Rotated.Message!,
+            12 => a.Metadata.Rotated.IsTrue,
             _ => throw new ArgumentOutOfRangeException(nameof(i))
         };
     }

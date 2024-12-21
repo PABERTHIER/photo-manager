@@ -60,10 +60,11 @@ public class AssetRepositoryConcurrentAccessTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset2 = new()
         {
@@ -84,10 +85,11 @@ public class AssetRepositoryConcurrentAccessTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = "The asset has been rotated",
-            IsAssetRotated = true
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
+            }
         };
         _asset3 = new()
         {
@@ -108,10 +110,11 @@ public class AssetRepositoryConcurrentAccessTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "a92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
-            AssetCorruptedMessage = "The asset is corrupted",
-            IsAssetCorrupted = true,
-            AssetRotatedMessage = "The asset has been rotated",
-            IsAssetRotated = true
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
+                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
+            }
         };
     }
 
@@ -137,10 +140,11 @@ public class AssetRepositoryConcurrentAccessTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "b92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
-            AssetCorruptedMessage = "The asset is corrupted",
-            IsAssetCorrupted = true,
-            AssetRotatedMessage = "The asset has been rotated",
-            IsAssetRotated = true
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
+                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
+            }
         };
         Asset asset5 = new()
         {
@@ -161,10 +165,11 @@ public class AssetRepositoryConcurrentAccessTests
             },
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = "c92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
-            AssetCorruptedMessage = "The asset is corrupted",
-            IsAssetCorrupted = true,
-            AssetRotatedMessage = "The asset has been rotated",
-            IsAssetRotated = true
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
+                Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
+            }
         };
 
         List<Reactive.Unit> assetsUpdatedEvents = [];

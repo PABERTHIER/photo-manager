@@ -38,8 +38,8 @@
                     <Label Grid.Row="0" Grid.Column="2" Foreground="#FFFFFFFF" VerticalContentAlignment="Center">
                         <Label.Content>
                             <MultiBinding Converter="{StaticResource TernaryConverter}">
-                                <Binding Path="IsAssetCorrupted"/>
-                                <Binding Path="AssetCorruptedMessage"/>
+                                <Binding Path="Metadata.Corrupted.IsTrue"/>
+                                <Binding Path="Metadata.Corrupted.Message"/>
                             </MultiBinding>
                         </Label.Content>
                     </Label>
@@ -47,8 +47,8 @@
                     <Label  Grid.Row="1" Grid.Column="2" Foreground="#FFFFFFFF" VerticalContentAlignment="Center">
                         <Label.Content>
                             <MultiBinding Converter="{StaticResource TernaryConverter}">
-                                <Binding Path="IsAssetRotated"/>
-                                <Binding Path="AssetRotatedMessage"/>
+                                <Binding Path="Metadata.Rotated.IsTrue"/>
+                                <Binding Path="Metadata.Rotated.Message"/>
                             </MultiBinding>
                         </Label.Content>
                     </Label>

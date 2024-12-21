@@ -12,10 +12,7 @@ public class Asset
     public required string Hash { get; init; }
     public BitmapImage? ImageData { get; set; } // Not stored in DB
     public DateTime ThumbnailCreationDateTime { get; init; }
-    public bool IsAssetCorrupted { get; init; }
-    public string? AssetCorruptedMessage { get; init; }
-    public bool IsAssetRotated { get; init; }
-    public string? AssetRotatedMessage { get; init; }
+    public Metadata Metadata { get; init; }
 
     // Used for tests only, to make FolderId and Folder properties immutable
     public Asset WithFolder(Folder folder)
@@ -31,10 +28,7 @@ public class Asset
             Hash = Hash,
             ImageData = ImageData,
             ThumbnailCreationDateTime = ThumbnailCreationDateTime,
-            IsAssetCorrupted = IsAssetCorrupted,
-            AssetCorruptedMessage = AssetCorruptedMessage,
-            IsAssetRotated = IsAssetRotated,
-            AssetRotatedMessage = AssetRotatedMessage
+            Metadata = Metadata
         };
     }
 
@@ -52,10 +46,7 @@ public class Asset
             Hash = hash,
             ImageData = ImageData,
             ThumbnailCreationDateTime = ThumbnailCreationDateTime,
-            IsAssetCorrupted = IsAssetCorrupted,
-            AssetCorruptedMessage = AssetCorruptedMessage,
-            IsAssetRotated = IsAssetRotated,
-            AssetRotatedMessage = AssetRotatedMessage
+            Metadata = Metadata
         };
     }
 }

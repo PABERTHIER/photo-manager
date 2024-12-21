@@ -79,10 +79,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset2 = new()
         {
@@ -102,10 +103,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset3 = new()
         {
@@ -125,10 +127,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset4 = new()
         {
@@ -148,10 +151,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset1Temp = new()
         {
@@ -171,10 +175,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset2Temp = new()
         {
@@ -194,10 +199,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset3Temp = new()
         {
@@ -217,10 +223,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset4Temp = new()
         {
@@ -240,10 +247,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset5Temp = new()
         {
@@ -263,10 +271,11 @@ public class ApplicationViewModelCatalogAssetsTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
     }
 

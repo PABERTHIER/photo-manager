@@ -15,12 +15,15 @@ public class TernaryConverterTests
         {
             Folder = new() { Path = "" },
             FileName = "toto.jpg",
-            IsAssetCorrupted = assertion,
-            AssetCorruptedMessage = message,
-            Hash = string.Empty
+            Hash = string.Empty,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = assertion, Message = message },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
-        object[] converterParameters = [asset.IsAssetCorrupted, asset.AssetCorruptedMessage];
+        object[] converterParameters = [asset.Metadata.Corrupted.IsTrue, asset.Metadata.Corrupted.Message];
         object? parameter = null;
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);
@@ -38,12 +41,15 @@ public class TernaryConverterTests
         {
             Folder = new() { Path = "" },
             FileName = "toto.jpg",
-            IsAssetRotated = assertion,
-            AssetRotatedMessage = message,
-            Hash = string.Empty
+            Hash = string.Empty,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = assertion, Message = message }
+            }
         };
 
-        object[] converterParameters = [asset.IsAssetRotated, asset.AssetRotatedMessage];
+        object[] converterParameters = [asset.Metadata.Rotated.IsTrue, asset.Metadata.Rotated.Message];
         object? parameter = null;
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);

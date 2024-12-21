@@ -1,4 +1,4 @@
-FolderId|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|AssetCorruptedMessage|IsAssetCorrupted|AssetRotatedMessage|IsAssetRotated
+FolderId|FileName|ImageRotation|PixelWidth|PixelHeight|ThumbnailPixelWidth|ThumbnailPixelHeight|ThumbnailCreationDateTime|Hash|CorruptedMessage|IsCorrupted|RotatedMessage|IsRotated
 f1f00403-0554-4201-9b6b-11a6b4cea3a9|1336.JPG|Rotate0|4032|3024|200|150|8/25/2023 12:01:20|fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa||False||False
 f1f00403-0554-4201-9b6b-11a6b4cea3a9|1452.DNG|Rotate90|4032|3024|200|150|8/25/2023 12:01:20|e9680ad893bee9471a55421c0ea30075723f3ad274caec6300f7ce44adefb8a68b1a4f65ea25543a39f60d63af1681eca61bfb6b6f18d38c8dbb0672e2018e58||False|The asset has been rotated|True
 f1f00403-0554-4201-9b6b-11a6b4cea3a9|533.JPG|Rotate270|3072|4080|113|150|8/25/2023 12:01:21|ee43714d8b96d7ed3308d18afcb701444198c783fbe4103ce44e95aaf99c2095ae70e6e2035a7a438d1598fadaf5fe8cb0d541378387d20e91f26819fcc64b82||False|The asset has been rotated|True

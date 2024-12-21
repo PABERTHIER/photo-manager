@@ -91,10 +91,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize,
         string additionalPath)
     {
@@ -132,10 +132,10 @@ public class AssetCreationServiceTests
                 _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
-                isAssetCorrupted,
-                assetCorruptedMessage,
-                isAssetRotated,
-                assetRotatedMessage);
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
         }
@@ -189,10 +189,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize,
         string additionalPath)
     {
@@ -230,10 +230,10 @@ public class AssetCreationServiceTests
                 _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
-                isAssetCorrupted,
-                assetCorruptedMessage,
-                isAssetRotated,
-                assetRotatedMessage);
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
         }
@@ -287,10 +287,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize,
         string additionalPath)
     {
@@ -328,10 +328,10 @@ public class AssetCreationServiceTests
                 _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
-                isAssetCorrupted,
-                assetCorruptedMessage,
-                isAssetRotated,
-                assetRotatedMessage);
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
         }
@@ -385,10 +385,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize,
         string additionalPath)
     {
@@ -426,10 +426,10 @@ public class AssetCreationServiceTests
                 _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
-                isAssetCorrupted,
-                assetCorruptedMessage,
-                isAssetRotated,
-                assetRotatedMessage);
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
         }
@@ -449,10 +449,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize,
         string additionalPath)
     {
@@ -490,10 +490,10 @@ public class AssetCreationServiceTests
                 _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
-                isAssetCorrupted,
-                assetCorruptedMessage,
-                isAssetRotated,
-                assetRotatedMessage);
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
         }
@@ -539,10 +539,11 @@ public class AssetCreationServiceTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
         try
@@ -576,10 +577,10 @@ public class AssetCreationServiceTests
                 expectedAsset.FileProperties.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
-                expectedAsset.IsAssetCorrupted,
-                expectedAsset.AssetCorruptedMessage,
-                expectedAsset.IsAssetRotated,
-                expectedAsset.AssetRotatedMessage);
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
         }
@@ -625,10 +626,11 @@ public class AssetCreationServiceTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "7ad01e9fe639957a9e8eaddc7fd864068f4a03f9981fd480f310740a43a0a4f2b8fa7a80d9c83039c46fcfbb63a5e465adaf07d33191369590adcda1586b1c94",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
         try
@@ -662,10 +664,10 @@ public class AssetCreationServiceTests
                 expectedAsset.FileProperties.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
-                expectedAsset.IsAssetCorrupted,
-                expectedAsset.AssetCorruptedMessage,
-                expectedAsset.IsAssetRotated,
-                expectedAsset.AssetRotatedMessage);
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
         }
@@ -710,10 +712,11 @@ public class AssetCreationServiceTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
         try
@@ -747,10 +750,10 @@ public class AssetCreationServiceTests
                 expectedAsset.FileProperties.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
-                expectedAsset.IsAssetCorrupted,
-                expectedAsset.AssetCorruptedMessage,
-                expectedAsset.IsAssetRotated,
-                expectedAsset.AssetRotatedMessage);
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, expectedImageByteSize);
         }
@@ -783,10 +786,11 @@ public class AssetCreationServiceTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
         const int imageByteSize = 2097;
@@ -822,10 +826,10 @@ public class AssetCreationServiceTests
                 expectedAsset.FileProperties.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
-                expectedAsset.IsAssetCorrupted,
-                expectedAsset.AssetCorruptedMessage,
-                expectedAsset.IsAssetRotated,
-                expectedAsset.AssetRotatedMessage);
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
 
             string newSameAssetFolderPath = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder1");
             Folder newSameAssetFolder = _testableAssetRepository!.AddFolder(newSameAssetFolderPath); // Set above, not in this method
@@ -851,10 +855,10 @@ public class AssetCreationServiceTests
                 expectedAsset.FileProperties.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
-                expectedAsset.IsAssetCorrupted,
-                expectedAsset.AssetCorruptedMessage,
-                expectedAsset.IsAssetRotated,
-                expectedAsset.AssetRotatedMessage);
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(2, assetsFromRepository.Count);
@@ -916,10 +920,11 @@ public class AssetCreationServiceTests
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
         const int imageByteSize = 2097;
@@ -955,10 +960,10 @@ public class AssetCreationServiceTests
                 expectedAsset.FileProperties.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
-                expectedAsset.IsAssetCorrupted,
-                expectedAsset.AssetCorruptedMessage,
-                expectedAsset.IsAssetRotated,
-                expectedAsset.AssetRotatedMessage);
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
 
@@ -1059,10 +1064,11 @@ public class AssetCreationServiceTests
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = imageRotation,
                 Hash = hash,
-                IsAssetCorrupted = true,
-                AssetCorruptedMessage = _userConfigurationService!.AssetSettings.AssetCorruptedMessage,
-                IsAssetRotated = false,
-                AssetRotatedMessage = null
+                Metadata = new()
+                {
+                    Corrupted = new() { IsTrue = true, Message = _userConfigurationService!.AssetSettings.CorruptedMessage },
+                    Rotated = new() { IsTrue = false, Message = null }
+                }
             };
 
             string imagePath = Path.Combine(_dataDirectory!, initialFileName);
@@ -1102,10 +1108,10 @@ public class AssetCreationServiceTests
                 expectedAsset.FileProperties.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
-                expectedAsset.IsAssetCorrupted,
-                expectedAsset.AssetCorruptedMessage,
-                expectedAsset.IsAssetRotated,
-                expectedAsset.AssetRotatedMessage);
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSizeExpected);
         }
@@ -1499,10 +1505,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
@@ -1559,10 +1565,10 @@ public class AssetCreationServiceTests
                 DateTime.Now.Date,
                 imageRotation,
                 hash,
-                isAssetCorrupted,
-                assetCorruptedMessage,
-                isAssetRotated,
-                assetRotatedMessage);
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
         }
@@ -1585,10 +1591,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
@@ -1660,10 +1666,10 @@ public class AssetCreationServiceTests
             //     thumbnailPixelHeight,
             //     imageRotation,
             //     hash,
-            //     isAssetCorrupted,
-            //     assetCorruptedMessage,
-            //     isAssetRotated,
-            //     assetRotatedMessage);
+            //     isCorrupted,
+            //     corruptedMessage,
+            //     isRotated,
+            //     rotatedMessage);
 
             // AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
         }
@@ -1726,10 +1732,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize)
     {
         ConfigureAssetCreationService(200, 150, false, false, false, true);
@@ -1786,10 +1792,10 @@ public class AssetCreationServiceTests
                 DateTime.Now.Date,
                 imageRotation,
                 hash,
-                isAssetCorrupted,
-                assetCorruptedMessage,
-                isAssetRotated,
-                assetRotatedMessage);
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, imageByteSize);
 
@@ -1887,10 +1893,11 @@ public class AssetCreationServiceTests
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = Rotation.Rotate0,
                 Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-                IsAssetCorrupted = false,
-                AssetCorruptedMessage = null,
-                IsAssetRotated = false,
-                AssetRotatedMessage = null
+                Metadata = new()
+                {
+                    Corrupted = new() { IsTrue = false, Message = null },
+                    Rotated = new() { IsTrue = false, Message = null }
+                }
             };
 
             const int expectedImageByteSize = 2097;
@@ -1909,10 +1916,10 @@ public class AssetCreationServiceTests
                 expectedAsset.FileProperties.Modification,
                 expectedAsset.ImageRotation,
                 expectedAsset.Hash,
-                expectedAsset.IsAssetCorrupted,
-                expectedAsset.AssetCorruptedMessage,
-                expectedAsset.IsAssetRotated,
-                expectedAsset.AssetRotatedMessage);
+                expectedAsset.Metadata.Corrupted.IsTrue,
+                expectedAsset.Metadata.Corrupted.Message,
+                expectedAsset.Metadata.Rotated.IsTrue,
+                expectedAsset.Metadata.Rotated.Message);
 
             AssertCataloguedAssetAndThumbnailValidity(asset2!, folder, thumbnails, expectedImageByteSize);
         }
@@ -1975,10 +1982,10 @@ public class AssetCreationServiceTests
         int thumbnailPixelHeight,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string assetCorruptedMessage,
-        bool isAssetRotated,
-        string assetRotatedMessage,
+        bool isCorrupted,
+        string corruptedMessage,
+        bool isRotated,
+        string rotatedMessage,
         int imageByteSize,
         bool analyseVideos)
     {
@@ -2017,10 +2024,10 @@ public class AssetCreationServiceTests
                 _expectedFileModificationDateTime,
                 imageRotation,
                 hash,
-                isAssetCorrupted,
-                assetCorruptedMessage,
-                isAssetRotated,
-                assetRotatedMessage);
+                isCorrupted,
+                corruptedMessage,
+                isRotated,
+                rotatedMessage);
 
             AssertCataloguedAssetAndThumbnailValidity(asset!, folder, thumbnails, imageByteSize);
 
@@ -2319,10 +2326,10 @@ public class AssetCreationServiceTests
         DateTime fileModificationDateTime,
         Rotation imageRotation,
         string hash,
-        bool isAssetCorrupted,
-        string? assetCorruptedMessage,
-        bool isAssetRotated,
-        string? assetRotatedMessage)
+        bool isCorrupted,
+        string? corruptedMessage,
+        bool isRotated,
+        string? rotatedMessage)
     {
         DateTime actualDate = DateTime.Now.Date;
 
@@ -2337,10 +2344,10 @@ public class AssetCreationServiceTests
         Assert.AreEqual(imageRotation, asset.ImageRotation);
         Assert.AreEqual(actualDate, asset.ThumbnailCreationDateTime.Date);
         Assert.AreEqual(hash, asset.Hash);
-        Assert.AreEqual(isAssetCorrupted, asset.IsAssetCorrupted);
-        Assert.AreEqual(assetCorruptedMessage, asset.AssetCorruptedMessage);
-        Assert.AreEqual(isAssetRotated, asset.IsAssetRotated);
-        Assert.AreEqual(assetRotatedMessage, asset.AssetRotatedMessage);
+        Assert.AreEqual(isCorrupted, asset.Metadata.Corrupted.IsTrue);
+        Assert.AreEqual(corruptedMessage, asset.Metadata.Corrupted.Message);
+        Assert.AreEqual(isRotated, asset.Metadata.Rotated.IsTrue);
+        Assert.AreEqual(rotatedMessage, asset.Metadata.Rotated.Message);
         Assert.AreEqual(imagePath, asset.FullPath);
         Assert.AreEqual(folderPath, asset.Folder.Path);
         Assert.IsNull(asset.ImageData); // Set above, not in this method

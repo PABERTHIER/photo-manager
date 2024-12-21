@@ -226,10 +226,19 @@ public class AssetCreationService(
             ImageRotation = rotation,
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = assetHashCalculatorService.CalculateHash(imageBytes, imagePath),
-            IsAssetCorrupted = isAssetCorrupted,
-            AssetCorruptedMessage = isAssetCorrupted ? userConfigurationService.AssetSettings.AssetCorruptedMessage : null,
-            IsAssetRotated = isAssetRotated,
-            AssetRotatedMessage = isAssetRotated ? userConfigurationService.AssetSettings.AssetRotatedMessage : null,
+            Metadata = new()
+            {
+                Corrupted = new()
+                {
+                    IsTrue = isAssetCorrupted,
+                    Message = isAssetCorrupted ? userConfigurationService.AssetSettings.CorruptedMessage : null
+                },
+                Rotated = new()
+                {
+                    IsTrue = isAssetRotated,
+                    Message = isAssetRotated ? userConfigurationService.AssetSettings.RotatedMessage : null
+                }
+            }
         };
 
         storageService.UpdateAssetFileProperties(asset);

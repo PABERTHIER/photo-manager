@@ -84,10 +84,10 @@ public class ObjectListStorageTests
         Assert.AreEqual(113, asset.Pixel.Thumbnail.Width);
         Assert.AreEqual(150, asset.Pixel.Thumbnail.Height);
         Assert.AreEqual(new DateTime(2023, 8, 25, 12, 01, 21), asset.ThumbnailCreationDateTime);
-        Assert.AreEqual(string.Empty, asset.AssetCorruptedMessage);
-        Assert.AreEqual(false, asset.IsAssetCorrupted);
-        Assert.AreEqual("The asset has been rotated", asset.AssetRotatedMessage);
-        Assert.AreEqual(true, asset.IsAssetRotated);
+        Assert.AreEqual(false, asset.Metadata.Corrupted.IsTrue);
+        Assert.AreEqual(string.Empty, asset.Metadata.Corrupted.Message);
+        Assert.AreEqual(true, asset.Metadata.Rotated.IsTrue);
+        Assert.AreEqual("The asset has been rotated", asset.Metadata.Rotated.Message);
     }
 
     [Test]
@@ -383,10 +383,11 @@ public class ObjectListStorageTests
                 ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 05),
                 Hash =
                     "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa",
-                AssetCorruptedMessage = null,
-                IsAssetCorrupted = false,
-                AssetRotatedMessage = null,
-                IsAssetRotated = false
+                Metadata = new()
+                {
+                    Corrupted = new() { IsTrue = false, Message = null },
+                    Rotated = new() { IsTrue = false, Message = null }
+                }
             },
 
             new()
@@ -404,10 +405,11 @@ public class ObjectListStorageTests
                 ThumbnailCreationDateTime = new (2023, 8, 19, 11, 26, 05),
                 Hash =
                     "e9680ad893bee9471a55421c0ea30075723f3ad274caec6300f7ce44adefb8a68b1a4f65ea25543a39f60d63af1681eca61bfb6b6f18d38c8dbb0672e2018e58",
-                AssetCorruptedMessage = null,
-                IsAssetCorrupted = false,
-                AssetRotatedMessage = "The asset has been rotated",
-                IsAssetRotated = true
+                Metadata = new()
+                {
+                    Corrupted = new() { IsTrue = false, Message = null },
+                    Rotated = new() { IsTrue = true, Message = "The asset has been rotated" }
+                }
             }
         ];
 
