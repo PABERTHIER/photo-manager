@@ -305,7 +305,7 @@ public class AssetRepositoryDeleteFolderTests
             Folder folder = new()
             {
                 Path = folderPath,
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
             };
 
             _testableAssetRepository!.DeleteFolder(folder);

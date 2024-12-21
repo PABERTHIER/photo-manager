@@ -216,7 +216,7 @@ public class AssetCreationService(
         Asset asset = new()
         {
             FileName = Path.GetFileName(imagePath),
-            FolderId = folder.FolderId,
+            FolderId = folder.Id,
             Folder = folder,
             Pixel = new()
             {

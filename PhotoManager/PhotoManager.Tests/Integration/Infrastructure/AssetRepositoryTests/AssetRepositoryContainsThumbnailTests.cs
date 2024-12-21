@@ -155,8 +155,8 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = new()
             {
-                Path = folderPath,
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
+                Path = folderPath
             };
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -193,8 +193,8 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = new()
             {
-                Path = folderPath,
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
+                Path = folderPath
             };
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -237,8 +237,8 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = new()
             {
-                Path = folderPath,
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
+                Path = folderPath
             };
 
             _asset1 = _asset1!.WithFolder(folder);

@@ -6,7 +6,7 @@ public static class FolderConfigs
     {
         return new ColumnProperties[]
         {
-            new ColumnProperties { ColumnName = "FolderId" },
+            new ColumnProperties { ColumnName = "Id" },
             new ColumnProperties { ColumnName = "Path" }
         };
     }
@@ -15,7 +15,7 @@ public static class FolderConfigs
     {
         return new Folder
         {
-            FolderId = new Guid(values[0]),
+            Id = new Guid(values[0]),
             Path = values[1]
         };
     }
@@ -24,7 +24,7 @@ public static class FolderConfigs
     {
         return i switch
         {
-            0 => f.FolderId,
+            0 => f.Id,
             1 => f.Path,
             _ => throw new ArgumentOutOfRangeException(nameof(i))
         };

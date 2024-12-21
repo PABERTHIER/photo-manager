@@ -92,8 +92,8 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -138,10 +138,10 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(4, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == destinationFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == destinationFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -231,8 +231,8 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -274,8 +274,8 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == destinationFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == destinationFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInSource);
@@ -319,7 +319,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(File.Exists(destinationFilePath2));
 
             Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder destinationFolder = new() { FolderId = Guid.NewGuid(), Path = destinationDirectory };
+            Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = destinationDirectory };
 
             Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 6.jpg");
             Assert.IsNotNull(asset1);
@@ -346,8 +346,8 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -395,10 +395,10 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(4, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == newDestinationFolder!.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == newDestinationFolder!.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == newDestinationFolder!.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == newDestinationFolder!.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -460,7 +460,7 @@ public class MoveAssetsServiceTests
             Assert.IsTrue(File.Exists(newSourceFilePath2));
 
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
-            Folder destinationFolder = new() { FolderId = Guid.NewGuid(), Path = destinationDirectory };
+            Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = destinationDirectory };
 
             Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 6.jpg");
             Assert.IsNotNull(asset1);
@@ -487,8 +487,8 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -533,8 +533,8 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == newDestinationFolder!.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == newDestinationFolder!.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == newDestinationFolder!.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == newDestinationFolder!.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsEmpty(cataloguedAssetsInSource);
@@ -603,7 +603,7 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -644,7 +644,7 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -734,8 +734,8 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -781,8 +781,8 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -856,8 +856,8 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(2, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -905,10 +905,10 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(4, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == destinationFolder.FolderId));
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == sourceFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset1.FileName && x.FolderId == destinationFolder.Id));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset2.FileName && x.FolderId == destinationFolder.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -1012,7 +1012,7 @@ public class MoveAssetsServiceTests
             Assert.IsFalse(File.Exists(destinationFilePath));
 
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
-            Folder destinationFolder = new() { FolderId = Guid.NewGuid(), Path = destinationDirectory };
+            Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = destinationDirectory };
 
             Asset? asset = _assetCreationService!.CreateAsset(sourceDirectory, assetOldFileName);
             Assert.IsNotNull(asset);
@@ -1033,7 +1033,7 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset.FileName && x.FolderId == sourceFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -1085,7 +1085,7 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -1148,7 +1148,7 @@ public class MoveAssetsServiceTests
             List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset.FileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == asset.FileName && x.FolderId == sourceFolder.Id));
 
             List<Asset> cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -1190,7 +1190,7 @@ public class MoveAssetsServiceTests
             assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
             Assert.IsNotEmpty(assetsInDb);
             Assert.AreEqual(1, assetsInDb.Count);
-            Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder.FolderId));
+            Assert.IsTrue(assetsInDb.Any(x => x.FileName == assetOldFileName && x.FolderId == sourceFolder.Id));
 
             cataloguedAssetsInSource = _assetRepository!.GetCataloguedAssetsByPath(sourceFolder.Path);
             Assert.IsNotEmpty(cataloguedAssetsInSource);
@@ -1349,7 +1349,7 @@ public class MoveAssetsServiceTests
             {
                 FileName = "NonExistentFile.jpg",
                 Folder = sourceFolder,
-                FolderId = sourceFolder.FolderId,
+                FolderId = sourceFolder.Id,
                 Hash = string.Empty
             };
 

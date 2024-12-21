@@ -27,9 +27,9 @@
 
 //     public FindDuplicatedAssetsTests()
 //     {
-//         _folder1 = new() { FolderId = "1", Path = "D:\\Inexistent Folder1" };
-//         _folder2 = new() { FolderId = "2", Path = "D:\\Inexistent Folder2" };
-//         _folder3 = new() { FolderId = "3", Path = "D:\\Inexistent Folder3" };
+//         _folder1 = new() { Id = "1", Path = "D:\\Inexistent Folder1" };
+//         _folder2 = new() { Id = "2", Path = "D:\\Inexistent Folder2" };
+//         _folder3 = new() { Id = "3", Path = "D:\\Inexistent Folder3" };
 
 //         _duplicatedAssets = new List<DuplicatedSetViewModel>();
 
@@ -46,42 +46,42 @@
 //         _duplicatedAssetViewModel1.Asset = new Asset()
 //         {
 //             FileName = "FileName1",
-//             FolderId = _folder1.FolderId,
+//             FolderId = _folder1.Id,
 //             Folder = _folder1,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078"
 //         };
 //         _duplicatedAssetViewModel2.Asset = new Asset()
 //         {
 //             FileName = "FileName2",
-//             FolderId = _folder2.FolderId,
+//             FolderId = _folder2.Id,
 //             Folder = _folder2,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078"
 //         };
 //         _duplicatedAssetViewModel3.Asset = new Asset()
 //         {
 //             FileName = "FileName3",
-//             FolderId = _folder1.FolderId,
+//             FolderId = _folder1.Id,
 //             Folder = _folder1,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4079"
 //         };
 //         _duplicatedAssetViewModel4.Asset = new Asset()
 //         {
 //             FileName = "FileName4",
-//             FolderId = _folder2.FolderId,
+//             FolderId = _folder2.Id,
 //             Folder = _folder2,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4079"
 //         };
 //         _duplicatedAssetViewModel5.Asset = new Asset()
 //         {
 //             FileName = "FileName5",
-//             FolderId = _folder2.FolderId,
+//             FolderId = _folder2.Id,
 //             Folder = _folder2,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4080"
 //         };
 //         _duplicatedAssetViewModel6.Asset = new Asset()
 //         {
 //             FileName = "FileName6",
-//             FolderId = _folder3.FolderId,
+//             FolderId = _folder3.Id,
 //             Folder = _folder3,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4080"
 //         };
@@ -101,12 +101,12 @@
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void SelectedAsset_Sould_Be_CurrentAsset()
 //     {
-//         Folder folder = new() { FolderId = "1", Path = "D:\\Inexistent Folder1" };
+//         Folder folder = new() { Id = "1", Path = "D:\\Inexistent Folder1" };
 
 //         var currentAsset = new Asset()
 //         {
 //             FileName = "FileName1",
-//             FolderId = _folder1.FolderId,
+//             FolderId = _folder1.Id,
 //             Folder = _folder1,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078"
 //         };
@@ -124,12 +124,12 @@
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void An_Other_Asset_Sould_Not_Be_CurrentAsset()
 //     {
-//         Folder folder = new() { FolderId = "10", Path = "D:\\Inexistent Folder10" };
+//         Folder folder = new() { Id = "10", Path = "D:\\Inexistent Folder10" };
 
 //         var currentAsset = new Asset()
 //         {
 //             FileName = "FileName10",
-//             FolderId = _folder1.FolderId,
+//             FolderId = _folder1.Id,
 //             Folder = _folder1,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4010"
 //         };
@@ -147,12 +147,12 @@
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void AssetsToDelete_Should_BeEquivalentTo_The_DuplicatedAssets_Selected()
 //     {
-//         Folder folder = new() { FolderId = "10", Path = "D:\\Inexistent Folder10" };
+//         Folder folder = new() { Id = "10", Path = "D:\\Inexistent Folder10" };
 
 //         var currentAsset = new Asset()
 //         {
 //             FileName = "FileName1",
-//             FolderId = _folder1.FolderId,
+//             FolderId = _folder1.Id,
 //             Folder = _folder1,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078"
 //         };
@@ -174,12 +174,12 @@
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void AssetsToDelete_Should_NotContain_The_DuplicatedAsset_Selected()
 //     {
-//         Folder folder = new() { FolderId = "10", Path = "D:\\Inexistent Folder10" };
+//         Folder folder = new() { Id = "10", Path = "D:\\Inexistent Folder10" };
 
 //         var currentAsset = new Asset()
 //         {
 //             FileName = "FileName1",
-//             FolderId = _folder1.FolderId,
+//             FolderId = _folder1.Id,
 //             Folder = _folder1,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078"
 //         };
@@ -201,12 +201,12 @@
 //     [Trait("Category", "DeleteAllDuplicatedAssetsByHash")]
 //     public void AssetsToDelete_Should_NotBeEquivalentTo_An_Other_DuplicatedAssets()
 //     {
-//         Folder folder = new() { FolderId = "10", Path = "D:\\Inexistent Folder10" };
+//         Folder folder = new() { Id = "10", Path = "D:\\Inexistent Folder10" };
 
 //         var currentAsset = new Asset()
 //         {
 //             FileName = "FileName1",
-//             FolderId = _folder1.FolderId,
+//             FolderId = _folder1.Id,
 //             Folder = _folder1,
 //             Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078"
 //         };

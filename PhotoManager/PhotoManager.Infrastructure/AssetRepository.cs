@@ -58,7 +58,7 @@ public class AssetRepository : IAssetRepository
 
                 if (folder != null)
                 {
-                    assetsList = GetAssetsByFolderId(folder.FolderId);
+                    assetsList = GetAssetsByFolderId(folder.Id);
 
                     if (!Thumbnails.ContainsKey(folder.Path))
                     {
@@ -131,7 +131,7 @@ public class AssetRepository : IAssetRepository
         {
             folder = new Folder
             {
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 Path = path
             };
 
@@ -259,7 +259,7 @@ public class AssetRepository : IAssetRepository
 
             if (folder != null)
             {
-                cataloguedAssets = assets.Where(a => a.FolderId == folder.FolderId).ToList();
+                cataloguedAssets = assets.Where(a => a.FolderId == folder.Id).ToList();
             }
         }
 
@@ -273,7 +273,7 @@ public class AssetRepository : IAssetRepository
         lock (syncLock)
         {
             Folder? folder = GetFolderByPath(directoryName);
-            result = folder != null && GetAssetByFolderIdAndFileName(folder.FolderId, fileName) != null;
+            result = folder != null && GetAssetByFolderIdAndFileName(folder.Id, fileName) != null;
         }
 
         return result;
@@ -287,7 +287,7 @@ public class AssetRepository : IAssetRepository
 
             if (folder != null)
             {
-                Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.FolderId, fileName);
+                Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.Id, fileName);
 
                 if (!Thumbnails.ContainsKey(folder.Path))
                 {
@@ -629,7 +629,7 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            result = folders.FirstOrDefault(f => f.FolderId == folderId);
+            result = folders.FirstOrDefault(f => f.Id == folderId);
         }
 
         return result;

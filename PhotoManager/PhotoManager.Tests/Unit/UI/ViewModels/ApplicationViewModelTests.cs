@@ -446,7 +446,7 @@ public class ApplicationViewModelTests
                 FileName = fileName,
                 Hash = string.Empty,
                 ImageData = new BitmapImage(),
-                Folder = new Folder { FolderId = folderId, Path = folderPath }
+                Folder = new Folder { Id = folderId, Path = folderPath }
             };
 
             _applicationViewModel!.SetAssets(assets);

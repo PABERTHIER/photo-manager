@@ -43,15 +43,15 @@ public class ObjectListStorageTests
         Assert.IsNotEmpty(result);
         Assert.AreEqual(3, result.Count);
 
-        Folder? folder1 = result.FirstOrDefault(x => x.FolderId == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9"));
+        Folder? folder1 = result.FirstOrDefault(x => x.Id == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9"));
         Assert.IsNotNull(folder1);
         Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test", folder1!.Path);
 
-        Folder? folder2 = result.FirstOrDefault(x => x.FolderId == new Guid("2c107211-1a1c-4e73-8e8b-35d18ca8ef85"));
+        Folder? folder2 = result.FirstOrDefault(x => x.Id == new Guid("2c107211-1a1c-4e73-8e8b-35d18ca8ef85"));
         Assert.IsNotNull(folder2);
         Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame", folder2!.Path);
 
-        Folder? folder3 = result.FirstOrDefault(x => x.FolderId == new Guid("18033543-defb-4d37-837b-d8063eda3a25"));
+        Folder? folder3 = result.FirstOrDefault(x => x.Id == new Guid("18033543-defb-4d37-837b-d8063eda3a25"));
         Assert.IsNotNull(folder3);
         Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test\\toto", folder3!.Path);
     }
@@ -171,7 +171,7 @@ public class ObjectListStorageTests
         Assert.IsInstanceOf<List<Folder>>(result);
         Assert.IsNotEmpty(result);
         Assert.AreEqual(3, result.Count);
-        Assert.IsNotNull(result.FirstOrDefault(x => x.FolderId == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9")));
+        Assert.IsNotNull(result.FirstOrDefault(x => x.Id == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9")));
     }
 
     [Test]
@@ -326,19 +326,19 @@ public class ObjectListStorageTests
         [
             new()
             {
-                FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
+                Id = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
                 Path = "D:\\Workspace\\PhotoManager\\Test"
             },
 
             new()
             {
-                FolderId = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
+                Id = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"
             },
 
             new()
             {
-                FolderId = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
+                Id = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\toto"
             }
         ];
@@ -501,19 +501,19 @@ public class ObjectListStorageTests
         [
             new()
             {
-                FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
+                Id = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
                 Path = "D:\\Workspace\\PhotoManager\\Test"
             },
 
             new()
             {
-                FolderId = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
+                Id = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"
             },
 
             new()
             {
-                FolderId = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
+                Id = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\toto"
             }
         ];
@@ -537,19 +537,19 @@ public class ObjectListStorageTests
         [
             new()
             {
-                FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
+                Id = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
                 Path = "D:\\Workspace\\PhotoManager\\Test"
             },
 
             new()
             {
-                FolderId = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
+                Id = new Guid("8f9dff55-4a15-411e-a4cb-7ec3024b2238"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"
             },
 
             new()
             {
-                FolderId = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
+                Id = new Guid("db4d226f-6901-43f9-9e82-e6a052f627d2"),
                 Path = "D:\\Workspace\\PhotoManager\\Test\\toto"
             }
         ];

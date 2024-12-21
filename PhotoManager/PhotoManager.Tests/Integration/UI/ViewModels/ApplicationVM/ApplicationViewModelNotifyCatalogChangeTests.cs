@@ -11324,7 +11324,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(catalogChange.Asset);
         Assert.AreEqual(expectedFoldersCount, folders.Count);
         Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
+        Assert.AreEqual(folders.First(x => x.Id == catalogChange.Folder!.Id), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
         Assert.AreEqual(CatalogChangeReason.FolderInspectionInProgress, catalogChange.Reason);
@@ -11357,7 +11357,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.IsNull(catalogChange.Asset);
         Assert.AreEqual(expectedFoldersCount, folders.Count);
         Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
+        Assert.AreEqual(folders.First(x => x.Id == catalogChange.Folder!.Id), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
         Assert.AreEqual(CatalogChangeReason.FolderCreated, catalogChange.Reason);

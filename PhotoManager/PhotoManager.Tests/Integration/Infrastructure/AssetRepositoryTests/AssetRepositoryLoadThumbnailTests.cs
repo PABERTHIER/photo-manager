@@ -294,7 +294,7 @@ public class AssetRepositoryLoadThumbnailTests
         {
             Guid folderId = Guid.NewGuid();
 
-            _asset1 = _asset1!.WithFolder(new() { FolderId = folderId, Path = _dataDirectory! });
+            _asset1 = _asset1!.WithFolder(new() { Id = folderId, Path = _dataDirectory! });
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 

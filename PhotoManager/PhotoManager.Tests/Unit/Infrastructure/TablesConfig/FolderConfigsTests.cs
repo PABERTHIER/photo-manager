@@ -13,7 +13,7 @@ public class FolderConfigsTests
         Assert.IsNotNull(columns);
         Assert.AreEqual(2, columns.Length);
 
-        Assert.AreEqual("FolderId", columns[0].ColumnName);
+        Assert.AreEqual("Id", columns[0].ColumnName);
         Assert.AreEqual("Path", columns[1].ColumnName);
     }
 
@@ -29,7 +29,7 @@ public class FolderConfigsTests
         Folder folder = FolderConfigs.ReadFunc(validValues);
 
         Assert.IsNotNull(folder);
-        Assert.AreEqual(_folderId, folder.FolderId);
+        Assert.AreEqual(_folderId, folder.Id);
         Assert.AreEqual("D:\\folder\\newFolder", folder.Path);
     }
 
@@ -47,7 +47,7 @@ public class FolderConfigsTests
         Folder folder = FolderConfigs.ReadFunc(tooManyValues);
 
         Assert.IsNotNull(folder);
-        Assert.AreEqual(_folderId, folder.FolderId);
+        Assert.AreEqual(_folderId, folder.Id);
         Assert.AreEqual("D:\\folder\\newFolder", folder.Path);
     }
 
@@ -76,7 +76,7 @@ public class FolderConfigsTests
     {
         Folder folder = new()
         {
-            FolderId = _folderId,
+            Id = _folderId,
             Path = "D:\\folder\\newFolder"
         };
 
@@ -113,7 +113,7 @@ public class FolderConfigsTests
     {
         Folder folder = new()
         {
-            FolderId = _folderId,
+            Id = _folderId,
             Path = "D:\\folder\\newFolder"
         };
 

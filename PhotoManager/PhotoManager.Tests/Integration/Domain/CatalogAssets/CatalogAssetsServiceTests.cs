@@ -8488,7 +8488,7 @@ public class CatalogAssetsServiceTests
         DateTime actualDate = DateTime.Now.Date;
 
         Assert.AreEqual(expectedAsset.FileName, asset.FileName);
-        Assert.AreEqual(folder.FolderId, asset.FolderId);
+        Assert.AreEqual(folder.Id, asset.FolderId);
         Assert.AreEqual(folder, asset.Folder);
         Assert.AreEqual(expectedAsset.FileProperties.Size, asset.FileProperties.Size);
         Assert.AreEqual(expectedAsset.Pixel.Asset.Width, asset.Pixel.Asset.Width);

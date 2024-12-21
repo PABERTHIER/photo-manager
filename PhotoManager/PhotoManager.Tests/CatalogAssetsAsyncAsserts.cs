@@ -40,12 +40,12 @@ public static class CatalogAssetsAsyncAsserts
 
         foreach (Folder folder in foldersContainingAssets)
         {
-            string blobFileName = $"{folder.FolderId}.bin";
+            string blobFileName = $"{folder.Id}.bin";
             string blobFilePath = Path.Combine(blobsPath, blobFileName);
 
             Assert.IsTrue(File.Exists(blobFilePath));
 
-            List<Asset> assetsFromRepositoryByFolder = assetsFromRepository.Where(x => x.FolderId == folder.FolderId).ToList();
+            List<Asset> assetsFromRepositoryByFolder = assetsFromRepository.Where(x => x.FolderId == folder.Id).ToList();
 
             Dictionary<string, byte[]>? dataRead = blobStorage.ReadFromBinaryFile(blobFilePath);
             Assert.IsNotNull(dataRead);
@@ -81,19 +81,19 @@ public static class CatalogAssetsAsyncAsserts
             Asset expectedAsset = assetToFolderMapping.Keys.First(a => a.FileName == assetFromDatabase.FileName && a.FolderId == assetFromDatabase.FolderId);
             Folder expectedFolder = assetToFolderMapping[expectedAsset];
 
-            AssertAssetFromDatabaseValidity(assetFromDatabase, expectedAsset, expectedFolder.FolderId);
+            AssertAssetFromDatabaseValidity(assetFromDatabase, expectedAsset, expectedFolder.Id);
         }
 
         Assert.AreEqual(folders.Count, foldersFromDatabase.Count);
 
-        Dictionary<Guid, Folder> foldersById = folders.ToDictionary(f => f.FolderId, f => f);
-        Dictionary<Guid, Folder> foldersFromDatabaseById = foldersFromDatabase.ToDictionary(f => f.FolderId, f => f);
+        Dictionary<Guid, Folder> foldersById = folders.ToDictionary(f => f.Id, f => f);
+        Dictionary<Guid, Folder> foldersFromDatabaseById = foldersFromDatabase.ToDictionary(f => f.Id, f => f);
 
         foreach ((Guid folderId, Folder? expectedFolder) in foldersById)
         {
             Folder actualFolder = foldersFromDatabaseById[folderId];
 
-            Assert.AreEqual(expectedFolder.FolderId, actualFolder.FolderId);
+            Assert.AreEqual(expectedFolder.Id, actualFolder.Id);
             Assert.AreEqual(expectedFolder.Path, actualFolder.Path);
         }
 
@@ -139,7 +139,7 @@ public static class CatalogAssetsAsyncAsserts
         if (hasOneFolder)
         {
             Assert.AreEqual(1, foldersFromDatabase.Count);
-            Assert.AreEqual(folder.FolderId, foldersFromDatabase[0].FolderId);
+            Assert.AreEqual(folder.Id, foldersFromDatabase[0].Id);
             Assert.AreEqual(folder.Path, foldersFromDatabase[0].Path);
         }
         else
@@ -287,7 +287,7 @@ public static class CatalogAssetsAsyncAsserts
         DateTime actualDate = DateTime.Now.Date;
 
         Assert.AreEqual(expectedAsset.FileName, asset.FileName);
-        Assert.AreEqual(folder.FolderId, asset.FolderId);
+        Assert.AreEqual(folder.Id, asset.FolderId);
         Assert.AreEqual(folder, asset.Folder);
         Assert.AreEqual(expectedAsset.FileProperties.Size, asset.FileProperties.Size);
         Assert.AreEqual(expectedAsset.Pixel.Asset.Width, asset.Pixel.Asset.Width);
@@ -377,7 +377,7 @@ public static class CatalogAssetsAsyncAsserts
         Assert.IsNull(catalogChange.Asset);
         Assert.AreEqual(expectedFoldersCount, folders.Count);
         Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
+        Assert.AreEqual(folders.First(x => x.Id == catalogChange.Folder!.Id), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
         Assert.AreEqual(CatalogChangeReason.FolderInspectionInProgress, catalogChange.Reason);
@@ -404,7 +404,7 @@ public static class CatalogAssetsAsyncAsserts
         Assert.IsNull(catalogChange.Asset);
         Assert.AreEqual(expectedFoldersCount, folders.Count);
         Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(folders.First(x => x.FolderId == catalogChange.Folder!.FolderId), catalogChange.Folder);
+        Assert.AreEqual(folders.First(x => x.Id == catalogChange.Folder!.Id), catalogChange.Folder);
         Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
         Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
         Assert.AreEqual(CatalogChangeReason.FolderCreated, catalogChange.Reason);
@@ -588,7 +588,7 @@ public static class CatalogAssetsAsyncAsserts
         // Delete all blobs in Blobs directory
         foreach (Folder folder in folders)
         {
-            string blobFileName = $"{folder.FolderId}.bin";
+            string blobFileName = $"{folder.Id}.bin";
             string blobFilePath = Path.Combine(blobsPath, blobFileName);
 
             File.Delete(blobFilePath);

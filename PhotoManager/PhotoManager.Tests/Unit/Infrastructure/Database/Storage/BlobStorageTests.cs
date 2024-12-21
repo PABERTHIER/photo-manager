@@ -27,7 +27,7 @@ public class BlobStorageTests
     }
 
     [Test]
-    [TestCase("18033543-defb-4d37-837b-d8063eda3a25.bin", 4, "Image_12.heic")] // The blobName is always like this FolderId + ".bin"
+    [TestCase("18033543-defb-4d37-837b-d8063eda3a25.bin", 4, "Image_12.heic")] // The blobName is always like this: Folder.Id + ".bin"
     [TestCase("f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin", 7, "1336.JPG")]
     public void ReadFromBinaryFile_FileExists_ReturnsDeserializedObject(string blobFileName, int countExpected, string keyContained)
     {

@@ -145,7 +145,7 @@ public class AssetRepositorySaveCatalogTests
             List<string> recentTargetPaths = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
 
             Assert.AreEqual(2, folders.Count);
-            Assert.IsTrue(folders.FirstOrDefault(x => x.FolderId == _asset1.FolderId)?.Name == _asset1.Folder.Name);
+            Assert.IsTrue(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name == _asset1.Folder.Name);
 
             Assert.AreEqual(1, assets.Count);
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);
@@ -254,7 +254,7 @@ public class AssetRepositorySaveCatalogTests
             List<string> recentTargetPaths = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
 
             Assert.AreEqual(2, folders.Count);
-            Assert.IsTrue(folders.FirstOrDefault(x => x.FolderId == _asset1.FolderId)?.Name == _asset1.Folder.Name);
+            Assert.IsTrue(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name == _asset1.Folder.Name);
 
             Assert.AreEqual(1, assets.Count);
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);
@@ -480,7 +480,7 @@ public class AssetRepositorySaveCatalogTests
             List<string> recentTargetPaths = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
 
             Assert.AreEqual(2, folders.Count);
-            Assert.IsTrue(folders.FirstOrDefault(x => x.FolderId == _asset1.FolderId)?.Name == _asset1.Folder.Name);
+            Assert.IsTrue(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name == _asset1.Folder.Name);
 
             Assert.AreEqual(1, assets.Count);
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);

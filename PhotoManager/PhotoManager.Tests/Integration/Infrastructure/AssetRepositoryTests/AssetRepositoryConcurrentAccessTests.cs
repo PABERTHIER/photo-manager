@@ -184,8 +184,8 @@ public class AssetRepositoryConcurrentAccessTests
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 
-            Folder folder3 = new() { FolderId = Guid.NewGuid(), Path = folderPath3 };
-            Folder folder4 = new() { FolderId = Guid.NewGuid(), Path = folderPath4 };
+            Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
+            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
 
             _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];

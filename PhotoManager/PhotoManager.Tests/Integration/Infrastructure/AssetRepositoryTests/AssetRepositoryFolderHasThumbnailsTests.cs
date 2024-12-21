@@ -43,7 +43,7 @@ public class AssetRepositoryFolderHasThumbnailsTests
 
         try
         {
-            Folder folder = new() { FolderId = Guid.NewGuid(), Path = _dataDirectory! };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
             _database!.WriteBlob([], folder.ThumbnailsFilename);
 
             bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
@@ -67,7 +67,7 @@ public class AssetRepositoryFolderHasThumbnailsTests
 
         try
         {
-            Folder folder = new() { FolderId = Guid.NewGuid(), Path = _dataDirectory! };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
 
             bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
 

@@ -30,7 +30,7 @@ public class DatabaseWriteBlobTests
     [Test]
     public void WriteBlob_BlobToWriteIsCorrectAndSemicolonSeparator_WritesBlob()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
@@ -74,7 +74,7 @@ public class DatabaseWriteBlobTests
     [Test]
     public void WriteBlob_BlobToWriteIsCorrectAndPipeSeparator_WritesBlob()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
@@ -118,7 +118,7 @@ public class DatabaseWriteBlobTests
     [Test]
     public void WriteBlob_BlobToWriteIsNullAndPipeSeparator_ThrowsNullReferenceException()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]>? blobToWrite = null;
@@ -148,7 +148,7 @@ public class DatabaseWriteBlobTests
     [Test]
     public void WriteBlob_BlobToWriteIsEmptyAndPipeSeparator_WritesNothingInTheFile()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = [];

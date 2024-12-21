@@ -2334,7 +2334,7 @@ public class AssetCreationServiceTests
         DateTime actualDate = DateTime.Now.Date;
 
         Assert.AreEqual(fileName, asset.FileName);
-        Assert.AreEqual(folder.FolderId, asset.FolderId);
+        Assert.AreEqual(folder.Id, asset.FolderId);
         Assert.AreEqual(folder, asset.Folder);
         Assert.AreEqual(fileSize, asset.FileProperties.Size);
         Assert.AreEqual(pixelWidth, asset.Pixel.Asset.Width);

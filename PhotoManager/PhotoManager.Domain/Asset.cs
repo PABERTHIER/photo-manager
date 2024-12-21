@@ -19,7 +19,7 @@ public class Asset
     {
         return new Asset
         {
-            FolderId = folder.FolderId,
+            FolderId = folder.Id,
             Folder = folder,
             FileName = FileName,
             FileProperties = FileProperties,

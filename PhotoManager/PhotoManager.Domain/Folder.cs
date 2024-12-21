@@ -2,10 +2,9 @@
 
 public class Folder
 {
-    // TODO: FolderId not null -> when a new -> new guid
-    public Guid FolderId { get; init; } // TODO: Rename to Id
+    public Guid Id { get; init; }
     public required string Path { get; init; }
-    public string ThumbnailsFilename => FolderId + ".bin"; // TODO: BlobFileName instead -> rename all methods like this
+    public string ThumbnailsFilename => Id + ".bin"; // TODO: BlobFileName instead -> rename all methods like this
 
     public string Name
     {
