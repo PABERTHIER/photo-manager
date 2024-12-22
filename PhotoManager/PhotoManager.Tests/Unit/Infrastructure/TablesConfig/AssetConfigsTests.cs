@@ -164,7 +164,7 @@ public class AssetConfigsTests
         Asset asset = new()
         {
             FolderId = _folderId,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+            Folder = new() { Id = _folderId, Path = "" },
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -209,8 +209,13 @@ public class AssetConfigsTests
         Asset asset = new()
         {
             FolderId = _folderId,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+            Folder = new() { Id = _folderId, Path = "" },
             FileName = "toto.jpg",
+            Pixel = new()
+            {
+                Asset = new(),
+                Thumbnail = new()
+            },
             ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
@@ -247,7 +252,7 @@ public class AssetConfigsTests
         Asset asset = new()
         {
             FolderId = _folderId,
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+            Folder = new() { Id = _folderId, Path = "" },
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()

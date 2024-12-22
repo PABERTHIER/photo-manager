@@ -523,6 +523,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             Pixel = new()
@@ -610,6 +611,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 10 portrait.png",
             Pixel = new()
@@ -696,6 +698,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_11.heic",
             Pixel = new()
@@ -770,6 +773,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             Pixel = new()
@@ -904,6 +908,7 @@ public class AssetCreationServiceTests
 
         Asset expectedAsset = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             Pixel = new()
@@ -1048,6 +1053,7 @@ public class AssetCreationServiceTests
         {
             Asset expectedAsset = new()
             {
+                FolderId = Guid.Empty, // Initialised later
                 Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                 FileName = corruptedAssetFileName,
                 Pixel = new()
@@ -1877,6 +1883,7 @@ public class AssetCreationServiceTests
 
             Asset expectedAsset = new()
             {
+                FolderId = Guid.Empty, // Initialised later
                 Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                 FileName = firstFrameFileName,
                 Pixel = new()

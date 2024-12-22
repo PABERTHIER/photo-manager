@@ -65,6 +65,7 @@ public class AssetsComparatorTests
         };
         _asset3 = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Homer.gif",
             Pixel = new()
@@ -84,6 +85,7 @@ public class AssetsComparatorTests
         };
         _asset4 = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_11.heic",
             Pixel = new()
@@ -109,10 +111,54 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file6.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file7.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file8.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file9.heic", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file6.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file7.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file8.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file9.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -127,12 +173,78 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file4.heic", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file6.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file7.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file8.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file9.heic", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty,
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file4.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file6.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file7.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file8.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file9.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -147,11 +259,66 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file2.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file3.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file4.heic", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file2.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file3.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file4.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file5.mp4",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -165,11 +332,66 @@ public class AssetsComparatorTests
         string[] fileNames = [];
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file2.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file3.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file4.heic", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty,
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file2.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file3.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file4.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file5.mp4",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
@@ -183,11 +405,66 @@ public class AssetsComparatorTests
         string[]? fileNames = null;
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file2.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file3.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file4.heic", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty,
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file2.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file3.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file4.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file5.mp4",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNames(fileNames!, cataloguedAssets));
@@ -425,10 +702,54 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file6.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file7.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file8.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file9.heic", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file6.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file7.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file8.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file9.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -443,11 +764,66 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file6.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file7.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file8.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file9.heic", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty,
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file6.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file7.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file8.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file9.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -462,11 +838,66 @@ public class AssetsComparatorTests
         string[] fileNames = ["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4", "toto.txt", "tutu.bat"];
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file2.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file3.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file4.heic", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty,
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file2.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file3.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file4.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file5.mp4",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -480,11 +911,66 @@ public class AssetsComparatorTests
         string[] fileNames = [];
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file2.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file3.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file4.heic", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty,
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file2.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file3.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file4.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file5.mp4",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
@@ -499,11 +985,66 @@ public class AssetsComparatorTests
         string[]? fileNames = null;
         List<Asset> cataloguedAssets =
         [
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file1.jpg", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file2.png", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file3.gif", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file4.heic", Hash = string.Empty },
-            new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "file5.mp4", Hash = string.Empty }
+            new()
+            {
+                FolderId = Guid.Empty,
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file2.png",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file3.gif",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file4.heic",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            },
+            new()
+            {
+                FolderId = Guid.Empty, // Initialised later
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "file5.mp4",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            }
         ];
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNames(fileNames!, cataloguedAssets));

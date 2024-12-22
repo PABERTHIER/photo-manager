@@ -13,9 +13,15 @@ public class TernaryConverterTests
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "toto.jpg",
             Hash = string.Empty,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = assertion, Message = message },
@@ -39,8 +45,14 @@ public class TernaryConverterTests
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "toto.jpg",
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             Hash = string.Empty,
             Metadata = new()
             {

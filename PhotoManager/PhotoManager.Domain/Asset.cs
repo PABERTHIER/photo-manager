@@ -2,12 +2,12 @@
 
 public class Asset
 {
-    public Guid FolderId { get; init; }
+    public required Guid FolderId { get; init; }
     public required Folder Folder { get; set; } // Not stored in the same table in DB
     public required string FileName { get; init; }
     public string FullPath => Path.Combine(Folder.Path, FileName);
     public FileProperties FileProperties { get; set; } // Not stored in DB
-    public Pixel Pixel { get; init; }
+    public required Pixel Pixel { get; init; }
     public Rotation ImageRotation { get; init; }
     public required string Hash { get; init; }
     public BitmapImage? ImageData { get; set; } // Not stored in DB

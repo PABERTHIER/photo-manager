@@ -68,6 +68,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     {
         _asset1 = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate.jpg",
             Pixel = new()
@@ -92,6 +93,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset2 = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9.png",
             Pixel = new()
@@ -116,6 +118,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset3 = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9_duplicate.png",
             Pixel = new()
@@ -140,6 +143,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset4 = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_11.heic",
             Pixel = new()
@@ -164,6 +168,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset1Temp = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate_copied.jpg",
             Pixel = new()
@@ -188,6 +193,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset2Temp = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             Pixel = new()
@@ -212,6 +218,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset3Temp = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Homer.gif",
             Pixel = new()
@@ -236,6 +243,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset4Temp = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Homer.jpg",
             Pixel = new()
@@ -260,6 +268,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         };
         _asset5Temp = new()
         {
+            FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "HomerDuplicated.jpg",
             Pixel = new()

@@ -31,7 +31,18 @@ public class UserConfigurationServiceTests
     public void SetAsWallpaper_ValidStyleAndTile_RegistersExpectedValues(WallpaperStyle style, string expectedStyleValue, string expectedTileValue)
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-        Asset asset = new() { Folder = folder, FileName = "NonExistentFile.jpg", Hash = string.Empty }; // Not giving an existing file to prevent the wallpaper to be changed
+        Asset asset = new()
+        {
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = "NonExistentFile.jpg",
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            Hash = string.Empty
+        }; // Not giving an existing file to prevent the wallpaper to be changed
 
         // Set up a StringWriter to capture console output
         StringWriter stringWriter = new();

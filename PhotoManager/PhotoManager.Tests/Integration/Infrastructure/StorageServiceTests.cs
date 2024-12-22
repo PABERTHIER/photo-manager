@@ -542,7 +542,18 @@ public class StorageServiceTests
     public void FileExists_ExistingFile_ReturnsTrue()
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-        Asset asset = new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty };
+        Asset asset = new()
+        {
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = "Image 1.jpg",
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            Hash = string.Empty
+        };
 
         bool exists = _storageService!.FileExists(folder, asset);
 
@@ -553,7 +564,18 @@ public class StorageServiceTests
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-        Asset asset = new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "NonExistent.jpg", Hash = string.Empty };
+        Asset asset = new()
+        {
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = "NonExistent.jpg",
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            Hash = string.Empty
+        };
 
         bool exists = _storageService!.FileExists(folder, asset);
 
@@ -566,7 +588,18 @@ public class StorageServiceTests
     public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string path, string fileName, string exceptionParameter)
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = path };
-        Asset asset = new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = fileName, Hash = string.Empty };
+        Asset asset = new()
+        {
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = fileName,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            Hash = string.Empty
+        };
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.FileExists(folder, asset));
 
@@ -668,11 +701,66 @@ public class StorageServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new() { Folder = folder, FileName = fileName1, Hash = string.Empty };
-            Asset asset2 = new() { Folder = folder, FileName = fileName2, Hash = string.Empty };
-            Asset asset3 = new() { Folder = folder, FileName = fileName3, Hash = string.Empty };
-            Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
-            Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
+            Asset asset1 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName1,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset2 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName2,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset3 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName3,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset4 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName4,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset5 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName5,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
 
             Assert.AreEqual(0, asset1.FileProperties.Size);
             Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Creation.Date);
@@ -771,11 +859,66 @@ public class StorageServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new() { Folder = folder, FileName = fileName1, Hash = string.Empty };
-            Asset asset2 = new() { Folder = folder, FileName = fileName2, Hash = string.Empty };
-            Asset asset3 = new() { Folder = folder, FileName = fileName3, Hash = string.Empty };
-            Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
-            Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
+            Asset asset1 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName1,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset2 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName2,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset3 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName3,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset4 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName4,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset5 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName5,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
 
             Assert.AreEqual(0, asset1.FileProperties.Size);
             Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
@@ -858,11 +1001,55 @@ public class StorageServiceTests
             File.SetLastWriteTime(destinationFilePath3, oldDateTime);
             File.SetLastWriteTime(destinationFilePath4, oldDateTime);
 
-            Asset asset1 = new() { Folder = folder, FileName = fileName1, Hash = string.Empty };
-            Asset asset2 = new() { Folder = folder, FileName = fileName2, Hash = string.Empty };
+            Asset asset1 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName1,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset2 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName2,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
             Asset? asset3 = null;
-            Asset asset4 = new() { Folder = folder, FileName = fileName4, Hash = string.Empty };
-            Asset asset5 = new() { Folder = folder, FileName = fileName5, Hash = string.Empty };
+            Asset asset4 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName4,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset5 = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName5,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
 
             Assert.AreEqual(0, asset1.FileProperties.Size);
             Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Creation.Date);
@@ -923,7 +1110,18 @@ public class StorageServiceTests
 
             File.SetLastWriteTime(destinationFilePath, oldDateTime);
 
-            Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
+            Asset asset = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
 
             Assert.AreEqual(0, asset.FileProperties.Size);
             Assert.AreEqual(DateTime.MinValue, asset.FileProperties.Creation.Date);
@@ -953,7 +1151,18 @@ public class StorageServiceTests
             const string fileName = "nonexistent.jpg";
 
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
-            Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
+            Asset asset = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
 
             DateTime creationTime = default;
             DateTime modificationTime = default;
@@ -999,7 +1208,18 @@ public class StorageServiceTests
 
             File.SetLastWriteTime(destinationFilePath, oldDateTime);
 
-            Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
+            Asset asset = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = fileName,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
 
             Assert.AreEqual(0, asset.FileProperties.Size);
             Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);

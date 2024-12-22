@@ -144,14 +144,87 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
-            Asset newAsset = new() { FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder };
+            Asset newAsset = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = "NewImage.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty,
+                ImageData = new()
+            };
+
             const string statusMessage = "Creating thumbnail for NewImage.jpg";
 
             _applicationViewModel!.SetAssets(assets);
@@ -194,14 +267,87 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
-            Asset newAsset = new() { FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder };
+            Asset newAsset = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = "NewImage.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty,
+                ImageData = new()
+            };
+
             const string statusMessage = "Creating thumbnail for NewImage.jpg";
 
             _applicationViewModel!.SetAssets(assets);
@@ -244,11 +390,71 @@ public class ApplicationViewModelTests
 
             List<Asset> cataloguedAssets =
             [
-                new() {FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder},
-                new() {FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder},
-                new() {FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder},
-                new() {FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder},
-                new() {FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder}
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             const string statusMessage = "Creating thumbnail for Image 5.jpg";
@@ -290,7 +496,19 @@ public class ApplicationViewModelTests
             Folder folder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
             Asset[] assets = [];
-            Asset newAsset = new() { FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder };
+            Asset newAsset = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = "NewImage.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty,
+                ImageData = new()
+            };
 
             _applicationViewModel!.SetAssets(assets);
 
@@ -323,15 +541,87 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             Folder newFolder = new() { Id = Guid.NewGuid(), Path = @"D:\NewFolder" };
-            Asset newAsset = new() { FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = newFolder };
+            Asset newAsset = new()
+            {
+                FolderId = newFolder.Id,
+                Folder = newFolder,
+                FileName = "NewImage.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty,
+                ImageData = new(),
+            };
 
             _applicationViewModel!.SetAssets(assets);
 
@@ -369,14 +659,86 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
-            Asset newAsset = new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "NewImage.jpg", Hash = string.Empty, ImageData = new BitmapImage() };
+            Asset newAsset = new()
+            {
+                FolderId = Guid.NewGuid(),
+                Folder = new() { Id = Guid.Empty, Path = "" },
+                FileName = "NewImage.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty,
+                ImageData = new()
+            };
 
             _applicationViewModel!.SetAssets(assets);
 
@@ -434,19 +796,85 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             Asset newAsset = new()
             {
+                FolderId = folderId,
+                Folder = new() { Id = folderId, Path = folderPath },
                 FileName = fileName,
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
                 Hash = string.Empty,
-                ImageData = new BitmapImage(),
-                Folder = new() { Id = folderId, Path = folderPath }
+                ImageData = new BitmapImage()
             };
 
             _applicationViewModel!.SetAssets(assets);
@@ -494,11 +922,71 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             const string statusMessage = "Removing thumbnail for Image 3.jpg";
@@ -545,11 +1033,71 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -585,11 +1133,71 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -623,11 +1231,71 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -661,11 +1329,71 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -744,11 +1472,71 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -778,14 +1566,86 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder },
-                new() { FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder }
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
-            Asset assetNotInList = new() { FileName = "ImageNotInList.jpg", Hash = string.Empty, ImageData = new BitmapImage(), Folder = folder };
+            Asset assetNotInList = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = "ImageNotInList.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty,
+                ImageData = new()
+            };
 
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.ViewerPosition = 4;
@@ -822,11 +1682,71 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -855,7 +1775,19 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SetAssets(assets);
@@ -940,11 +1872,71 @@ public class ApplicationViewModelTests
 
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.Product = "PhotoManager";
@@ -1031,8 +2023,14 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1069,11 +2067,71 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.Undefined);
@@ -1106,11 +2164,71 @@ public class ApplicationViewModelTests
         {
             Asset[] assets =
             [
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 5.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 2.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 3.jpg", Hash = string.Empty, ImageData = new BitmapImage() },
-                new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 4.jpg", Hash = string.Empty, ImageData = new BitmapImage() }
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                },
+                new()
+                {
+                    FolderId = Guid.Empty,
+                    Folder = new() { Id = Guid.Empty, Path = "" },
+                    FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
+                    Hash = string.Empty,
+                    ImageData = new()
+                }
             ];
 
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.Undefined);
@@ -1162,8 +2280,14 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1175,8 +2299,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1188,8 +2318,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1201,8 +2337,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1214,8 +2356,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1257,8 +2405,14 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1270,8 +2424,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1283,8 +2443,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1296,8 +2462,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1309,8 +2481,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1370,8 +2548,14 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1383,8 +2567,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1396,8 +2586,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1409,8 +2605,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1422,8 +2624,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1465,8 +2673,14 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1478,8 +2692,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1491,8 +2711,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1504,8 +2730,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1517,8 +2749,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1578,8 +2816,14 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1591,8 +2835,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1604,8 +2854,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1617,8 +2873,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1630,8 +2892,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1673,8 +2941,14 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1686,8 +2960,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1699,8 +2979,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1712,8 +2998,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1725,8 +3017,14 @@ public class ApplicationViewModelTests
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new()
@@ -1784,40 +3082,70 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2048 }
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2048 }
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2020 }
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2000 }
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2030 }
@@ -1854,40 +3182,70 @@ public class ApplicationViewModelTests
             [
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 5.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2048 }
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 2.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2048 }
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 1.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2020 }
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 3.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2000 }
                 },
                 new()
                 {
+                    FolderId = Guid.Empty,
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "Image 4.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 1280, Height = 720 },
+                        Thumbnail = new() { Width = 200, Height = 112 }
+                    },
                     Hash = string.Empty,
                     ImageData = new BitmapImage(),
                     FileProperties = new() { Size = 2030 }

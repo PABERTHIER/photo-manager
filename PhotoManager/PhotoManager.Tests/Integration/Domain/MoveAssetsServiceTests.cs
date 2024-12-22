@@ -1258,9 +1258,35 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty };
+            Guid folderId1 = Guid.NewGuid();
+            Guid folderId2 = Guid.NewGuid();
+
+            Asset asset1 = new()
+            {
+                FolderId = folderId1,
+                Folder = new() { Id = folderId1, Path = _dataDirectory! },
+                FileName = "Image 1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
             Asset? asset2 = null;
-            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty };
+            Asset asset3 = new()
+            {
+                FolderId = folderId2,
+                Folder = new() { Id = folderId2, Path = _dataDirectory! },
+                FileName = "Image 2.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+
             Asset[] assets = [asset1, asset2!, asset3];
 
             Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
@@ -1283,11 +1309,47 @@ public class MoveAssetsServiceTests
     {
         try
         {
+            Guid folderId1 = Guid.NewGuid();
+            Guid folderId2 = Guid.NewGuid();
             Folder? folder = null;
 
-            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty };
-            Asset asset2 = new() { FileName = "NonExistentFile.jpg", Folder = folder!, Hash = string.Empty };
-            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty };
+            Asset asset1 = new()
+            {
+                FolderId = folderId1,
+                Folder = new() { Id = folderId1, Path = _dataDirectory! },
+                FileName = "Image 1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset2 = new()
+            {
+                FolderId = Guid.Empty,
+                Folder = folder!,
+                FileName = "NonExistentFile.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 0, Height = 0 },
+                    Thumbnail = new() { Width = 0, Height = 0 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset3 = new()
+            {
+                FolderId = folderId2,
+                Folder = new() { Id = folderId2, Path = _dataDirectory! },
+                FileName = "Image 2.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+
             Asset[] assets = [asset1, asset2, asset3];
 
             Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
@@ -1310,7 +1372,22 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset[] assets = [new() { FileName = "NonExistentFile.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty }];
+            Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+
+            Asset[] assets = [
+                new()
+                {
+                    FolderId = folder.Id,
+                    Folder = folder,
+                    FileName = "NonExistentFile.jpg",
+                    Pixel = new()
+                    {
+                        Asset = new() { Width = 0, Height = 0 },
+                        Thumbnail = new() { Width = 0, Height = 0 }
+                    },
+                    Hash = string.Empty
+                }
+            ];
 
             Folder? destinationFolder = null;
 
@@ -1347,9 +1424,14 @@ public class MoveAssetsServiceTests
 
             Asset asset = new()
             {
-                FileName = "NonExistentFile.jpg",
-                Folder = sourceFolder,
                 FolderId = sourceFolder.Id,
+                Folder = sourceFolder,
+                FileName = "NonExistentFile.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 0, Height = 0 },
+                    Thumbnail = new() { Width = 0, Height = 0 }
+                },
                 Hash = string.Empty
             };
 
@@ -1471,9 +1553,35 @@ public class MoveAssetsServiceTests
     {
         try
         {
-            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty };
+            Guid folderId1 = Guid.NewGuid();
+            Guid folderId2 = Guid.NewGuid();
+
+            Asset asset1 = new()
+            {
+                FolderId = folderId1,
+                Folder = new() { Id = folderId1, Path = _dataDirectory! },
+                FileName = "Image 1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
             Asset? asset2 = null;
-            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty };
+            Asset asset3 = new()
+            {
+                FolderId = folderId2,
+                Folder = new() { Id = folderId2, Path = _dataDirectory! },
+                FileName = "Image 2.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+
             Asset[] assets = [asset1, asset2!, asset3];
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
@@ -1492,11 +1600,47 @@ public class MoveAssetsServiceTests
     {
         try
         {
+            Guid folderId1 = Guid.NewGuid();
+            Guid folderId2 = Guid.NewGuid();
             Folder? folder = null;
 
-            Asset asset1 = new() { FileName = "Image 1.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty };
-            Asset asset2 = new() { FileName = "NonExistentFile.jpg", Folder = folder!, Hash = string.Empty };
-            Asset asset3 = new() { FileName = "Image 2.jpg", Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! }, Hash = string.Empty };
+            Asset asset1 = new()
+            {
+                FolderId = folderId1,
+                Folder = new() { Id = folderId1, Path = _dataDirectory! },
+                FileName = "Image 1.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset2 = new()
+            {
+                FolderId = Guid.Empty,
+                Folder = folder!,
+                FileName = "NonExistentFile.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 0, Height = 0 },
+                    Thumbnail = new() { Width = 0, Height = 0 }
+                },
+                Hash = string.Empty
+            };
+            Asset asset3 = new()
+            {
+                FolderId = folderId2,
+                Folder = new() { Id = folderId2, Path = _dataDirectory! },
+                FileName = "Image 2.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 1280, Height = 720 },
+                    Thumbnail = new() { Width = 200, Height = 112 }
+                },
+                Hash = string.Empty
+            };
+
             Asset[] assets = [asset1, asset2, asset3];
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.DeleteAssets(assets));
@@ -1516,7 +1660,20 @@ public class MoveAssetsServiceTests
         try
         {
             Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-            Asset asset = new() { FileName = "NonExistentFile.jpg", Folder = folder, Hash = string.Empty };
+
+            Asset asset = new()
+            {
+                FolderId = folder.Id,
+                Folder = folder,
+                FileName = "NonExistentFile.jpg",
+                Pixel = new()
+                {
+                    Asset = new() { Width = 0, Height = 0 },
+                    Thumbnail = new() { Width = 0, Height = 0 }
+                },
+                Hash = string.Empty
+            };
+
             Asset[] assets = [asset];
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.DeleteAssets(assets));
