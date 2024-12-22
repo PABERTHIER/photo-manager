@@ -63,8 +63,8 @@ The aim is to let you configure it as you need.
 **The `Asset` part is about settings of asset:** :framed_picture:
 
 - `AnalyseVideos = false`: Enable it to extract the first frame from each videos, that will be stored in the folder `FirstFrameVideosFolderName` (Path settings).
-- `AssetCorruptedMessage = "The asset is corrupted"`: The message to display when the asset is corrupted.
-- `AssetRotatedMessage = "The asset has been rotated"`: The message to display when the asset has been rotated from the original.
+- `CorruptedMessage = "The asset is corrupted"`: The message to display when the asset is corrupted.
+- `RotatedMessage = "The asset has been rotated"`: The message to display when the asset has been rotated from the original.
 - `CatalogBatchSize = 100000`: The max amount of pictures to analyse, once the number reached, the analyse will stop.
 - `CatalogCooldownMinutes = 2`: The number of minutes before starting a new analysis.
 - `CorruptedImageOrientation = 10000`: The default orientation for a corrupted image, while it's corrupted, the tool cannot determine it.

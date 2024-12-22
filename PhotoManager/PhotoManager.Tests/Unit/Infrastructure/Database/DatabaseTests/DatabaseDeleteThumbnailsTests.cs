@@ -28,7 +28,7 @@ public class DatabaseDeleteThumbnailsTests
     [Test]
     public void DeleteThumbnails_BlobExists_DeleteFile()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
@@ -63,7 +63,7 @@ public class DatabaseDeleteThumbnailsTests
     [Test]
     public void DeleteThumbnails_BlobDoesNotExist_DoesNotDeleteFile()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
 

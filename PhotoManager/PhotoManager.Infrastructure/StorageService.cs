@@ -3,7 +3,7 @@ using System.Text;
 
 namespace PhotoManager.Infrastructure;
 
-// TODO: Rename to FileService
+// TODO: Rename to FileService + split
 public class StorageService(IUserConfigurationService userConfigurationService) : IStorageService
 {
     public List<DirectoryInfo> GetSubDirectories(string directoryPath)
@@ -142,15 +142,15 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
         return Directory.Exists(fullPath);
     }
 
-    public void UpdateAssetsFileDateTimeProperties(List<Asset> assets)
+    public void UpdateAssetsFileProperties(List<Asset> assets)
     {
         for (int i = 0; i < assets.Count; i++)
         {
-            UpdateAssetFileDateTimeProperties(assets[i]);
+            UpdateAssetFileProperties(assets[i]);
         }
     }
 
-    public void UpdateAssetFileDateTimeProperties(Asset asset)
+    public void UpdateAssetFileProperties(Asset asset)
     {
         if (!FileExists(asset.FullPath))
         {
@@ -158,8 +158,13 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
         }
 
         FileInfo info = new (asset.FullPath);
-        asset.FileCreationDateTime = info.CreationTime;
-        asset.FileModificationDateTime = info.LastWriteTime;
+
+        asset.FileProperties = new()
+        {
+            Size = info.Length,
+            Creation = info.CreationTime,
+            Modification = info.LastWriteTime
+        };
     }
 
     public bool IsValidGDIPlusImage(byte[] imageData)

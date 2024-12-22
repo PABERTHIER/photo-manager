@@ -1,5 +1,6 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -22,7 +23,7 @@ public class FolderNavigationViewModel : ApplicationViewModel
     {
         get
         {
-            return !string.IsNullOrEmpty(TargetPath) ? new Folder { Path = TargetPath } : null;
+            return !string.IsNullOrEmpty(TargetPath) ? new() { Id = Guid.NewGuid(), Path = TargetPath } : null;
         }
     }
 

@@ -122,13 +122,13 @@ public class Database : IDatabase
     }
 
     // TODO: This method verifies if the folder has its .bin generated, but not if there are data in it or not
-    public bool FolderHasThumbnails(string blobName) // FolderId + ".bin"
+    public bool FolderHasThumbnails(string blobName) // Folder.Id + ".bin"
     {
         string blobFilePath = ResolveBlobFilePath(blobName);
         return File.Exists(blobFilePath);
     }
 
-    public void DeleteThumbnails(string blobName) // FolderId + ".bin"
+    public void DeleteThumbnails(string blobName) // Folder.Id + ".bin"
     {
         string thumbnailsFilePath = ResolveBlobFilePath(blobName);
         File.Delete(thumbnailsFilePath);

@@ -58,7 +58,7 @@ public class AssetRepository : IAssetRepository
 
                 if (folder != null)
                 {
-                    assetsList = GetAssetsByFolderId(folder.FolderId);
+                    assetsList = GetAssetsByFolderId(folder.Id);
 
                     if (!Thumbnails.ContainsKey(folder.Path))
                     {
@@ -72,17 +72,12 @@ public class AssetRepository : IAssetRepository
                         {
                             if (Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail) && thumbnail.ContainsKey(asset.FileName))
                             {
-                                asset.ImageData = _storageService.LoadBitmapThumbnailImage(thumbnail[asset.FileName], asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
+                                asset.ImageData = _storageService.LoadBitmapThumbnailImage(thumbnail[asset.FileName], asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
                             }
                         }
 
                         // Removes assets with no thumbnails
                         assetsList.RemoveAll(asset => asset.ImageData == null);
-                    }
-
-                    foreach (Asset asset in assetsList)
-                    {
-                        _storageService.UpdateAssetFileDateTimeProperties(asset);
                     }
                 }
             }
@@ -134,9 +129,9 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            folder = new Folder
+            folder = new()
             {
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 Path = path
             };
 
@@ -264,7 +259,7 @@ public class AssetRepository : IAssetRepository
 
             if (folder != null)
             {
-                cataloguedAssets = assets.Where(a => a.FolderId == folder.FolderId).ToList();
+                cataloguedAssets = assets.Where(a => a.FolderId == folder.Id).ToList();
             }
         }
 
@@ -278,7 +273,7 @@ public class AssetRepository : IAssetRepository
         lock (syncLock)
         {
             Folder? folder = GetFolderByPath(directoryName);
-            result = folder != null && GetAssetByFolderIdAndFileName(folder.FolderId, fileName) != null;
+            result = folder != null && GetAssetByFolderIdAndFileName(folder.Id, fileName) != null;
         }
 
         return result;
@@ -292,7 +287,7 @@ public class AssetRepository : IAssetRepository
 
             if (folder != null)
             {
-                Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.FolderId, fileName);
+                Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.Id, fileName);
 
                 if (!Thumbnails.ContainsKey(folder.Path))
                 {
@@ -525,7 +520,15 @@ public class AssetRepository : IAssetRepository
         folders = ReadFolders();
         syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
         recentTargetPaths = ReadRecentTargetPaths();
-        assets.ForEach(a => a.Folder = GetFolderById(a.FolderId) ?? new() { Path = Path.Combine("FolderNotFound", a.FolderId.ToString(), a.FileName) });
+
+        for (int i = 0; i < assets.Count; i++)
+        {
+            // TODO: Improve the mapping for perf
+            assets[i].Folder = GetFolderById(assets[i].FolderId)!; // If the folder is not found, that means the DB has been modified manually
+
+            // Not saved in DB because it is computed each time to detect file update
+            _storageService.UpdateAssetFileProperties(assets[i]);
+        }
     }
 
     private List<Folder> ReadFolders()
@@ -626,7 +629,7 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            result = folders.FirstOrDefault(f => f.FolderId == folderId);
+            result = folders.FirstOrDefault(f => f.Id == folderId);
         }
 
         return result;

@@ -110,8 +110,8 @@ public class UserConfigurationService : IUserConfigurationService
     private void InitializeConfigValues()
     {
         bool analyseVideos = _configuration.GetValue<bool>(UserConfigurationKeys.ANALYSE_VIDEOS);
-        string? assetCorruptedMessage = _configuration.GetValue<string>(UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE);
-        string? assetRotatedMessage = _configuration.GetValue<string>(UserConfigurationKeys.ASSET_ROTATED_MESSAGE);
+        string? corruptedMessage = _configuration.GetValue<string>(UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE);
+        string? rotatedMessage = _configuration.GetValue<string>(UserConfigurationKeys.ASSET_ROTATED_MESSAGE);
         int catalogBatchSize = _configuration.GetValue<int>(UserConfigurationKeys.CATALOG_BATCH_SIZE);
         ushort catalogCooldownMinutes = _configuration.GetValue<ushort>(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES);
         ushort corruptedImageOrientation = _configuration.GetValue<ushort>(UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION);
@@ -123,8 +123,8 @@ public class UserConfigurationService : IUserConfigurationService
 
         AssetSettings = new (
             analyseVideos,
-            assetCorruptedMessage!,
-            assetRotatedMessage!,
+            corruptedMessage!,
+            rotatedMessage!,
             catalogBatchSize,
             catalogCooldownMinutes,
             corruptedImageOrientation,

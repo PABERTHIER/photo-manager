@@ -30,7 +30,7 @@ public class DatabaseReadBlobTests
     [Test]
     public void ReadBlob_FileExistsAndSemicolonSeparator_ReturnsBlob()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
@@ -72,7 +72,7 @@ public class DatabaseReadBlobTests
     [Test]
     public void ReadBlob_FileExistsAndPipeSeparator_ReturnsBlob()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
@@ -114,7 +114,7 @@ public class DatabaseReadBlobTests
     [Test]
     public void ReadBlob_FileDoesNotExistsAndPipeSeparator_ReturnsNull()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
 

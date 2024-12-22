@@ -154,7 +154,7 @@
 //        {
 //            FileName = "Inexistent Image.jpg",
 //            Folder = asset.Folder,
-//            FolderId = asset.FolderId,
+//            FolderId = asset.Id,
 //            Hash = asset.Hash
 //        };
 
@@ -197,7 +197,7 @@
 //        {
 //            FileName = "Inexistent Image.jpg",
 //            Folder = folder,
-//            FolderId = folder.FolderId,
+//            FolderId = folder.Id,
 //            Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078"
 //        }, null);
 
@@ -238,7 +238,7 @@
 //        {
 //            FileName = "Inexistent Image.jpg",
 //            Folder = folder,
-//            FolderId = folder.FolderId,
+//            FolderId = folder.Id,
 //            Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078"
 //        }, null);
 

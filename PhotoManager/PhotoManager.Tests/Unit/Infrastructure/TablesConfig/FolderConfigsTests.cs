@@ -13,7 +13,7 @@ public class FolderConfigsTests
         Assert.IsNotNull(columns);
         Assert.AreEqual(2, columns.Length);
 
-        Assert.AreEqual("FolderId", columns[0].ColumnName);
+        Assert.AreEqual("Id", columns[0].ColumnName);
         Assert.AreEqual("Path", columns[1].ColumnName);
     }
 
@@ -29,7 +29,7 @@ public class FolderConfigsTests
         Folder folder = FolderConfigs.ReadFunc(validValues);
 
         Assert.IsNotNull(folder);
-        Assert.AreEqual(_folderId, folder.FolderId);
+        Assert.AreEqual(_folderId, folder.Id);
         Assert.AreEqual("D:\\folder\\newFolder", folder.Path);
     }
 
@@ -47,7 +47,7 @@ public class FolderConfigsTests
         Folder folder = FolderConfigs.ReadFunc(tooManyValues);
 
         Assert.IsNotNull(folder);
-        Assert.AreEqual(_folderId, folder.FolderId);
+        Assert.AreEqual(_folderId, folder.Id);
         Assert.AreEqual("D:\\folder\\newFolder", folder.Path);
     }
 
@@ -76,7 +76,7 @@ public class FolderConfigsTests
     {
         Folder folder = new()
         {
-            FolderId = _folderId,
+            Id = _folderId,
             Path = "D:\\folder\\newFolder"
         };
 
@@ -91,29 +91,11 @@ public class FolderConfigsTests
     }
 
     [Test]
-    public void WriteFunc_FolderWithPartialValues_ConvertsFolderPropertiesToIndexInArrayWithSomeDefaultValues()
-    {
-        Folder folder = new()
-        {
-            Path = "Path\\SubPath"
-        };
-
-        object[] result = new object[2];
-        for (int i = 0; i < 2; i++)
-        {
-            result[i] = FolderConfigs.WriteFunc(folder, i);
-        }
-
-        Assert.AreEqual(Guid.Empty, result[0]);
-        Assert.AreEqual("Path\\SubPath", result[1]);
-    }
-
-    [Test]
     public void WriteFunc_IndexOutOfRange_ThrowsArgumentOutOfRangeException()
     {
         Folder folder = new()
         {
-            FolderId = _folderId,
+            Id = _folderId,
             Path = "D:\\folder\\newFolder"
         };
 

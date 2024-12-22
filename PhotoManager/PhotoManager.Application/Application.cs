@@ -60,7 +60,7 @@ public class Application : IApplication
 
     public void LoadThumbnail(Asset asset)
     {
-        asset.ImageData = _assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.ThumbnailPixelWidth, asset.ThumbnailPixelHeight);
+        asset.ImageData = _assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
     }
 
     public SyncAssetsConfiguration GetSyncAssetsConfiguration()

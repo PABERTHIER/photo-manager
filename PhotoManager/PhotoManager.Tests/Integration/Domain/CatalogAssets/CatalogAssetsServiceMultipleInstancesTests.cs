@@ -6,10 +6,11 @@ public class CatalogAssetsServiceMultipleInstancesTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
     private string? _databaseBackupPath;
-    private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
     private string? _defaultAssetsDirectory;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
+    private const string DATABASE_END_PATH = "v1.0";
+    private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
 
     private CatalogAssetsService? _catalogAssetsService;
     private BlobStorage? _blobStorage;
@@ -62,156 +63,228 @@ public class CatalogAssetsServiceMultipleInstancesTests
     {
         _asset1 = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate.jpg",
-            FileSize = 29857,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 29857,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset2 = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9.png",
-            FileSize = 126277,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 126277,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset3 = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9_duplicate.png",
-            FileSize = 126277,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 126277,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset4 = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_11.heic",
-            FileSize = 1411940,
-            PixelHeight = 4032,
-            PixelWidth = 3024,
-            ThumbnailPixelWidth = 112,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 3024, Height = 4032 },
+                Thumbnail = new() { Width = 112, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 1411940,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset1Temp = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate_copied.jpg",
-            FileSize = 29857,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 29857,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset2Temp = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
-            FileSize = 29857,
-            PixelHeight = 720,
-            PixelWidth = 1280,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 29857,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset3Temp = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Homer.gif",
-            FileSize = 64123,
-            PixelHeight = 320,
-            PixelWidth = 320,
-            ThumbnailPixelWidth = 150,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 320, Height = 320 },
+                Thumbnail = new() { Width = 150, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 64123,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset4Temp = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Homer.jpg",
-            FileSize = 6599,
-            PixelHeight = 180,
-            PixelWidth = 320,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 320, Height = 180 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 6599,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset5Temp = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "HomerDuplicated.jpg",
-            FileSize = 6599,
-            PixelHeight = 180,
-            PixelWidth = 320,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
+            Pixel = new()
+            {
+                Asset = new() { Width = 320, Height = 180 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 6599,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
             Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
-            IsAssetCorrupted = false,
-            AssetCorruptedMessage = null,
-            IsAssetRotated = false,
-            AssetRotatedMessage = null
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
     }
 
@@ -286,9 +359,6 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             List<string> assetPaths = [imagePath1ToCopy, imagePath2ToCopy, imagePath3ToCopy, imagePath4ToCopy, videoPath1ToCopy, videoPath2ToCopy];
             List<string> assetPathsAfterSync = [imagePath1ToCopy, imagePath2ToCopy, imagePath3ToCopy, imagePath4ToCopy, firstFramePath1, firstFramePath2];
-
-            List<Asset> expectedAssetsFirstSync = [_asset4!, _asset2!, _asset2Temp!, _asset3Temp!, _asset4Temp!, _asset5Temp!];
-            List<Asset> expectedAssetsSecondSync = [_asset4!, _asset3Temp!, _asset4Temp!, _asset5Temp!, _asset2Temp!];
 
             List<int> assetsImageByteSizeFirstSync = [
                 ASSET4_IMAGE_BYTE_SIZE,
@@ -403,18 +473,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Assert.IsTrue(File.Exists(firstFramePath1));
             Assert.IsTrue(File.Exists(firstFramePath2));
 
-            _asset4!.Folder = rootFolder!;
-            _asset4!.FolderId = rootFolder!.FolderId;
-            _asset2!.Folder = imageDeletedFolder!;
-            _asset2!.FolderId = imageDeletedFolder!.FolderId;
-            _asset2Temp!.Folder = imageUpdatedFolder!;
-            _asset2Temp!.FolderId = imageUpdatedFolder!.FolderId;
-            _asset3Temp!.Folder = subDirFolder!;
-            _asset3Temp!.FolderId = subDirFolder!.FolderId;
-            _asset4Temp!.Folder = videoFirstFrameFolder!;
-            _asset4Temp!.FolderId = videoFirstFrameFolder!.FolderId;
-            _asset5Temp!.Folder = videoFirstFrameFolder;
-            _asset5Temp!.FolderId = videoFirstFrameFolder.FolderId;
+            _asset4 = _asset4!.WithFolder(rootFolder!);
+            _asset2 = _asset2!.WithFolder(imageDeletedFolder!);
+            _asset2Temp = _asset2Temp!.WithFolder(imageUpdatedFolder!);
+            _asset3Temp = _asset3Temp!.WithFolder(subDirFolder!);
+            _asset4Temp = _asset4Temp!.WithFolder(videoFirstFrameFolder!);
+            _asset5Temp = _asset5Temp!.WithFolder(videoFirstFrameFolder!);
+
+            List<Asset> expectedAssetsFirstSync = [_asset4!, _asset2!, _asset2Temp!, _asset3Temp!, _asset4Temp!, _asset5Temp!];
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -439,7 +505,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
             Assert.AreEqual(6, assetsFromRepository.Count);
 
-            List<Folder> expectedFolders = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, videoFirstFrameFolder, videoFirstFrameFolder];
+            List<Folder> expectedFolders = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, imageDeletedDirectory, imageUpdatedDirectory, subDirDirectory, firstFrameVideosDirectory, firstFrameVideosDirectory];
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
@@ -447,15 +513,15 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsFirstSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            List<Folder> folders = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, subSubDirFolder!, videoFirstFrameFolder];
-            List<Folder> foldersContainingAssetsFirstSync = [rootFolder, imageDeletedFolder, imageUpdatedFolder, subDirFolder, videoFirstFrameFolder];
+            List<Folder> folders = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, subSubDirFolder!, videoFirstFrameFolder!];
+            List<Folder> foldersContainingAssetsFirstSync = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new()
             {
-                { rootFolder, [_asset4!]},
-                { imageDeletedFolder, [_asset2!]},
-                { imageUpdatedFolder, [_asset2Temp!]},
-                { subDirFolder, [_asset3Temp!]},
-                { videoFirstFrameFolder, [_asset4Temp!, _asset5Temp!]}
+                { rootFolder!, [_asset4!]},
+                { imageDeletedFolder!, [_asset2!]},
+                { imageUpdatedFolder!, [_asset2Temp!]},
+                { subDirFolder!, [_asset3Temp!]},
+                { videoFirstFrameFolder!, [_asset4Temp!, _asset5Temp!]}
             };
             Dictionary<string, int> assetNameToByteSizeMappingFirstSync = new()
             {
@@ -504,19 +570,19 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder], _asset4!, rootFolder, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder!], _asset4!, rootFolder!, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageDeletedDirectory, folderToAssetsMappingFirstSync[imageDeletedFolder], _asset2!, imageDeletedFolder, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageDeletedDirectory, folderToAssetsMappingFirstSync[imageDeletedFolder!], _asset2!, imageDeletedFolder!, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder!], _asset2Temp!, imageUpdatedFolder!, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder], _asset3Temp!, subDirFolder, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder!], _asset3Temp!, subDirFolder!, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
@@ -524,14 +590,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
 
-            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFrameFolder].Count; i++)
+            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFrameFolder!].Count; i++)
             {
                 CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
                     catalogChanges,
                     firstFrameVideosDirectory,
-                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][..(i + 1)],
-                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][i],
-                    videoFirstFrameFolder,
+                    folderToAssetsMappingFirstSync[videoFirstFrameFolder!][..(i + 1)],
+                    folderToAssetsMappingFirstSync[videoFirstFrameFolder!][i],
+                    videoFirstFrameFolder!,
                     ref increment);
             }
 
@@ -543,35 +609,20 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             File.Delete(imagePath2ToCopy);
 
-            _asset2Temp!.ThumbnailCreationDateTime = DateTime.Now.AddDays(10);
-            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.ThumbnailCreationDateTime);
+            _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
+            File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 
             thumbnails = _testableAssetRepository!.GetThumbnails();
 
-            List<Folder> foldersContainingAssetsSecondSync = [imageDeletedFolder, imageUpdatedFolder, videoFirstFrameFolder];
-            Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
-            {
-                { rootFolder, [_asset4!]},
-                { subDirFolder, [_asset3Temp!]},
-                { videoFirstFrameFolder, [_asset4Temp!, _asset5Temp!]},
-                { imageUpdatedFolder, [_asset2Temp!]}
-            };
-            Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
-            {
-                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
-                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
-                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE },
-                { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE },
-                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
-            };
+            List<Folder> foldersContainingAssetsSecondSync = [imageDeletedFolder!, imageUpdatedFolder!, videoFirstFrameFolder!];
 
             // Because stored in the DB and null is converted into an empty string
-            _asset4!.AssetCorruptedMessage = string.Empty;
-            _asset4!.AssetRotatedMessage = string.Empty;
-            _asset3Temp!.AssetCorruptedMessage = string.Empty;
-            _asset3Temp!.AssetRotatedMessage = string.Empty;
+            // _asset4!.Metadata.Corrupted.Message = string.Empty;
+            // _asset4!.Metadata.Rotated.Message = string.Empty;
+            // _asset3Temp!.Metadata.Corrupted.Message = string.Empty;
+            // _asset3Temp!.Metadata.Rotated.Message = string.Empty;
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.AreEqual(2, assetsInDirectory.Length);
@@ -611,16 +662,29 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Assert.IsTrue(File.Exists(firstFramePath1));
             Assert.IsTrue(File.Exists(firstFramePath2));
 
-            _asset4!.Folder = rootFolder!;
-            _asset4!.FolderId = rootFolder!.FolderId;
-            _asset2Temp!.Folder = imageUpdatedFolder!;
-            _asset2Temp!.FolderId = imageUpdatedFolder!.FolderId;
-            _asset3Temp!.Folder = subDirFolder!;
-            _asset3Temp!.FolderId = subDirFolder!.FolderId;
-            _asset4Temp!.Folder = videoFirstFrameFolder!;
-            _asset4Temp!.FolderId = videoFirstFrameFolder!.FolderId;
-            _asset5Temp!.Folder = videoFirstFrameFolder;
-            _asset5Temp!.FolderId = videoFirstFrameFolder.FolderId;
+            _asset4 = _asset4!.WithFolder(rootFolder!);
+            _asset2Temp = _asset2Temp!.WithFolder(imageUpdatedFolder!);
+            _asset3Temp = _asset3Temp!.WithFolder(subDirFolder!);
+            _asset4Temp = _asset4Temp!.WithFolder(videoFirstFrameFolder!);
+            _asset5Temp = _asset5Temp!.WithFolder(videoFirstFrameFolder!);
+
+            List<Asset> expectedAssetsSecondSync = [_asset4!, _asset3Temp!, _asset4Temp!, _asset5Temp!, _asset2Temp!];
+
+            Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
+            {
+                { rootFolder!, [_asset4!]},
+                { subDirFolder!, [_asset3Temp!]},
+                { videoFirstFrameFolder!, [_asset4Temp!, _asset5Temp!]},
+                { imageUpdatedFolder!, [_asset2Temp!]}
+            };
+            Dictionary<string, int> assetNameToByteSizeMappingSecondSync = new()
+            {
+                { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE },
+                { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
+                { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE },
+                { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE },
+                { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
+            };
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -646,7 +710,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Assert.AreEqual(5, assetsFromRepository.Count);
 
             assetPathsAfterSync = [imagePath1ToCopy, imagePath4ToCopy, firstFramePath1, firstFramePath2, imagePath3ToCopy];
-            expectedFolders = [rootFolder, subDirFolder, videoFirstFrameFolder, videoFirstFrameFolder, imageUpdatedFolder];
+            expectedFolders = [rootFolder!, subDirFolder!, videoFirstFrameFolder!, videoFirstFrameFolder!, imageUpdatedFolder!];
             expectedDirectories = [assetsDirectory, subDirDirectory, firstFrameVideosDirectory, firstFrameVideosDirectory, imageUpdatedDirectory];
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
@@ -691,7 +755,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder], _asset4!, rootFolder, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, assetsDirectory, folderToAssetsMappingFirstSync[rootFolder!], _asset4!, rootFolder!, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
@@ -699,11 +763,11 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingFirstSync[imageUpdatedFolder!], _asset2Temp!, imageUpdatedFolder!, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder], _asset3Temp!, subDirFolder, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(catalogChanges, subDirDirectory, folderToAssetsMappingFirstSync[subDirFolder!], _asset3Temp!, subDirFolder!, ref increment);
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
@@ -711,14 +775,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderAdded(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
 
-            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFrameFolder].Count; i++)
+            for (int i = 0; i < folderToAssetsMappingFirstSync[videoFirstFrameFolder!].Count; i++)
             {
                 CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
                     catalogChanges,
                     firstFrameVideosDirectory,
-                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][..(i + 1)],
-                    folderToAssetsMappingFirstSync[videoFirstFrameFolder][i],
-                    videoFirstFrameFolder,
+                    folderToAssetsMappingFirstSync[videoFirstFrameFolder!][..(i + 1)],
+                    folderToAssetsMappingFirstSync[videoFirstFrameFolder!][i],
+                    videoFirstFrameFolder!,
                     ref increment);
             }
 
@@ -731,7 +795,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetDeleted(catalogChanges, imageDeletedDirectory, [], _asset2!, imageDeletedFolder!, false, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder], _asset2Temp!, imageUpdatedFolder, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetUpdated(catalogChanges, imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder!], _asset2Temp!, imageUpdatedFolder!, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, subSubDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, firstFrameVideosDirectory, ref increment);
@@ -765,7 +829,6 @@ public class CatalogAssetsServiceMultipleInstancesTests
             string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
-            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -806,14 +869,12 @@ public class CatalogAssetsServiceMultipleInstancesTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            _asset1!.Folder = folder!;
-            _asset1!.FolderId = folder!.FolderId;
-            _asset2!.Folder = folder;
-            _asset2!.FolderId = folder.FolderId;
-            _asset3!.Folder = folder;
-            _asset3!.FolderId = folder.FolderId;
-            _asset4!.Folder = folder;
-            _asset4!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder!);
+            _asset2 = _asset2!.WithFolder(folder!);
+            _asset3 = _asset3!.WithFolder(folder!);
+            _asset4 = _asset4!.WithFolder(folder!);
+
+            List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -825,10 +886,10 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder, expectedAssets } };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, expectedAssets } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset1!.FileName, ASSET1_IMAGE_BYTE_SIZE },
@@ -837,15 +898,15 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 { _asset4!.FileName, ASSET4_IMAGE_BYTE_SIZE }
             };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
+            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
                 _blobStorage!,
                 _database!,
                 _userConfigurationService,
                 blobsPath,
                 tablesPath,
-                [folder],
-                [folder],
+                [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -861,8 +922,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
-                [folder],
-                [folder],
+                [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -875,14 +936,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
+            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
             {
                 CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
                     catalogChanges,
                     assetsDirectory,
-                    folderToAssetsMapping[folder][..(i + 1)],
-                    folderToAssetsMapping[folder][i],
-                    folder,
+                    folderToAssetsMapping[folder!][..(i + 1)],
+                    folderToAssetsMapping[folder!][i],
+                    folder!,
                     ref increment);
             }
 
@@ -899,7 +960,6 @@ public class CatalogAssetsServiceMultipleInstancesTests
             imagePath1 = Path.Combine(assetsDirectory, "Image 1.jpg");
 
             assetPaths = [imagePath1];
-            expectedAssets = [_asset2Temp!];
             assetsImageByteSize = [ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
@@ -933,8 +993,9 @@ public class CatalogAssetsServiceMultipleInstancesTests
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.IsNotNull(folder);
 
-            _asset2Temp!.Folder = folder!;
-            _asset2Temp!.FolderId = folder!.FolderId;
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
+
+            expectedAssets = [_asset2Temp!];
 
             Assert.IsTrue(_testableAssetRepository!.BackupExists());
 
@@ -946,21 +1007,21 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
-                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder);
+                CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPaths[i], assetsDirectory, folder!);
             }
 
-            folderToAssetsMapping = new() { { folder, expectedAssets } };
+            folderToAssetsMapping = new() { { folder!, expectedAssets } };
             assetNameToByteSizeMapping = new() { { _asset2Temp!.FileName, ASSET1_IMAGE_BYTE_SIZE } };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder], thumbnails, assetsImageByteSize);
+            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
                 _blobStorage!,
                 _database!,
                 _userConfigurationService,
                 blobsPath,
                 tablesPath,
-                [folder],
-                [folder],
+                [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -976,8 +1037,8 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 backupFilePath,
                 blobsPath,
                 tablesPath,
-                [folder],
-                [folder],
+                [folder!],
+                [folder!],
                 assetsFromRepository,
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
@@ -990,14 +1051,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
 
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment);
 
-            for (int i = 0; i < folderToAssetsMapping[folder].Count; i++)
+            for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
             {
                 CatalogAssetsAsyncAsserts.CheckCatalogChangesAssetAdded(
                     catalogChanges,
                     assetsDirectory,
-                    folderToAssetsMapping[folder][..(i + 1)],
-                    folderToAssetsMapping[folder][i],
-                    folder,
+                    folderToAssetsMapping[folder!][..(i + 1)],
+                    folderToAssetsMapping[folder!][i],
+                    folder!,
                     ref increment);
             }
 

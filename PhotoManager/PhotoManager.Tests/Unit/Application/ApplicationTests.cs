@@ -24,12 +24,12 @@
 //            new Asset
 //            {
 //                FileName = "dbzrrou-1d391dff-a336-4395-81a5-885a98685d93.jpg",
-//                Folder = new Folder { Path = @"D:\Imágenes\" }
+//                Folder = new() { Id = Guid.NewGuid(), Path = @"D:\Imágenes\" }
 //            },
 //            new Asset
 //            {
 //                FileName = "dbxb0an-d90d6335-7b9c-4a7b-84aa-71501c73f63b.jpg",
-//                Folder = new Folder { Path = @"D:\Imágenes\" }
+//                Folder = new() { Id = Guid.NewGuid(), Path = @"D:\Imágenes\" }
 //            }
 //        };
 

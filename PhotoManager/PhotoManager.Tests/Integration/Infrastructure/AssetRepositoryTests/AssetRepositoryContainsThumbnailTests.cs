@@ -7,6 +7,7 @@ public class AssetRepositoryContainsThumbnailTests
 {
     private string? _dataDirectory;
     private string? _backupPath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private TestableAssetRepository? _testableAssetRepository;
@@ -40,20 +41,27 @@ public class AssetRepositoryContainsThumbnailTests
         _asset1 = new()
         {
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
-            FileSize = 363888,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1920,
-            PixelHeight = 1080,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1920, Height = 1080 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 363888,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
     }
 
@@ -67,8 +75,9 @@ public class AssetRepositoryContainsThumbnailTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
@@ -100,8 +109,9 @@ public class AssetRepositoryContainsThumbnailTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
@@ -145,12 +155,11 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = new()
             {
-                Path = folderPath,
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
+                Path = folderPath
             };
 
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
@@ -184,12 +193,11 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = new()
             {
-                Path = folderPath,
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
+                Path = folderPath
             };
 
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.IsEmpty(thumbnails);
@@ -229,12 +237,11 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = new()
             {
-                Path = folderPath,
-                FolderId = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
+                Path = folderPath
             };
 
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+            _asset1 = _asset1!.WithFolder(folder);
 
             testableAssetRepository.AddAsset(_asset1!, []);
 
@@ -265,8 +272,8 @@ public class AssetRepositoryContainsThumbnailTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
 
@@ -307,8 +314,8 @@ public class AssetRepositoryContainsThumbnailTests
                 { "Image2.png", [4, 5, 6]}
             };
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
 
@@ -350,8 +357,9 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             const string fileName = "toto";
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
@@ -384,8 +392,9 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             string? fileName = null;
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());
@@ -418,8 +427,9 @@ public class AssetRepositoryContainsThumbnailTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             string? directoryName = null;
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
-            _asset1!.Folder = folder;
-            _asset1!.FolderId = folder.FolderId;
+
+            _asset1 = _asset1!.WithFolder(folder);
+
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Assert.IsTrue(_testableAssetRepository.HasChanges());

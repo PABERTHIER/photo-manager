@@ -17,8 +17,14 @@ public class FileNameConverterTests
         FileNameConverter fileNameConverter = new();
         Asset asset = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = name,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
             Hash = string.Empty
         };
 

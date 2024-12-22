@@ -28,7 +28,7 @@ public class DatabaseFolderHasThumbnailsTests
     [Test]
     public void FolderHasThumbnails_BlobExists_ReturnsTrue()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
         Dictionary<string, byte[]> blobToWrite = new()
         {
@@ -60,7 +60,7 @@ public class DatabaseFolderHasThumbnailsTests
     [Test]
     public void FolderHasThumbnails_BlobDoesNotExist_ReturnsFalse()
     {
-        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this FolderId + ".bin"
+        string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
 
         try

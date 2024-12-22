@@ -6,16 +6,16 @@ public static class FolderConfigs
     {
         return new ColumnProperties[]
         {
-            new ColumnProperties { ColumnName = "FolderId" },
+            new ColumnProperties { ColumnName = "Id" },
             new ColumnProperties { ColumnName = "Path" }
         };
     }
 
     public static Folder ReadFunc(string[] values)
     {
-        return new Folder
+        return new()
         {
-            FolderId = new Guid(values[0]),
+            Id = new Guid(values[0]),
             Path = values[1]
         };
     }
@@ -24,7 +24,7 @@ public static class FolderConfigs
     {
         return i switch
         {
-            0 => f.FolderId,
+            0 => f.Id,
             1 => f.Path,
             _ => throw new ArgumentOutOfRangeException(nameof(i))
         };

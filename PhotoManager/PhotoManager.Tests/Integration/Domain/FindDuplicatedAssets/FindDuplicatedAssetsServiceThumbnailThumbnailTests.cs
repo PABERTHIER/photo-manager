@@ -5,6 +5,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
 {
     private string? _dataDirectory;
     private string? _backupPath;
+    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
     private AssetRepository? _assetRepository;
@@ -69,92 +70,127 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         _asset1 = new()
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_1336_Mini.JPG",
-            FileSize = 1586,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 43,
-            PixelHeight = 32,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 149,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 43, Height = 32 },
+                Thumbnail = new() { Width = 200, Height = 149 }
+            },
+            FileProperties = new()
+            {
+                Size = 1586,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset2 = new()
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_1336_Original.JPG",
-            FileSize = 4526710,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 4032,
-            PixelHeight = 3024,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 4032, Height = 3024 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 4526710,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset3 = new()
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_1336_ShitQuality.JPG",
-            FileSize = 370819,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 4032,
-            PixelHeight = 3024,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 4032, Height = 3024 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 370819,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset4 = new()
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_1336_Small.JPG",
-            FileSize = 53227,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 591,
-            PixelHeight = 443,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 150,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 591, Height = 443 },
+                Thumbnail = new() { Width = 200, Height = 150 }
+            },
+            FileProperties = new()
+            {
+                Size = 53227,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
         _asset5 = new() // Another asset completely different from the actual asset
         {
             FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
-            FileSize = 29857,
             ImageRotation = Rotation.Rotate0,
-            PixelWidth = 1280,
-            PixelHeight = 720,
-            ThumbnailPixelWidth = 200,
-            ThumbnailPixelHeight = 112,
-            ThumbnailCreationDateTime = new DateTime(2024, 06, 07, 08, 54, 37),
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            FileProperties = new()
+            {
+                Size = 29857,
+                Creation = DateTime.Now,
+                Modification = _expectedFileModificationDateTime
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
             Hash = "", // Set in each test
-            AssetCorruptedMessage = null,
-            IsAssetCorrupted = false,
-            AssetRotatedMessage = null,
-            IsAssetRotated = false
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
     }
 
@@ -179,19 +215,14 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = MINI_ASSET_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ORIGINAL_ASSET_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = SHIT_QUALITY_ASSET_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = SMALL_ASSET_HASH;
-            _asset5!.Folder = folder2;
-            _asset5.Hash = MISC_ASSET_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(MINI_ASSET_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ORIGINAL_ASSET_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(SHIT_QUALITY_ASSET_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_HASH);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -237,19 +268,14 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = MINI_ASSET_MD5_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ORIGINAL_ASSET_MD5_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = SHIT_QUALITY_ASSET_MD5_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = SMALL_ASSET_MD5_HASH;
-            _asset5!.Folder = folder2;
-            _asset5.Hash = MISC_ASSET_MD5_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(MINI_ASSET_MD5_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ORIGINAL_ASSET_MD5_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(SHIT_QUALITY_ASSET_MD5_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_MD5_HASH);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -295,19 +321,14 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = MINI_ASSET_D_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ORIGINAL_ASSET_D_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = SHIT_QUALITY_ASSET_D_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = SMALL_ASSET_D_HASH;
-            _asset5!.Folder = folder2;
-            _asset5.Hash = MISC_ASSET_D_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(MINI_ASSET_D_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ORIGINAL_ASSET_D_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(SHIT_QUALITY_ASSET_D_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_D_HASH);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 
@@ -355,19 +376,14 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
-            _asset1!.Folder = folder1;
-            _asset1.Hash = MINI_ASSET_P_HASH;
-            _asset2!.Folder = folder1;
-            _asset2.Hash = ORIGINAL_ASSET_P_HASH;
-            _asset3!.Folder = folder1;
-            _asset3.Hash = SHIT_QUALITY_ASSET_P_HASH;
-            _asset4!.Folder = folder1;
-            _asset4.Hash = SMALL_ASSET_P_HASH;
-            _asset5!.Folder = folder2;
-            _asset5.Hash = MISC_ASSET_P_HASH; // If this asset is in the set, then the threshold is not good
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(MINI_ASSET_P_HASH);
+            _asset2 = _asset2!.WithFolder(folder1).WithHash(ORIGINAL_ASSET_P_HASH);
+            _asset3 = _asset3!.WithFolder(folder1).WithHash(SHIT_QUALITY_ASSET_P_HASH);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_P_HASH);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
 
             byte[] assetData1 = [1, 2, 3];
 

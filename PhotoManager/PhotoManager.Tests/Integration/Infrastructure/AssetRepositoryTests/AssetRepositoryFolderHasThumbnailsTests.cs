@@ -8,9 +8,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
     private string? _dataDirectory;
     private string? _backupPath;
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
-    private PhotoManager.Infrastructure.Database.Database? _database;
 
     private AssetRepository? _assetRepository;
+    private PhotoManager.Infrastructure.Database.Database? _database;
     private Mock<IStorageService>? _storageServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
@@ -43,7 +43,7 @@ public class AssetRepositoryFolderHasThumbnailsTests
 
         try
         {
-            Folder folder = new() { FolderId = Guid.NewGuid(), Path = _dataDirectory! };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
             _database!.WriteBlob([], folder.ThumbnailsFilename);
 
             bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
@@ -67,7 +67,7 @@ public class AssetRepositoryFolderHasThumbnailsTests
 
         try
         {
-            Folder folder = new() { FolderId = Guid.NewGuid(), Path = _dataDirectory! };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
 
             bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
 

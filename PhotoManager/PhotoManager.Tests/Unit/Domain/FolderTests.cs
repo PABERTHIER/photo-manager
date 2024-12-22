@@ -20,8 +20,8 @@ public class FolderTests
     [TestCase("TestFolder\\TestSubFolder1", "TestFolder\\TestSubFolder2", false)]
     public void IsParentOf_PathIsValid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2, bool expected)
     {
-        Folder parentFolder1 = new() { Path = Path.Combine(_dataDirectory!, parentFolderSubPath1) };
-        Folder childFolder2 = new() { Path = Path.Combine(_dataDirectory!, childFolderSubPath2) };
+        Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, parentFolderSubPath1) };
+        Folder childFolder2 = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, childFolderSubPath2) };
 
         bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
 
@@ -35,8 +35,8 @@ public class FolderTests
     [TestCase("TestFolder", " ", false)]
     public void IsParentOf_PathIsInvalid_ReturnsExpected(string parentFolderSubPath1, string childFolderSubPath2, bool expected)
     {
-        Folder parentFolder1 = new() { Path = parentFolderSubPath1 };
-        Folder childFolder2 = new() { Path = childFolderSubPath2 };
+        Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderSubPath1 };
+        Folder childFolder2 = new() { Id = Guid.NewGuid(), Path = childFolderSubPath2 };
 
         bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
 
@@ -46,8 +46,8 @@ public class FolderTests
     [Test]
     public void IsParentOf_PathIsNull_ReturnsFalse()
     {
-        Folder folder = new() { Path = null! };
-        Folder childFolder = new() { Path = Path.Combine(_dataDirectory!, "TestFolder") };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = null! };
+        Folder childFolder = new() { Id = Guid.NewGuid(), Path = Path.Combine(_dataDirectory!, "TestFolder") };
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);
 
@@ -57,8 +57,8 @@ public class FolderTests
     [Test]
     public void IsParentOf_ChildPathIsNull_ReturnsFalse()
     {
-        Folder folder = new() { Path = _dataDirectory! };
-        Folder childFolder = new() { Path = null! };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Folder childFolder = new() { Id = Guid.NewGuid(), Path = null! };
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);
 

@@ -216,22 +216,32 @@ public class AssetCreationService(
         Asset asset = new()
         {
             FileName = Path.GetFileName(imagePath),
-            FolderId = folder.FolderId,
+            FolderId = folder.Id,
             Folder = folder,
-            FileSize = new FileInfo(imagePath).Length,
-            PixelWidth = originalDecodeWidth,
-            PixelHeight = originalDecodeHeight,
-            ThumbnailPixelWidth = thumbnailDecodeWidth,
-            ThumbnailPixelHeight = thumbnailDecodeHeight,
+            Pixel = new()
+            {
+                Asset = new() { Width = originalDecodeWidth, Height = originalDecodeHeight },
+                Thumbnail = new() { Width = thumbnailDecodeWidth, Height = thumbnailDecodeHeight}
+            },
             ImageRotation = rotation,
             ThumbnailCreationDateTime = DateTime.Now,
             Hash = assetHashCalculatorService.CalculateHash(imageBytes, imagePath),
-            IsAssetCorrupted = isAssetCorrupted,
-            AssetCorruptedMessage = isAssetCorrupted ? userConfigurationService.AssetSettings.AssetCorruptedMessage : null,
-            IsAssetRotated = isAssetRotated,
-            AssetRotatedMessage = isAssetRotated ? userConfigurationService.AssetSettings.AssetRotatedMessage : null,
+            Metadata = new()
+            {
+                Corrupted = new()
+                {
+                    IsTrue = isAssetCorrupted,
+                    Message = isAssetCorrupted ? userConfigurationService.AssetSettings.CorruptedMessage : null
+                },
+                Rotated = new()
+                {
+                    IsTrue = isAssetRotated,
+                    Message = isAssetRotated ? userConfigurationService.AssetSettings.RotatedMessage : null
+                }
+            }
         };
 
+        storageService.UpdateAssetFileProperties(asset);
         assetRepository.AddAsset(asset, thumbnailBuffer);
 
         return asset;

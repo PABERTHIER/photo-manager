@@ -96,7 +96,7 @@ public partial class ThumbnailsUserControl : UserControl
         }
     }
 
-    // Triggered when double clicked on the fullscreen image from ViewerUserControl to pass into thumbnail mode
+    // Triggered when double-clicked on the fullscreen image from ViewerUserControl to pass into thumbnail mode
     public void ShowImage()
     {
         if (thumbnailsListView.Items.Count > 0 && thumbnailsListView.SelectedItem != null)

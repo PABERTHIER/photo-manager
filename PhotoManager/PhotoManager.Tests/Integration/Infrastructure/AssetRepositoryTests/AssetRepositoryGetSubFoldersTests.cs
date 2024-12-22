@@ -125,8 +125,8 @@ public class AssetRepositoryGetSubFoldersTests
             string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
             string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
 
-            Folder parentFolder1 = new() { Path = parentFolderPath1 };
-            Folder parentFolder2 = new() { Path = parentFolderPath2 };
+            Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
+            Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
 
             Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1, includeHidden: false);
             Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2, includeHidden: false);

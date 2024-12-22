@@ -55,10 +55,10 @@ public class AssetRepositoryGetFolderByPathTests
             Assert.IsNotNull(folderByPath2);
 
             Assert.AreEqual(folderPath1, folderByPath1!.Path);
-            Assert.AreEqual(addedFolder1.FolderId, folderByPath1.FolderId);
+            Assert.AreEqual(addedFolder1.Id, folderByPath1.Id);
 
             Assert.AreEqual(folderPath2, folderByPath2!.Path);
-            Assert.AreEqual(addedFolder2.FolderId, folderByPath2.FolderId);
+            Assert.AreEqual(addedFolder2.Id, folderByPath2.Id);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
@@ -89,10 +89,10 @@ public class AssetRepositoryGetFolderByPathTests
             Assert.IsNotNull(folderByPath2);
 
             Assert.AreEqual(folderPath1, folderByPath1!.Path);
-            Assert.AreEqual(addedFolder1.FolderId, folderByPath1.FolderId);
+            Assert.AreEqual(addedFolder1.Id, folderByPath1.Id);
 
             Assert.AreEqual(folderPath1, folderByPath2!.Path);
-            Assert.AreNotEqual(addedFolder2.FolderId, folderByPath2.FolderId);
+            Assert.AreNotEqual(addedFolder2.Id, folderByPath2.Id);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }
@@ -166,8 +166,8 @@ public class AssetRepositoryGetFolderByPathTests
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
-            Folder? folderByPath1 = new() { Path = _dataDirectory! };
-            Folder? folderByPath2 = new() { Path = _dataDirectory! };
+            Folder? folderByPath1 = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+            Folder? folderByPath2 = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
 
             // Simulate concurrent access
             Parallel.Invoke(
@@ -179,10 +179,10 @@ public class AssetRepositoryGetFolderByPathTests
             Assert.IsNotNull(folderByPath2);
 
             Assert.AreEqual(folderPath1, folderByPath1!.Path);
-            Assert.AreEqual(addedFolder1.FolderId, folderByPath1.FolderId);
+            Assert.AreEqual(addedFolder1.Id, folderByPath1.Id);
 
             Assert.AreEqual(folderPath2, folderByPath2!.Path);
-            Assert.AreEqual(addedFolder2.FolderId, folderByPath2.FolderId);
+            Assert.AreEqual(addedFolder2.Id, folderByPath2.Id);
 
             Assert.IsEmpty(assetsUpdatedEvents);
         }

@@ -42,9 +42,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
         try
         {
-            Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
-            Folder folder2 = new() { Path = "D:\\Workspace\\PhotoManager\\Tutu" };
-            Folder folder3 = new() { Path = "D:\\Workspace\\PhotoManager\\Titi" };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Toto" };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Tutu" };
+            Folder folder3 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Titi" };
 
             _assetRepository!.UpdateTargetPathToRecent(folder1);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
@@ -79,7 +79,7 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         {
             for (int i = 0; i < 30; i++)
             {
-                _assetRepository!.UpdateTargetPathToRecent(new Folder { Path = $"D:\\Workspace\\PhotoManager\\Folder{i}" });
+                _assetRepository!.UpdateTargetPathToRecent(new() { Id = Guid.NewGuid(), Path = $"D:\\Workspace\\PhotoManager\\Folder{i}" });
             }
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
@@ -110,9 +110,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         {
             string? nullPath = null;
 
-            Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
-            Folder folder2 = new() { Path = "D:\\Workspace\\PhotoManager\\Tutu" };
-            Folder folder3 = new() { Path = nullPath! };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Toto" };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Tutu" };
+            Folder folder3 = new() { Id = Guid.NewGuid(), Path = nullPath! };
 
             _assetRepository!.UpdateTargetPathToRecent(folder1);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
@@ -146,9 +146,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
         {
             string emptyPath = string.Empty;
 
-            Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
-            Folder folder2 = new() { Path = "D:\\Workspace\\PhotoManager\\Tutu" };
-            Folder folder3 = new() { Path = emptyPath };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Toto" };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Tutu" };
+            Folder folder3 = new() { Id = Guid.NewGuid(), Path = emptyPath };
 
             _assetRepository!.UpdateTargetPathToRecent(folder1);
             _assetRepository!.UpdateTargetPathToRecent(folder2);
@@ -180,8 +180,8 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
         try
         {
-            Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
-            Folder folder2 = new() { Path = "D:\\Workspace\\PhotoManager\\Tutu" };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Toto" };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Tutu" };
             Folder? folder3 = null;
 
             _assetRepository!.UpdateTargetPathToRecent(folder1);
@@ -216,9 +216,9 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
         try
         {
-            Folder folder1 = new() { Path = "D:\\Workspace\\PhotoManager\\Toto" };
-            Folder folder2 = new() { Path = "D:\\Workspace\\PhotoManager\\Tutu" };
-            Folder folder3 = new() { Path = "D:\\Workspace\\PhotoManager\\Titi" };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Toto" };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Tutu" };
+            Folder folder3 = new() { Id = Guid.NewGuid(), Path = "D:\\Workspace\\PhotoManager\\Titi" };
 
             // Simulate concurrent access
             Parallel.Invoke(

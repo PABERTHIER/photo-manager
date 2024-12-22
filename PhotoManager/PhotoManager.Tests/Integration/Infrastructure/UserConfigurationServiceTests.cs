@@ -30,8 +30,19 @@ public class UserConfigurationServiceTests
     [TestCase(WallpaperStyle.Fill, "10", "0")]
     public void SetAsWallpaper_ValidStyleAndTile_RegistersExpectedValues(WallpaperStyle style, string expectedStyleValue, string expectedTileValue)
     {
-        Folder folder = new() { Path = _dataDirectory! };
-        Asset asset = new() { Folder = folder, FileName = "NonExistentFile.jpg", Hash = string.Empty }; // Not giving an existing file to prevent the wallpaper to be changed
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Asset asset = new()
+        {
+            FolderId = folder.Id,
+            Folder = folder,
+            FileName = "NonExistentFile.jpg",
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            Hash = string.Empty
+        }; // Not giving an existing file to prevent the wallpaper to be changed
 
         // Set up a StringWriter to capture console output
         StringWriter stringWriter = new();
@@ -77,21 +88,21 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void AssetCorruptedMessage_CorrectValue_ReturnsAssetCorruptedMessageValue()
+    public void CorruptedMessage_CorrectValue_ReturnsCorruptedMessageValue()
     {
-        string assetCorruptedMessage = _userConfigurationService!.AssetSettings.AssetCorruptedMessage;
+        string corruptedMessage = _userConfigurationService!.AssetSettings.CorruptedMessage;
 
-        Assert.IsNotNull(assetCorruptedMessage);
-        Assert.AreEqual("The asset is corrupted", assetCorruptedMessage);
+        Assert.IsNotNull(corruptedMessage);
+        Assert.AreEqual("The asset is corrupted", corruptedMessage);
     }
 
     [Test]
-    public void AssetRotatedMessage_CorrectValue_ReturnsAssetRotatedMessageValue()
+    public void RotatedMessage_CorrectValue_ReturnsRotatedMessageValue()
     {
-        string assetRotatedMessage = _userConfigurationService!.AssetSettings.AssetRotatedMessage;
+        string rotatedMessage = _userConfigurationService!.AssetSettings.RotatedMessage;
 
-        Assert.IsNotNull(assetRotatedMessage);
-        Assert.AreEqual("The asset has been rotated", assetRotatedMessage);
+        Assert.IsNotNull(rotatedMessage);
+        Assert.AreEqual("The asset has been rotated", rotatedMessage);
     }
 
     [Test]

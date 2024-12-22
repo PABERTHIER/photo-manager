@@ -45,11 +45,11 @@ public class DatabaseDeleteOldBackupsTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            bool backupCreated1 = _database!.WriteBackup(new DateTime(2023, 04, 04));
-            bool backupCreated2 = _database!.WriteBackup(new DateTime(2023, 03, 04));
-            bool backupCreated3 = _database!.WriteBackup(new DateTime(2023, 02, 04));
-            bool backupCreated4 = _database!.WriteBackup(new DateTime(2023, 01, 04));
-            bool backupCreated5 = _database!.WriteBackup(new DateTime(2023, 05, 04));
+            bool backupCreated1 = _database!.WriteBackup(new (2023, 04, 04));
+            bool backupCreated2 = _database!.WriteBackup(new (2023, 03, 04));
+            bool backupCreated3 = _database!.WriteBackup(new (2023, 02, 04));
+            bool backupCreated4 = _database!.WriteBackup(new (2023, 01, 04));
+            bool backupCreated5 = _database!.WriteBackup(new (2023, 05, 04));
 
             Assert.IsTrue(backupCreated1);
             Assert.IsTrue(backupCreated2);
@@ -95,9 +95,9 @@ public class DatabaseDeleteOldBackupsTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            bool backupCreated1 = _database!.WriteBackup(new DateTime(2023, 04, 04));
-            bool backupCreated2 = _database!.WriteBackup(new DateTime(2023, 03, 04));
-            bool backupCreated3 = _database!.WriteBackup(new DateTime(2023, 02, 04));
+            bool backupCreated1 = _database!.WriteBackup(new (2023, 04, 04));
+            bool backupCreated2 = _database!.WriteBackup(new (2023, 03, 04));
+            bool backupCreated3 = _database!.WriteBackup(new (2023, 02, 04));
 
             Assert.IsTrue(backupCreated1);
             Assert.IsTrue(backupCreated2);

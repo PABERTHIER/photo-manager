@@ -13,14 +13,23 @@ public class TernaryConverterTests
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "toto.jpg",
-            IsAssetCorrupted = assertion,
-            AssetCorruptedMessage = message,
-            Hash = string.Empty
+            Hash = string.Empty,
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = assertion, Message = message },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
         };
 
-        object[] converterParameters = [asset.IsAssetCorrupted, asset.AssetCorruptedMessage];
+        object[] converterParameters = [asset.Metadata.Corrupted.IsTrue, asset.Metadata.Corrupted.Message];
         object? parameter = null;
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);
@@ -36,14 +45,23 @@ public class TernaryConverterTests
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
         {
-            Folder = new() { Path = "" },
+            FolderId = Guid.Empty, // Initialised later
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "toto.jpg",
-            IsAssetRotated = assertion,
-            AssetRotatedMessage = message,
-            Hash = string.Empty
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            Hash = string.Empty,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = assertion, Message = message }
+            }
         };
 
-        object[] converterParameters = [asset.IsAssetRotated, asset.AssetRotatedMessage];
+        object[] converterParameters = [asset.Metadata.Rotated.IsTrue, asset.Metadata.Rotated.Message];
         object? parameter = null;
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);
