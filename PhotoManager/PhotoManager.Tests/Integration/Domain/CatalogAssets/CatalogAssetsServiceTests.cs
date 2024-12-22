@@ -63,7 +63,7 @@ public class CatalogAssetsServiceTests
     {
         _asset1 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate.jpg",
             Pixel = new()
             {
@@ -87,7 +87,7 @@ public class CatalogAssetsServiceTests
         };
         _asset2 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9.png",
             Pixel = new()
             {
@@ -111,7 +111,7 @@ public class CatalogAssetsServiceTests
         };
         _asset3 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9_duplicate.png",
             Pixel = new()
             {
@@ -135,7 +135,7 @@ public class CatalogAssetsServiceTests
         };
         _asset4 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_11.heic",
             Pixel = new()
             {
@@ -159,7 +159,7 @@ public class CatalogAssetsServiceTests
         };
         _asset1Temp = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate_copied.jpg",
             Pixel = new()
             {
@@ -183,7 +183,7 @@ public class CatalogAssetsServiceTests
         };
         _asset2Temp = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             Pixel = new()
             {
@@ -207,7 +207,7 @@ public class CatalogAssetsServiceTests
         };
         _asset3Temp = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Homer.gif",
             Pixel = new()
             {
@@ -231,7 +231,7 @@ public class CatalogAssetsServiceTests
         };
         _asset4Temp = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Homer.jpg",
             Pixel = new()
             {
@@ -255,7 +255,7 @@ public class CatalogAssetsServiceTests
         };
         _asset5Temp = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "HomerDuplicated.jpg",
             Pixel = new()
             {

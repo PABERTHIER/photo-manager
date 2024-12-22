@@ -39,7 +39,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
 
         _asset1 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
@@ -64,7 +64,7 @@ public class AssetRepositoryGetCataloguedAssetsTests
         };
         _asset2 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = "Image 9.png",
             ImageRotation = Rotation.Rotate90,
@@ -100,8 +100,8 @@ public class AssetRepositoryGetCataloguedAssetsTests
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
 
-            _asset1 = _asset1!.WithFolder(new() { Path = folderPath1 });
-            _asset2 = _asset2!.WithFolder(new() { Path = folderPath2 });
+            _asset1 = _asset1!.WithFolder(new() { Id = Guid.NewGuid(), Path = folderPath1 });
+            _asset2 = _asset2!.WithFolder(new() { Id = Guid.NewGuid(), Path = folderPath2 });
 
             _assetRepository!.AddAsset(_asset1!, []);
             _assetRepository!.AddAsset(_asset2!, []);
@@ -162,8 +162,8 @@ public class AssetRepositoryGetCataloguedAssetsTests
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
 
-            _asset1 = _asset1!.WithFolder(new() { Path = folderPath1 });
-            _asset2 = _asset2!.WithFolder(new() { Path = folderPath2 });
+            _asset1 = _asset1!.WithFolder(new() { Id = Guid.NewGuid(), Path = folderPath1 });
+            _asset2 = _asset2!.WithFolder(new() { Id = Guid.NewGuid(), Path = folderPath2 });
 
             _assetRepository!.AddAsset(_asset1!, []);
             _assetRepository!.AddAsset(_asset2!, []);

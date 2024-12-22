@@ -114,7 +114,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -135,7 +135,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -190,7 +190,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -211,7 +211,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -285,7 +285,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -306,7 +306,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -421,7 +421,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -442,7 +442,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -501,7 +501,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -522,7 +522,7 @@ public class DatabaseWriteObjectListTests
                 new()
                 {
                     FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                    Folder = new() { Path = "" },
+                    Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
                     Pixel = new()
@@ -576,7 +576,7 @@ public class DatabaseWriteObjectListTests
             new()
             {
                 FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                Folder = new() { Path = "" },
+                Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                 FileName = "20200720175810_3.jpg",
                 ImageRotation = Rotation.Rotate0,
                 Pixel = new()
@@ -597,7 +597,7 @@ public class DatabaseWriteObjectListTests
             new()
             {
                 FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-                Folder = new() { Path = "" },
+                Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                 FileName = "20200720175816_3.jpg",
                 ImageRotation = Rotation.Rotate0,
                 Pixel = new()

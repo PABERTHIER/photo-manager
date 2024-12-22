@@ -13,8 +13,8 @@
 //        using var mock = AutoMock.GetLoose();
 //        mock.Mock<IApplication>().Setup(a => a.GetInitialFolder()).Returns(@"D:\Data");
 
-//        Folder sourceFolder = new() { Path = @"D:\Data\Folder1" };
-//        Folder selectedFolder = new() { Path = @"D:\Data\Folder2" };
+//        Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = @"D:\Data\Folder1" };
+//        Folder selectedFolder = new() { Id = Guid.NewGuid(), Path = @"D:\Data\Folder2" };
 
 //        var viewModel = mock.Container.Resolve<FolderNavigationViewModel>(
 //            new NamedParameter("sourceFolder", sourceFolder),
@@ -39,7 +39,7 @@
 //        using var mock = AutoMock.GetLoose();
 //        mock.Mock<IApplication>().Setup(a => a.GetInitialFolder()).Returns(@"D:\Data");
 
-//        Folder sourceFolder = new() { Path = sourcePath };
+//        Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
 //        var viewModel = mock.Container.Resolve<FolderNavigationViewModel>(
 //            new NamedParameter("sourceFolder", sourceFolder),
@@ -73,7 +73,7 @@
 //        using var mock = AutoMock.GetLoose();
 //        mock.Mock<IApplication>().Setup(a => a.GetInitialFolder()).Returns(@"D:\Data");
 
-//        Folder sourceFolder = new() { Path = @"D:\Data\Folder1" };
+//        Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = @"D:\Data\Folder1" };
 
 //        var viewModel = mock.Container.Resolve<FolderNavigationViewModel>(
 //            new NamedParameter("sourceFolder", sourceFolder),

@@ -80,7 +80,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         _asset1 = new()
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1336_1K.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -105,7 +105,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         _asset2 = new()
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1336_2K.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -130,7 +130,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         _asset3 = new()
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1336_3K.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -155,7 +155,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         _asset4 = new()
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1336_4K_Original.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -180,7 +180,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         _asset5 = new()
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1336_8K.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -205,7 +205,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         _asset6 = new()
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1336_Thumbnail.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -230,7 +230,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         _asset7 = new() // Another asset completely different from the actual asset
         {
             FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -275,8 +275,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Resolution");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1_K_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET2_K_HASH);
@@ -332,8 +332,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Resolution");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1_K_MD5_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET2_K_MD5_HASH);
@@ -389,8 +389,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Resolution");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1_K_D_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET2_K_D_HASH);
@@ -448,8 +448,8 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Resolution");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1_K_P_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET2_K_P_HASH);

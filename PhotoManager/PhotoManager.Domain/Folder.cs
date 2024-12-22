@@ -2,7 +2,7 @@
 
 public class Folder
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
     public required string Path { get; init; }
     public string ThumbnailsFilename => Id + ".bin"; // TODO: BlobFileName instead -> rename all methods like this
 
@@ -22,7 +22,7 @@ public class Folder
         get
         {
             string? parentPath = GetParentPath(Path);
-            return parentPath != null ? new Folder { Path = parentPath } : null;
+            return parentPath != null ? new() { Id = Guid.NewGuid(), Path = parentPath } : null;
         }
     }
 

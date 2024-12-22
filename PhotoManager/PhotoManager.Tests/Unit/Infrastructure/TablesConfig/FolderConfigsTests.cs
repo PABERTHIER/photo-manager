@@ -91,24 +91,6 @@ public class FolderConfigsTests
     }
 
     [Test]
-    public void WriteFunc_FolderWithPartialValues_ConvertsFolderPropertiesToIndexInArrayWithSomeDefaultValues()
-    {
-        Folder folder = new()
-        {
-            Path = "Path\\SubPath"
-        };
-
-        object[] result = new object[2];
-        for (int i = 0; i < 2; i++)
-        {
-            result[i] = FolderConfigs.WriteFunc(folder, i);
-        }
-
-        Assert.AreEqual(Guid.Empty, result[0]);
-        Assert.AreEqual("Path\\SubPath", result[1]);
-    }
-
-    [Test]
     public void WriteFunc_IndexOutOfRange_ThrowsArgumentOutOfRangeException()
     {
         Folder folder = new()

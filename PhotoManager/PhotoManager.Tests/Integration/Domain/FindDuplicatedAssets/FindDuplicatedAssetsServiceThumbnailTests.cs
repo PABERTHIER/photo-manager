@@ -47,7 +47,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         _asset1 = new()
         {
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -72,7 +72,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         _asset2 = new()
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9.png",
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
@@ -97,7 +97,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         _asset3 = new()
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -122,7 +122,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         _asset4 = new()
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9_duplicate.png",
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
@@ -147,7 +147,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         _asset5 = new()
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_11.heic",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -179,8 +179,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             string sourcePath1 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
             string sourcePath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
 
-            Folder folder1 = new() { Path = sourcePath1 };
-            Folder folder2 = new() { Path = sourcePath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = sourcePath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = sourcePath2 };
 
             const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
             const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
@@ -243,7 +243,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             string sourcePath = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
 
-            Folder folder = new() { Path = sourcePath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
             _asset2 = _asset2!.WithFolder(folder).WithHash(hash);
             _asset3 = _asset3!.WithFolder(folder).WithHash(hash);
@@ -296,8 +296,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             const string hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
 
@@ -327,8 +327,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
             const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
@@ -381,7 +381,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
 
-            Folder folder = new() { Path = folderPath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
 
             const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
             const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";

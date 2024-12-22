@@ -41,7 +41,7 @@ public class AssetRepositoryContainsThumbnailTests
         _asset1 = new()
         {
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()

@@ -129,7 +129,7 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            folder = new Folder
+            folder = new()
             {
                 Id = Guid.NewGuid(),
                 Path = path

@@ -541,8 +541,8 @@ public class StorageServiceTests
     [Test]
     public void FileExists_ExistingFile_ReturnsTrue()
     {
-        Folder folder = new() { Path = _dataDirectory! };
-        Asset asset = new() { Folder = new() { Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Asset asset = new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "Image 1.jpg", Hash = string.Empty };
 
         bool exists = _storageService!.FileExists(folder, asset);
 
@@ -552,8 +552,8 @@ public class StorageServiceTests
     [Test]
     public void FileExists_FileDoesNotExist_ReturnsFalse()
     {
-        Folder folder = new() { Path = _dataDirectory! };
-        Asset asset = new() { Folder = new() { Path = "" }, FileName = "NonExistent.jpg", Hash = string.Empty };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
+        Asset asset = new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = "NonExistent.jpg", Hash = string.Empty };
 
         bool exists = _storageService!.FileExists(folder, asset);
 
@@ -565,8 +565,8 @@ public class StorageServiceTests
     [TestCase(null, "Image 1.jpg", "path1")]
     public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string path, string fileName, string exceptionParameter)
     {
-        Folder folder = new() { Path = path };
-        Asset asset = new() { Folder = new() { Path = "" }, FileName = fileName, Hash = string.Empty };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = path };
+        Asset asset = new() { Folder = new() { Id = Guid.Empty, Path = "" }, FileName = fileName, Hash = string.Empty };
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.FileExists(folder, asset));
 
@@ -658,7 +658,7 @@ public class StorageServiceTests
             File.Copy(sourceFilePath3, destinationFilePath3);
             File.Copy(sourceFilePath4, destinationFilePath4);
 
-            Folder folder = new() { Path = destinationPath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
             DateTime creationTime = DateTime.Now;
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
@@ -760,7 +760,7 @@ public class StorageServiceTests
             File.Copy(sourceFilePath4, destinationFilePath4);
 
             string? path = null;
-            Folder folder = new() { Path = path! };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = path! };
 
             DateTime creationTime = default;
             DateTime modificationTime = default;
@@ -848,7 +848,7 @@ public class StorageServiceTests
             File.Copy(sourceFilePath3, destinationFilePath3);
             File.Copy(sourceFilePath4, destinationFilePath4);
 
-            Folder folder = new() { Path = destinationPath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
             DateTime creationTime = DateTime.Now;
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
@@ -916,7 +916,7 @@ public class StorageServiceTests
 
             File.Copy(sourceFilePath, destinationFilePath);
 
-            Folder folder = new() { Path = destinationPath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
 
             DateTime creationTime = DateTime.Now;
             DateTime oldDateTime = DateTime.Now.AddDays(-1);
@@ -952,7 +952,7 @@ public class StorageServiceTests
 
             const string fileName = "nonexistent.jpg";
 
-            Folder folder = new() { Path = destinationPath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
             Asset asset = new() { Folder = folder, FileName = fileName, Hash = string.Empty };
 
             DateTime creationTime = default;
@@ -991,7 +991,7 @@ public class StorageServiceTests
             File.Copy(sourceFilePath, destinationFilePath);
 
             string? path = null;
-            Folder folder = new() { Path = path! };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = path! };
 
             DateTime creationTime = default;
             DateTime modificationTime = default;

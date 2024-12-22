@@ -13,7 +13,7 @@ public static class FolderConfigs
 
     public static Folder ReadFunc(string[] values)
     {
-        return new Folder
+        return new()
         {
             Id = new Guid(values[0]),
             Path = values[1]

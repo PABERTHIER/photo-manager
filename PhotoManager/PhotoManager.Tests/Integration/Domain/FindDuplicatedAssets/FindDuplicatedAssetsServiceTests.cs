@@ -45,7 +45,7 @@ public class FindDuplicatedAssetsServiceTests
         _asset1 = new()
         {
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -70,7 +70,7 @@ public class FindDuplicatedAssetsServiceTests
         _asset2 = new()
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9.png",
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
@@ -95,7 +95,7 @@ public class FindDuplicatedAssetsServiceTests
         _asset3 = new()
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -120,7 +120,7 @@ public class FindDuplicatedAssetsServiceTests
         _asset4 = new()
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9_duplicate.png",
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
@@ -145,7 +145,7 @@ public class FindDuplicatedAssetsServiceTests
         _asset5 = new()
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_11.heic",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -177,8 +177,8 @@ public class FindDuplicatedAssetsServiceTests
             string sourcePath1 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
             string sourcePath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
 
-            Folder folder1 = new() { Path = sourcePath1 };
-            Folder folder2 = new() { Path = sourcePath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = sourcePath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = sourcePath2 };
 
             _asset1 = _asset1!.WithFolder(folder1);
             _asset2 = _asset2!.WithFolder(folder2);
@@ -236,7 +236,7 @@ public class FindDuplicatedAssetsServiceTests
             const string hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960";
             string sourcePath = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
 
-            Folder folder = new() { Path = sourcePath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
             _asset2 = _asset2!.WithFolder(folder).WithHash(hash);
             _asset3 = _asset3!.WithFolder(folder).WithHash(hash);
@@ -288,8 +288,8 @@ public class FindDuplicatedAssetsServiceTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             _asset1 = _asset1!.WithFolder(folder1);
             _asset3 = _asset3!.WithFolder(folder2);
@@ -317,8 +317,8 @@ public class FindDuplicatedAssetsServiceTests
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
             string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             _asset1 = _asset1!.WithFolder(folder1);
             _asset2 = _asset2!.WithFolder(folder2);
@@ -367,7 +367,7 @@ public class FindDuplicatedAssetsServiceTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
 
-            Folder folder = new() { Path = folderPath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);

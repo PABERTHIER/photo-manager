@@ -30,7 +30,7 @@ public class UserConfigurationServiceTests
     [TestCase(WallpaperStyle.Fill, "10", "0")]
     public void SetAsWallpaper_ValidStyleAndTile_RegistersExpectedValues(WallpaperStyle style, string expectedStyleValue, string expectedTileValue)
     {
-        Folder folder = new() { Path = _dataDirectory! };
+        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
         Asset asset = new() { Folder = folder, FileName = "NonExistentFile.jpg", Hash = string.Empty }; // Not giving an existing file to prevent the wallpaper to be changed
 
         // Set up a StringWriter to capture console output

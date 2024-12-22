@@ -13,7 +13,7 @@ public class TernaryConverterTests
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "toto.jpg",
             Hash = string.Empty,
             Metadata = new()
@@ -39,7 +39,7 @@ public class TernaryConverterTests
         TernaryConverter ternaryConverter = new();
         Asset asset = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "toto.jpg",
             Hash = string.Empty,
             Metadata = new()

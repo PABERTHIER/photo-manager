@@ -85,7 +85,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _asset1 = new()
         {
             FolderId = new Guid("db973547-ed18-4e7d-8dc8-ce441aabef80"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1336.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -110,7 +110,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _asset2 = new()
         {
             FolderId = new Guid("65a65540-586e-4b2e-a62a-ccdbd7d442f2"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1337.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -135,7 +135,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _asset3 = new()
         {
             FolderId = new Guid("65ba6b40-dc3c-46b6-8508-135cb4e1f961"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1349.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -160,7 +160,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _asset4 = new()
         {
             FolderId = new Guid("ee3dcc63-53d8-4937-a38a-45b3189118e6"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1350.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -185,7 +185,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _asset5 = new()
         {
             FolderId = new Guid("044e3039-0b4b-4065-b215-9cf185d1f90f"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1413.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -210,7 +210,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _asset6 = new()
         {
             FolderId = new Guid("80fa1201-1b9d-4d8e-8730-6efe8e46fcbd"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1414.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -235,7 +235,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _asset7 = new()
         {
             FolderId = new Guid("4c0b2c7c-3159-4855-850b-27c7e737a96e"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "1415.JPG",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -260,7 +260,7 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         _asset8 = new() // Another asset completely different from the actual asset
         {
             FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -307,10 +307,10 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             string folderPath3 = Path.Combine(_dataDirectory!, "Duplicates\\NotDuplicate\\Sample3");
             string folderPath4 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
-            Folder folder3 = new() { Path = folderPath3 };
-            Folder folder4 = new() { Path = folderPath4 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+            Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
+            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_HASH);
@@ -370,10 +370,10 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             string folderPath3 = Path.Combine(_dataDirectory!, "Duplicates\\NotDuplicate\\Sample3");
             string folderPath4 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
-            Folder folder3 = new() { Path = folderPath3 };
-            Folder folder4 = new() { Path = folderPath4 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+            Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
+            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_MD5_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_MD5_HASH);
@@ -431,8 +431,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\NotDuplicate\\Sample1");
             string folderPath4 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder4 = new() { Path = folderPath4 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_D_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_D_HASH);
@@ -474,8 +474,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\NotDuplicate\\Sample2");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             _asset3 = _asset3!.WithFolder(folder1).WithHash(ASSET1349_D_HASH);
             _asset4 = _asset4!.WithFolder(folder1).WithHash(ASSET1350_D_HASH);
@@ -523,8 +523,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\NotDuplicate\\Sample3");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
             _asset5 = _asset5!.WithFolder(folder1).WithHash(ASSET1413_D_HASH);
             _asset6 = _asset6!.WithFolder(folder1).WithHash(ASSET1414_D_HASH);
@@ -589,10 +589,10 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             string folderPath3 = Path.Combine(_dataDirectory!, "Duplicates\\NotDuplicate\\Sample3");
             string folderPath4 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
-            Folder folder1 = new() { Path = folderPath1 };
-            Folder folder2 = new() { Path = folderPath2 };
-            Folder folder3 = new() { Path = folderPath3 };
-            Folder folder4 = new() { Path = folderPath4 };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
+            Folder folder3 = new() { Id = Guid.NewGuid(), Path = folderPath3 };
+            Folder folder4 = new() { Id = Guid.NewGuid(), Path = folderPath4 };
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(ASSET1336_P_HASH);
             _asset2 = _asset2!.WithFolder(folder1).WithHash(ASSET1337_P_HASH);

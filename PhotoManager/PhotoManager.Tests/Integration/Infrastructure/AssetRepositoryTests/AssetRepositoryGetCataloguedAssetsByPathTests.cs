@@ -38,7 +38,7 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
         _asset1 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,

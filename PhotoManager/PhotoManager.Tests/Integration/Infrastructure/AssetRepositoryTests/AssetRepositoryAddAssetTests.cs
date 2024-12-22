@@ -41,7 +41,7 @@ public class AssetRepositoryAddAssetTests
 
         _asset1 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = "Image 1.jpg",
             ImageRotation = Rotation.Rotate0,
@@ -66,7 +66,7 @@ public class AssetRepositoryAddAssetTests
         };
         _asset2 = new()
         {
-            Folder = new() { Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = "Image 9.png",
             ImageRotation = Rotation.Rotate90,
@@ -101,7 +101,7 @@ public class AssetRepositoryAddAssetTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath);
-            Folder folder2 = new() { Path = folderPath };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath };
 
             _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
@@ -153,8 +153,8 @@ public class AssetRepositoryAddAssetTests
         try
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
-            Folder folder1 = new() { Path = folderPath };
-            Folder folder2 = new() { Path = folderPath };
+            Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath };
 
             _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];
@@ -341,7 +341,7 @@ public class AssetRepositoryAddAssetTests
         try
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
-            Folder folder = new() { Path = folderPath };
+            Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
             _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
 
@@ -490,7 +490,7 @@ public class AssetRepositoryAddAssetTests
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath);
-            Folder folder2 = new() { Path = folderPath };
+            Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath };
 
             _asset1 = _asset1!.WithFolder(folder1);
             byte[] assetData1 = [1, 2, 3];

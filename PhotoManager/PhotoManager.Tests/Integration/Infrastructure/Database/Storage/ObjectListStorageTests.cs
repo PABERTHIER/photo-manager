@@ -371,7 +371,7 @@ public class ObjectListStorageTests
             new()
             {
                 FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761e"),
-                Folder = new() { Path = "" },
+                Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                 FileName = "1336.JPG",
                 ImageRotation = Rotation.Rotate0,
                 Pixel = new()
@@ -393,7 +393,7 @@ public class ObjectListStorageTests
             new()
             {
                 FolderId = new Guid("dfc8aab7-3543-48e7-9fdc-596ba733761f"),
-                Folder = new() { Path = "" },
+                Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                 FileName = "1452.DNG",
                 ImageRotation = Rotation.Rotate90,
                 Pixel = new()
