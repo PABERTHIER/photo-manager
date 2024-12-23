@@ -51,7 +51,7 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.That(dataTablePropertiesDictionary, Is.Not.Empty);
             Assert.That(dataTablePropertiesDictionary, Has.Count.EqualTo(1));
             Assert.That(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName), Is.True);
-            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].TableName, Is.EqualTo(properties.TableName).AsCollection);
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].TableName, Is.EqualTo(properties.TableName));
             Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
         }
         finally
@@ -85,7 +85,7 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.That(dataTablePropertiesDictionary, Is.Not.Empty);
             Assert.That(dataTablePropertiesDictionary, Has.Count.EqualTo(1));
             Assert.That(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName), Is.True);
-            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].TableName, Is.EqualTo(properties.TableName).AsCollection);
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].TableName, Is.EqualTo(properties.TableName));
             Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
         }
         finally
@@ -119,7 +119,7 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.That(dataTablePropertiesDictionary, Is.Not.Empty);
             Assert.That(dataTablePropertiesDictionary, Has.Count.EqualTo(1));
             Assert.That(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName), Is.True);
-            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].TableName, Is.EqualTo(properties.TableName).AsCollection);
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].TableName, Is.EqualTo(properties.TableName));
             Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
         }
         finally
@@ -153,7 +153,7 @@ public class DatabaseSetDataTablePropertiesTests
             Assert.That(dataTablePropertiesDictionary, Is.Not.Empty);
             Assert.That(dataTablePropertiesDictionary, Has.Count.EqualTo(1));
             Assert.That(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName), Is.True);
-            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].TableName, Is.EqualTo(properties.TableName).AsCollection);
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].TableName, Is.EqualTo(properties.TableName));
             Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
         }
         finally

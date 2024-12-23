@@ -235,3 +235,6 @@ dotnet_diagnostic.IDE0063.severity = none
 # CA2208: Instantiate argument exceptions correctly
 # Here is to fix this: Note that the provided parameter name should have the exact casing as declared on the method.
 dotnet_diagnostic.CA2208.severity = none
+
+# NUnit2045: Use Assert.Multiple
+dotnet_diagnostic.NUnit2045.severity = none
