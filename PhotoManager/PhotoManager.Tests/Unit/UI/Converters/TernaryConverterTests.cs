@@ -7,7 +7,7 @@ public class TernaryConverterTests
 {
     [Test]
     [TestCase(true, "Message", "Message")]
-    [TestCase(false, null, null)]
+    [TestCase(false, null!, null!)]
     public void Convert_AssetCorrupted_ReturnsValue(bool assertion, string message, string expected)
     {
         TernaryConverter ternaryConverter = new();
@@ -34,12 +34,12 @@ public class TernaryConverterTests
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
     [TestCase(true, "Message", "Message")]
-    [TestCase(false, null, null)]
+    [TestCase(false, null!, null!)]
     public void Convert_AssetRotated_ReturnsValue(bool assertion, string message, string expected)
     {
         TernaryConverter ternaryConverter = new();
@@ -66,7 +66,7 @@ public class TernaryConverterTests
 
         string? result = (string?)ternaryConverter.Convert(converterParameters, typeof(object[]), parameter!, CultureInfo.InvariantCulture);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -79,6 +79,6 @@ public class TernaryConverterTests
 
         NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => ternaryConverter.ConvertBack(value!, targetTypes!, parameter!, CultureInfo.InvariantCulture));
 
-        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }
 }

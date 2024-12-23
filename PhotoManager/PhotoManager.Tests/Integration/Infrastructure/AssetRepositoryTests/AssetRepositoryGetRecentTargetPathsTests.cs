@@ -51,11 +51,11 @@ public class AssetRepositoryGetRecentTargetPathsTests
             _assetRepository!.SaveRecentTargetPaths(recentTargetPathsToSave);
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
 
-            Assert.AreEqual(2, recentTargetPaths.Count);
-            Assert.AreEqual(recentTargetPathsToSave[0], recentTargetPaths[0]);
-            Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths[1]);
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths[0], Is.EqualTo(recentTargetPathsToSave[0]));
+            Assert.That(recentTargetPaths[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -74,9 +74,9 @@ public class AssetRepositoryGetRecentTargetPathsTests
         {
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.IsEmpty(recentTargetPaths);
+            Assert.That(recentTargetPaths, Is.Empty);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -112,19 +112,19 @@ public class AssetRepositoryGetRecentTargetPathsTests
                 () => recentTargetPaths3 = _assetRepository.GetRecentTargetPaths()
             );
 
-            Assert.AreEqual(2, recentTargetPaths1.Count);
-            Assert.AreEqual(recentTargetPathsToSave[0], recentTargetPaths1[0]);
-            Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths1[1]);
+            Assert.That(recentTargetPaths1, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths1[0], Is.EqualTo(recentTargetPathsToSave[0]));
+            Assert.That(recentTargetPaths1[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
-            Assert.AreEqual(2, recentTargetPaths2.Count);
-            Assert.AreEqual(recentTargetPathsToSave[0], recentTargetPaths2[0]);
-            Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths2[1]);
+            Assert.That(recentTargetPaths2, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths2[0], Is.EqualTo(recentTargetPathsToSave[0]));
+            Assert.That(recentTargetPaths2[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
-            Assert.AreEqual(2, recentTargetPaths3.Count);
-            Assert.AreEqual(recentTargetPathsToSave[0], recentTargetPaths3[0]);
-            Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths3[1]);
+            Assert.That(recentTargetPaths3, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths3[0], Is.EqualTo(recentTargetPathsToSave[0]));
+            Assert.That(recentTargetPaths3[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

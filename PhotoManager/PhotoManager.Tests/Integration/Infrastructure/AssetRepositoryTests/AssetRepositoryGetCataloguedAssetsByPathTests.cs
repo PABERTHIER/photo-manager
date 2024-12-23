@@ -81,19 +81,19 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
             _assetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             List<Asset> cataloguedAssets1 = _assetRepository.GetCataloguedAssetsByPath(folderPath1);
             List<Asset> cataloguedAssets2 = _assetRepository.GetCataloguedAssetsByPath(folderPath2);
 
-            Assert.AreEqual(1, cataloguedAssets1.Count);
-            Assert.IsEmpty(cataloguedAssets2);
+            Assert.That(cataloguedAssets1, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets2, Is.Empty);
 
-            Assert.IsTrue(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName == _asset1.FileName);
+            Assert.That(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName == _asset1.FileName, Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -119,15 +119,15 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
             _assetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(folderPath2);
 
-            Assert.IsEmpty(cataloguedAssets);
+            Assert.That(cataloguedAssets, Is.Empty);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -153,15 +153,15 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
             _assetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             List<Asset> cataloguedAssets = _assetRepository.GetCataloguedAssetsByPath(folderPath2!);
 
-            Assert.IsEmpty(cataloguedAssets);
+            Assert.That(cataloguedAssets, Is.Empty);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -188,8 +188,8 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
             _assetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             List<Asset> cataloguedAssets1 = [];
             List<Asset> cataloguedAssets2 = [];
@@ -200,13 +200,13 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
                 () => cataloguedAssets2 = _assetRepository.GetCataloguedAssetsByPath(folderPath2)
             );
 
-            Assert.AreEqual(1, cataloguedAssets1.Count);
-            Assert.IsEmpty(cataloguedAssets2);
+            Assert.That(cataloguedAssets1, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets2, Is.Empty);
 
-            Assert.IsTrue(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName == _asset1.FileName);
+            Assert.That(cataloguedAssets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName == _asset1.FileName, Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

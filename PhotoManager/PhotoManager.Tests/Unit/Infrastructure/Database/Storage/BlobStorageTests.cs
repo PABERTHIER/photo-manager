@@ -35,10 +35,10 @@ public class BlobStorageTests
 
         Dictionary<string, byte[]>? deserializedObject = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 
-        Assert.IsNotNull(deserializedObject);
-        Assert.IsInstanceOf<Dictionary<string, byte[]>?>(deserializedObject);
-        Assert.AreEqual(countExpected, deserializedObject!.Count);
-        Assert.IsTrue(deserializedObject.ContainsKey(keyContained));
+        Assert.That(deserializedObject, Is.Not.Null);
+        Assert.That(deserializedObject, Is.InstanceOf<Dictionary<string, byte[]>?>());
+        Assert.That(deserializedObject!, Has.Count.EqualTo(countExpected));
+        Assert.That(deserializedObject.ContainsKey(keyContained), Is.True);
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class BlobStorageTests
 
         Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class BlobStorageTests
     {
         Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(_dataDirectory!);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -66,7 +66,7 @@ public class BlobStorageTests
 
         Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(blobFilePath!);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -84,13 +84,13 @@ public class BlobStorageTests
 
             _blobStorage!.WriteToBinaryFile(data, binaryFilePath);
 
-            Assert.IsTrue(File.Exists(binaryFilePath));
+            Assert.That(File.Exists(binaryFilePath), Is.True);
 
             Dictionary<string, byte[]>? dataRead = _blobStorage!.ReadFromBinaryFile(binaryFilePath);
-            Assert.IsNotNull(dataRead);
-            Assert.AreEqual(data.Count, dataRead!.Count);
-            CollectionAssert.AreEqual(data["Image1.jpg"], dataRead["Image1.jpg"]);
-            CollectionAssert.AreEqual(data["Image2.png"], dataRead["Image2.png"]);
+            Assert.That(dataRead, Is.Not.Null);
+            Assert.That(dataRead!, Has.Count.EqualTo(data.Count));
+            Assert.That(dataRead["Image1.jpg"], Is.EqualTo(data["Image1.jpg"]).AsCollection);
+            Assert.That(dataRead["Image2.png"], Is.EqualTo(data["Image2.png"]).AsCollection);
         }
         finally
         {
@@ -109,8 +109,8 @@ public class BlobStorageTests
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _blobStorage!.WriteToBinaryFile(data!, binaryFilePath));
 
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
-            Assert.IsTrue(File.Exists(binaryFilePath));
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+            Assert.That(File.Exists(binaryFilePath), Is.True);
         }
         finally
         {
@@ -129,11 +129,11 @@ public class BlobStorageTests
 
             _blobStorage!.WriteToBinaryFile(data, binaryFilePath);
 
-            Assert.IsTrue(File.Exists(binaryFilePath));
+            Assert.That(File.Exists(binaryFilePath), Is.True);
 
             Dictionary<string, byte[]>? dataRead = _blobStorage!.ReadFromBinaryFile(binaryFilePath);
-            Assert.IsNotNull(dataRead);
-            Assert.AreEqual(data.Count, dataRead!.Count);
+            Assert.That(dataRead, Is.Not.Null);
+            Assert.That(dataRead!, Has.Count.EqualTo(data.Count));
         }
         finally
         {
@@ -152,7 +152,7 @@ public class BlobStorageTests
 
         UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _blobStorage!.WriteToBinaryFile(data, _dataDirectory!));
 
-        Assert.AreEqual($"Access to the path '{_dataDirectory!}' is denied.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Access to the path '{_dataDirectory!}' is denied."));
     }
 
     [Test]
@@ -168,6 +168,6 @@ public class BlobStorageTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _blobStorage!.WriteToBinaryFile(data, binaryFilePath!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
     }
 }

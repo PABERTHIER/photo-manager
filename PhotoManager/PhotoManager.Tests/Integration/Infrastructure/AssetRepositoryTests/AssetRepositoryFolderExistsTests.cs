@@ -48,9 +48,9 @@ public class AssetRepositoryFolderExistsTests
 
             bool folderExists = _assetRepository!.FolderExists(folderPath);
 
-            Assert.IsTrue(folderExists);
+            Assert.That(folderExists, Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -74,9 +74,9 @@ public class AssetRepositoryFolderExistsTests
 
             bool folderExists = _assetRepository!.FolderExists(folderPath2);
 
-            Assert.IsFalse(folderExists);
+            Assert.That(folderExists, Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -108,11 +108,11 @@ public class AssetRepositoryFolderExistsTests
                 () => folderExists3 = _assetRepository!.FolderExists(folderPath)
             );
 
-            Assert.IsTrue(folderExists1);
-            Assert.IsTrue(folderExists2);
-            Assert.IsTrue(folderExists3);
+            Assert.That(folderExists1, Is.True);
+            Assert.That(folderExists2, Is.True);
+            Assert.That(folderExists3, Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

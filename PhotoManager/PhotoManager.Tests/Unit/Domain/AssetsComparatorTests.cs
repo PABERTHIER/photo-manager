@@ -163,8 +163,8 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsNotEmpty(newFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }, newFileNames);
+        Assert.That(newFileNames, Is.Not.Empty);
+        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
     }
 
     [Test]
@@ -249,8 +249,8 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsNotEmpty(newFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file2.png", "file3.gif", "file5.mp4" }, newFileNames);
+        Assert.That(newFileNames, Is.Not.Empty);
+        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file2.png", "file3.gif", "file5.mp4" }));
     }
 
     [Test]
@@ -323,7 +323,7 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsEmpty(newFileNames);
+        Assert.That(newFileNames, Is.Empty);
     }
 
     [Test]
@@ -396,7 +396,7 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsEmpty(newFileNames);
+        Assert.That(newFileNames, Is.Empty);
     }
 
     [Test]
@@ -469,7 +469,7 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNames(fileNames!, cataloguedAssets));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'first')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
     }
 
     [Test]
@@ -480,8 +480,8 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsNotEmpty(newFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }, newFileNames);
+        Assert.That(newFileNames, Is.Not.Empty);
+        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
     }
 
     [Test]
@@ -492,7 +492,7 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -503,8 +503,8 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsNotEmpty(newFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }, newFileNames);
+        Assert.That(newFileNames, Is.Not.Empty);
+        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
     }
 
     [Test]
@@ -515,8 +515,8 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsNotEmpty(newFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file2.png", "file3.gif", "file5.mp4" }, newFileNames);
+        Assert.That(newFileNames, Is.Not.Empty);
+        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file2.png", "file3.gif", "file5.mp4" }));
     }
 
     [Test]
@@ -527,7 +527,7 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsEmpty(newFileNames);
+        Assert.That(newFileNames, Is.Empty);
     }
 
     [Test]
@@ -538,7 +538,7 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsEmpty(newFileNames);
+        Assert.That(newFileNames, Is.Empty);
     }
 
     [Test]
@@ -549,7 +549,7 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNamesToSync(sourceFileNames!, destinationFileNames));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'first')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
     }
 
     [Test]
@@ -560,8 +560,8 @@ public class AssetsComparatorTests
 
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsNotEmpty(newFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }, newFileNames);
+        Assert.That(newFileNames, Is.Not.Empty);
+        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
     }
 
     [Test]
@@ -572,7 +572,7 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'second')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
     }
 
     [Test]
@@ -587,8 +587,8 @@ public class AssetsComparatorTests
     {
         (string[] imageNames, string[] videoNames) = _assetsComparator!.GetImageAndVideoNames(fileNames);
 
-        CollectionAssert.AreEquivalent(expectedImageNames, imageNames);
-        CollectionAssert.AreEquivalent(expectedVideoNames, videoNames);
+        Assert.That(imageNames, Is.EquivalentTo(expectedImageNames));
+        Assert.That(videoNames, Is.EquivalentTo(expectedVideoNames));
     }
 
     [Test]
@@ -598,7 +598,7 @@ public class AssetsComparatorTests
 
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetsComparator!.GetImageAndVideoNames(fileNames!));
 
-        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -631,8 +631,8 @@ public class AssetsComparatorTests
 
         string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
 
-        Assert.IsNotEmpty(updatedFileNames);
-        CollectionAssert.AreEquivalent(expectedFileNames, updatedFileNames);
+        Assert.That(updatedFileNames, Is.Not.Empty);
+        Assert.That(updatedFileNames, Is.EquivalentTo(expectedFileNames));
     }
 
     [Test]
@@ -663,7 +663,7 @@ public class AssetsComparatorTests
 
         string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
 
-        Assert.IsEmpty(updatedFileNames);
+        Assert.That(updatedFileNames, Is.Empty);
     }
 
     [Test]
@@ -673,7 +673,7 @@ public class AssetsComparatorTests
 
         string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
 
-        Assert.IsEmpty(updatedFileNames);
+        Assert.That(updatedFileNames, Is.Empty);
     }
 
     [Test]
@@ -683,7 +683,7 @@ public class AssetsComparatorTests
 
         string[] updatedFileNames = _assetsComparator!.GetUpdatedFileNames(cataloguedAssets);
 
-        Assert.IsEmpty(updatedFileNames);
+        Assert.That(updatedFileNames, Is.Empty);
     }
 
     [Test]
@@ -693,7 +693,7 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetUpdatedFileNames(cataloguedAssets!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -754,8 +754,8 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsNotEmpty(deletedFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic" }, deletedFileNames);
+        Assert.That(deletedFileNames, Is.Not.Empty);
+        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic" }));
     }
 
     [Test]
@@ -828,8 +828,8 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsNotEmpty(deletedFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic" }, deletedFileNames);
+        Assert.That(deletedFileNames, Is.Not.Empty);
+        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic" }));
     }
 
     [Test]
@@ -902,7 +902,7 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsEmpty(deletedFileNames);
+        Assert.That(deletedFileNames, Is.Empty);
     }
 
     [Test]
@@ -975,8 +975,8 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsNotEmpty(deletedFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }, deletedFileNames);
+        Assert.That(deletedFileNames, Is.Not.Empty);
+        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
     }
 
     [Test]
@@ -1049,7 +1049,7 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNames(fileNames!, cataloguedAssets));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'second')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
     }
 
     [Test]
@@ -1060,7 +1060,7 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
-        Assert.IsEmpty(deletedFileNames);
+        Assert.That(deletedFileNames, Is.Empty);
     }
 
     [Test]
@@ -1071,7 +1071,7 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -1082,8 +1082,8 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsNotEmpty(deletedFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4" }, deletedFileNames);
+        Assert.That(deletedFileNames, Is.Not.Empty);
+        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4" }));
     }
 
     [Test]
@@ -1094,8 +1094,8 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsNotEmpty(deletedFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4" }, deletedFileNames);
+        Assert.That(deletedFileNames, Is.Not.Empty);
+        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4" }));
     }
 
     [Test]
@@ -1106,7 +1106,7 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsEmpty(deletedFileNames);
+        Assert.That(deletedFileNames, Is.Empty);
     }
 
     [Test]
@@ -1117,8 +1117,8 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsNotEmpty(deletedFileNames);
-        CollectionAssert.AreEquivalent(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }, deletedFileNames);
+        Assert.That(deletedFileNames, Is.Not.Empty);
+        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
     }
 
     [Test]
@@ -1129,7 +1129,7 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames!, destinationFileNames));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'second')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'second')"));
     }
 
     [Test]
@@ -1140,7 +1140,7 @@ public class AssetsComparatorTests
 
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
-        Assert.IsEmpty(deletedFileNames);
+        Assert.That(deletedFileNames, Is.Empty);
     }
 
     [Test]
@@ -1151,6 +1151,6 @@ public class AssetsComparatorTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'first')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'first')"));
     }
 }

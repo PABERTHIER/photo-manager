@@ -63,20 +63,20 @@ public class AssetRepositoryGetSubFoldersTests
             Folder[] childFolders2 = _assetRepository!.GetSubFolders(childFolder2, includeHidden: false);
             Folder[] childFolders3 = _assetRepository!.GetSubFolders(childFolder3, includeHidden: false);
 
-            Assert.IsNotEmpty(parentFolders1);
-            Assert.AreEqual(1, parentFolders1.Length);
-            Assert.AreEqual(childFolderPath1, parentFolders1[0].Path);
+            Assert.That(parentFolders1, Is.Not.Empty);
+            Assert.That(parentFolders1, Has.Length.EqualTo(1));
+            Assert.That(parentFolders1[0].Path, Is.EqualTo(childFolderPath1));
 
-            Assert.IsNotEmpty(parentFolders2);
-            Assert.AreEqual(2, parentFolders2.Length);
-            Assert.AreEqual(childFolderPath2, parentFolders2[0].Path);
-            Assert.AreEqual(childFolderPath3, parentFolders2[1].Path);
+            Assert.That(parentFolders2, Is.Not.Empty);
+            Assert.That(parentFolders2, Has.Length.EqualTo(2));
+            Assert.That(parentFolders2[0].Path, Is.EqualTo(childFolderPath2));
+            Assert.That(parentFolders2[1].Path, Is.EqualTo(childFolderPath3));
 
-            Assert.IsEmpty(childFolders1);
-            Assert.IsEmpty(childFolders2);
-            Assert.IsEmpty(childFolders3);
+            Assert.That(childFolders1, Is.Empty);
+            Assert.That(childFolders2, Is.Empty);
+            Assert.That(childFolders3, Is.Empty);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -102,10 +102,10 @@ public class AssetRepositoryGetSubFoldersTests
             Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1, includeHidden: false);
             Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2, includeHidden: false);
 
-            Assert.IsEmpty(parentFolders1);
-            Assert.IsEmpty(parentFolders2);
+            Assert.That(parentFolders1, Is.Empty);
+            Assert.That(parentFolders2, Is.Empty);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -131,10 +131,10 @@ public class AssetRepositoryGetSubFoldersTests
             Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1, includeHidden: false);
             Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2, includeHidden: false);
 
-            Assert.IsEmpty(parentFolders1);
-            Assert.IsEmpty(parentFolders2);
+            Assert.That(parentFolders1, Is.Empty);
+            Assert.That(parentFolders2, Is.Empty);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -159,9 +159,9 @@ public class AssetRepositoryGetSubFoldersTests
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => _assetRepository!.GetSubFolders(parentFolder1!, includeHidden: false));
 
-            Assert.AreEqual("Delegate to an instance method cannot have null 'this'.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

@@ -130,47 +130,47 @@ public class AssetRepositoryGetAssetsCounterTests
             _asset2 = _asset2!.WithFolder(folder);
             _asset3 = _asset3!.WithFolder(folder);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
 
             int assetsCounter = _assetRepository.GetAssetsCounter();
-            Assert.AreEqual(0, assetsCounter);
+            Assert.That(assetsCounter, Is.EqualTo(0));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
 
             _assetRepository.AddAsset(_asset1!, []);
             assetsCounter = _assetRepository.GetAssetsCounter();
-            Assert.AreEqual(1, assetsCounter);
+            Assert.That(assetsCounter, Is.EqualTo(1));
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             _assetRepository.AddAsset(_asset2!, []);
             assetsCounter = _assetRepository.GetAssetsCounter();
-            Assert.AreEqual(2, assetsCounter);
+            Assert.That(assetsCounter, Is.EqualTo(2));
 
-            Assert.AreEqual(2, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
             _assetRepository.AddAsset(_asset3!, []);
             assetsCounter = _assetRepository.GetAssetsCounter();
-            Assert.AreEqual(3, assetsCounter);
+            Assert.That(assetsCounter, Is.EqualTo(3));
 
-            Assert.AreEqual(3, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
 
             _assetRepository.DeleteAsset(folderPath, _asset3.FileName);
 
             assetsCounter = _assetRepository.GetAssetsCounter();
-            Assert.AreEqual(2, assetsCounter);
+            Assert.That(assetsCounter, Is.EqualTo(2));
 
-            Assert.AreEqual(4, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[3]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(4));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[3], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -189,9 +189,9 @@ public class AssetRepositoryGetAssetsCounterTests
         {
             int assetsCounter = _assetRepository!.GetAssetsCounter();
 
-            Assert.AreEqual(0, assetsCounter);
+            Assert.That(assetsCounter, Is.EqualTo(0));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -219,10 +219,10 @@ public class AssetRepositoryGetAssetsCounterTests
             _assetRepository.AddAsset(_asset2!, []);
             _assetRepository.AddAsset(_asset3!, []);
 
-            Assert.AreEqual(3, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
 
             int assetsCounter1 = 0;
             int assetsCounter2 = 0;
@@ -235,14 +235,14 @@ public class AssetRepositoryGetAssetsCounterTests
                 () => assetsCounter3 = _assetRepository.GetAssetsCounter()
             );
 
-            Assert.AreEqual(3, assetsCounter1);
-            Assert.AreEqual(3, assetsCounter2);
-            Assert.AreEqual(3, assetsCounter3);
+            Assert.That(assetsCounter1, Is.EqualTo(3));
+            Assert.That(assetsCounter2, Is.EqualTo(3));
+            Assert.That(assetsCounter3, Is.EqualTo(3));
 
-            Assert.AreEqual(3, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

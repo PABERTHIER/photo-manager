@@ -51,20 +51,20 @@ public class AssetRepositorySaveRecentTargetPathsTests
             _assetRepository!.SaveRecentTargetPaths(recentTargetPathsToSave);
             List<string> recentTargetPaths = _assetRepository.GetRecentTargetPaths();
 
-            Assert.AreEqual(2, recentTargetPaths.Count);
-            Assert.AreEqual(recentTargetPathsToSave[0], recentTargetPaths[0]);
-            Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths[1]);
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths[0], Is.EqualTo(recentTargetPathsToSave[0]));
+            Assert.That(recentTargetPaths[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             _assetRepository.SaveRecentTargetPaths([]);
             recentTargetPaths = _assetRepository.GetRecentTargetPaths();
 
-            Assert.IsEmpty(recentTargetPaths);
+            Assert.That(recentTargetPaths, Is.Empty);
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -96,13 +96,13 @@ public class AssetRepositorySaveRecentTargetPathsTests
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.AreEqual(2, recentTargetPaths.Count);
-            Assert.AreEqual(recentTargetPathsToSave[0], recentTargetPaths[0]);
-            Assert.AreEqual(recentTargetPathsToSave[1], recentTargetPaths[1]);
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths[0], Is.EqualTo(recentTargetPathsToSave[0]));
+            Assert.That(recentTargetPaths[1], Is.EqualTo(recentTargetPathsToSave[1]));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

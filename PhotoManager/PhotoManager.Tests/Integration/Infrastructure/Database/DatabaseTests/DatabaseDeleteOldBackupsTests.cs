@@ -51,24 +51,24 @@ public class DatabaseDeleteOldBackupsTests
             bool backupCreated4 = _database!.WriteBackup(new (2023, 01, 04));
             bool backupCreated5 = _database!.WriteBackup(new (2023, 05, 04));
 
-            Assert.IsTrue(backupCreated1);
-            Assert.IsTrue(backupCreated2);
-            Assert.IsTrue(backupCreated3);
-            Assert.IsTrue(backupCreated4);
-            Assert.IsTrue(backupCreated5);
+            Assert.That(backupCreated1, Is.True);
+            Assert.That(backupCreated2, Is.True);
+            Assert.That(backupCreated3, Is.True);
+            Assert.That(backupCreated4, Is.True);
+            Assert.That(backupCreated5, Is.True);
 
             _database!.DeleteOldBackups(backupsToKeep);
 
-            Assert.IsTrue(File.Exists(path1));
-            Assert.IsTrue(File.Exists(path2));
-            Assert.IsFalse(File.Exists(path3));
-            Assert.IsFalse(File.Exists(path4));
-            Assert.IsTrue(File.Exists(path5));
+            Assert.That(File.Exists(path1), Is.True);
+            Assert.That(File.Exists(path2), Is.True);
+            Assert.That(File.Exists(path3), Is.False);
+            Assert.That(File.Exists(path4), Is.False);
+            Assert.That(File.Exists(path5), Is.True);
 
-            Assert.IsNotNull(_database!.Diagnostics.LastDeletedBackupFilePaths);
-            Assert.AreEqual(2, _database!.Diagnostics.LastDeletedBackupFilePaths!.Length);
-            Assert.AreEqual(path4, _database!.Diagnostics.LastDeletedBackupFilePaths[0]);
-            Assert.AreEqual(path3, _database!.Diagnostics.LastDeletedBackupFilePaths[1]);
+            Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
+            Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths!, Has.Length.EqualTo(2));
+            Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths[0], Is.EqualTo(path4));
+            Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths[1], Is.EqualTo(path3));
         }
         finally
         {
@@ -99,18 +99,18 @@ public class DatabaseDeleteOldBackupsTests
             bool backupCreated2 = _database!.WriteBackup(new (2023, 03, 04));
             bool backupCreated3 = _database!.WriteBackup(new (2023, 02, 04));
 
-            Assert.IsTrue(backupCreated1);
-            Assert.IsTrue(backupCreated2);
-            Assert.IsTrue(backupCreated3);
+            Assert.That(backupCreated1, Is.True);
+            Assert.That(backupCreated2, Is.True);
+            Assert.That(backupCreated3, Is.True);
 
             _database!.DeleteOldBackups(backupsToKeep);
 
-            Assert.IsTrue(File.Exists(path1));
-            Assert.IsTrue(File.Exists(path2));
-            Assert.IsTrue(File.Exists(path3));
+            Assert.That(File.Exists(path1), Is.True);
+            Assert.That(File.Exists(path2), Is.True);
+            Assert.That(File.Exists(path3), Is.True);
 
-            Assert.IsNotNull(_database!.Diagnostics.LastDeletedBackupFilePaths);
-            Assert.AreEqual(0, _database!.Diagnostics.LastDeletedBackupFilePaths!.Length);
+            Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
+            Assert.That(_database!.Diagnostics.LastDeletedBackupFilePaths!.Length, Is.EqualTo(0));
         }
         finally
         {

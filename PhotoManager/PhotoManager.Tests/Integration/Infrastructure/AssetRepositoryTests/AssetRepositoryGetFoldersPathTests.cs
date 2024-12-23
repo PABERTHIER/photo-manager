@@ -50,13 +50,13 @@ public class AssetRepositoryGetFoldersPathTests
 
             HashSet<string> foldersPath = _assetRepository!.GetFoldersPath();
 
-            Assert.AreEqual(2, foldersPath.Count);
-            Assert.AreEqual(folderPath1, addedFolder1.Path);
-            Assert.IsTrue(foldersPath.Contains(folderPath1));
-            Assert.AreEqual(folderPath2, addedFolder2.Path);
-            Assert.IsTrue(foldersPath.Contains(folderPath2));
+            Assert.That(foldersPath, Has.Count.EqualTo(2));
+            Assert.That(addedFolder1.Path, Is.EqualTo(folderPath1));
+            Assert.That(foldersPath.Contains(folderPath1), Is.True);
+            Assert.That(addedFolder2.Path, Is.EqualTo(folderPath2));
+            Assert.That(foldersPath.Contains(folderPath2), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -75,9 +75,9 @@ public class AssetRepositoryGetFoldersPathTests
         {
             HashSet<string> foldersPath = _assetRepository!.GetFoldersPath();
 
-            Assert.IsEmpty(foldersPath);
+            Assert.That(foldersPath, Is.Empty);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -111,22 +111,22 @@ public class AssetRepositoryGetFoldersPathTests
                 () => foldersPath3 = _assetRepository!.GetFoldersPath()
             );
 
-            Assert.AreEqual(folderPath1, addedFolder1.Path);
-            Assert.AreEqual(folderPath2, addedFolder2.Path);
+            Assert.That(addedFolder1.Path, Is.EqualTo(folderPath1));
+            Assert.That(addedFolder2.Path, Is.EqualTo(folderPath2));
 
-            Assert.AreEqual(2, foldersPath1.Count);
-            Assert.IsTrue(foldersPath1.Contains(folderPath1));
-            Assert.IsTrue(foldersPath1.Contains(folderPath2));
+            Assert.That(foldersPath1, Has.Count.EqualTo(2));
+            Assert.That(foldersPath1.Contains(folderPath1), Is.True);
+            Assert.That(foldersPath1.Contains(folderPath2), Is.True);
 
-            Assert.AreEqual(2, foldersPath2.Count);
-            Assert.IsTrue(foldersPath2.Contains(folderPath1));
-            Assert.IsTrue(foldersPath2.Contains(folderPath2));
+            Assert.That(foldersPath2, Has.Count.EqualTo(2));
+            Assert.That(foldersPath2.Contains(folderPath1), Is.True);
+            Assert.That(foldersPath2.Contains(folderPath2), Is.True);
 
-            Assert.AreEqual(2, foldersPath3.Count);
-            Assert.IsTrue(foldersPath3.Contains(folderPath1));
-            Assert.IsTrue(foldersPath3.Contains(folderPath2));
+            Assert.That(foldersPath3, Has.Count.EqualTo(2));
+            Assert.That(foldersPath3.Contains(folderPath1), Is.True);
+            Assert.That(foldersPath3.Contains(folderPath2), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

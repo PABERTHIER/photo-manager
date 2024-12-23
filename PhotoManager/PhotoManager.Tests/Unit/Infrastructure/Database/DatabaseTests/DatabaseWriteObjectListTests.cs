@@ -163,9 +163,9 @@ public class DatabaseWriteObjectListTests
 
             Exception? exception = Assert.Throws<Exception>(() => _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
 
-            Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Properties must be defined for the columns in the table NoTableName."));
 
-            Assert.IsFalse(File.Exists(filePath));
+            Assert.That(File.Exists(filePath), Is.False);
         }
         finally
         {
@@ -355,13 +355,13 @@ public class DatabaseWriteObjectListTests
 
             _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc);
 
-            Assert.IsTrue(File.Exists(filePath));
+            Assert.That(File.Exists(filePath), Is.True);
 
-            Assert.AreEqual(filePath, _database!.Diagnostics.LastWriteFilePath);
-            Assert.AreNotEqual(csv, _database!.Diagnostics.LastWriteFileRaw);
+            Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(filePath));
+            Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.Not.EqualTo(csv));
 
             string fileContent = File.ReadAllText(filePath);
-            Assert.AreNotEqual(csv, fileContent);
+            Assert.That(fileContent, Is.Not.EqualTo(csv));
         }
         finally
         {
@@ -396,8 +396,8 @@ public class DatabaseWriteObjectListTests
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
                 _database!.WriteObjectList(assets!, tableName, AssetConfigs.WriteFunc));
 
-            Assert.AreEqual("Value cannot be null. (Parameter 'list')", exception?.Message);
-            Assert.IsFalse(File.Exists(filePath));
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'list')"));
+            Assert.That(File.Exists(filePath), Is.False);
         }
         finally
         {
@@ -477,8 +477,8 @@ public class DatabaseWriteObjectListTests
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
                 _database!.WriteObjectList(assets, tableName, AssetConfigs.WriteFunc));
 
-            Assert.AreEqual("Value cannot be null. (Parameter 'tableName')", exception?.Message);
-            Assert.IsFalse(File.Exists(filePath));
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'tableName')"));
+            Assert.That(File.Exists(filePath), Is.False);
         }
         finally
         {
@@ -558,9 +558,9 @@ public class DatabaseWriteObjectListTests
             ArgumentNullException? exception2 = Assert.Throws<ArgumentNullException>(() =>
                 _database!.WriteObjectList(assets, tableName!, AssetConfigs.WriteFunc));
 
-            Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception1?.Message);
-            Assert.AreEqual("Value cannot be null. (Parameter 'tableName')", exception2?.Message);
-            Assert.IsFalse(File.Exists(filePath));
+            Assert.That(exception1?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
+            Assert.That(exception2?.Message, Is.EqualTo("Value cannot be null. (Parameter 'tableName')"));
+            Assert.That(File.Exists(filePath), Is.False);
         }
         finally
         {
@@ -649,12 +649,12 @@ public class DatabaseWriteObjectListTests
 
     private void Asserts(string filePath, string csv)
     {
-        Assert.IsTrue(File.Exists(filePath));
+        Assert.That(File.Exists(filePath), Is.True);
 
-        Assert.AreEqual(filePath, _database!.Diagnostics.LastWriteFilePath);
-        Assert.AreEqual(csv, _database!.Diagnostics.LastWriteFileRaw);
+        Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(filePath));
+        Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.EqualTo(csv));
 
         string fileContent = File.ReadAllText(filePath);
-        Assert.AreEqual(csv, fileContent);
+        Assert.That(fileContent, Is.EqualTo(csv));
     }
 }

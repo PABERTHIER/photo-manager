@@ -128,7 +128,7 @@ public class DatabaseReadObjectListTests
             File.WriteAllText(filePath, csv);
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, AssetConfigs.ReadFunc));
-            Assert.AreEqual(exceptionMessage, exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
         }
         finally
         {
@@ -284,7 +284,7 @@ public class DatabaseReadObjectListTests
         {
             List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv!, tableName, escapeText);
 
-            Assert.IsEmpty(assets);
+            Assert.That(assets, Is.Empty);
         }
         finally
         {
@@ -308,7 +308,7 @@ public class DatabaseReadObjectListTests
         {
             List<Asset> assets = ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
 
-            Assert.IsEmpty(assets);
+            Assert.That(assets, Is.Empty);
         }
         finally
         {
@@ -340,7 +340,7 @@ public class DatabaseReadObjectListTests
                 ReadObjectList(directoryPath, _userConfigurationService!.StorageSettings.Separator, filePath, csv, tableName, escapeText);
             });
 
-            Assert.AreEqual(exceptionMessage, exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
         }
         finally
         {
@@ -380,7 +380,7 @@ public class DatabaseReadObjectListTests
             });
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.ReadObjectList(tableName, nullFunc!));
-            Assert.AreEqual(exceptionMessage, exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
         }
         finally
         {
@@ -423,7 +423,7 @@ public class DatabaseReadObjectListTests
             });
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => database.ReadObjectList(tableName, AssetConfigs.ReadFunc));
-            Assert.AreEqual(exceptionMessage, exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo(exceptionMessage));
         }
         finally
         {
@@ -470,39 +470,39 @@ public class DatabaseReadObjectListTests
 
     private void Asserts(List<Asset> assets, string filePath, string csv)
     {
-        Assert.AreEqual(2, assets.Count);
+        Assert.That(assets, Has.Count.EqualTo(2));
 
         Asset asset1 = assets[0];
-        Assert.AreEqual(new Guid("876283c6-780e-4ad5-975c-be63044c087a"), asset1.FolderId);
-        Assert.AreEqual("20200720175810_3.jpg", asset1.FileName);
-        Assert.AreEqual(Rotation.Rotate0, asset1.ImageRotation);
-        Assert.AreEqual(1920, asset1.Pixel.Asset.Width);
-        Assert.AreEqual(1080, asset1.Pixel.Asset.Height);
-        Assert.AreEqual(200, asset1.Pixel.Thumbnail.Width);
-        Assert.AreEqual(112, asset1.Pixel.Thumbnail.Height);
-        Assert.AreEqual(new DateTime(2023, 8, 19, 11, 26, 09), asset1.ThumbnailCreationDateTime);
-        Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset1.Hash);
-        Assert.AreEqual(false, asset1.Metadata.Corrupted.IsTrue);
-        Assert.AreEqual("", asset1.Metadata.Corrupted.Message);
-        Assert.AreEqual(false, asset1.Metadata.Rotated.IsTrue);
-        Assert.AreEqual("", asset1.Metadata.Rotated.Message);
+        Assert.That(asset1.FolderId, Is.EqualTo(new Guid("876283c6-780e-4ad5-975c-be63044c087a")));
+        Assert.That(asset1.FileName, Is.EqualTo("20200720175810_3.jpg"));
+        Assert.That(asset1.ImageRotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(asset1.Pixel.Asset.Width, Is.EqualTo(1920));
+        Assert.That(asset1.Pixel.Asset.Height, Is.EqualTo(1080));
+        Assert.That(asset1.Pixel.Thumbnail.Width, Is.EqualTo(200));
+        Assert.That(asset1.Pixel.Thumbnail.Height, Is.EqualTo(112));
+        Assert.That(asset1.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 19, 11, 26, 09)));
+        Assert.That(asset1.Hash, Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(asset1.Metadata.Corrupted.IsTrue, Is.EqualTo(false));
+        Assert.That(asset1.Metadata.Corrupted.Message, Is.EqualTo(""));
+        Assert.That(asset1.Metadata.Rotated.IsTrue, Is.EqualTo(false));
+        Assert.That(asset1.Metadata.Rotated.Message, Is.EqualTo(""));
 
         Asset asset2 = assets[1];
-        Assert.AreEqual(new Guid("876283c6-780e-4ad5-975c-be63044c087a"), asset2.FolderId);
-        Assert.AreEqual("20200720175816_3.jpg", asset2.FileName);
-        Assert.AreEqual(Rotation.Rotate0, asset2.ImageRotation);
-        Assert.AreEqual(1920, asset2.Pixel.Asset.Width);
-        Assert.AreEqual(1080, asset2.Pixel.Asset.Height);
-        Assert.AreEqual(200, asset2.Pixel.Thumbnail.Width);
-        Assert.AreEqual(112, asset2.Pixel.Thumbnail.Height);
-        Assert.AreEqual(new DateTime(2023, 8, 19, 11, 26, 09), asset2.ThumbnailCreationDateTime);
-        Assert.AreEqual("0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124", asset2.Hash);
-        Assert.AreEqual(true, asset2.Metadata.Corrupted.IsTrue);
-        Assert.AreEqual("The asset is corrupted", asset2.Metadata.Corrupted.Message);
-        Assert.AreEqual(true, asset2.Metadata.Rotated.IsTrue);
-        Assert.AreEqual("The asset has been rotated", asset2.Metadata.Rotated.Message);
+        Assert.That(asset2.FolderId, Is.EqualTo(new Guid("876283c6-780e-4ad5-975c-be63044c087a")));
+        Assert.That(asset2.FileName, Is.EqualTo("20200720175816_3.jpg"));
+        Assert.That(asset2.ImageRotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(asset2.Pixel.Asset.Width, Is.EqualTo(1920));
+        Assert.That(asset2.Pixel.Asset.Height, Is.EqualTo(1080));
+        Assert.That(asset2.Pixel.Thumbnail.Width, Is.EqualTo(200));
+        Assert.That(asset2.Pixel.Thumbnail.Height, Is.EqualTo(112));
+        Assert.That(asset2.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 19, 11, 26, 09)));
+        Assert.That(asset2.Hash, Is.EqualTo("0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124"));
+        Assert.That(asset2.Metadata.Corrupted.IsTrue, Is.EqualTo(true));
+        Assert.That(asset2.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
+        Assert.That(asset2.Metadata.Rotated.IsTrue, Is.EqualTo(true));
+        Assert.That(asset2.Metadata.Rotated.Message, Is.EqualTo("The asset has been rotated"));
 
-        Assert.AreEqual(filePath, _database!.Diagnostics.LastReadFilePath);
-        Assert.AreEqual(csv, _database!.Diagnostics.LastReadFileRaw);
+        Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(filePath));
+        Assert.That(_database!.Diagnostics.LastReadFileRaw, Is.EqualTo(csv));
     }
 }

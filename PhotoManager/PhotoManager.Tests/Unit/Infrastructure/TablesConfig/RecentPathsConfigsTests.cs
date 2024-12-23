@@ -8,10 +8,10 @@ public class RecentPathsConfigsTests
     {
         ColumnProperties[] columns = RecentPathsConfigs.ConfigureDataTable();
 
-        Assert.IsNotNull(columns);
-        Assert.AreEqual(1, columns.Length);
+        Assert.That(columns, Is.Not.Null);
+        Assert.That(columns, Has.Length.EqualTo(1));
 
-        Assert.AreEqual("Path", columns[0].ColumnName);
+        Assert.That(columns[0].ColumnName, Is.EqualTo("Path"));
     }
 
     [Test]
@@ -24,8 +24,8 @@ public class RecentPathsConfigsTests
 
         string recentPath = RecentPathsConfigs.ReadFunc(validValues);
 
-        Assert.IsNotNull(recentPath);
-        Assert.AreEqual("D:\\folder\\newFolder", recentPath);
+        Assert.That(recentPath, Is.Not.Null);
+        Assert.That(recentPath, Is.EqualTo("D:\\folder\\newFolder"));
     }
 
     [Test]
@@ -39,8 +39,8 @@ public class RecentPathsConfigsTests
 
         string recentPath = RecentPathsConfigs.ReadFunc(tooManyValues);
 
-        Assert.IsNotNull(recentPath);
-        Assert.AreEqual("D:\\folder\\newFolder1", recentPath);
+        Assert.That(recentPath, Is.Not.Null);
+        Assert.That(recentPath, Is.EqualTo("D:\\folder\\newFolder1"));
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class RecentPathsConfigsTests
 
         string recentPath = RecentPathsConfigs.ReadFunc(nullValues);
 
-        Assert.IsNull(recentPath);
+        Assert.That(recentPath, Is.Null);
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class RecentPathsConfigsTests
 
         IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => RecentPathsConfigs.ReadFunc(emptyArray));
 
-        Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Index was outside the bounds of the array."));
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class RecentPathsConfigsTests
 
         object result = RecentPathsConfigs.WriteFunc(recentPath, 0);
 
-        Assert.AreEqual(recentPath, result);
+        Assert.That(result, Is.EqualTo(recentPath));
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class RecentPathsConfigsTests
 
         ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => RecentPathsConfigs.WriteFunc(recentPath, 2));
 
-        Assert.AreEqual("Specified argument was out of the range of valid values. (Parameter 'i')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
     }
 
     [Test]
@@ -90,6 +90,6 @@ public class RecentPathsConfigsTests
 
         object result = RecentPathsConfigs.WriteFunc(recentPath!, 0);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 }

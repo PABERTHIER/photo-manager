@@ -24,7 +24,7 @@ public class VideoHelperTests
 
         try
         {
-            Assert.IsFalse(File.Exists(expectedFirstFrameVideoPath));
+            Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.False);
 
             string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath);
 
@@ -36,10 +36,10 @@ public class VideoHelperTests
 
             loggingAssertsService.AssertLogInfos(messages, typeOfService);
 
-            Assert.IsFalse(string.IsNullOrEmpty(firstFrameVideoPath));
-            Assert.AreEqual(expectedFirstFrameVideoPath, firstFrameVideoPath);
+            Assert.That(string.IsNullOrEmpty(firstFrameVideoPath), Is.False);
+            Assert.That(firstFrameVideoPath, Is.EqualTo(expectedFirstFrameVideoPath));
 
-            Assert.IsTrue(File.Exists(expectedFirstFrameVideoPath));
+            Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.True);
         }
         finally
         {
@@ -66,10 +66,10 @@ public class VideoHelperTests
             string sourceImagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
             File.Copy(sourceImagePath, expectedFirstFrameVideoPath);
-            Assert.IsTrue(File.Exists(expectedFirstFrameVideoPath));
+            Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.True);
 
             string videoPath = Path.Combine(_dataDirectory!, videoFileName);
-            Assert.IsTrue(File.Exists(videoPath));
+            Assert.That(File.Exists(videoPath), Is.True);
 
             string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, videoFileName, destinationPath);
 
@@ -79,8 +79,8 @@ public class VideoHelperTests
 
             loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
 
-            Assert.IsTrue(string.IsNullOrEmpty(firstFrameVideoPath));
-            Assert.IsTrue(File.Exists(expectedFirstFrameVideoPath));
+            Assert.That(string.IsNullOrEmpty(firstFrameVideoPath), Is.True);
+            Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.True);
         }
         finally
         {
@@ -110,8 +110,8 @@ public class VideoHelperTests
 
             loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
 
-            Assert.IsTrue(string.IsNullOrEmpty(firstFrameVideoPath));
-            Assert.IsFalse(File.Exists(expectedFirstFrameVideoPath));
+            Assert.That(string.IsNullOrEmpty(firstFrameVideoPath), Is.True);
+            Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.False);
         }
         finally
         {
@@ -141,8 +141,8 @@ public class VideoHelperTests
 
             loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
 
-            Assert.IsTrue(string.IsNullOrEmpty(firstFrameVideoPath));
-            Assert.IsFalse(File.Exists(expectedFirstFrameVideoPath));
+            Assert.That(string.IsNullOrEmpty(firstFrameVideoPath), Is.True);
+            Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.False);
         }
         finally
         {

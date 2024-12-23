@@ -203,30 +203,30 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.IsNotEmpty(duplicatedAssets);
-            Assert.AreEqual(2, duplicatedAssets.Count);
+            Assert.That(duplicatedAssets, Is.Not.Empty);
+            Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
 
             List<Asset> firstDuplicatedAssetsSet = duplicatedAssets[0];
             List<Asset> secondDuplicatedAssetsSet = duplicatedAssets[1];
 
-            Assert.AreEqual(2, firstDuplicatedAssetsSet.Count);
-            Assert.AreEqual(2, secondDuplicatedAssetsSet.Count);
+            Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
+            Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
 
             Asset? duplicatedAsset1 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset1.FileName);
             Asset? duplicatedAsset3 = firstDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
 
-            Assert.IsNotNull(duplicatedAsset1);
-            Assert.IsNotNull(duplicatedAsset3);
-            Assert.AreEqual(_asset1.FileName, duplicatedAsset1!.FileName);
-            Assert.AreEqual(_asset3.FileName, duplicatedAsset3!.FileName);
+            Assert.That(duplicatedAsset1, Is.Not.Null);
+            Assert.That(duplicatedAsset3, Is.Not.Null);
+            Assert.That(duplicatedAsset1!.FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(duplicatedAsset3!.FileName, Is.EqualTo(_asset3.FileName));
 
             Asset? duplicatedAsset2 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
             Asset? duplicatedAsset4 = secondDuplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset4.FileName);
 
-            Assert.IsNotNull(duplicatedAsset2);
-            Assert.IsNotNull(duplicatedAsset4);
-            Assert.AreEqual(_asset2.FileName, duplicatedAsset2!.FileName);
-            Assert.AreEqual(_asset4.FileName, duplicatedAsset4!.FileName);
+            Assert.That(duplicatedAsset2, Is.Not.Null);
+            Assert.That(duplicatedAsset4, Is.Not.Null);
+            Assert.That(duplicatedAsset2!.FileName, Is.EqualTo(_asset2.FileName));
+            Assert.That(duplicatedAsset4!.FileName, Is.EqualTo(_asset4.FileName));
         }
         finally
         {
@@ -260,27 +260,27 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.IsNotEmpty(duplicatedAssets);
-            Assert.AreEqual(1, duplicatedAssets.Count);
+            Assert.That(duplicatedAssets, Is.Not.Empty);
+            Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
 
             List<Asset> duplicatedAssetsSet = duplicatedAssets[0];
 
-            Assert.AreEqual(4, duplicatedAssetsSet.Count);
+            Assert.That(duplicatedAssetsSet, Has.Count.EqualTo(4));
 
             Asset? duplicatedAsset2 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset2.FileName);
             Asset? duplicatedAsset3 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset3.FileName);
             Asset? duplicatedAsset4 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset4.FileName);
             Asset? duplicatedAsset5 = duplicatedAssetsSet.FirstOrDefault(x => x.FileName == _asset5.FileName);
 
-            Assert.IsNotNull(duplicatedAsset2);
-            Assert.IsNotNull(duplicatedAsset3);
-            Assert.IsNotNull(duplicatedAsset4);
-            Assert.IsNotNull(duplicatedAsset5);
+            Assert.That(duplicatedAsset2, Is.Not.Null);
+            Assert.That(duplicatedAsset3, Is.Not.Null);
+            Assert.That(duplicatedAsset4, Is.Not.Null);
+            Assert.That(duplicatedAsset5, Is.Not.Null);
 
-            Assert.AreEqual(_asset2.FileName, duplicatedAsset2!.FileName);
-            Assert.AreEqual(_asset3.FileName, duplicatedAsset3!.FileName);
-            Assert.AreEqual(_asset4.FileName, duplicatedAsset4!.FileName);
-            Assert.AreEqual(_asset5.FileName, duplicatedAsset5!.FileName);
+            Assert.That(duplicatedAsset2!.FileName, Is.EqualTo(_asset2.FileName));
+            Assert.That(duplicatedAsset3!.FileName, Is.EqualTo(_asset3.FileName));
+            Assert.That(duplicatedAsset4!.FileName, Is.EqualTo(_asset4.FileName));
+            Assert.That(duplicatedAsset5!.FileName, Is.EqualTo(_asset5.FileName));
         }
         finally
         {
@@ -311,7 +311,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.IsEmpty(duplicatedAssets);
+            Assert.That(duplicatedAssets, Is.Empty);
         }
         finally
         {
@@ -351,7 +351,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.IsEmpty(duplicatedAssets);
+            Assert.That(duplicatedAssets, Is.Empty);
         }
         finally
         {
@@ -366,7 +366,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         {
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.IsEmpty(duplicatedAssets);
+            Assert.That(duplicatedAssets, Is.Empty);
         }
         finally
         {
@@ -397,7 +397,7 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
             List<List<Asset>> duplicatedAssets = _findDuplicatedAssetsService!.GetDuplicatedAssets();
 
-            Assert.IsEmpty(duplicatedAssets);
+            Assert.That(duplicatedAssets, Is.Empty);
         }
         finally
         {

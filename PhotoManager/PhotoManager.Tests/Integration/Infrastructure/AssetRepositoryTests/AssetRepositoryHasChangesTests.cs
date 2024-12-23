@@ -42,9 +42,9 @@ public class AssetRepositoryHasChangesTests
 
         try
         {
-            Assert.IsFalse(_assetRepository!.HasChanges());
+            Assert.That(_assetRepository!.HasChanges(), Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -61,15 +61,15 @@ public class AssetRepositoryHasChangesTests
 
         try
         {
-            Assert.IsFalse(_assetRepository!.HasChanges());
+            Assert.That(_assetRepository!.HasChanges(), Is.False);
 
             string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
 
             _assetRepository!.AddFolder(folderPath1);
 
-            Assert.IsTrue(_assetRepository!.HasChanges());
+            Assert.That(_assetRepository!.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -86,7 +86,7 @@ public class AssetRepositoryHasChangesTests
 
         try
         {
-            Assert.IsFalse(_assetRepository!.HasChanges());
+            Assert.That(_assetRepository!.HasChanges(), Is.False);
 
             string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
 
@@ -103,11 +103,11 @@ public class AssetRepositoryHasChangesTests
                 () => hasChanges3 = _assetRepository!.HasChanges()
             );
 
-            Assert.IsTrue(hasChanges1);
-            Assert.IsTrue(hasChanges2);
-            Assert.IsTrue(hasChanges3);
+            Assert.That(hasChanges1, Is.True);
+            Assert.That(hasChanges2, Is.True);
+            Assert.That(hasChanges3, Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

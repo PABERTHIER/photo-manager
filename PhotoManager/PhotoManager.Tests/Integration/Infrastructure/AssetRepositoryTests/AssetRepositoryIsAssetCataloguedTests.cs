@@ -81,17 +81,17 @@ public class AssetRepositoryIsAssetCataloguedTests
 
             _assetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             bool isAssetCatalogued1 = _assetRepository!.IsAssetCatalogued(folderPath1, _asset1.FileName);
             bool isAssetCatalogued2 = _assetRepository!.IsAssetCatalogued(folderPath2, "toto.jpg");
 
-            Assert.IsTrue(isAssetCatalogued1);
-            Assert.IsFalse(isAssetCatalogued2);
+            Assert.That(isAssetCatalogued1, Is.True);
+            Assert.That(isAssetCatalogued2, Is.False);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -117,15 +117,15 @@ public class AssetRepositoryIsAssetCataloguedTests
 
             _assetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             bool isAssetCatalogued = _assetRepository.IsAssetCatalogued(folderPath2, "toto.jpg");
 
-            Assert.IsFalse(isAssetCatalogued);
+            Assert.That(isAssetCatalogued, Is.False);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -146,9 +146,9 @@ public class AssetRepositoryIsAssetCataloguedTests
 
             bool isAssetCatalogued = _assetRepository!.IsAssetCatalogued(folderPath!, "toto.jpg");
 
-            Assert.IsFalse(isAssetCatalogued);
+            Assert.That(isAssetCatalogued, Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -173,9 +173,9 @@ public class AssetRepositoryIsAssetCataloguedTests
 
             bool isAssetCatalogued = _assetRepository.IsAssetCatalogued(folderPath1, fileName!);
 
-            Assert.IsFalse(isAssetCatalogued);
+            Assert.That(isAssetCatalogued, Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -202,8 +202,8 @@ public class AssetRepositoryIsAssetCataloguedTests
 
             _assetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             bool isAssetCatalogued1 = false;
             bool isAssetCatalogued2 = false;
@@ -214,11 +214,11 @@ public class AssetRepositoryIsAssetCataloguedTests
                 () => isAssetCatalogued2 = _assetRepository!.IsAssetCatalogued(folderPath2, "toto.jpg")
             );
 
-            Assert.IsTrue(isAssetCatalogued1);
-            Assert.IsFalse(isAssetCatalogued2);
+            Assert.That(isAssetCatalogued1, Is.True);
+            Assert.That(isAssetCatalogued2, Is.False);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

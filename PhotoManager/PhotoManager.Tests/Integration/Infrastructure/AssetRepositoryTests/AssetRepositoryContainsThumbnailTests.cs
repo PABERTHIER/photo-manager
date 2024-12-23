@@ -80,17 +80,17 @@ public class AssetRepositoryContainsThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
-            Assert.IsTrue(isContainingThumbnail);
+            Assert.That(isContainingThumbnail, Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -114,10 +114,10 @@ public class AssetRepositoryContainsThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             bool isContainingThumbnail1 = false;
             bool isContainingThumbnail2 = false;
@@ -130,12 +130,12 @@ public class AssetRepositoryContainsThumbnailTests
                 () => isContainingThumbnail3 = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName)
             );
 
-            Assert.IsTrue(isContainingThumbnail1);
-            Assert.IsTrue(isContainingThumbnail2);
-            Assert.IsTrue(isContainingThumbnail3);
+            Assert.That(isContainingThumbnail1, Is.True);
+            Assert.That(isContainingThumbnail2, Is.True);
+            Assert.That(isContainingThumbnail3, Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -163,17 +163,17 @@ public class AssetRepositoryContainsThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
-            Assert.IsTrue(isContainingThumbnail);
+            Assert.That(isContainingThumbnail, Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -200,17 +200,17 @@ public class AssetRepositoryContainsThumbnailTests
             _asset1 = _asset1!.WithFolder(folder);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
-            Assert.IsFalse(thumbnails.ContainsKey(_asset1!.Folder.Path));
+            Assert.That(thumbnails, Is.Empty);
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
 
             bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_asset1!.Folder.Path));
-            Assert.IsEmpty(thumbnails[_asset1!.Folder.Path]);
-            Assert.IsFalse(isContainingThumbnail);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path], Is.Empty);
+            Assert.That(isContainingThumbnail, Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -245,15 +245,15 @@ public class AssetRepositoryContainsThumbnailTests
 
             testableAssetRepository.AddAsset(_asset1!, []);
 
-            Assert.IsTrue(testableAssetRepository.HasChanges()); // Set by AddFolder method, called by AddAsset method
+            Assert.That(testableAssetRepository.HasChanges(), Is.True); // Set by AddFolder method, called by AddAsset method
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
 
             bool isContainingThumbnail = testableAssetRepository.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
-            Assert.IsFalse(isContainingThumbnail);
+            Assert.That(isContainingThumbnail, Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -275,22 +275,22 @@ public class AssetRepositoryContainsThumbnailTests
 
             _asset1 = _asset1!.WithFolder(folder);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
-            Assert.IsFalse(thumbnails.ContainsKey(_asset1!.Folder.Path));
+            Assert.That(thumbnails, Is.Empty);
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
 
             bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_asset1!.Folder.Path));
-            Assert.IsEmpty(thumbnails[_asset1!.Folder.Path]);
-            Assert.IsFalse(isContainingThumbnail);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path], Is.Empty);
+            Assert.That(isContainingThumbnail, Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -317,27 +317,27 @@ public class AssetRepositoryContainsThumbnailTests
 
             _asset1 = _asset1!.WithFolder(folder);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
 
             _database!.WriteBlob(blobToWrite, _asset1!.Folder.ThumbnailsFilename);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
-            Assert.IsFalse(thumbnails.ContainsKey(_asset1!.Folder.Path));
+            Assert.That(thumbnails, Is.Empty);
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
 
             bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, _asset1!.FileName);
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_asset1.Folder.Path));
-            Assert.AreEqual(2, thumbnails[_asset1.Folder.Path].Count);
-            Assert.IsTrue(thumbnails[_asset1.Folder.Path].ContainsKey(_asset1.FileName));
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[_asset1.Folder.Path][_asset1.FileName]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_asset1.Folder.Path), Is.True);
+            Assert.That(thumbnails[_asset1.Folder.Path], Has.Count.EqualTo(2));
+            Assert.That(thumbnails[_asset1.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[_asset1.Folder.Path][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
 
-            Assert.IsTrue(isContainingThumbnail);
+            Assert.That(isContainingThumbnail, Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -362,17 +362,17 @@ public class AssetRepositoryContainsThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, fileName);
 
-            Assert.IsFalse(isContainingThumbnail);
+            Assert.That(isContainingThumbnail, Is.False);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -397,17 +397,17 @@ public class AssetRepositoryContainsThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             bool isContainingThumbnail = _testableAssetRepository!.ContainsThumbnail(_asset1!.Folder.Path, fileName!);
 
-            Assert.IsFalse(isContainingThumbnail);
+            Assert.That(isContainingThumbnail, Is.False);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -432,17 +432,17 @@ public class AssetRepositoryContainsThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.ContainsThumbnail(directoryName!, _asset1!.FileName));
 
-            Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

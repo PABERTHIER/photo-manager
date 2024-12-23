@@ -298,12 +298,12 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
 
             List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-            Assert.AreEqual(expected, duplicatedAssets.Count);
+            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
 
             if (expected > 0)
             {
                 IList<string> assetsNameList = assetsName.ToList();
-                Assert.IsTrue(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)));
+                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
         finally
@@ -355,12 +355,12 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
 
             List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-            Assert.AreEqual(expected, duplicatedAssets.Count);
+            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
 
             if (expected > 0)
             {
                 IList<string> assetsNameList = assetsName.ToList();
-                Assert.IsTrue(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)));
+                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
         finally
@@ -412,7 +412,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => findDuplicatedAssetsService.GetDuplicatedAssets());
 
-            Assert.AreEqual("Invalid arguments for hamming distance calculation.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Invalid arguments for hamming distance calculation."));
         }
         finally
         {
@@ -471,12 +471,12 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
 
             List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-            Assert.AreEqual(expected, duplicatedAssets.Count);
+            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
 
             if (expected > 0)
             {
                 IList<string> assetsNameList = assetsName.ToList();
-                Assert.IsTrue(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)));
+                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
         finally

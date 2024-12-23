@@ -35,6 +35,6 @@ public class ImageHelperTests
     public void Should_Detect_When_AssetIsImage(string fileExtension, bool expected)
     {
         bool result = PhotoManager.Common.ImageHelper.IsImageFile(fileExtension);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

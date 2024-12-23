@@ -81,14 +81,14 @@ public class AssetRepositoryLoadThumbnailTests
             _testableAssetRepository!.AddAsset(_asset1!, [1, 2, 3]);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_asset1!.Folder.Path));
-            Assert.AreEqual(1, thumbnails[_asset1!.Folder.Path].Count);
-            Assert.IsTrue(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName));
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[_asset1!.Folder.Path][_asset1.FileName]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             BitmapImage? bitmapImage = _testableAssetRepository!.LoadThumbnail(
                 _dataDirectory!,
@@ -96,27 +96,27 @@ public class AssetRepositoryLoadThumbnailTests
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
 
-            Assert.IsNotNull(bitmapImage);
+            Assert.That(bitmapImage, Is.Not.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assets.Count);
-            Assert.AreEqual(_asset1.FileName, assets[0].FileName);
+            Assert.That(assets, Has.Count.EqualTo(1));
+            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_asset1!.Folder.Path));
-            Assert.AreEqual(1, thumbnails[_asset1!.Folder.Path].Count);
-            Assert.IsTrue(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName));
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[_asset1!.Folder.Path][_asset1.FileName]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
 
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
 
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -145,7 +145,7 @@ public class AssetRepositoryLoadThumbnailTests
             _database!.WriteBlob(blobToWrite, addedFolder1.ThumbnailsFilename);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             BitmapImage? bitmapImage = _testableAssetRepository!.LoadThumbnail(
                 _dataDirectory!,
@@ -153,25 +153,25 @@ public class AssetRepositoryLoadThumbnailTests
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
 
-            Assert.IsNotNull(bitmapImage);
+            Assert.That(bitmapImage, Is.Not.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(0, assets.Count);
+            Assert.That(assets.Count, Is.EqualTo(0));
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_dataDirectory!));
-            Assert.AreEqual(2, thumbnails[_dataDirectory!].Count);
-            Assert.IsTrue(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName));
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[_dataDirectory!][_asset1.FileName]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
+            Assert.That(thumbnails[_dataDirectory!], Has.Count.EqualTo(2));
+            Assert.That(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[_dataDirectory!][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
 
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)), Is.True);
 
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -207,7 +207,7 @@ public class AssetRepositoryLoadThumbnailTests
             _database!.WriteBlob(blobToWrite, addedFolder1.ThumbnailsFilename);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = testableAssetRepository.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             BitmapImage? bitmapImage = testableAssetRepository.LoadThumbnail(
                 _dataDirectory!,
@@ -215,21 +215,21 @@ public class AssetRepositoryLoadThumbnailTests
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
 
-            Assert.IsNull(bitmapImage);
+            Assert.That(bitmapImage, Is.Null);
 
             List<Asset> assets = testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(0, assets.Count);
+            Assert.That(assets.Count, Is.EqualTo(0));
 
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)), Is.True);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -251,7 +251,7 @@ public class AssetRepositoryLoadThumbnailTests
             _database!.WriteBlob([], addedFolder1.ThumbnailsFilename);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             BitmapImage? bitmapImage = _testableAssetRepository!.LoadThumbnail(
                 _dataDirectory!,
@@ -259,23 +259,23 @@ public class AssetRepositoryLoadThumbnailTests
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
 
-            Assert.IsNull(bitmapImage);
+            Assert.That(bitmapImage, Is.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(0, assets.Count);
+            Assert.That(assets.Count, Is.EqualTo(0));
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_dataDirectory!));
-            Assert.IsEmpty(thumbnails[_dataDirectory!]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
+            Assert.That(thumbnails[_dataDirectory!], Is.Empty);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)), Is.True);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsTrue(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -299,14 +299,14 @@ public class AssetRepositoryLoadThumbnailTests
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_dataDirectory!));
-            Assert.AreEqual(1, thumbnails[_dataDirectory!].Count);
-            Assert.IsTrue(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName));
-            Assert.AreEqual(Array.Empty<byte>(), thumbnails[_dataDirectory!][_asset1.FileName]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
+            Assert.That(thumbnails[_dataDirectory!], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[_dataDirectory!][_asset1.FileName], Is.EqualTo(Array.Empty<byte>()));
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             BitmapImage? bitmapImage = _testableAssetRepository!.LoadThumbnail(
                 _dataDirectory!,
@@ -314,24 +314,24 @@ public class AssetRepositoryLoadThumbnailTests
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
 
-            Assert.IsNotNull(bitmapImage);
+            Assert.That(bitmapImage, Is.Not.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assets.Count);
+            Assert.That(assets, Has.Count.EqualTo(1));
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_dataDirectory!));
-            Assert.AreEqual(1, thumbnails[_dataDirectory!].Count);
-            Assert.IsTrue(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName));
-            Assert.AreEqual(Array.Empty<byte>(), thumbnails[_dataDirectory!][_asset1.FileName]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
+            Assert.That(thumbnails[_dataDirectory!], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[_dataDirectory!][_asset1.FileName], Is.EqualTo(Array.Empty<byte>()));
 
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -349,7 +349,7 @@ public class AssetRepositoryLoadThumbnailTests
         try
         {
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             BitmapImage? bitmapImage = _testableAssetRepository!.LoadThumbnail(
                 _dataDirectory!,
@@ -357,21 +357,21 @@ public class AssetRepositoryLoadThumbnailTests
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
 
-            Assert.IsNull(bitmapImage);
+            Assert.That(bitmapImage, Is.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(0, assets.Count);
+            Assert.That(assets.Count, Is.EqualTo(0));
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_dataDirectory!));
-            Assert.IsEmpty(thumbnails[_dataDirectory!]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
+            Assert.That(thumbnails[_dataDirectory!], Is.Empty);
 
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -395,8 +395,8 @@ public class AssetRepositoryLoadThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
             {
@@ -407,10 +407,10 @@ public class AssetRepositoryLoadThumbnailTests
                     _asset1.Pixel.Thumbnail.Height);
             });
 
-            Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -433,17 +433,17 @@ public class AssetRepositoryLoadThumbnailTests
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             string? fileName = null;
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _testableAssetRepository!.LoadThumbnail(_dataDirectory!, fileName!, 0, 0));
 
-            Assert.AreEqual("Value cannot be null. (Parameter 'key')", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'key')"));
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
@@ -467,14 +467,14 @@ public class AssetRepositoryLoadThumbnailTests
             _testableAssetRepository!.AddAsset(_asset1!, [1, 2, 3]);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_asset1!.Folder.Path));
-            Assert.AreEqual(1, thumbnails[_asset1!.Folder.Path].Count);
-            Assert.IsTrue(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName));
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[_asset1!.Folder.Path][_asset1.FileName]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             BitmapImage? bitmapImage1 = null;
             BitmapImage? bitmapImage2 = null;
@@ -499,29 +499,29 @@ public class AssetRepositoryLoadThumbnailTests
                     _asset1.Pixel.Thumbnail.Height)
             );
 
-            Assert.IsNotNull(bitmapImage1);
-            Assert.IsNotNull(bitmapImage2);
-            Assert.IsNotNull(bitmapImage3);
+            Assert.That(bitmapImage1, Is.Not.Null);
+            Assert.That(bitmapImage2, Is.Not.Null);
+            Assert.That(bitmapImage3, Is.Not.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assets.Count);
-            Assert.AreEqual(_asset1.FileName, assets[0].FileName);
+            Assert.That(assets, Has.Count.EqualTo(1));
+            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
 
-            Assert.AreEqual(1, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(_asset1!.Folder.Path));
-            Assert.AreEqual(1, thumbnails[_asset1!.Folder.Path].Count);
-            Assert.IsTrue(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName));
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[_asset1!.Folder.Path][_asset1.FileName]);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
 
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
 
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")));
-            Assert.IsFalse(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")));
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
-            Assert.AreEqual(1, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

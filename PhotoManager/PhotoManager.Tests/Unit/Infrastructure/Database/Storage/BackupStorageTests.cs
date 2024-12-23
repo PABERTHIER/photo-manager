@@ -29,7 +29,7 @@ public class BackupStorageTests
 
         string[] actualFiles = _backupStorage!.GetBackupFilesPaths(_dataDirectory!);
 
-        CollectionAssert.IsSubsetOf(partialExpectedFiles, actualFiles);
+        Assert.That(partialExpectedFiles, Is.SubsetOf(actualFiles));
     }
 
     [Test]
@@ -43,9 +43,9 @@ public class BackupStorageTests
 
             string[] actualFiles = _backupStorage!.GetBackupFilesPaths(backupDirectory);
 
-            Assert.IsNotNull(actualFiles);
-            Assert.AreEqual(0, actualFiles.Length);
-            Assert.IsEmpty(actualFiles);
+            Assert.That(actualFiles, Is.Not.Null);
+            Assert.That(actualFiles.Length, Is.EqualTo(0));
+            Assert.That(actualFiles, Is.Empty);
         }
         finally
         {
@@ -61,7 +61,7 @@ public class BackupStorageTests
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _backupStorage!.GetBackupFilesPaths(backupDirectory));
 
-        Assert.AreEqual($"Could not find a part of the path '{backupDirectory}'.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Could not find a part of the path '{backupDirectory}'."));
     }
 
     [Test]
@@ -71,7 +71,7 @@ public class BackupStorageTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _backupStorage!.GetBackupFilesPaths(backupDirectory!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class BackupStorageTests
         {
             _backupStorage!.WriteFolderToZipFile(sourceDirectoryName, destinationArchiveFileName);
 
-            Assert.IsTrue(File.Exists(destinationArchiveFileName));
+            Assert.That(File.Exists(destinationArchiveFileName), Is.True);
         }
         finally
         {
@@ -105,8 +105,8 @@ public class BackupStorageTests
                 _backupStorage!.WriteFolderToZipFile(invalidSourceDirectoryName, destinationArchiveFileName);
             });
 
-            Assert.AreEqual($"Could not find a part of the path '{Path.Combine(TestContext.CurrentContext.TestDirectory, invalidSourceDirectoryName)}'.", exception?.Message);
-            Assert.IsTrue(File.Exists(destinationArchiveFileName));
+            Assert.That(exception?.Message, Is.EqualTo($"Could not find a part of the path '{Path.Combine(TestContext.CurrentContext.TestDirectory, invalidSourceDirectoryName)}'."));
+            Assert.That(File.Exists(destinationArchiveFileName), Is.True);
         }
         finally
         {
@@ -127,7 +127,7 @@ public class BackupStorageTests
             backupStorage.WriteFolderToZipFile(sourceDirectoryName, destinationArchiveFileName!);
         });
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
     }
 
     [Test]
@@ -143,7 +143,7 @@ public class BackupStorageTests
             backupStorage.WriteFolderToZipFile(sourceDirectoryName, destinationArchiveFileName);
         });
 
-        Assert.AreEqual($"Could not find a part of the path '{destinationArchiveFileName}'.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Could not find a part of the path '{destinationArchiveFileName}'."));
     }
 
     [Test]
@@ -154,11 +154,11 @@ public class BackupStorageTests
 
         _backupStorage!.WriteFolderToZipFile(sourceDirectoryName, destinationArchiveFileName);
 
-        Assert.IsTrue(File.Exists(destinationArchiveFileName));
+        Assert.That(File.Exists(destinationArchiveFileName), Is.True);
 
         _backupStorage!.DeleteBackupFile(destinationArchiveFileName);
 
-        Assert.IsFalse(File.Exists(destinationArchiveFileName));
+        Assert.That(File.Exists(destinationArchiveFileName), Is.False);
     }
 
     [Test]
@@ -174,7 +174,7 @@ public class BackupStorageTests
     {
         UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _backupStorage!.DeleteBackupFile(_dataDirectory!));
 
-        Assert.AreEqual($"Access to the path '{_dataDirectory!}' is denied.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Access to the path '{_dataDirectory!}' is denied."));
     }
 
     [Test]
@@ -184,6 +184,6 @@ public class BackupStorageTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _backupStorage!.DeleteBackupFile(tempFilePath!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
     }
 }

@@ -65,10 +65,10 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock.Verify(bs => bs.DeleteBackupFile(path3), Times.Once);
             _backupStorageMock.Verify(bs => bs.DeleteBackupFile(path4), Times.Once);
 
-            Assert.IsNotNull(database.Diagnostics.LastDeletedBackupFilePaths);
-            Assert.AreEqual(2, database.Diagnostics.LastDeletedBackupFilePaths!.Length);
-            Assert.AreEqual(path4, database.Diagnostics.LastDeletedBackupFilePaths[0]);
-            Assert.AreEqual(path3, database.Diagnostics.LastDeletedBackupFilePaths[1]);
+            Assert.That(database.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
+            Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!, Has.Length.EqualTo(2));
+            Assert.That(database.Diagnostics.LastDeletedBackupFilePaths[0], Is.EqualTo(path4));
+            Assert.That(database.Diagnostics.LastDeletedBackupFilePaths[1], Is.EqualTo(path3));
         }
         finally
         {
@@ -104,8 +104,8 @@ public class DatabaseDeleteOldBackupsTests
 
             _backupStorageMock.Verify(bs => bs.DeleteBackupFile(It.IsAny<string>()), Times.Never);
 
-            Assert.IsNotNull(database.Diagnostics.LastDeletedBackupFilePaths);
-            Assert.AreEqual(0, database.Diagnostics.LastDeletedBackupFilePaths!.Length);
+            Assert.That(database.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
+            Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!.Length, Is.EqualTo(0));
         }
         finally
         {

@@ -44,9 +44,9 @@ public class AssetRepositoryBackupExistsTests
         {
             _assetRepository!.WriteBackup();
 
-            Assert.IsTrue(_assetRepository!.BackupExists());
+            Assert.That(_assetRepository!.BackupExists(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -63,9 +63,9 @@ public class AssetRepositoryBackupExistsTests
 
         try
         {
-            Assert.IsFalse(_assetRepository!.BackupExists());
+            Assert.That(_assetRepository!.BackupExists(), Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -95,11 +95,11 @@ public class AssetRepositoryBackupExistsTests
                 () => backupExists3 = _assetRepository!.BackupExists()
             );
 
-            Assert.IsTrue(backupExists1);
-            Assert.IsTrue(backupExists2);
-            Assert.IsTrue(backupExists3);
+            Assert.That(backupExists1, Is.True);
+            Assert.That(backupExists2, Is.True);
+            Assert.That(backupExists3, Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

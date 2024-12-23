@@ -48,19 +48,19 @@ public class DatabaseReadBlobTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
-            Assert.IsTrue(File.Exists(blobFilePath));
+            Assert.That(File.Exists(blobFilePath), Is.True);
 
             Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
-            Assert.IsNotNull(blob);
-            Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
-            Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastReadFilePath);
-            Assert.AreEqual(blobToWrite.Count, blob!.Count);
-            Assert.IsTrue(blob.ContainsKey("Image1.jpg"));
-            CollectionAssert.AreEqual(blobToWrite["Image1.jpg"], blob["Image1.jpg"]);
-            CollectionAssert.AreEqual(blobToWrite["Image2.png"], blob["Image2.png"]);
+            Assert.That(blob, Is.Not.Null);
+            Assert.That(blob, Is.InstanceOf<Dictionary<string, byte[]>?>());
+            Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(blobFilePath));
+            Assert.That(blob!, Has.Count.EqualTo(blobToWrite.Count));
+            Assert.That(blob.ContainsKey("Image1.jpg"), Is.True);
+            Assert.That(blob["Image1.jpg"], Is.EqualTo(blobToWrite["Image1.jpg"]).AsCollection);
+            Assert.That(blob["Image2.png"], Is.EqualTo(blobToWrite["Image2.png"]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
-            Assert.AreEqual(blobToWrite, blob);
+            Assert.That(blob, Is.EqualTo(blobToWrite));
         }
         finally
         {
@@ -90,19 +90,19 @@ public class DatabaseReadBlobTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
-            Assert.IsTrue(File.Exists(blobFilePath));
+            Assert.That(File.Exists(blobFilePath), Is.True);
 
             Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
-            Assert.IsNotNull(blob);
-            Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
-            Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastReadFilePath);
-            Assert.AreEqual(blobToWrite.Count, blob!.Count);
-            Assert.IsTrue(blob.ContainsKey("Image1.jpg"));
-            CollectionAssert.AreEqual(blobToWrite["Image1.jpg"], blob["Image1.jpg"]);
-            CollectionAssert.AreEqual(blobToWrite["Image2.png"], blob["Image2.png"]);
+            Assert.That(blob, Is.Not.Null);
+            Assert.That(blob, Is.InstanceOf<Dictionary<string, byte[]>?>());
+            Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(blobFilePath));
+            Assert.That(blob!, Has.Count.EqualTo(blobToWrite.Count));
+            Assert.That(blob.ContainsKey("Image1.jpg"), Is.True);
+            Assert.That(blob["Image1.jpg"], Is.EqualTo(blobToWrite["Image1.jpg"]).AsCollection);
+            Assert.That(blob["Image2.png"], Is.EqualTo(blobToWrite["Image2.png"]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
-            Assert.AreEqual(blobToWrite, blob);
+            Assert.That(blob, Is.EqualTo(blobToWrite));
         }
         finally
         {
@@ -128,8 +128,8 @@ public class DatabaseReadBlobTests
 
             Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
-            Assert.IsNull(blob);
-            Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastReadFilePath);
+            Assert.That(blob, Is.Null);
+            Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(blobFilePath));
         }
         finally
         {

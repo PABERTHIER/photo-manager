@@ -45,18 +45,18 @@ public class AssetRepositoryWriteBackupTests
             DateTime backupDate = DateTime.Now;
             string backupFilePath = Path.Combine(_backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
 
-            Assert.IsFalse(File.Exists(backupFilePath));
-            Assert.IsFalse(_assetRepository!.BackupExists());
+            Assert.That(File.Exists(backupFilePath), Is.False);
+            Assert.That(_assetRepository!.BackupExists(), Is.False);
 
             _assetRepository!.WriteBackup();
 
-            Assert.IsTrue(File.Exists(backupFilePath));
-            Assert.IsTrue(_assetRepository!.BackupExists());
+            Assert.That(File.Exists(backupFilePath), Is.True);
+            Assert.That(_assetRepository!.BackupExists(), Is.True);
 
             int filesInBackupDirectory = Directory.GetFiles(_backupPath! + "_Backups").Length;
-            Assert.AreEqual(1, filesInBackupDirectory);
+            Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -84,18 +84,18 @@ public class AssetRepositoryWriteBackupTests
             DateTime backupDate = DateTime.Now;
             string backupFilePath = Path.Combine(_backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
 
-            Assert.IsFalse(File.Exists(backupFilePath));
-            Assert.IsFalse(assetRepository.BackupExists());
+            Assert.That(File.Exists(backupFilePath), Is.False);
+            Assert.That(assetRepository.BackupExists(), Is.False);
 
             assetRepository.WriteBackup();
 
-            Assert.IsFalse(File.Exists(backupFilePath));
-            Assert.IsFalse(assetRepository.BackupExists());
+            Assert.That(File.Exists(backupFilePath), Is.False);
+            Assert.That(assetRepository.BackupExists(), Is.False);
 
             int filesInBackupDirectory = Directory.GetFiles(_backupPath! + "_Backups").Length;
-            Assert.AreEqual(0, filesInBackupDirectory);
+            Assert.That(filesInBackupDirectory, Is.EqualTo(0));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -115,19 +115,19 @@ public class AssetRepositoryWriteBackupTests
             DateTime backupDate = DateTime.Now;
             string backupFilePath = Path.Combine(_backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
 
-            Assert.IsFalse(File.Exists(backupFilePath));
-            Assert.IsFalse(_assetRepository!.BackupExists());
+            Assert.That(File.Exists(backupFilePath), Is.False);
+            Assert.That(_assetRepository!.BackupExists(), Is.False);
 
             _assetRepository!.WriteBackup();
             _assetRepository!.WriteBackup();
 
-            Assert.IsTrue(File.Exists(backupFilePath));
-            Assert.IsTrue(_assetRepository!.BackupExists());
+            Assert.That(File.Exists(backupFilePath), Is.True);
+            Assert.That(_assetRepository!.BackupExists(), Is.True);
 
             int filesInBackupDirectory = Directory.GetFiles(_backupPath! + "_Backups").Length;
-            Assert.AreEqual(1, filesInBackupDirectory);
+            Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -147,8 +147,8 @@ public class AssetRepositoryWriteBackupTests
             DateTime backupDate = DateTime.Now;
             string backupFilePath = Path.Combine(_backupPath! + "_Backups", backupDate.ToString("yyyyMMdd") + ".zip");
 
-            Assert.IsFalse(File.Exists(backupFilePath));
-            Assert.IsFalse(_assetRepository!.BackupExists());
+            Assert.That(File.Exists(backupFilePath), Is.False);
+            Assert.That(_assetRepository!.BackupExists(), Is.False);
 
             // Simulate concurrent access
             Parallel.Invoke(
@@ -157,13 +157,13 @@ public class AssetRepositoryWriteBackupTests
                 () => _assetRepository!.WriteBackup()
             );
 
-            Assert.IsTrue(File.Exists(backupFilePath));
-            Assert.IsTrue(_assetRepository!.BackupExists());
+            Assert.That(File.Exists(backupFilePath), Is.True);
+            Assert.That(_assetRepository!.BackupExists(), Is.True);
 
             int filesInBackupDirectory = Directory.GetFiles(_backupPath! + "_Backups").Length;
-            Assert.AreEqual(1, filesInBackupDirectory);
+            Assert.That(filesInBackupDirectory, Is.EqualTo(1));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
