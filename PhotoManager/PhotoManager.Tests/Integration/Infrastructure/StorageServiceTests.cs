@@ -30,14 +30,14 @@ public class StorageServiceTests
 
         List<DirectoryInfo> subDirectories = _storageService!.GetSubDirectories(directoryPath);
 
-        Assert.IsNotNull(subDirectories);
+        Assert.That(subDirectories, Is.Not.Null);
         Assert.That(subDirectories, Has.Exactly(3).Items);
-        Assert.IsTrue(subDirectories.Any(dir => dir.Name == "TestHiddenSubFolder"));
-        Assert.IsTrue(subDirectories.Any(dir => dir.Name == "TestSubFolder1"));
-        Assert.IsTrue(subDirectories.Any(dir => dir.Name == "TestSubFolder2"));
-        Assert.AreEqual("TestHiddenSubFolder", subDirectories[0].Name);
-        Assert.AreEqual("TestSubFolder1", subDirectories[1].Name);
-        Assert.AreEqual("TestSubFolder2", subDirectories[2].Name);
+        Assert.That(subDirectories.Any(dir => dir.Name == "TestHiddenSubFolder"), Is.True);
+        Assert.That(subDirectories.Any(dir => dir.Name == "TestSubFolder1"), Is.True);
+        Assert.That(subDirectories.Any(dir => dir.Name == "TestSubFolder2"), Is.True);
+        Assert.That(subDirectories[0].Name, Is.EqualTo("TestHiddenSubFolder"));
+        Assert.That(subDirectories[1].Name, Is.EqualTo("TestSubFolder1"));
+        Assert.That(subDirectories[2].Name, Is.EqualTo("TestSubFolder2"));
     }
 
     [Test]
@@ -47,7 +47,7 @@ public class StorageServiceTests
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetSubDirectories(directoryPath));
 
-        Assert.AreEqual($"Could not find a part of the path '{directoryPath}'.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Could not find a part of the path '{directoryPath}'."));
     }
 
     [Test]
@@ -57,11 +57,11 @@ public class StorageServiceTests
 
         List<DirectoryInfo> recursiveSubDirectories = _storageService!.GetRecursiveSubDirectories(directoryPath);
 
-        Assert.AreEqual(4, recursiveSubDirectories.Count);
-        Assert.IsTrue(recursiveSubDirectories.Any(dir => dir.Name == "TestHiddenSubFolder"));
-        Assert.IsTrue(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder1"));
-        Assert.IsTrue(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder2"));
-        Assert.IsTrue(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder3"));
+        Assert.That(recursiveSubDirectories, Has.Count.EqualTo(4));
+        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == "TestHiddenSubFolder"), Is.True);
+        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder1"), Is.True);
+        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder2"), Is.True);
+        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder3"), Is.True);
         Assert.That(recursiveSubDirectories[0].FullName, Does.EndWith("\\TestHiddenSubFolder"));
         Assert.That(recursiveSubDirectories[1].FullName, Does.EndWith("\\TestSubFolder1"));
         Assert.That(recursiveSubDirectories[2].FullName, Does.EndWith("\\TestSubFolder2"));
@@ -75,7 +75,7 @@ public class StorageServiceTests
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetRecursiveSubDirectories(directoryPath));
 
-        Assert.AreEqual($"Could not find a part of the path '{directoryPath}'.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Could not find a part of the path '{directoryPath}'."));
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class StorageServiceTests
 
         _storageService!.CreateDirectory(testDirectory);
 
-        Assert.IsTrue(Directory.Exists(testDirectory));
+        Assert.That(Directory.Exists(testDirectory), Is.True);
 
         Directory.Delete(testDirectory);
     }
@@ -100,11 +100,11 @@ public class StorageServiceTests
 
         File.Copy(sourceFilePath, destinationFilePath);
 
-        Assert.IsTrue(File.Exists(destinationFilePath));
+        Assert.That(File.Exists(destinationFilePath), Is.True);
 
         _storageService!.DeleteFile(_dataDirectory!, newFileName);
 
-        Assert.IsFalse(File.Exists(destinationFilePath));
+        Assert.That(File.Exists(destinationFilePath), Is.False);
     }
 
     [Test]
@@ -113,7 +113,7 @@ public class StorageServiceTests
         const string testFileName = "NonExistentImage.jpg";
         string testFilePath = Path.Combine(_dataDirectory!, testFileName);
 
-        Assert.IsFalse(File.Exists(testFilePath));
+        Assert.That(File.Exists(testFilePath), Is.False);
 
         Assert.DoesNotThrow(() => _storageService!.DeleteFile(_dataDirectory!, testFileName));
     }
@@ -123,9 +123,9 @@ public class StorageServiceTests
     {
         string[] fileNames = _storageService!.GetFileNames(_dataDirectory!);
 
-        Assert.GreaterOrEqual(fileNames.Length, 2);
-        Assert.Contains("Image 2.jpg", fileNames);
-        Assert.Contains("Image 1.jpg", fileNames);
+        Assert.That(fileNames, Has.Length.GreaterThanOrEqualTo(2));
+        Assert.That(fileNames, Does.Contain("Image 2.jpg"));
+        Assert.That(fileNames, Does.Contain("Image 1.jpg"));
     }
 
     [Test]
@@ -135,8 +135,8 @@ public class StorageServiceTests
 
         byte[] actualBytes = _storageService!.GetFileBytes(testFilePath);
 
-        Assert.IsNotNull(actualBytes);
-        Assert.Greater(actualBytes.Length, 0);
+        Assert.That(actualBytes, Is.Not.Null);
+        Assert.That(actualBytes, Is.Not.Empty);
     }
 
     [Test]
@@ -146,14 +146,14 @@ public class StorageServiceTests
 
         FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _storageService!.GetFileBytes(nonExistentFilePath));
 
-        Assert.AreEqual($"Could not find file '{nonExistentFilePath}'.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Could not find file '{nonExistentFilePath}'."));
     }
 
     [Test]
     public void GetFileBytes_FilePathIsInvalid_ThrowsUnauthorizedAccessException()
     {
         UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _storageService!.GetFileBytes(_dataDirectory!));
-        Assert.AreEqual($"Access to the path '{_dataDirectory!}' is denied.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Access to the path '{_dataDirectory!}' is denied."));
     }
 
     [Test]
@@ -172,8 +172,7 @@ public class StorageServiceTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(expectedOrientation));
     }
 
     [Test]
@@ -190,8 +189,7 @@ public class StorageServiceTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.IsNotNull(orientation);
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -204,7 +202,7 @@ public class StorageServiceTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -217,7 +215,7 @@ public class StorageServiceTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -230,7 +228,7 @@ public class StorageServiceTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -248,7 +246,7 @@ public class StorageServiceTests
                 _userConfigurationService!.AssetSettings.DefaultExifOrientation,
                 _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-            Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+            Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
         }
     }
 
@@ -264,8 +262,7 @@ public class StorageServiceTests
 
         ushort orientation = _storageService!.GetHeicExifOrientation(buffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(expectedOrientation));
     }
 
     [Test]
@@ -275,7 +272,7 @@ public class StorageServiceTests
 
         ushort orientation = _storageService!.GetHeicExifOrientation(invalidHeicBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -287,8 +284,8 @@ public class StorageServiceTests
         {
             _storageService!.GetHeicExifOrientation(nullBuffer!, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         });
-        
-        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
+
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
 
     [Test]
@@ -301,7 +298,7 @@ public class StorageServiceTests
             _storageService!.GetHeicExifOrientation(emptyBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         });
 
-        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
     }
 
     [Test]
@@ -314,18 +311,18 @@ public class StorageServiceTests
 
         byte[] imageBuffer = _storageService!.GetJpegBitmapImage(image);
 
-        Assert.IsNotNull(imageBuffer);
-        Assert.AreNotEqual(0, imageBuffer.Length);
+        Assert.That(imageBuffer, Is.Not.Null);
+        Assert.That(imageBuffer, Is.Not.Empty);
 
         string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
-            Assert.IsTrue(_storageService.IsValidGDIPlusImage(imageBuffer));
+            Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.jpeg");
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
         finally
         {
@@ -343,18 +340,18 @@ public class StorageServiceTests
 
         byte[] imageBuffer = _storageService!.GetJpegBitmapImage(image);
 
-        Assert.IsNotNull(imageBuffer);
-        Assert.AreNotEqual(0, imageBuffer.Length);
+        Assert.That(imageBuffer, Is.Not.Null);
+        Assert.That(imageBuffer, Is.Not.Empty);
 
         string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
-            Assert.IsTrue(_storageService.IsValidGDIPlusImage(imageBuffer));
+            Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.jpeg");
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
         finally
         {
@@ -369,7 +366,7 @@ public class StorageServiceTests
 
         InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _storageService!.GetJpegBitmapImage(image));
 
-        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
     }
 
     [Test]
@@ -379,7 +376,7 @@ public class StorageServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.GetJpegBitmapImage(invalidImage!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -392,18 +389,18 @@ public class StorageServiceTests
 
         byte[] imageBuffer = _storageService!.GetPngBitmapImage(image);
 
-        Assert.IsNotNull(imageBuffer);
-        Assert.AreNotEqual(0, imageBuffer.Length);
+        Assert.That(imageBuffer, Is.Not.Null);
+        Assert.That(imageBuffer, Is.Not.Empty);
 
         string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
-            Assert.IsTrue(_storageService.IsValidGDIPlusImage(imageBuffer));
+            Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.png");
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
         finally
         {
@@ -421,18 +418,18 @@ public class StorageServiceTests
 
         byte[] imageBuffer = _storageService!.GetPngBitmapImage(image);
 
-        Assert.IsNotNull(imageBuffer);
-        Assert.AreNotEqual(0, imageBuffer.Length);
+        Assert.That(imageBuffer, Is.Not.Null);
+        Assert.That(imageBuffer, Is.Not.Empty);
 
         string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
-            Assert.IsTrue(_storageService.IsValidGDIPlusImage(imageBuffer));
+            Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.png");
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
         finally
         {
@@ -447,7 +444,7 @@ public class StorageServiceTests
 
         InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _storageService!.GetPngBitmapImage(image));
 
-        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
     }
 
     [Test]
@@ -457,7 +454,7 @@ public class StorageServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.GetPngBitmapImage(invalidImage!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -470,18 +467,18 @@ public class StorageServiceTests
 
         byte[] imageBuffer = _storageService!.GetGifBitmapImage(image);
 
-        Assert.IsNotNull(imageBuffer);
-        Assert.AreNotEqual(0, imageBuffer.Length);
+        Assert.That(imageBuffer, Is.Not.Null);
+        Assert.That(imageBuffer, Is.Not.Empty);
 
         string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
-            Assert.IsTrue(_storageService.IsValidGDIPlusImage(imageBuffer));
+            Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.gif");
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
         finally
         {
@@ -499,18 +496,18 @@ public class StorageServiceTests
 
         byte[] imageBuffer = _storageService!.GetGifBitmapImage(image);
 
-        Assert.IsNotNull(imageBuffer);
-        Assert.AreNotEqual(0, imageBuffer.Length);
+        Assert.That(imageBuffer, Is.Not.Null);
+        Assert.That(imageBuffer, Is.Not.Empty);
 
         string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
 
         try
         {
-            Assert.IsTrue(_storageService.IsValidGDIPlusImage(imageBuffer));
+            Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.gif");
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
-            Assert.IsTrue(IsValidImage(destinationNewFilePath));
+            Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
         finally
         {
@@ -525,7 +522,7 @@ public class StorageServiceTests
 
         InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _storageService!.GetGifBitmapImage(image));
 
-        Assert.AreEqual("Operation is not valid due to the current state of the object.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Operation is not valid due to the current state of the object."));
     }
 
     [Test]
@@ -535,7 +532,7 @@ public class StorageServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.GetGifBitmapImage(invalidImage!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -557,7 +554,7 @@ public class StorageServiceTests
 
         bool exists = _storageService!.FileExists(folder, asset);
 
-        Assert.IsTrue(exists);
+        Assert.That(exists, Is.True);
     }
 
     [Test]
@@ -579,12 +576,12 @@ public class StorageServiceTests
 
         bool exists = _storageService!.FileExists(folder, asset);
 
-        Assert.IsFalse(exists);
+        Assert.That(exists, Is.False);
     }
 
     [Test]
-    [TestCase("toto", null, "path2")]
-    [TestCase(null, "Image 1.jpg", "path1")]
+    [TestCase("toto", null!, "path2")]
+    [TestCase(null!, "Image 1.jpg", "path1")]
     public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string path, string fileName, string exceptionParameter)
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = path };
@@ -603,7 +600,7 @@ public class StorageServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.FileExists(folder, asset));
 
-        Assert.AreEqual($"Value cannot be null. (Parameter '{exceptionParameter}')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Value cannot be null. (Parameter '{exceptionParameter}')"));
     }
 
     [Test]
@@ -613,7 +610,7 @@ public class StorageServiceTests
 
         bool exists = _storageService!.FileExists(fullPath);
 
-        Assert.IsTrue(exists);
+        Assert.That(exists, Is.True);
     }
 
     [Test]
@@ -623,7 +620,7 @@ public class StorageServiceTests
 
         bool exists = _storageService!.FileExists(fullPath);
 
-        Assert.IsFalse(exists);
+        Assert.That(exists, Is.False);
     }
 
     [Test]
@@ -633,7 +630,7 @@ public class StorageServiceTests
 
         bool exists = _storageService!.FileExists(fullPath!);
 
-        Assert.IsFalse(exists);
+        Assert.That(exists, Is.False);
     }
 
     [Test]
@@ -641,7 +638,7 @@ public class StorageServiceTests
     {
         bool exists = _storageService!.FolderExists(_dataDirectory!);
 
-        Assert.IsTrue(exists);
+        Assert.That(exists, Is.True);
     }
 
     [Test]
@@ -649,7 +646,7 @@ public class StorageServiceTests
     {
         bool exists = _storageService!.FolderExists("toto");
 
-        Assert.IsFalse(exists);
+        Assert.That(exists, Is.False);
     }
 
     [Test]
@@ -659,7 +656,7 @@ public class StorageServiceTests
 
         bool exists = _storageService!.FolderExists(fullPath!);
 
-        Assert.IsFalse(exists);
+        Assert.That(exists, Is.False);
     }
 
     [Test]
@@ -762,39 +759,39 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.AreEqual(0, asset1.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset2.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset2.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset2.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset3.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset3.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset3.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset4.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset5.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Modification.Date);
+            Assert.That(asset1.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset2.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset3.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
 
             _storageService!.UpdateAssetsFileProperties([asset1, asset2, asset3, asset4, asset5]);
 
-            Assert.AreEqual(64123, asset1.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset1.FileProperties.Modification.Date);
-            Assert.AreEqual(29857, asset2.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset2.FileProperties.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset2.FileProperties.Modification.Date);
-            Assert.AreEqual(126277, asset3.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset3.FileProperties.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset3.FileProperties.Modification.Date);
-            Assert.AreEqual(1411940, asset4.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset4.FileProperties.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset4.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset5.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Modification.Date);
+            Assert.That(asset1.FileProperties.Size, Is.EqualTo(64123));
+            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
+            Assert.That(asset2.FileProperties.Size, Is.EqualTo(29857));
+            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
+            Assert.That(asset3.FileProperties.Size, Is.EqualTo(126277));
+            Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
+            Assert.That(asset4.FileProperties.Size, Is.EqualTo(1411940));
+            Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
+            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
         }
         finally
         {
@@ -815,7 +812,7 @@ public class StorageServiceTests
 
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetsFileProperties(assets!));
 
-        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -920,41 +917,41 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.AreEqual(0, asset1.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset1.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset2.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset2.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset2.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset3.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset3.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset3.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset4.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset4.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset4.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset5.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset5.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset5.FileProperties.Modification.Date);
+            Assert.That(asset1.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+            Assert.That(asset2.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+            Assert.That(asset3.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.UpdateAssetsFileProperties([asset1, asset2, asset3, asset4, asset5]));
 
-            Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
 
-            Assert.AreEqual(0, asset1.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset1.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset2.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset2.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset2.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset3.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset3.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset3.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset4.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset4.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset4.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset5.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset5.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset5.FileProperties.Modification.Date);
+            Assert.That(asset1.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+            Assert.That(asset2.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+            Assert.That(asset3.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
+            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
         }
         finally
         {
@@ -1051,35 +1048,35 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.AreEqual(0, asset1.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset1.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset2.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset2.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset2.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset4.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset5.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Modification.Date);
+            Assert.That(asset1.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset2.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetsFileProperties([asset1, asset2, asset3!, asset4, asset5]));
 
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            Assert.AreEqual(64123, asset1.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset1.FileProperties.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset1.FileProperties.Modification.Date);
-            Assert.AreEqual(29857, asset2.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset2.FileProperties.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset2.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset4.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset4.FileProperties.Modification.Date);
-            Assert.AreEqual(0, asset5.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset5.FileProperties.Modification.Date);
+            Assert.That(asset1.FileProperties.Size, Is.EqualTo(64123));
+            Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
+            Assert.That(asset2.FileProperties.Size, Is.EqualTo(29857));
+            Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
+            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
         }
         finally
         {
@@ -1123,15 +1120,15 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.AreEqual(0, asset.FileProperties.Size);
-            Assert.AreEqual(DateTime.MinValue, asset.FileProperties.Creation.Date);
-            Assert.AreEqual(DateTime.MinValue, asset.FileProperties.Modification.Date);
+            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
 
             _storageService!.UpdateAssetFileProperties(asset);
 
-            Assert.AreEqual(29857, asset.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
-            Assert.AreEqual(oldDateTime.Date, asset.FileProperties.Modification.Date);
+            Assert.That(asset.FileProperties.Size, Is.EqualTo(29857));
+            Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
         }
         finally
         {
@@ -1167,15 +1164,15 @@ public class StorageServiceTests
             DateTime creationTime = default;
             DateTime modificationTime = default;
 
-            Assert.AreEqual(0, asset.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileProperties.Modification.Date);
+            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
 
             _storageService!.UpdateAssetFileProperties(asset);
 
-            Assert.AreEqual(0, asset.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileProperties.Modification.Date);
+            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
         }
         finally
         {
@@ -1221,17 +1218,17 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.AreEqual(0, asset.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileProperties.Modification.Date);
+            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.UpdateAssetFileProperties(asset));
 
-            Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
 
-            Assert.AreEqual(0, asset.FileProperties.Size);
-            Assert.AreEqual(creationTime.Date, asset.FileProperties.Creation.Date);
-            Assert.AreEqual(modificationTime.Date, asset.FileProperties.Modification.Date);
+            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
+            Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
         }
         finally
         {
@@ -1246,7 +1243,7 @@ public class StorageServiceTests
 
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _storageService!.UpdateAssetFileProperties(asset!));
 
-        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -1261,7 +1258,7 @@ public class StorageServiceTests
 
         bool result = _storageService!.IsValidGDIPlusImage(validImageData);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -1272,7 +1269,7 @@ public class StorageServiceTests
 
         bool result = _storageService!.IsValidGDIPlusImage(invalidImageData);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1282,7 +1279,7 @@ public class StorageServiceTests
 
         bool result = _storageService!.IsValidGDIPlusImage(emptyHeicData);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1293,7 +1290,7 @@ public class StorageServiceTests
 
         bool result = _storageService!.IsValidHeic(validHeicData);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -1303,7 +1300,7 @@ public class StorageServiceTests
 
         bool result = _storageService!.IsValidHeic(invalidHeicData);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -1313,14 +1310,14 @@ public class StorageServiceTests
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.IsValidHeic(emptyHeicData));
 
-        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
     }
 
     [Test]
     public void GetTotalFilesCount_FilesInDirectory_ReturnsTotalFilesCount()
     {
         int totalFilesCount = _storageService!.GetTotalFilesCount();
-        Assert.AreEqual(67, totalFilesCount);
+        Assert.That(totalFilesCount, Is.EqualTo(67));
     }
 
     [Test]
@@ -1340,7 +1337,7 @@ public class StorageServiceTests
             StorageService storageService = new (userConfigurationService);
 
             int totalFilesCount = storageService.GetTotalFilesCount();
-            Assert.AreEqual(0, totalFilesCount);
+            Assert.That(totalFilesCount, Is.EqualTo(0));
         }
         finally
         {

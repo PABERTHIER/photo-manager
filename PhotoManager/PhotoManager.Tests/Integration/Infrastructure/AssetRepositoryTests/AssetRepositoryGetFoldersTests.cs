@@ -50,13 +50,13 @@ public class AssetRepositoryGetFoldersTests
 
             Folder[] folders = _assetRepository!.GetFolders();
 
-            Assert.AreEqual(2, folders.Length);
-            Assert.AreEqual(folderPath1, folders[0].Path);
-            Assert.AreEqual(addedFolder1.Id, folders[0].Id);
-            Assert.AreEqual(folderPath2, folders[1].Path);
-            Assert.AreEqual(addedFolder2.Id, folders[1].Id);
+            Assert.That(folders, Has.Length.EqualTo(2));
+            Assert.That(folders[0].Path, Is.EqualTo(folderPath1));
+            Assert.That(folders[0].Id, Is.EqualTo(addedFolder1.Id));
+            Assert.That(folders[1].Path, Is.EqualTo(folderPath2));
+            Assert.That(folders[1].Id, Is.EqualTo(addedFolder2.Id));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -75,9 +75,9 @@ public class AssetRepositoryGetFoldersTests
         {
             Folder[] folders = _assetRepository!.GetFolders();
 
-            Assert.IsEmpty(folders);
+            Assert.That(folders, Is.Empty);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -111,25 +111,25 @@ public class AssetRepositoryGetFoldersTests
                 () => folders3 = _assetRepository!.GetFolders()
             );
 
-            Assert.AreEqual(2, folders1.Length);
-            Assert.AreEqual(folderPath1, folders1[0].Path);
-            Assert.AreEqual(addedFolder1.Id, folders1[0].Id);
-            Assert.AreEqual(folderPath2, folders1[1].Path);
-            Assert.AreEqual(addedFolder2.Id, folders1[1].Id);
+            Assert.That(folders1, Has.Length.EqualTo(2));
+            Assert.That(folders1[0].Path, Is.EqualTo(folderPath1));
+            Assert.That(folders1[0].Id, Is.EqualTo(addedFolder1.Id));
+            Assert.That(folders1[1].Path, Is.EqualTo(folderPath2));
+            Assert.That(folders1[1].Id, Is.EqualTo(addedFolder2.Id));
 
-            Assert.AreEqual(2, folders2.Length);
-            Assert.AreEqual(folderPath1, folders2[0].Path);
-            Assert.AreEqual(addedFolder1.Id, folders2[0].Id);
-            Assert.AreEqual(folderPath2, folders2[1].Path);
-            Assert.AreEqual(addedFolder2.Id, folders2[1].Id);
+            Assert.That(folders2, Has.Length.EqualTo(2));
+            Assert.That(folders2[0].Path, Is.EqualTo(folderPath1));
+            Assert.That(folders2[0].Id, Is.EqualTo(addedFolder1.Id));
+            Assert.That(folders2[1].Path, Is.EqualTo(folderPath2));
+            Assert.That(folders2[1].Id, Is.EqualTo(addedFolder2.Id));
 
-            Assert.AreEqual(2, folders3.Length);
-            Assert.AreEqual(folderPath1, folders3[0].Path);
-            Assert.AreEqual(addedFolder1.Id, folders3[0].Id);
-            Assert.AreEqual(folderPath2, folders3[1].Path);
-            Assert.AreEqual(addedFolder2.Id, folders3[1].Id);
+            Assert.That(folders3, Has.Length.EqualTo(2));
+            Assert.That(folders3[0].Path, Is.EqualTo(folderPath1));
+            Assert.That(folders3[0].Id, Is.EqualTo(addedFolder1.Id));
+            Assert.That(folders3[1].Path, Is.EqualTo(folderPath2));
+            Assert.That(folders3[1].Id, Is.EqualTo(addedFolder2.Id));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

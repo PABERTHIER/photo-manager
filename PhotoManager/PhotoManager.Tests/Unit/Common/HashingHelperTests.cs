@@ -29,9 +29,9 @@ public class HashingHelperTests
 
         string hash = HashingHelper.CalculateHash(imageBytes);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(128, hash.Length); // SHA-512 generates a 128-character long hash in hexadecimal representation
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(128)); // SHA-512 generates a 128-character long hash in hexadecimal representation
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -42,9 +42,9 @@ public class HashingHelperTests
 
         string hash = HashingHelper.CalculateHash(imageBytes);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(128, hash.Length);
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(128));
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -54,7 +54,7 @@ public class HashingHelperTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateHash(imageBytes!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -72,9 +72,9 @@ public class HashingHelperTests
 
         string? phash = HashingHelper.CalculatePHash(filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(phash));
-        Assert.AreEqual(210, phash?.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, phash?.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(phash), Is.False);
+        Assert.That(phash?.Length, Is.EqualTo(210)); // The PHash is a 210-character hexadecimal string
+        Assert.That(phash?.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -83,16 +83,16 @@ public class HashingHelperTests
         string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.png");
 
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(filePath));
-        
-        Assert.AreEqual($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3571", exception?.Message);
+
+        Assert.That(exception?.Message, Is.EqualTo($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3571"));
     }
 
     [Test]
     public void CalculatePHash_ImagePathIsInvalid_ThrowsMagickBlobErrorException()
     {
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(_dataDirectory!));
-        
-        Assert.AreEqual($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3571", exception?.Message);
+
+        Assert.That(exception?.Message, Is.EqualTo($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3571"));
     }
 
     [Test]
@@ -101,8 +101,8 @@ public class HashingHelperTests
         string? filePath = null;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculatePHash(filePath!));
-        
-        Assert.AreEqual("Value cannot be null or empty. (Parameter 'fileName')", exception?.Message);
+
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null or empty. (Parameter 'fileName')"));
     }
 
     [Test]
@@ -119,9 +119,9 @@ public class HashingHelperTests
 
         string dHash = HashingHelper.CalculateDHash(filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(dHash));
-        Assert.AreEqual(17, dHash.Length); // The DHash is a 17-character number
-        Assert.AreEqual(expectedHash, dHash);
+        Assert.That(string.IsNullOrWhiteSpace(dHash), Is.False);
+        Assert.That(dHash, Has.Length.EqualTo(17)); // The DHash is a 17-character number
+        Assert.That(dHash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -133,9 +133,9 @@ public class HashingHelperTests
 
         string dHash = HashingHelper.CalculateDHash(filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(dHash));
-        Assert.AreEqual(1, dHash.Length);
-        Assert.AreEqual(expectedHash, dHash);
+        Assert.That(string.IsNullOrWhiteSpace(dHash), Is.False);
+        Assert.That(dHash, Has.Length.EqualTo(1));
+        Assert.That(dHash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -144,16 +144,16 @@ public class HashingHelperTests
         string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.png");
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(filePath));
-        
-        Assert.AreEqual("Parameter is not valid.", exception?.Message);
+
+        Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
     }
 
     [Test]
     public void CalculateDHash_ImagePathIsInvalid_ThrowsArgumentException()
     {
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_dataDirectory!));
-        
-        Assert.AreEqual("Parameter is not valid.", exception?.Message);
+
+        Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
     }
 
     [Test]
@@ -162,8 +162,8 @@ public class HashingHelperTests
         string? filePath = null;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateDHash(filePath!));
-        
-        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
+
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
     }
 
     [Test]
@@ -182,9 +182,9 @@ public class HashingHelperTests
 
         string md5Hash = HashingHelper.CalculateMD5Hash(imageBytes);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(md5Hash));
-        Assert.AreEqual(32, md5Hash.Length); // The MD5Hash is a 32-character hexadecimal string
-        Assert.AreEqual(expectedHash, md5Hash);
+        Assert.That(string.IsNullOrWhiteSpace(md5Hash), Is.False);
+        Assert.That(md5Hash, Has.Length.EqualTo(32)); // The MD5Hash is a 32-character hexadecimal string
+        Assert.That(md5Hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -195,9 +195,9 @@ public class HashingHelperTests
 
         string hash = HashingHelper.CalculateMD5Hash(imageBytes);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(32, hash.Length);
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(32));
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -207,7 +207,7 @@ public class HashingHelperTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateMD5Hash(imageBytes!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -219,7 +219,7 @@ public class HashingHelperTests
     {
         int distance = HashingHelper.CalculateHammingDistance(hash, hash);
 
-        Assert.AreEqual(0, distance);
+        Assert.That(distance, Is.EqualTo(0));
     }
 
     [Test]
@@ -234,8 +234,8 @@ public class HashingHelperTests
     {
         int distance = HashingHelper.CalculateHammingDistance(hash1, hash2);
 
-        Assert.AreEqual(expectedDistance, distance);
-        Assert.GreaterOrEqual(expectedDistance, 0);
+        Assert.That(distance, Is.GreaterThanOrEqualTo(0));
+        Assert.That(distance, Is.EqualTo(expectedDistance));
     }
 
     [Test]
@@ -248,6 +248,6 @@ public class HashingHelperTests
     {
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateHammingDistance(hash1!, hash2!));
 
-        Assert.AreEqual("Invalid arguments for hamming distance calculation.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Invalid arguments for hamming distance calculation."));
     }
 }

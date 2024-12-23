@@ -48,7 +48,7 @@ public class DatabaseFolderHasThumbnailsTests
 
             bool folderHasThumbnails = _database!.FolderHasThumbnails(blobName);
 
-            Assert.IsTrue(folderHasThumbnails);
+            Assert.That(folderHasThumbnails, Is.True);
         }
         finally
         {
@@ -73,7 +73,7 @@ public class DatabaseFolderHasThumbnailsTests
 
             bool folderHasThumbnails = _database!.FolderHasThumbnails(blobName);
 
-            Assert.IsFalse(folderHasThumbnails);
+            Assert.That(folderHasThumbnails, Is.False);
         }
         finally
         {

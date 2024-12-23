@@ -39,21 +39,21 @@ public class ObjectListStorageTests
 
         List<Folder> result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsInstanceOf<List<Folder>>(result);
-        Assert.IsNotEmpty(result);
-        Assert.AreEqual(3, result.Count);
+        Assert.That(result, Is.InstanceOf<List<Folder>>());
+        Assert.That(result, Is.Not.Empty);
+        Assert.That(result, Has.Count.EqualTo(3));
 
         Folder? folder1 = result.FirstOrDefault(x => x.Id == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9"));
-        Assert.IsNotNull(folder1);
-        Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test", folder1!.Path);
+        Assert.That(folder1, Is.Not.Null);
+        Assert.That(folder1!.Path, Is.EqualTo("D:\\Workspace\\PhotoManager\\Test"));
 
         Folder? folder2 = result.FirstOrDefault(x => x.Id == new Guid("2c107211-1a1c-4e73-8e8b-35d18ca8ef85"));
-        Assert.IsNotNull(folder2);
-        Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame", folder2!.Path);
+        Assert.That(folder2, Is.Not.Null);
+        Assert.That(folder2!.Path, Is.EqualTo("D:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"));
 
         Folder? folder3 = result.FirstOrDefault(x => x.Id == new Guid("18033543-defb-4d37-837b-d8063eda3a25"));
-        Assert.IsNotNull(folder3);
-        Assert.AreEqual("D:\\Workspace\\PhotoManager\\Test\\toto", folder3!.Path);
+        Assert.That(folder3, Is.Not.Null);
+        Assert.That(folder3!.Path, Is.EqualTo("D:\\Workspace\\PhotoManager\\Test\\toto"));
     }
 
     [Test]
@@ -70,24 +70,24 @@ public class ObjectListStorageTests
 
         List<Asset> result = _objectListStorage!.ReadObjectList(dataFilePath, AssetConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsInstanceOf<List<Asset>>(result);
-        Assert.IsNotEmpty(result);
-        Assert.AreEqual(11, result.Count);
+        Assert.That(result, Is.InstanceOf<List<Asset>>());
+        Assert.That(result, Is.Not.Empty);
+        Assert.That(result, Has.Count.EqualTo(11));
 
         Asset? asset = result.FirstOrDefault(x => x.Hash == "ee43714d8b96d7ed3308d18afcb701444198c783fbe4103ce44e95aaf99c2095ae70e6e2035a7a438d1598fadaf5fe8cb0d541378387d20e91f26819fcc64b82");
-        Assert.IsNotNull(asset);
-        Assert.AreEqual("533.JPG", asset!.FileName);
-        Assert.AreEqual(new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9"), asset.FolderId);
-        Assert.AreEqual(Rotation.Rotate270, asset.ImageRotation);
-        Assert.AreEqual(3072, asset.Pixel.Asset.Width);
-        Assert.AreEqual(4080, asset.Pixel.Asset.Height);
-        Assert.AreEqual(113, asset.Pixel.Thumbnail.Width);
-        Assert.AreEqual(150, asset.Pixel.Thumbnail.Height);
-        Assert.AreEqual(new DateTime(2023, 8, 25, 12, 01, 21), asset.ThumbnailCreationDateTime);
-        Assert.AreEqual(false, asset.Metadata.Corrupted.IsTrue);
-        Assert.AreEqual(string.Empty, asset.Metadata.Corrupted.Message);
-        Assert.AreEqual(true, asset.Metadata.Rotated.IsTrue);
-        Assert.AreEqual("The asset has been rotated", asset.Metadata.Rotated.Message);
+        Assert.That(asset, Is.Not.Null);
+        Assert.That(asset!.FileName, Is.EqualTo("533.JPG"));
+        Assert.That(asset.FolderId, Is.EqualTo(new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9")));
+        Assert.That(asset.ImageRotation, Is.EqualTo(Rotation.Rotate270));
+        Assert.That(asset.Pixel.Asset.Width, Is.EqualTo(3072));
+        Assert.That(asset.Pixel.Asset.Height, Is.EqualTo(4080));
+        Assert.That(asset.Pixel.Thumbnail.Width, Is.EqualTo(113));
+        Assert.That(asset.Pixel.Thumbnail.Height, Is.EqualTo(150));
+        Assert.That(asset.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 25, 12, 01, 21)));
+        Assert.That(asset.Metadata.Corrupted.IsTrue, Is.EqualTo(false));
+        Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo(string.Empty));
+        Assert.That(asset.Metadata.Rotated.IsTrue, Is.EqualTo(true));
+        Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo("The asset has been rotated"));
     }
 
     [Test]
@@ -104,21 +104,21 @@ public class ObjectListStorageTests
 
         List<SyncAssetsDirectoriesDefinition> result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
-        Assert.IsNotEmpty(result);
-        Assert.AreEqual(2, result.Count);
+        Assert.That(result, Is.InstanceOf<List<SyncAssetsDirectoriesDefinition>>());
+        Assert.That(result, Is.Not.Empty);
+        Assert.That(result, Has.Count.EqualTo(2));
 
         SyncAssetsDirectoriesDefinition? firstSyncAssetsDirectoriesDefinition = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Toto\\Screenshots");
-        Assert.IsNotNull(firstSyncAssetsDirectoriesDefinition);
-        Assert.AreEqual("C:\\Images\\Toto", firstSyncAssetsDirectoriesDefinition!.DestinationDirectory);
-        Assert.AreEqual(false, firstSyncAssetsDirectoriesDefinition.IncludeSubFolders);
-        Assert.AreEqual(false, firstSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource);
+        Assert.That(firstSyncAssetsDirectoriesDefinition, Is.Not.Null);
+        Assert.That(firstSyncAssetsDirectoriesDefinition!.DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+        Assert.That(firstSyncAssetsDirectoriesDefinition.IncludeSubFolders, Is.EqualTo(false));
+        Assert.That(firstSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.EqualTo(false));
 
         SyncAssetsDirectoriesDefinition? secondSyncAssetsDirectoriesDefinition = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Tutu\\Screenshots");
-        Assert.IsNotNull(secondSyncAssetsDirectoriesDefinition);
-        Assert.AreEqual("C:\\Images\\Tutu", secondSyncAssetsDirectoriesDefinition!.DestinationDirectory);
-        Assert.AreEqual(false, secondSyncAssetsDirectoriesDefinition.IncludeSubFolders);
-        Assert.AreEqual(false, secondSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource);
+        Assert.That(secondSyncAssetsDirectoriesDefinition, Is.Not.Null);
+        Assert.That(secondSyncAssetsDirectoriesDefinition!.DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
+        Assert.That(secondSyncAssetsDirectoriesDefinition.IncludeSubFolders, Is.EqualTo(false));
+        Assert.That(secondSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.EqualTo(false));
     }
 
     [Test]
@@ -135,10 +135,10 @@ public class ObjectListStorageTests
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsNotEmpty(result);
-        Assert.AreEqual(2, result.Count);
-        Assert.IsTrue(result.Any(x => x == "D:\\Workspace\\PhotoManager\\Toto"));
-        Assert.IsTrue(result.Any(x => x == "D:\\Workspace\\PhotoManager\\Tutu"));
+        Assert.That(result, Is.Not.Empty);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result.Any(x => x == "D:\\Workspace\\PhotoManager\\Toto"), Is.True);
+        Assert.That(result.Any(x => x == "D:\\Workspace\\PhotoManager\\Tutu"), Is.True);
     }
 
     [Test]
@@ -155,8 +155,8 @@ public class ObjectListStorageTests
 
         List<SyncAssetsDirectoriesDefinition> result = _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsInstanceOf<List<SyncAssetsDirectoriesDefinition>>(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.InstanceOf<List<SyncAssetsDirectoriesDefinition>>());
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -168,10 +168,10 @@ public class ObjectListStorageTests
 
         List<Folder> result = _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsInstanceOf<List<Folder>>(result);
-        Assert.IsNotEmpty(result);
-        Assert.AreEqual(3, result.Count);
-        Assert.IsNotNull(result.FirstOrDefault(x => x.Id == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9")));
+        Assert.That(result, Is.InstanceOf<List<Folder>>());
+        Assert.That(result, Is.Not.Empty);
+        Assert.That(result, Has.Count.EqualTo(3));
+        Assert.That(result.FirstOrDefault(x => x.Id == new Guid("f1f00403-0554-4201-9b6b-11a6b4cea3a9")), Is.Not.Null);
     }
 
     [Test]
@@ -184,7 +184,7 @@ public class ObjectListStorageTests
             _objectListStorage!.ReadObjectList(dataFilePath, FolderConfigs.ReadFunc, new Diagnostics());
         });
 
-        Assert.AreEqual("Guid should contain 32 digits with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Guid should contain 32 digits with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)."));
     }
 
     [Test]
@@ -197,7 +197,7 @@ public class ObjectListStorageTests
             _objectListStorage!.ReadObjectList(dataFilePath, SyncAssetsDirectoriesDefinitionConfigs.ReadFunc, new Diagnostics());
         });
 
-        Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Index was outside the bounds of the array."));
     }
 
     [Test]
@@ -217,7 +217,7 @@ public class ObjectListStorageTests
             _objectListStorage!.ReadObjectList(dataFilePath, AssetConfigs.ReadFunc, new Diagnostics());
         });
 
-        Assert.AreEqual("Requested value 'D:\\Workspace\\PhotoManager\\Test' was not found.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Requested value 'D:\\Workspace\\PhotoManager\\Test' was not found."));
     }
 
     [Test]
@@ -237,7 +237,7 @@ public class ObjectListStorageTests
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -256,7 +256,7 @@ public class ObjectListStorageTests
 
         List<string> result = _objectListStorage!.ReadObjectList(_dataDirectory!, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -276,7 +276,7 @@ public class ObjectListStorageTests
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -296,7 +296,7 @@ public class ObjectListStorageTests
 
         List<string> result = _objectListStorage!.ReadObjectList(dataFilePath!, RecentPathsConfigs.ReadFunc, new Diagnostics());
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -315,7 +315,7 @@ public class ObjectListStorageTests
 
         NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _objectListStorage!.ReadObjectList(dataFilePath, func!, new Diagnostics()));
 
-        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
     }
 
     [Test]
@@ -354,7 +354,7 @@ public class ObjectListStorageTests
             _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
             _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics());
 
-            Assert.IsTrue(File.Exists(dataFilePath));
+            Assert.That(File.Exists(dataFilePath), Is.True);
         }
         finally
         {
@@ -424,7 +424,7 @@ public class ObjectListStorageTests
             _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
             _objectListStorage!.WriteObjectList(dataFilePath, assets, AssetConfigs.WriteFunc, new Diagnostics());
 
-            Assert.IsTrue(File.Exists(dataFilePath));
+            Assert.That(File.Exists(dataFilePath), Is.True);
         }
         finally
         {
@@ -456,7 +456,7 @@ public class ObjectListStorageTests
             _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
             _objectListStorage!.WriteObjectList(dataFilePath, syncAssetsDirectoriesDefinitions, SyncAssetsDirectoriesDefinitionConfigs.WriteFunc, new Diagnostics());
 
-            Assert.IsTrue(File.Exists(dataFilePath));
+            Assert.That(File.Exists(dataFilePath), Is.True);
         }
         finally
         {
@@ -485,7 +485,7 @@ public class ObjectListStorageTests
             _objectListStorage!.Initialize(dataTableProperties, _userConfigurationService!.StorageSettings.Separator);
             _objectListStorage!.WriteObjectList(dataFilePath, recentTargetPaths, RecentPathsConfigs.WriteFunc, new Diagnostics());
 
-            Assert.IsTrue(File.Exists(dataFilePath));
+            Assert.That(File.Exists(dataFilePath), Is.True);
         }
         finally
         {
@@ -524,9 +524,9 @@ public class ObjectListStorageTests
 
         Exception? exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
 
-        Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Properties must be defined for the columns in the table NoTableName."));
 
-        Assert.IsFalse(File.Exists(dataFilePath));
+        Assert.That(File.Exists(dataFilePath), Is.False);
     }
 
     [Test]
@@ -556,9 +556,9 @@ public class ObjectListStorageTests
 
         Exception? exception = Assert.Throws<Exception>(() => _objectListStorage!.WriteObjectList(dataFilePath, folders, FolderConfigs.WriteFunc, new Diagnostics()));
 
-        Assert.AreEqual("Properties must be defined for the columns in the table NoTableName.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Properties must be defined for the columns in the table NoTableName."));
 
-        Assert.IsFalse(File.Exists(dataFilePath));
+        Assert.That(File.Exists(dataFilePath), Is.False);
     }
 
     [Test]
@@ -583,8 +583,8 @@ public class ObjectListStorageTests
             _objectListStorage!.WriteObjectList(dataFilePath, nonExistentValues, RecentPathsConfigs.WriteFunc, new Diagnostics());
         });
 
-        Assert.AreEqual($"Could not find a part of the path '{dataFilePath}'.", exception?.Message);
-        Assert.IsFalse(File.Exists(dataFilePath));
+        Assert.That(exception?.Message, Is.EqualTo($"Could not find a part of the path '{dataFilePath}'."));
+        Assert.That(File.Exists(dataFilePath), Is.False);
     }
 
     [Test]
@@ -608,7 +608,7 @@ public class ObjectListStorageTests
             _objectListStorage!.WriteObjectList(_dataDirectory!, nonExistentValues, RecentPathsConfigs.WriteFunc, new Diagnostics());
         });
 
-        Assert.AreEqual($"Access to the path '{_dataDirectory!}' is denied.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"Access to the path '{_dataDirectory!}' is denied."));
     }
 
     [Test]
@@ -633,8 +633,8 @@ public class ObjectListStorageTests
             _objectListStorage!.WriteObjectList(dataFilePath!, nonExistentValues, RecentPathsConfigs.WriteFunc, new Diagnostics());
         });
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
-        Assert.IsFalse(File.Exists(dataFilePath));
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
+        Assert.That(File.Exists(dataFilePath), Is.False);
     }
 
     [Test]
@@ -668,8 +668,8 @@ public class ObjectListStorageTests
                 },
                 new Diagnostics()));
 
-        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
-        Assert.IsFalse(File.Exists(dataFilePath));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(File.Exists(dataFilePath), Is.False);
     }
 
     [Test]
@@ -697,7 +697,7 @@ public class ObjectListStorageTests
                 f!,
                 new Diagnostics()));
 
-        Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
-        Assert.IsFalse(File.Exists(dataFilePath));
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(File.Exists(dataFilePath), Is.False);
     }
 }

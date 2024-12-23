@@ -68,23 +68,23 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(0, result[0].SyncedImages);
-            Assert.AreEqual($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.IsEmpty(statusChanges);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Is.Empty);
         }
         finally
         {
@@ -120,24 +120,24 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.IsEmpty(fileNamesInDestination);
+            Assert.That(fileNamesInDestination, Is.Empty);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -150,51 +150,51 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(4, result[0].SyncedImages);
-            Assert.AreEqual($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(4, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath1}' => '{assetDestinationPath1}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[1].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath3}' => '{assetDestinationPath3}'", statusChanges[2].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[3].NewStatus);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(4));
+            Assert.That(result[0].Message, Is.EqualTo($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(4));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
+            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
         }
         finally
         {
@@ -236,39 +236,39 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopyPath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopyPath2, assetDestinationPath2);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.IsEmpty(fileNamesInSource);
+            Assert.That(fileNamesInSource, Is.Empty);
 
             string[] fileNamesInSourceToCopy = _storageService!.GetFileNames(sourceToCopyPath);
-            Assert.AreEqual(4, fileNamesInSourceToCopy.Length);
-            Assert.IsTrue(fileNamesInSourceToCopy.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSourceToCopy.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSourceToCopy.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSourceToCopy.Any(x => x == assetName4));
+            Assert.That(fileNamesInSourceToCopy, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSourceToCopy.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSourceToCopy.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSourceToCopy.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSourceToCopy.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(2, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetSourcePath1));
-            Assert.IsFalse(_storageService.FileExists(assetSourcePath2));
-            Assert.IsFalse(_storageService.FileExists(assetSourcePath3));
-            Assert.IsFalse(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.False);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.False);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.False);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.False);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourceToCopyPath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourceToCopyPath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourceToCopyPath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourceToCopyPath4));
+            Assert.That(_storageService.FileExists(assetSourceToCopyPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourceToCopyPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourceToCopyPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourceToCopyPath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -281,53 +281,53 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.IsEmpty(fileNamesInSource);
+            Assert.That(fileNamesInSource, Is.Empty);
 
             fileNamesInSourceToCopy = _storageService!.GetFileNames(sourceToCopyPath);
-            Assert.AreEqual(4, fileNamesInSourceToCopy.Length);
-            Assert.IsTrue(fileNamesInSourceToCopy.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSourceToCopy.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSourceToCopy.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSourceToCopy.Any(x => x == assetName4));
+            Assert.That(fileNamesInSourceToCopy, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSourceToCopy.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSourceToCopy.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSourceToCopy.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSourceToCopy.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(2, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetSourcePath1));
-            Assert.IsFalse(_storageService.FileExists(assetSourcePath2));
-            Assert.IsFalse(_storageService.FileExists(assetSourcePath3));
-            Assert.IsFalse(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.False);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.False);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.False);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.False);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourceToCopyPath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourceToCopyPath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourceToCopyPath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourceToCopyPath4));
+            Assert.That(_storageService.FileExists(assetSourceToCopyPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourceToCopyPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourceToCopyPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourceToCopyPath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(0, result[0].SyncedImages);
-            Assert.AreEqual($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(0, statusChanges.Count);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges.Count, Is.EqualTo(0));
         }
         finally
         {
@@ -363,31 +363,31 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath3, assetDestinationPath3);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath4, assetDestinationPath4);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(2, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -400,49 +400,49 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(2, result[0].SyncedImages);
-            Assert.AreEqual($"2 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(2, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath1}' => '{assetDestinationPath1}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[1].NewStatus);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(2));
+            Assert.That(result[0].Message, Is.EqualTo($"2 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(2));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
         }
         finally
         {
@@ -477,34 +477,34 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath3, assetDestinationPath3);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath4, assetDestinationPath4);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(3, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(3));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -517,48 +517,48 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(1, result[0].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(1, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[0].NewStatus);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(1));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
         }
         finally
         {
@@ -611,58 +611,58 @@ public class SyncAssetsServiceTests
             string assetDestinationPath8 = Path.Combine(secondDestinationDirectory, assetName8);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath3, assetDestinationPath3);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath4, assetDestinationPath4);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath6, assetDestinationPath6);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath8, assetDestinationPath8);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource1 = _storageService!.GetFileNames(firstSourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource1.Length);
-            Assert.IsTrue(fileNamesInSource1.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource1.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource1.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource1.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource1, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource1.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource1.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource1.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource1.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInSource2 = _storageService!.GetFileNames(secondSourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource2.Length);
-            Assert.IsTrue(fileNamesInSource2.Any(x => x == assetName5));
-            Assert.IsTrue(fileNamesInSource2.Any(x => x == assetName6));
-            Assert.IsTrue(fileNamesInSource2.Any(x => x == assetName7));
-            Assert.IsTrue(fileNamesInSource2.Any(x => x == assetName8));
+            Assert.That(fileNamesInSource2, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource2.Any(x => x == assetName5), Is.True);
+            Assert.That(fileNamesInSource2.Any(x => x == assetName6), Is.True);
+            Assert.That(fileNamesInSource2.Any(x => x == assetName7), Is.True);
+            Assert.That(fileNamesInSource2.Any(x => x == assetName8), Is.True);
 
             string[] fileNamesInDestination1 = _storageService!.GetFileNames(firstDestinationDirectory);
-            Assert.AreEqual(2, fileNamesInDestination1.Length);
-            Assert.IsTrue(fileNamesInDestination1.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination1.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination1, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestination1.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination1.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination2 = _storageService!.GetFileNames(secondDestinationDirectory);
-            Assert.AreEqual(2, fileNamesInDestination2.Length);
-            Assert.IsTrue(fileNamesInDestination2.Any(x => x == assetName6));
-            Assert.IsTrue(fileNamesInDestination2.Any(x => x == assetName8));
+            Assert.That(fileNamesInDestination2, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestination2.Any(x => x == assetName6), Is.True);
+            Assert.That(fileNamesInDestination2.Any(x => x == assetName8), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath5));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath6));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath7));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath8));
+            Assert.That(_storageService.FileExists(assetSourcePath5), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath6), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath7), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath8), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath6));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath7));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath8));
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath7), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath8), Is.True);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -682,86 +682,86 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[1].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[1].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[1].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[1].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[1].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[1].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[1].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[1].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[1].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[1].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[1].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[1].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource1 = _storageService!.GetFileNames(firstSourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource1.Length);
-            Assert.IsTrue(fileNamesInSource1.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource1.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource1.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource1.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource1, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource1.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource1.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource1.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource1.Any(x => x == assetName4), Is.True);
 
             fileNamesInSource2 = _storageService!.GetFileNames(secondSourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource2.Length);
-            Assert.IsTrue(fileNamesInSource2.Any(x => x == assetName5));
-            Assert.IsTrue(fileNamesInSource2.Any(x => x == assetName6));
-            Assert.IsTrue(fileNamesInSource2.Any(x => x == assetName7));
-            Assert.IsTrue(fileNamesInSource2.Any(x => x == assetName8));
+            Assert.That(fileNamesInSource2, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource2.Any(x => x == assetName5), Is.True);
+            Assert.That(fileNamesInSource2.Any(x => x == assetName6), Is.True);
+            Assert.That(fileNamesInSource2.Any(x => x == assetName7), Is.True);
+            Assert.That(fileNamesInSource2.Any(x => x == assetName8), Is.True);
 
             fileNamesInDestination1 = _storageService!.GetFileNames(firstDestinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination1.Length);
-            Assert.IsTrue(fileNamesInDestination1.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination1.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination1.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination1.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination1, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination1.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination1.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination1.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination1.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination2 = _storageService!.GetFileNames(secondDestinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination2.Length);
-            Assert.IsTrue(fileNamesInDestination2.Any(x => x == assetName5));
-            Assert.IsTrue(fileNamesInDestination2.Any(x => x == assetName6));
-            Assert.IsTrue(fileNamesInDestination2.Any(x => x == assetName7));
-            Assert.IsTrue(fileNamesInDestination2.Any(x => x == assetName8));
+            Assert.That(fileNamesInDestination2, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination2.Any(x => x == assetName5), Is.True);
+            Assert.That(fileNamesInDestination2.Any(x => x == assetName6), Is.True);
+            Assert.That(fileNamesInDestination2.Any(x => x == assetName7), Is.True);
+            Assert.That(fileNamesInDestination2.Any(x => x == assetName8), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath5));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath6));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath7));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath8));
+            Assert.That(_storageService.FileExists(assetSourcePath5), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath6), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath7), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath8), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath6));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath7));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath7));
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath7), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath7), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(2, result.Count);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(2));
 
-            Assert.AreEqual(firstSourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(firstDestinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(2, result[0].SyncedImages);
-            Assert.AreEqual($"2 images synced from '{firstSourceDirectory}' to '{firstDestinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(4, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath1}' => '{assetDestinationPath1}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[1].NewStatus);
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(firstSourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(firstDestinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(2));
+            Assert.That(result[0].Message, Is.EqualTo($"2 images synced from '{firstSourceDirectory}' to '{firstDestinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(4));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
 
-            Assert.AreEqual(secondSourceDirectory, result[1].SourceDirectory);
-            Assert.AreEqual(secondDestinationDirectory, result[1].DestinationDirectory);
-            Assert.AreEqual(2, result[1].SyncedImages);
-            Assert.AreEqual($"2 images synced from '{secondSourceDirectory}' to '{secondDestinationDirectory}'.", result[1].Message);
-            Assert.AreEqual(4, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath5}' => '{assetDestinationPath5}'", statusChanges[2].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath7}' => '{assetDestinationPath7}'", statusChanges[3].NewStatus);
+            Assert.That(result[1].SourceDirectory, Is.EqualTo(secondSourceDirectory));
+            Assert.That(result[1].DestinationDirectory, Is.EqualTo(secondDestinationDirectory));
+            Assert.That(result[1].SyncedImages, Is.EqualTo(2));
+            Assert.That(result[1].Message, Is.EqualTo($"2 images synced from '{secondSourceDirectory}' to '{secondDestinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(4));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath5}' => '{assetDestinationPath5}'"));
+            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetSourcePath7}' => '{assetDestinationPath7}'"));
         }
         finally
         {
@@ -811,50 +811,50 @@ public class SyncAssetsServiceTests
             string assetDestinationSubDirectory2Path4 = Path.Combine(destinationSubDirectory2, assetName4);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath2, assetDestinationSubDirectory1Path2);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath3, assetDestinationSubDirectory2Path3);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
             string[] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
             string[] fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -867,64 +867,64 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(2, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
             fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.False);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(1, result[0].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(1, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[0].NewStatus);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(1));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
         }
         finally
         {
@@ -973,53 +973,53 @@ public class SyncAssetsServiceTests
             string assetDestinationSubDirectory2Path4 = Path.Combine(destinationSubDirectory2, assetName4);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath2, assetDestinationSubDirectory1Path2);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath3, assetDestinationSubDirectory2Path3);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath4, assetDestinationSubDirectory2Path4);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
             string[] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
             string[] fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(2, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.True);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -1032,63 +1032,63 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
             fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
             fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(2, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(0, result[0].SyncedImages);
-            Assert.AreEqual($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.IsEmpty(statusChanges);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Is.Empty);
         }
         finally
         {
@@ -1139,47 +1139,47 @@ public class SyncAssetsServiceTests
             string assetDestinationPath6 = Path.Combine(destinationDirectory, assetName6);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationToCopySubDirectory1Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path, assetDestinationToCopySubDirectory2Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInSourceSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory1.Any(x => x == assetName5), Is.True);
 
             string[] fileNamesInSourceSubDirectory2 = _storageService!.GetFileNames(sourceSubDirectory2);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory2.Any(x => x == assetName6));
+            Assert.That(fileNamesInSourceSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory2.Any(x => x == assetName6), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory1Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory2Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
 
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory1));
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory2));
+            Assert.That(_storageService.FolderExists(destinationSubDirectory1), Is.False);
+            Assert.That(_storageService.FolderExists(destinationSubDirectory2), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -1192,65 +1192,65 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInSourceSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory1.Any(x => x == assetName5), Is.True);
 
             fileNamesInSourceSubDirectory2 = _storageService!.GetFileNames(sourceSubDirectory2);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory2.Any(x => x == assetName6));
+            Assert.That(fileNamesInSourceSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory2.Any(x => x == assetName6), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory1Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory2Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
 
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory1));
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory2));
+            Assert.That(_storageService.FolderExists(destinationSubDirectory1), Is.False);
+            Assert.That(_storageService.FolderExists(destinationSubDirectory2), Is.False);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(3, result[0].SyncedImages);
-            Assert.AreEqual($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(3, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath3}' => '{assetDestinationPath3}'", statusChanges[1].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[2].NewStatus);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
+            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(3));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
         }
         finally
         {
@@ -1306,47 +1306,47 @@ public class SyncAssetsServiceTests
             string assetDestinationSubDirectory2Path = Path.Combine(destinationSubDirectory2, assetName6);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationToCopySubDirectory1Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path, assetDestinationToCopySubDirectory2Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInSourceSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory1.Any(x => x == assetName5), Is.True);
 
             string[] fileNamesInSourceSubDirectory2 = _storageService!.GetFileNames(sourceSubDirectory2);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory2.Any(x => x == assetName6));
+            Assert.That(fileNamesInSourceSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory2.Any(x => x == assetName6), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory1Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory2Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
 
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory1));
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory2));
+            Assert.That(_storageService.FolderExists(destinationSubDirectory1), Is.False);
+            Assert.That(_storageService.FolderExists(destinationSubDirectory2), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -1360,86 +1360,86 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInSourceSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory1.Any(x => x == assetName5), Is.True);
 
             fileNamesInSourceSubDirectory2 = _storageService!.GetFileNames(sourceSubDirectory2);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory2.Any(x => x == assetName6));
+            Assert.That(fileNamesInSourceSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory2.Any(x => x == assetName6), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName5), Is.True);
 
             string[] fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName6));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName6), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory1Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory2Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(3, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(3, result[0].SyncedImages);
-            Assert.AreEqual($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(3));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
+            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
 
-            Assert.AreEqual(sourceSubDirectory1, result[1].SourceDirectory);
-            Assert.AreEqual(destinationSubDirectory1, result[1].DestinationDirectory);
-            Assert.AreEqual(1, result[1].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'.", result[1].Message);
+            Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
+            Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
+            Assert.That(result[1].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[1].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
-            Assert.AreEqual(sourceSubDirectory2, result[2].SourceDirectory);
-            Assert.AreEqual(destinationSubDirectory2, result[2].DestinationDirectory);
-            Assert.AreEqual(1, result[2].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'.", result[2].Message);
+            Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
+            Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
+            Assert.That(result[2].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
 
-            Assert.AreEqual(5, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath3}' => '{assetDestinationPath3}'", statusChanges[1].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[2].NewStatus);
-            Assert.AreEqual($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'", statusChanges[3].NewStatus);
-            Assert.AreEqual($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'", statusChanges[4].NewStatus);
+            Assert.That(statusChanges, Has.Count.EqualTo(5));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'"));
+            Assert.That(statusChanges[4].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
         }
         finally
         {
@@ -1497,55 +1497,55 @@ public class SyncAssetsServiceTests
             string assetDestinationSubDirectory2Path = Path.Combine(destinationSubDirectory2, assetName6);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationToCopySubDirectory1Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path, assetDestinationToCopySubDirectory2Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationSubDirectory1Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInSourceSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory1.Any(x => x == assetName5), Is.True);
 
             string[] fileNamesInSourceSubDirectory2 = _storageService!.GetFileNames(sourceSubDirectory2);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory2.Any(x => x == assetName6));
+            Assert.That(fileNamesInSourceSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory2.Any(x => x == assetName6), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
             string[] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName5), Is.True);
 
             string[] fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.IsEmpty(fileNamesInDestinationSubDirectory2);
+            Assert.That(fileNamesInDestinationSubDirectory2, Is.Empty);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory1Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory2Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -1559,84 +1559,84 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInSourceSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory1.Any(x => x == assetName5), Is.True);
 
             fileNamesInSourceSubDirectory2 = _storageService!.GetFileNames(sourceSubDirectory2);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory2.Any(x => x == assetName6));
+            Assert.That(fileNamesInSourceSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory2.Any(x => x == assetName6), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName5));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName5), Is.True);
 
             fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName6));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName6), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory1Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory2Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(3, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(3, result[0].SyncedImages);
-            Assert.AreEqual($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(3));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
+            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
 
-            Assert.AreEqual(sourceSubDirectory1, result[1].SourceDirectory);
-            Assert.AreEqual(destinationSubDirectory1, result[1].DestinationDirectory);
-            Assert.AreEqual(0, result[1].SyncedImages);
-            Assert.AreEqual($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'.", result[1].Message);
+            Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
+            Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
+            Assert.That(result[1].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
-            Assert.AreEqual(sourceSubDirectory2, result[2].SourceDirectory);
-            Assert.AreEqual(destinationSubDirectory2, result[2].DestinationDirectory);
-            Assert.AreEqual(1, result[2].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'.", result[2].Message);
+            Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
+            Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
+            Assert.That(result[2].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
 
-            Assert.AreEqual(4, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath3}' => '{assetDestinationPath3}'", statusChanges[1].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[2].NewStatus);
-            Assert.AreEqual($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'", statusChanges[3].NewStatus);
+            Assert.That(statusChanges, Has.Count.EqualTo(4));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
         }
         finally
         {
@@ -1687,50 +1687,50 @@ public class SyncAssetsServiceTests
             string assetDestinationSubDirectory2Path4 = Path.Combine(destinationSubDirectory2, assetName4);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath2, assetDestinationSubDirectory1Path2);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath3, assetDestinationSubDirectory2Path3);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
             string[] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
             string[] fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -1743,64 +1743,64 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(2, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(2));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
             fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName3), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory1Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path4), Is.False);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationSubDirectory2Path4));
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.False);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(1, result[0].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(1, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[0].NewStatus);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(1));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
         }
         finally
         {
@@ -1857,51 +1857,51 @@ public class SyncAssetsServiceTests
             string assetDestinationSubDirectory3Path = Path.Combine(destinationSubDirectory3, assetName6);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory2Path, assetDestinationToCopySubDirectory2Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory3Path, assetDestinationToCopySubDirectory3Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.IsEmpty(fileNamesInSourceSubDirectory1);
+            Assert.That(fileNamesInSourceSubDirectory1, Is.Empty);
 
             string[] fileNamesInSourceSubDirectory2 = _storageService!.GetFileNames(sourceSubDirectory2);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory2.Any(x => x == assetName5));
+            Assert.That(fileNamesInSourceSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory2.Any(x => x == assetName5), Is.True);
 
             string[] fileNamesInSourceSubDirectory3 = _storageService!.GetFileNames(sourceSubDirectory3);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory3.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory3.Any(x => x == assetName6));
+            Assert.That(fileNamesInSourceSubDirectory3, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory3.Any(x => x == assetName6), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory2Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory3Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory2Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory3Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
 
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory1));
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory2));
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory3));
+            Assert.That(_storageService.FolderExists(destinationSubDirectory1), Is.False);
+            Assert.That(_storageService.FolderExists(destinationSubDirectory2), Is.False);
+            Assert.That(_storageService.FolderExists(destinationSubDirectory3), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -1915,98 +1915,98 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.IsEmpty(fileNamesInSourceSubDirectory1);
+            Assert.That(fileNamesInSourceSubDirectory1, Is.Empty);
 
             fileNamesInSourceSubDirectory2 = _storageService!.GetFileNames(sourceSubDirectory2);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory2.Any(x => x == assetName5));
+            Assert.That(fileNamesInSourceSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory2.Any(x => x == assetName5), Is.True);
 
             fileNamesInSourceSubDirectory3 = _storageService!.GetFileNames(sourceSubDirectory3);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory3.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory3.Any(x => x == assetName6));
+            Assert.That(fileNamesInSourceSubDirectory3, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory3.Any(x => x == assetName6), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
             string [] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.IsEmpty(fileNamesInDestinationSubDirectory1);
+            Assert.That(fileNamesInDestinationSubDirectory1, Is.Empty);
 
             string[] fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory2.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory2.Any(x => x == assetName5));
+            Assert.That(fileNamesInDestinationSubDirectory2, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory2.Any(x => x == assetName5), Is.True);
 
             string[] fileNamesInDestinationSubDirectory3 = _storageService!.GetFileNames(destinationSubDirectory3);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory3.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory3.Any(x => x == assetName6));
+            Assert.That(fileNamesInDestinationSubDirectory3, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory3.Any(x => x == assetName6), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory2Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory3Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory2Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory3Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
 
-            Assert.IsTrue(_storageService.FolderExists(destinationSubDirectory1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory2Path));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory3Path));
+            Assert.That(_storageService.FolderExists(destinationSubDirectory1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory3Path), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(4, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(3, result[0].SyncedImages);
-            Assert.AreEqual($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(4));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
+            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
 
-            Assert.AreEqual(sourceSubDirectory1, result[1].SourceDirectory);
-            Assert.AreEqual(destinationSubDirectory1, result[1].DestinationDirectory);
-            Assert.AreEqual(0, result[1].SyncedImages);
-            Assert.AreEqual($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'.", result[1].Message);
+            Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
+            Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
+            Assert.That(result[1].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
-            Assert.AreEqual(sourceSubDirectory2, result[2].SourceDirectory);
-            Assert.AreEqual(destinationSubDirectory2, result[2].DestinationDirectory);
-            Assert.AreEqual(1, result[2].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'.", result[2].Message);
+            Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
+            Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
+            Assert.That(result[2].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
 
-            Assert.AreEqual(sourceSubDirectory3, result[3].SourceDirectory);
-            Assert.AreEqual(destinationSubDirectory3, result[3].DestinationDirectory);
-            Assert.AreEqual(1, result[3].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceSubDirectory3}' to '{destinationSubDirectory3}'.", result[3].Message);
+            Assert.That(result[3].SourceDirectory, Is.EqualTo(sourceSubDirectory3));
+            Assert.That(result[3].DestinationDirectory, Is.EqualTo(destinationSubDirectory3));
+            Assert.That(result[3].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[3].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory3}' to '{destinationSubDirectory3}'."));
 
-            Assert.AreEqual(5, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath3}' => '{assetDestinationPath3}'", statusChanges[1].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[2].NewStatus);
-            Assert.AreEqual($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'", statusChanges[3].NewStatus);
-            Assert.AreEqual($"'{assetDestinationToCopySubDirectory3Path}' => '{assetDestinationSubDirectory3Path}'", statusChanges[4].NewStatus);
+            Assert.That(statusChanges, Has.Count.EqualTo(5));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
+            Assert.That(statusChanges[4].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory3Path}' => '{assetDestinationSubDirectory3Path}'"));
         }
         finally
         {
@@ -2051,37 +2051,37 @@ public class SyncAssetsServiceTests
             string assetDestinationSubDirectory1Path = Path.Combine(destinationSubDirectory1, assetName2);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourcePath1, assetDestinationPath1);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetSourceToCopySubDirectory1Path, assetDestinationToCopySubDirectory1Path);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInSourceSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory1.Any(x => x == assetName2), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(1, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory1Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory1Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.IsFalse(_storageService.FolderExists(destinationSubDirectory1));
+            Assert.That(_storageService.FolderExists(destinationSubDirectory1), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -2095,67 +2095,67 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInSourceSubDirectory1 = _storageService!.GetFileNames(sourceSubDirectory1);
-            Assert.AreEqual(1, fileNamesInSourceSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInSourceSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInSourceSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInSourceSubDirectory1.Any(x => x == assetName2), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
-            Assert.AreEqual(1, fileNamesInDestinationSubDirectory1.Length);
-            Assert.IsTrue(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2));
+            Assert.That(fileNamesInDestinationSubDirectory1, Has.Length.EqualTo(1));
+            Assert.That(fileNamesInDestinationSubDirectory1.Any(x => x == assetName2), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationToCopySubDirectory1Path));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationToCopySubDirectory1Path), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationSubDirectory1Path));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(3, result[0].SyncedImages);
-            Assert.AreEqual($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
+            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
 
-            Assert.AreEqual(sourceSubDirectory1, result[1].SourceDirectory);
-            Assert.AreEqual(destinationSubDirectory1, result[1].DestinationDirectory);
-            Assert.AreEqual(1, result[1].SyncedImages);
-            Assert.AreEqual($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'.", result[1].Message);
+            Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
+            Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
+            Assert.That(result[1].SyncedImages, Is.EqualTo(1));
+            Assert.That(result[1].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
-            Assert.AreEqual(4, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath3}' => '{assetDestinationPath3}'", statusChanges[1].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[2].NewStatus);
-            Assert.AreEqual($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'", statusChanges[3].NewStatus);
+            Assert.That(statusChanges, Has.Count.EqualTo(4));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'"));
         }
         finally
         {
@@ -2206,41 +2206,41 @@ public class SyncAssetsServiceTests
             string assetDestinationToCopyPath4 = Path.Combine(destinationToCopy, assetName8);
 
             bool assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetDestinationToCopyPath1, assetDestinationPath5);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetDestinationToCopyPath2, assetDestinationPath6);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetDestinationToCopyPath3, assetDestinationPath7);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
             assetHasBeenCopied = _moveAssetsService!.CopyAsset(assetDestinationToCopyPath4, assetDestinationPath8);
-            Assert.IsTrue(assetHasBeenCopied);
+            Assert.That(assetHasBeenCopied, Is.True);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName5));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName6));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName7));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName8));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName5), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName6), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName7), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName8), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath6));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath7));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath8));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath7), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath8), Is.True);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -2254,59 +2254,59 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath5));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath6));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath7));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath8));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath5), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath6), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath7), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath8), Is.False);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(8, result[0].SyncedImages);
-            Assert.AreEqual($"8 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(8, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath1}' => '{assetDestinationPath1}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[1].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath3}' => '{assetDestinationPath3}'", statusChanges[2].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[3].NewStatus);
-            Assert.AreEqual($"Deleted '{assetDestinationPath5}'", statusChanges[4].NewStatus);
-            Assert.AreEqual($"Deleted '{assetDestinationPath6}'", statusChanges[5].NewStatus);
-            Assert.AreEqual($"Deleted '{assetDestinationPath7}'", statusChanges[6].NewStatus);
-            Assert.AreEqual($"Deleted '{assetDestinationPath8}'", statusChanges[7].NewStatus);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(8));
+            Assert.That(result[0].Message, Is.EqualTo($"8 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(8));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
+            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+            Assert.That(statusChanges[4].NewStatus, Is.EqualTo($"Deleted '{assetDestinationPath5}'"));
+            Assert.That(statusChanges[5].NewStatus, Is.EqualTo($"Deleted '{assetDestinationPath6}'"));
+            Assert.That(statusChanges[6].NewStatus, Is.EqualTo($"Deleted '{assetDestinationPath7}'"));
+            Assert.That(statusChanges[7].NewStatus, Is.EqualTo($"Deleted '{assetDestinationPath8}'"));
         }
         finally
         {
@@ -2341,56 +2341,56 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.IsEmpty(fileNamesInDestination);
+            Assert.That(fileNamesInDestination, Is.Empty);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.IsEmpty(syncAssetsConfigurationFromRepository.Definitions);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Is.Empty);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.IsEmpty(fileNamesInDestination);
+            Assert.That(fileNamesInDestination, Is.Empty);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         finally
         {
@@ -2425,24 +2425,24 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.IsEmpty(fileNamesInDestination);
+            Assert.That(fileNamesInDestination, Is.Empty);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
             SyncAssetsDirectoriesDefinition? definition = null;
@@ -2451,13 +2451,13 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(1, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(null, syncAssetsConfigurationFromRepository.Definitions[0]);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(1));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.EqualTo(null));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _syncAssetsService!.ExecuteAsync(statusChanges.Add));
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
         finally
         {
@@ -2492,53 +2492,53 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.IsEmpty(fileNamesInDestination);
+            Assert.That(fileNamesInDestination, Is.Empty);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository!.GetSyncAssetsConfiguration();
-            Assert.IsEmpty(syncAssetsConfigurationFromRepository.Definitions);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Is.Empty);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.IsEmpty(fileNamesInDestination);
+            Assert.That(fileNamesInDestination, Is.Empty);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         finally
         {
@@ -2573,35 +2573,35 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.IsEmpty(fileNamesInDestination);
+            Assert.That(fileNamesInDestination, Is.Empty);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsFalse(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
             SyncAssetsConfiguration? syncAssetsConfiguration = null;
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration!);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.IsNull(syncAssetsConfigurationFromRepository);
+            Assert.That(syncAssetsConfigurationFromRepository, Is.Null);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _syncAssetsService!.ExecuteAsync(statusChanges.Add));
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
         finally
         {
@@ -2631,23 +2631,23 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(0, result[0].SyncedImages);
-            Assert.AreEqual($"Source directory '{sourceDirectory}' not found.", result[0].Message);
-            Assert.IsEmpty(statusChanges);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].Message, Is.EqualTo($"Source directory '{sourceDirectory}' not found."));
+            Assert.That(statusChanges, Is.Empty);
         }
         finally
         {
@@ -2677,23 +2677,23 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(0, result[0].SyncedImages);
-            Assert.AreEqual($"Source directory '{sourceDirectory}' not found.", result[0].Message);
-            Assert.IsEmpty(statusChanges);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].Message, Is.EqualTo($"Source directory '{sourceDirectory}' not found."));
+            Assert.That(statusChanges, Is.Empty);
         }
         finally
         {
@@ -2726,18 +2726,18 @@ public class SyncAssetsServiceTests
             string assetDestinationPath4 = Path.Combine(destinationDirectory, assetName4);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FolderExists(destinationDirectory));
+            Assert.That(_storageService.FolderExists(destinationDirectory), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -2750,51 +2750,51 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
             string[] fileNamesInDestination = _storageService!.GetFileNames(destinationDirectory);
-            Assert.AreEqual(4, fileNamesInDestination.Length);
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInDestination.Any(x => x == assetName4));
+            Assert.That(fileNamesInDestination, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInDestination.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath1));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath2));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath3));
-            Assert.IsTrue(_storageService.FileExists(assetDestinationPath4));
+            Assert.That(_storageService.FileExists(assetDestinationPath1), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath2), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
+            Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(4, result[0].SyncedImages);
-            Assert.AreEqual($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'.", result[0].Message);
-            Assert.AreEqual(4, statusChanges.Count);
-            Assert.AreEqual($"'{assetSourcePath1}' => '{assetDestinationPath1}'", statusChanges[0].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath2}' => '{assetDestinationPath2}'", statusChanges[1].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath3}' => '{assetDestinationPath3}'", statusChanges[2].NewStatus);
-            Assert.AreEqual($"'{assetSourcePath4}' => '{assetDestinationPath4}'", statusChanges[3].NewStatus);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(4));
+            Assert.That(result[0].Message, Is.EqualTo($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
+            Assert.That(statusChanges, Has.Count.EqualTo(4));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+            Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
+            Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
         }
         finally
         {
@@ -2822,18 +2822,18 @@ public class SyncAssetsServiceTests
             string assetSourcePath4 = Path.Combine(sourceDirectory, assetName4);
 
             string[] fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsFalse(_storageService.FolderExists(destinationDirectory!));
+            Assert.That(_storageService.FolderExists(destinationDirectory!), Is.False);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
@@ -2846,35 +2846,35 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
-            Assert.AreEqual(syncAssetsConfiguration.Definitions.Count, syncAssetsConfigurationFromRepository.Definitions.Count);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].SourceDirectory, syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DestinationDirectory, syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].IncludeSubFolders, syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders);
-            Assert.AreEqual(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource, syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource);
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].IncludeSubFolders, Is.EqualTo(syncAssetsConfiguration.Definitions[0].IncludeSubFolders));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DeleteAssetsNotInSource, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DeleteAssetsNotInSource));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
             List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
-            Assert.AreEqual(4, fileNamesInSource.Length);
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName1));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName2));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName3));
-            Assert.IsTrue(fileNamesInSource.Any(x => x == assetName4));
+            Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
+            Assert.That(fileNamesInSource.Any(x => x == assetName1), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName2), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName3), Is.True);
+            Assert.That(fileNamesInSource.Any(x => x == assetName4), Is.True);
 
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath1));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath2));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath3));
-            Assert.IsTrue(_storageService.FileExists(assetSourcePath4));
+            Assert.That(_storageService.FileExists(assetSourcePath1), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath2), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
+            Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.IsNotEmpty(result);
-            Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(sourceDirectory, result[0].SourceDirectory);
-            Assert.AreEqual(destinationDirectory, result[0].DestinationDirectory);
-            Assert.AreEqual(0, result[0].SyncedImages);
-            Assert.AreEqual("Value cannot be null. (Parameter 'path')", result[0].Message);
-            Assert.IsEmpty(statusChanges);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
+            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
+            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
+            Assert.That(statusChanges, Is.Empty);
         }
         finally
         {

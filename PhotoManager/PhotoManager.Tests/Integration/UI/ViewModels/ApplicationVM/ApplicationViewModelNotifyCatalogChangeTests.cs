@@ -349,15 +349,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -367,24 +367,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset2 = _asset2!.WithFolder(folder!);
@@ -393,13 +393,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -428,7 +428,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -445,7 +445,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(9, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(9));
 
             int increment = 0;
 
@@ -479,24 +479,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(17, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -508,8 +508,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -559,20 +559,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET4_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -582,34 +582,34 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
@@ -617,16 +617,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!, _asset4Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(3, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(3));
 
             List<Folder> expectedFolders = [folder!, folder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
@@ -662,7 +662,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -679,7 +679,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -724,21 +724,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(14, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(14));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -750,17 +750,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing folder
-            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(2));
 
             GoToFolderEmulation(firstFrameVideosDirectory);
-            
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -773,15 +773,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(22, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[21]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(22));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -841,20 +841,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -864,48 +864,48 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             List<Folder> expectedFolders = [folder!, folder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory];
@@ -935,7 +935,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -952,7 +952,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(7, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
             int increment = 0;
 
@@ -986,18 +986,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1009,15 +1009,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing folder
-            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(2));
 
             GoToFolderEmulation(firstFrameVideosDirectory);
 
-            Assert.AreEqual(0, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets.Count, Is.EqualTo(0));
             AssertObservableAssets(firstFrameVideosDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -1030,15 +1030,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(19, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[18]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(19));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1082,15 +1082,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -1100,37 +1100,37 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset2 = _asset2!.WithFolder(folder!);
 
             List<Asset> expectedAssets = [_asset1!, _asset2!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -1157,7 +1157,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -1174,7 +1174,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(7, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
             int increment = 0;
 
@@ -1208,18 +1208,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1231,8 +1231,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1278,18 +1278,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath1ToCopy, imagePath1ToCopyTemp);
             ImageHelper.CreateInvalidImage(imagePath1ToCopyTemp, imagePath1ToCopy);
             File.Delete(imagePath1ToCopyTemp);
-            Assert.IsTrue(File.Exists(imagePath1ToCopy));
+            Assert.That(File.Exists(imagePath1ToCopy), Is.True);
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -1299,36 +1299,36 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
 
             List<Asset> expectedAssets = [_asset3Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -1351,7 +1351,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -1368,7 +1368,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(7, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
             int increment = 0;
 
@@ -1403,16 +1403,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 false);
 
-            Assert.AreEqual(9, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1424,8 +1424,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1468,15 +1468,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -1486,17 +1486,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
             CancellationToken cancellationToken = new (canceled);
@@ -1504,19 +1504,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService, blobsPath, tablesPath, false, false, folder!);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges()); // SaveCatalog has not been done due to the Cancellation
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True); // SaveCatalog has not been done due to the Cancellation
 
             CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
                 _database!,
@@ -1530,7 +1530,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false,
                 folder!);
 
-            Assert.AreEqual(4, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(4));
 
             int increment = 0;
 
@@ -1540,17 +1540,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterNotifyCatalogChanges(_applicationViewModel!, assetsDirectory, 0, [], null!, folder!, false);
 
-            Assert.AreEqual(4, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
 
             CheckInstance(applicationViewModelInstances, assetsDirectory, 0, [], null!, folder!, false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1590,15 +1590,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -1608,24 +1608,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
@@ -1635,13 +1635,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset1Temp!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -1671,7 +1671,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -1688,7 +1688,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -1722,27 +1722,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1754,8 +1754,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -1778,31 +1778,31 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
-            Assert.IsNotNull(assetsFromRepository[2].ImageData);
-            Assert.IsNotNull(assetsFromRepository[3].ImageData);
-            Assert.IsNull(assetsFromRepository[4].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
@@ -1827,7 +1827,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -1844,7 +1844,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -1863,43 +1863,43 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(36, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[31]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(36));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -1911,8 +1911,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1961,20 +1961,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET4_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(3, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -1984,34 +1984,34 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
@@ -2019,16 +2019,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!, _asset4Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(3, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(3));
 
             List<Folder> expectedFolders = [folder!, folder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
@@ -2064,7 +2064,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -2081,7 +2081,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -2126,21 +2126,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(14, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(14));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -2152,52 +2152,52 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
             File.SetLastWriteTime(videoPath1ToCopy, _asset4Temp.ThumbnailCreationDateTime);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(3, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(3, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(3));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
-            Assert.IsNull(assetsFromRepository[2].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders, thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -2212,7 +2212,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -2229,7 +2229,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -2249,27 +2249,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -2281,17 +2281,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing folder
-            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(2));
 
             GoToFolderEmulation(firstFrameVideosDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -2304,15 +2304,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(28, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[27]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -2369,20 +2369,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(3, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -2392,48 +2392,48 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             List<Folder> expectedFolders = [folder!, folder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory];
@@ -2463,7 +2463,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -2480,7 +2480,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(7, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
             int increment = 0;
 
@@ -2514,18 +2514,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -2537,8 +2537,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -2546,36 +2546,36 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.SetLastWriteTime(videoPath1ToCopy, _asset4Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(3, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -2590,7 +2590,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -2607,7 +2607,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(11, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(11));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -2625,22 +2625,22 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(15, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(15));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -2652,15 +2652,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing folder
-            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(2));
 
             GoToFolderEmulation(firstFrameVideosDirectory);
 
-            Assert.AreEqual(0, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets.Count, Is.EqualTo(0));
             AssertObservableAssets(firstFrameVideosDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -2673,15 +2673,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[22]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -2732,15 +2732,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -2750,36 +2750,36 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             List<Asset> expectedAssets = [_asset2Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -2802,7 +2802,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -2819,7 +2819,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(6, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(6));
 
             int increment = 0;
 
@@ -2853,15 +2853,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 false);
 
-            Assert.AreEqual(8, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -2873,8 +2873,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -2887,12 +2887,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.SetLastWriteTime(imagePath1ToCopy, _asset2Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
 
@@ -2907,21 +2907,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNull(assetsFromRepository[1].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSizeUpdated);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -2936,7 +2936,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -2953,7 +2953,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(12, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(12));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -2980,23 +2980,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(16, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -3008,8 +3008,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -3053,15 +3053,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -3071,37 +3071,37 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
 
             List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -3128,7 +3128,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -3145,7 +3145,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(7, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
             int increment = 0;
 
@@ -3179,18 +3179,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -3202,8 +3202,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -3211,7 +3211,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath1ToCopy, imagePath1ToCopyTemp);
             ImageHelper.CreateInvalidImage(imagePath1ToCopyTemp, imagePath1ToCopy);
             File.Delete(imagePath1ToCopyTemp);
-            Assert.IsTrue(File.Exists(imagePath1ToCopy));
+            Assert.That(File.Exists(imagePath1ToCopy), Is.True);
 
             // Because recreated with CreateInvalidImage() + minus 10 min to simulate update
             _asset2Temp!.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddMinutes(-10) };
@@ -3230,27 +3230,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsImageByteSizeUpdated.Remove(ASSET2_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new() { { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE } };
@@ -3268,7 +3268,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -3285,7 +3285,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(13, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(13));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -3313,30 +3313,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 false);
 
-            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -3348,8 +3348,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -3393,15 +3393,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -3411,24 +3411,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
@@ -3438,13 +3438,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset1Temp!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -3474,7 +3474,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -3491,7 +3491,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -3525,27 +3525,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -3557,8 +3557,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -3583,31 +3583,31 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
-            Assert.IsNotNull(assetsFromRepository[2].ImageData);
-            Assert.IsNotNull(assetsFromRepository[3].ImageData);
-            Assert.IsNull(assetsFromRepository[4].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
@@ -3632,7 +3632,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -3649,7 +3649,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -3668,43 +3668,43 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(36, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[31]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(36));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -3716,8 +3716,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -3758,15 +3758,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -3776,24 +3776,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
@@ -3803,13 +3803,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset1Temp!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -3839,7 +3839,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -3856,7 +3856,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -3890,27 +3890,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -3922,8 +3922,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -3942,22 +3942,22 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
-            Assert.IsFalse(File.Exists(destinationFilePathToCopy));
+            Assert.That(File.Exists(destinationFilePathToCopy), Is.False);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -3986,7 +3986,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -4003,7 +4003,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -4022,39 +4022,39 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(32, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -4066,8 +4066,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -4119,20 +4119,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE, ASSET4_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(3, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -4142,34 +4142,34 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
@@ -4177,16 +4177,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!, _asset4Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(3, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(3));
 
             List<Folder> expectedFolders = [folder!, folder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, firstFrameVideosDirectory];
@@ -4222,7 +4222,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -4239,7 +4239,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -4284,21 +4284,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(14, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(14));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -4310,49 +4310,49 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
             File.Delete(videoPath1ToCopy);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(3, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(3));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
-            Assert.IsNull(assetsFromRepository[2].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, folders, thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -4367,7 +4367,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -4384,7 +4384,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -4404,27 +4404,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -4436,17 +4436,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing folder
-            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(2));
 
             GoToFolderEmulation(firstFrameVideosDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMapping[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -4459,15 +4459,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(28, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[27]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -4529,20 +4529,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET3_TEMP_IMAGE_BYTE_SIZE, ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(3, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(3));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -4552,48 +4552,48 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             List<Asset> expectedAssets = [_asset3Temp!, _asset2Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             List<Folder> expectedFolders = [folder!, folder!];
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory];
@@ -4623,7 +4623,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -4640,7 +4640,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(7, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(7));
 
             int increment = 0;
 
@@ -4674,18 +4674,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(11, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -4697,44 +4697,44 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
             File.Delete(videoPath1ToCopy);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMapping, [folder!], thumbnails, assetsImageByteSize);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -4749,7 +4749,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -4766,7 +4766,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(11, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(11));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -4784,22 +4784,22 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(15, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(15));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -4811,15 +4811,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing folder
-            Assert.AreEqual(2, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(2));
 
             GoToFolderEmulation(firstFrameVideosDirectory);
 
-            Assert.AreEqual(0, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets.Count, Is.EqualTo(0));
             AssertObservableAssets(firstFrameVideosDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -4832,15 +4832,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[22]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -4898,15 +4898,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSizeThirdSync = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -4916,24 +4916,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
@@ -4945,13 +4945,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<Asset> expectedAssetsSecondSync = [_asset1!, _asset2!, _asset3!, _asset4!];
             List<Asset> expectedAssetsThirdSync = [_asset1!, _asset2!, _asset3!, _asset4!, _asset1Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -4981,7 +4981,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -4998,7 +4998,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -5032,27 +5032,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -5064,30 +5064,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
             File.Delete(destinationFilePathToCopy);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
-            Assert.IsFalse(File.Exists(destinationFilePathToCopy));
+            Assert.That(File.Exists(destinationFilePathToCopy), Is.False);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -5116,7 +5116,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -5133,7 +5133,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -5152,39 +5152,39 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(32, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -5196,41 +5196,41 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Third sync
 
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
-            Assert.IsTrue(File.Exists(destinationFilePathToCopy));
+            Assert.That(File.Exists(destinationFilePathToCopy), Is.True);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsThirdSync[i], assetPathsAfterSecondSync[i], assetsDirectory, folder!);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
-            Assert.IsNotNull(assetsFromRepository[2].ImageData);
-            Assert.IsNotNull(assetsFromRepository[3].ImageData);
-            Assert.IsNull(assetsFromRepository[4].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingThirdSync = new() { { folder!, expectedAssetsThirdSync } };
             Dictionary<string, int> assetNameToByteSizeMappingThirdSync = new()
@@ -5255,7 +5255,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingThirdSync,
                 assetNameToByteSizeMappingThirdSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -5272,7 +5272,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingThirdSync,
                 assetNameToByteSizeMappingThirdSync);
 
-            Assert.AreEqual(22, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(22));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -5291,47 +5291,47 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(40, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[34]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[35]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[36]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[37]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[38]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[39]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(40));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -5343,8 +5343,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -5388,15 +5388,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -5406,36 +5406,36 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             List<Asset> expectedAssets = [_asset2Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -5458,7 +5458,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -5475,7 +5475,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(6, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(6));
 
             int increment = 0;
 
@@ -5509,15 +5509,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 false);
 
-            Assert.AreEqual(8, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -5529,8 +5529,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -5541,12 +5541,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath2, imagePath2ToCopy);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset3Temp = _asset3Temp!.WithFolder(folder!);
 
@@ -5561,21 +5561,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(2));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNull(assetsFromRepository[1].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingUpdated, [folder!], thumbnails, assetsImageByteSizeUpdated);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -5590,7 +5590,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -5607,7 +5607,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(12, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(12));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -5634,23 +5634,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(16, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -5662,8 +5662,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -5707,15 +5707,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -5725,24 +5725,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
@@ -5752,13 +5752,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset1Temp!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -5788,7 +5788,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -5805,7 +5805,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -5839,27 +5839,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -5871,8 +5871,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -5893,22 +5893,22 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
-            Assert.IsFalse(File.Exists(destinationFilePathToCopy));
+            Assert.That(File.Exists(destinationFilePathToCopy), Is.False);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -5937,7 +5937,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -5954,7 +5954,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -5973,39 +5973,39 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(32, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("ViewerPosition", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("CanGoToPreviousAsset", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("CanGoToNextAsset", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("CurrentAsset", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -6017,8 +6017,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -6063,15 +6063,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET1_TEMP_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -6081,24 +6081,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
@@ -6108,13 +6108,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset1Temp!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -6144,7 +6144,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -6161,7 +6161,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(10, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(10));
 
             int increment = 0;
 
@@ -6196,27 +6196,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -6228,8 +6228,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -6248,23 +6248,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsImageByteSizeUpdated.Remove(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
-            Assert.IsFalse(File.Exists(destinationFilePathToCopy));
+            Assert.That(File.Exists(destinationFilePathToCopy), Is.False);
 
             CancellationToken cancellationToken = new (true);
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -6294,7 +6294,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -6311,7 +6311,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangesNoBackupChanges(catalogChanges, ref increment);
@@ -6326,11 +6326,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(24, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(24));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -6342,8 +6342,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -6391,21 +6391,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSizeSecondSync = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory1.Length);
+            Assert.That(assetsInDirectory1, Has.Length.EqualTo(4));
 
             string[] assetsInDirectory2 = Directory.GetFiles(tempDirectory);
-            Assert.AreEqual(1, assetsInDirectory2.Length);
+            Assert.That(assetsInDirectory2, Has.Length.EqualTo(1));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder1);
+            Assert.That(folder1, Is.Null);
 
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
-            Assert.IsNull(folder2);
+            Assert.That(folder2, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -6415,30 +6415,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath1);
+            Assert.That(assetsFromRepositoryByPath1, Is.Empty);
 
             List<Asset> assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath2);
+            Assert.That(assetsFromRepositoryByPath2, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder1);
+            Assert.That(folder1, Is.Not.Null);
 
             folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
-            Assert.IsNotNull(folder2);
+            Assert.That(folder2, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder1!);
             _asset2 = _asset2!.WithFolder(folder1!);
@@ -6448,16 +6448,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset1Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath1.Count);
+            Assert.That(assetsFromRepositoryByPath1, Has.Count.EqualTo(4));
 
             assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath2.Count);
+            Assert.That(assetsFromRepositoryByPath2, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             List<string> expectedDirectories = [assetsDirectory, assetsDirectory, assetsDirectory, assetsDirectory, tempDirectory];
             List<Folder> expectedFolders = [folder1!, folder1!, folder1!, folder1!, folder2!];
@@ -6491,7 +6491,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -6508,7 +6508,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(12, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(12));
 
             int increment = 0;
 
@@ -6558,26 +6558,26 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 true);
 
-            Assert.AreEqual(20, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -6589,10 +6589,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(folder2, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(folder2));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -6607,28 +6607,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssetsUpdated.Remove(_asset1Temp);
 
             assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory1.Length);
+            Assert.That(assetsInDirectory1, Has.Length.EqualTo(4));
 
-            Assert.IsFalse(File.Exists(destinationFilePathToCopy));
+            Assert.That(File.Exists(destinationFilePathToCopy), Is.False);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder1);
+            Assert.That(folder1, Is.Not.Null);
 
             Folder? deletedFolder = _testableAssetRepository!.GetFolderByPath(tempDirectory);
-            Assert.IsNull(deletedFolder);
+            Assert.That(deletedFolder, Is.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath1.Count);
+            Assert.That(assetsFromRepositoryByPath1, Has.Count.EqualTo(4));
 
             assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath2);
+            Assert.That(assetsFromRepositoryByPath2, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -6657,7 +6657,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -6674,7 +6674,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(20, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(20));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -6695,34 +6695,34 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 true);
 
-            Assert.AreEqual(28, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -6734,11 +6734,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(folder2, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(folder2));
 
-            Assert.AreEqual(1, folderRemovedEvents.Count);
-            Assert.AreEqual(folder2, folderRemovedEvents[0]);
+            Assert.That(folderRemovedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderRemovedEvents[0], Is.EqualTo(folder2));
         }
         finally
         {
@@ -6788,21 +6788,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSizeThirdSync = [ASSET2_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(0, assetsInDirectory1.Length);
+            Assert.That(assetsInDirectory1.Length, Is.EqualTo(0));
 
             string[] assetsInDirectory2 = Directory.GetFiles(tempDirectory);
-            Assert.AreEqual(2, assetsInDirectory2.Length);
+            Assert.That(assetsInDirectory2, Has.Length.EqualTo(2));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder1);
+            Assert.That(folder1, Is.Null);
 
             Folder? folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
-            Assert.IsNull(folder2);
+            Assert.That(folder2, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -6812,30 +6812,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath1);
+            Assert.That(assetsFromRepositoryByPath1, Is.Empty);
 
             List<Asset> assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath2);
+            Assert.That(assetsFromRepositoryByPath2, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder1);
+            Assert.That(folder1, Is.Not.Null);
 
             folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
-            Assert.IsNotNull(folder2);
+            Assert.That(folder2, Is.Not.Null);
 
             _asset2Temp = _asset2Temp!.WithFolder(folder2!);
 
@@ -6843,16 +6843,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new() { { folder2!, [_asset2Temp] } };
             Dictionary<string, int> assetNameToByteSizeMappingFirstSync = new() { { _asset2Temp!.FileName, ASSET2_TEMP_IMAGE_BYTE_SIZE } };
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(0, assetsFromRepositoryByPath1.Count);
+            Assert.That(assetsFromRepositoryByPath1.Count, Is.EqualTo(0));
 
             assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath2.Count);
+            Assert.That(assetsFromRepositoryByPath2, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
             CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0], _asset2Temp, destinationFilePathToCopy1, tempDirectory, folder2!);
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync, [folder2!], thumbnails, assetsImageByteSizeFirstSync); // Only folder2 contains assets
@@ -6868,7 +6868,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -6885,7 +6885,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.AreEqual(8, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(8));
 
             int increment = 0;
 
@@ -6916,15 +6916,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 false);
 
-            Assert.AreEqual(8, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(8));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -6936,20 +6936,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(folder2, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(folder2));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder1);
+            Assert.That(folder1, Is.Not.Null);
 
             folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
-            Assert.IsNotNull(folder2);
+            Assert.That(folder2, Is.Not.Null);
 
             _asset2 = _asset2!.WithFolder(folder2!);
 
@@ -6960,16 +6960,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE }
             };
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(0, assetsFromRepositoryByPath1.Count);
+            Assert.That(assetsFromRepositoryByPath1.Count, Is.EqualTo(0));
 
             assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
-            Assert.AreEqual(2, assetsFromRepositoryByPath2.Count);
+            Assert.That(assetsFromRepositoryByPath2, Has.Count.EqualTo(2));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(2, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(2));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -6990,7 +6990,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -7007,7 +7007,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.AreEqual(16, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(16));
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
@@ -7034,23 +7034,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 false);
 
-            Assert.AreEqual(16, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -7062,39 +7062,39 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(folder2, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(folder2));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Third sync
 
             Directory.Delete(tempDirectory, true);
 
-            Assert.IsFalse(File.Exists(destinationFilePathToCopy1));
-            Assert.IsFalse(File.Exists(destinationFilePathToCopy2));
+            Assert.That(File.Exists(destinationFilePathToCopy1), Is.False);
+            Assert.That(File.Exists(destinationFilePathToCopy2), Is.False);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder1);
+            Assert.That(folder1, Is.Not.Null);
 
             folder2 = _testableAssetRepository!.GetFolderByPath(tempDirectory);
-            Assert.IsNotNull(folder2);
+            Assert.That(folder2, Is.Not.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingThirdSync = new() { { folder2!, [_asset2] } };
             Dictionary<string, int> assetNameToByteSizeMappingThirdSync = new() { { _asset2!.FileName, ASSET2_IMAGE_BYTE_SIZE } };
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(0, assetsFromRepositoryByPath1.Count);
+            Assert.That(assetsFromRepositoryByPath1.Count, Is.EqualTo(0));
 
             assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
-            Assert.AreEqual(1, assetsFromRepositoryByPath2.Count);
+            Assert.That(assetsFromRepositoryByPath2, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(1, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(1));
 
             CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[0], _asset2, destinationFilePathToCopy2, tempDirectory, folder2!);
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingThirdSync, [folder2!], thumbnails, assetsImageByteSizeThirdSync); // Only folder2 contains assets
@@ -7110,7 +7110,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingThirdSync,
                 assetNameToByteSizeMappingThirdSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -7127,7 +7127,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingThirdSync,
                 assetNameToByteSizeMappingThirdSync);
 
-            Assert.AreEqual(23, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(23));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -7147,30 +7147,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 false);
 
-            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -7182,37 +7182,37 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(folder2, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(folder2));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Fourth sync
 
             assetsInDirectory1 = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(0, assetsInDirectory1.Length);
+            Assert.That(assetsInDirectory1.Length, Is.EqualTo(0));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder1 = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder1);
+            Assert.That(folder1, Is.Not.Null);
 
             Folder? folder2Updated = _testableAssetRepository!.GetFolderByPath(tempDirectory);
-            Assert.IsNull(folder2Updated);
+            Assert.That(folder2Updated, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFourthSync = [];
             Dictionary<string, int> assetNameToByteSizeMappingFourthSync = [];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath1 = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(0, assetsFromRepositoryByPath1.Count);
+            Assert.That(assetsFromRepositoryByPath1.Count, Is.EqualTo(0));
 
             assetsFromRepositoryByPath2 = _testableAssetRepository.GetCataloguedAssetsByPath(tempDirectory);
-            Assert.AreEqual(0, assetsFromRepositoryByPath2.Count);
+            Assert.That(assetsFromRepositoryByPath2.Count, Is.EqualTo(0));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(0, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository.Count, Is.EqualTo(0));
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, [], [], thumbnails, []); // No Folders and assets anymore
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -7227,7 +7227,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFourthSync,
                 assetNameToByteSizeMappingFourthSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -7244,7 +7244,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFourthSync,
                 assetNameToByteSizeMappingFourthSync);
 
-            Assert.AreEqual(31, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(31));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -7265,38 +7265,38 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder1!,
                 false);
 
-            Assert.AreEqual(31, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(31));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -7308,11 +7308,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(1, folderAddedEvents.Count);
-            Assert.AreEqual(folder2, folderAddedEvents[0]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(folder2));
 
-            Assert.AreEqual(1, folderRemovedEvents.Count);
-            Assert.AreEqual(folder2, folderRemovedEvents[0]);
+            Assert.That(folderRemovedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderRemovedEvents[0], Is.EqualTo(folder2));
         }
         finally
         {
@@ -7399,41 +7399,41 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
             assetsInDirectory = Directory.GetFiles(imageDeletedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subSubDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
-            Assert.IsFalse(File.Exists(firstFramePath2));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
+            Assert.That(File.Exists(firstFramePath2), Is.False);
 
             Folder? rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(rootFolder);
+            Assert.That(rootFolder, Is.Null);
 
             Folder? imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Null);
 
             Folder? imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Null);
 
             Folder? subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Null);
 
             Folder? subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -7443,59 +7443,59 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsInRootFromRepositoryByPath);
+            Assert.That(assetsInRootFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.IsEmpty(assetsInImageDeletedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.IsEmpty(assetsInImageUpdatedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.IsEmpty(assetsInSubDirFolderFromRepositoryByPath);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.IsEmpty(assetsInSubSubDirFolderFromRepositoryByPath);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(rootFolder);
+            Assert.That(rootFolder, Is.Not.Null);
 
             imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNotNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Not.Null);
 
             imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNotNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Not.Null);
 
             subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNotNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Not.Null);
 
             subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNotNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
-            Assert.IsTrue(File.Exists(firstFramePath2));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
+            Assert.That(File.Exists(firstFramePath2), Is.True);
 
             _asset4 = _asset4!.WithFolder(rootFolder!);
             _asset2 = _asset2!.WithFolder(imageDeletedFolder!);
@@ -7506,28 +7506,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssetsFirstSync = [_asset4!, _asset2!, _asset2Temp!, _asset3Temp!, _asset4Temp!, _asset5Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsInRootFromRepositoryByPath.Count);
+            Assert.That(assetsInRootFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.AreEqual(1, assetsInImageDeletedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInImageUpdatedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.AreEqual(1, assetsInSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.AreEqual(0, assetsInSubSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath.Count, Is.EqualTo(0));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(2, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(2));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(6, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(6));
 
             List<Folder> expectedFolders = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, imageDeletedDirectory, imageUpdatedDirectory, subDirDirectory, firstFrameVideosDirectory, firstFrameVideosDirectory];
@@ -7570,7 +7570,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -7587,7 +7587,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.AreEqual(21, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(21));
 
             int increment = 0;
 
@@ -7672,30 +7672,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(23, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -7707,14 +7707,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(5, folderAddedEvents.Count);
-            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
-            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
-            Assert.AreEqual(subDirFolder, folderAddedEvents[2]);
-            Assert.AreEqual(subSubDirFolder, folderAddedEvents[3]);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[4]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(5));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(imageDeletedFolder));
+            Assert.That(folderAddedEvents[1], Is.EqualTo(imageUpdatedFolder));
+            Assert.That(folderAddedEvents[2], Is.EqualTo(subDirFolder));
+            Assert.That(folderAddedEvents[3], Is.EqualTo(subSubDirFolder));
+            Assert.That(folderAddedEvents[4], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
             
             // Second Sync
 
@@ -7740,42 +7740,42 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             };
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
             assetsInDirectory = Directory.GetFiles(imageDeletedDirectory);
-            Assert.AreEqual(0, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory.Length, Is.EqualTo(0));
             assetsInDirectory = Directory.GetFiles(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subSubDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(rootFolder);
+            Assert.That(rootFolder, Is.Not.Null);
 
             imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNotNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Not.Null);
 
             imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNotNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Not.Null);
 
             subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNotNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Not.Null);
 
             subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNotNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
-            Assert.IsTrue(File.Exists(firstFramePath2));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
+            Assert.That(File.Exists(firstFramePath2), Is.True);
 
             _asset4 = _asset4!.WithFolder(rootFolder!);
             _asset2Temp = _asset2Temp!.WithFolder(imageUpdatedFolder!);
@@ -7785,28 +7785,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssetsSecondSync = [_asset4!, _asset3Temp!, _asset4Temp!, _asset5Temp!, _asset2Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsInRootFromRepositoryByPath.Count);
+            Assert.That(assetsInRootFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.IsEmpty(assetsInImageDeletedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Is.Empty);
 
             assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInImageUpdatedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.AreEqual(1, assetsInSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.AreEqual(0, assetsInSubSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath.Count, Is.EqualTo(0));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(2, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(2));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             assetPathsAfterSync = [imagePath1ToCopy, imagePath4ToCopy, firstFramePath1, firstFramePath2, imagePath3ToCopy];
             expectedFolders = [rootFolder!, subDirFolder!, videoFirstFrameFolder!, videoFirstFrameFolder!, imageUpdatedFolder!];
@@ -7817,11 +7817,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNull(assetsFromRepository[1].ImageData);
-            Assert.IsNull(assetsFromRepository[2].ImageData);
-            Assert.IsNull(assetsFromRepository[3].ImageData);
-            Assert.IsNull(assetsFromRepository[4].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
+            Assert.That(assetsFromRepository[3].ImageData, Is.Null);
+            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -7836,7 +7836,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -7853,7 +7853,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.AreEqual(38, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(38));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -7890,47 +7890,47 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(40, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[36]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[37]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[38]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[39]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(40));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -7942,21 +7942,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(5, folderAddedEvents.Count);
-            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
-            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
-            Assert.AreEqual(subDirFolder, folderAddedEvents[2]);
-            Assert.AreEqual(subSubDirFolder, folderAddedEvents[3]);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[4]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(5));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(imageDeletedFolder));
+            Assert.That(folderAddedEvents[1], Is.EqualTo(imageUpdatedFolder));
+            Assert.That(folderAddedEvents[2], Is.EqualTo(subDirFolder));
+            Assert.That(folderAddedEvents[3], Is.EqualTo(subSubDirFolder));
+            Assert.That(folderAddedEvents[4], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing to imageDeletedFolder -> imageDeletedDirectory
-            Assert.AreEqual(1, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(1));
 
             GoToFolderEmulation(imageDeletedDirectory);
 
-            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            Assert.That(_applicationViewModel.ObservableAssets, Is.Empty);
             AssertObservableAssets(imageDeletedDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -7970,7 +7970,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to imageUpdatedFolder -> imageUpdatedDirectory
             GoToFolderEmulation(imageUpdatedDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -7984,7 +7984,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to subDirFolder -> subDirDirectory
             GoToFolderEmulation(subDirDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(subDirDirectory, folderToAssetsMappingSecondSync[subDirFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -7998,7 +7998,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to subSubDirFolder -> subSubDirDirectory
             GoToFolderEmulation(subSubDirDirectory);
 
-            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            Assert.That(_applicationViewModel.ObservableAssets, Is.Empty);
             AssertObservableAssets(subSubDirDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8012,7 +8012,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to videoFirstFrameFolder -> firstFrameVideosDirectory
             GoToFolderEmulation(firstFrameVideosDirectory);
 
-            Assert.AreEqual(2, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(2));
             AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMappingSecondSync[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8026,7 +8026,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to rootFolder -> assetsDirectory
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(assetsDirectory, folderToAssetsMappingSecondSync[rootFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8037,31 +8037,31 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(64, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[40]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[41]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[42]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[43]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[44]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[45]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[46]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[47]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[48]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[49]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[50]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[51]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[52]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[53]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[54]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[55]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[56]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[57]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[58]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[59]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[60]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[61]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[62]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[63]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(64));
+            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("AppTitle"));
         }
         finally
         {
@@ -8144,40 +8144,40 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 ASSET2_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
             assetsInDirectory = Directory.GetFiles(imageDeletedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subSubDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             Folder? rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(rootFolder);
+            Assert.That(rootFolder, Is.Null);
 
             Folder? imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Null);
 
             Folder? imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Null);
 
             Folder? subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Null);
 
             Folder? subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -8187,58 +8187,58 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsInRootFromRepositoryByPath);
+            Assert.That(assetsInRootFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.IsEmpty(assetsInImageDeletedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.IsEmpty(assetsInImageUpdatedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.IsEmpty(assetsInSubDirFolderFromRepositoryByPath);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.IsEmpty(assetsInSubSubDirFolderFromRepositoryByPath);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(rootFolder);
+            Assert.That(rootFolder, Is.Not.Null);
 
             imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNotNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Not.Null);
 
             imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNotNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Not.Null);
 
             subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNotNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Not.Null);
 
             subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNotNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
 
             _asset4 = _asset4!.WithFolder(rootFolder!);
             _asset2 = _asset2!.WithFolder(imageDeletedFolder!);
@@ -8248,28 +8248,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssetsFirstSync = [_asset4!, _asset2!, _asset2Temp!, _asset3Temp!, _asset4Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsInRootFromRepositoryByPath.Count);
+            Assert.That(assetsInRootFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.AreEqual(1, assetsInImageDeletedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInImageUpdatedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.AreEqual(1, assetsInSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.AreEqual(0, assetsInSubSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath.Count, Is.EqualTo(0));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             List<Folder> expectedFolders = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             List<string> expectedDirectories = [assetsDirectory, imageDeletedDirectory, imageUpdatedDirectory, subDirDirectory, firstFrameVideosDirectory];
@@ -8311,7 +8311,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -8328,7 +8328,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.AreEqual(20, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(20));
 
             int increment = 0;
 
@@ -8409,29 +8409,29 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(22, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(22));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -8443,14 +8443,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(5, folderAddedEvents.Count);
-            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
-            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
-            Assert.AreEqual(subDirFolder, folderAddedEvents[2]);
-            Assert.AreEqual(subSubDirFolder, folderAddedEvents[3]);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[4]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(5));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(imageDeletedFolder));
+            Assert.That(folderAddedEvents[1], Is.EqualTo(imageUpdatedFolder));
+            Assert.That(folderAddedEvents[2], Is.EqualTo(subDirFolder));
+            Assert.That(folderAddedEvents[3], Is.EqualTo(subSubDirFolder));
+            Assert.That(folderAddedEvents[4], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
             
             // Second Sync
 
@@ -8475,41 +8475,41 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             };
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
             assetsInDirectory = Directory.GetFiles(imageDeletedDirectory);
-            Assert.AreEqual(0, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory.Length, Is.EqualTo(0));
             assetsInDirectory = Directory.GetFiles(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subSubDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(rootFolder);
+            Assert.That(rootFolder, Is.Not.Null);
 
             imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNotNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Not.Null);
 
             imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNotNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Not.Null);
 
             subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNotNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Not.Null);
 
             subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNotNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
 
             _asset4 = _asset4!.WithFolder(rootFolder!);
             _asset2Temp = _asset2Temp!.WithFolder(imageUpdatedFolder!);
@@ -8518,28 +8518,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssetsSecondSync = [_asset4!, _asset3Temp!, _asset4Temp!, _asset2Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsInRootFromRepositoryByPath.Count);
+            Assert.That(assetsInRootFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.IsEmpty(assetsInImageDeletedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Is.Empty);
 
             assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInImageUpdatedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.AreEqual(1, assetsInSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.AreEqual(0, assetsInSubSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath.Count, Is.EqualTo(0));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             assetPathsAfterSync = [imagePath1ToCopy, imagePath4ToCopy, firstFramePath1, imagePath3ToCopy];
             expectedFolders = [rootFolder!, subDirFolder!, videoFirstFrameFolder!, imageUpdatedFolder!];
@@ -8550,10 +8550,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNull(assetsFromRepository[1].ImageData);
-            Assert.IsNull(assetsFromRepository[2].ImageData);
-            Assert.IsNull(assetsFromRepository[3].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
+            Assert.That(assetsFromRepository[3].ImageData, Is.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -8568,7 +8568,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -8585,7 +8585,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.AreEqual(37, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(37));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -8622,46 +8622,46 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(39, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[36]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[37]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[38]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(39));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -8673,21 +8673,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(5, folderAddedEvents.Count);
-            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
-            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
-            Assert.AreEqual(subDirFolder, folderAddedEvents[2]);
-            Assert.AreEqual(subSubDirFolder, folderAddedEvents[3]);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[4]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(5));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(imageDeletedFolder));
+            Assert.That(folderAddedEvents[1], Is.EqualTo(imageUpdatedFolder));
+            Assert.That(folderAddedEvents[2], Is.EqualTo(subDirFolder));
+            Assert.That(folderAddedEvents[3], Is.EqualTo(subSubDirFolder));
+            Assert.That(folderAddedEvents[4], Is.EqualTo(videoFirstFrameFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing to imageDeletedFolder -> imageDeletedDirectory
-            Assert.AreEqual(1, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(1));
 
             GoToFolderEmulation(imageDeletedDirectory);
 
-            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            Assert.That(_applicationViewModel.ObservableAssets, Is.Empty);
             AssertObservableAssets(imageDeletedDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8701,7 +8701,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to imageUpdatedFolder -> imageUpdatedDirectory
             GoToFolderEmulation(imageUpdatedDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8715,7 +8715,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to subDirFolder -> subDirDirectory
             GoToFolderEmulation(subDirDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(subDirDirectory, folderToAssetsMappingSecondSync[subDirFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8729,7 +8729,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to subSubDirFolder -> subSubDirDirectory
             GoToFolderEmulation(subSubDirDirectory);
 
-            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            Assert.That(_applicationViewModel.ObservableAssets, Is.Empty);
             AssertObservableAssets(subSubDirDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8743,7 +8743,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to videoFirstFrameFolder -> firstFrameVideosDirectory
             GoToFolderEmulation(firstFrameVideosDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMappingSecondSync[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8757,7 +8757,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to rootFolder -> assetsDirectory
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(assetsDirectory, folderToAssetsMappingSecondSync[rootFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -8768,31 +8768,31 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(63, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[39]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[40]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[41]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[42]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[43]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[44]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[45]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[46]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[47]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[48]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[49]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[50]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[51]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[52]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[53]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[54]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[55]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[56]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[57]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[58]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[59]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[60]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[61]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[62]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(63));
+            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("AppTitle"));
         }
         finally
         {
@@ -8877,40 +8877,40 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 ASSET5_TEMP_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
             assetsInDirectory = Directory.GetFiles(imageDeletedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subSubDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
-            Assert.IsFalse(File.Exists(firstFramePath1));
+            Assert.That(File.Exists(firstFramePath1), Is.False);
 
             Folder? rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(rootFolder);
+            Assert.That(rootFolder, Is.Null);
 
             Folder? imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Null);
 
             Folder? imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Null);
 
             Folder? subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Null);
 
             Folder? subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Null);
 
             Folder? videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -8920,59 +8920,59 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsInRootFromRepositoryByPath);
+            Assert.That(assetsInRootFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.IsEmpty(assetsInImageDeletedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.IsEmpty(assetsInImageUpdatedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.IsEmpty(assetsInSubDirFolderFromRepositoryByPath);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.IsEmpty(assetsInSubSubDirFolderFromRepositoryByPath);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath, Is.Empty);
 
             List<Asset> videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.IsEmpty(videoFirstFramesFromRepositoryByPath);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(rootFolder);
+            Assert.That(rootFolder, Is.Not.Null);
 
             imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNotNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Not.Null);
 
             imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNotNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Not.Null);
 
             subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNotNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Not.Null);
 
             subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNotNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
-            Assert.IsTrue(File.Exists(firstFramePath2));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
+            Assert.That(File.Exists(firstFramePath2), Is.True);
 
             _asset4 = _asset4!.WithFolder(rootFolder!);
             _asset2 = _asset2!.WithFolder(imageDeletedFolder!);
@@ -8982,28 +8982,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssetsFirstSync = [_asset4!, _asset2!, _asset2Temp!, _asset4Temp!, _asset3Temp!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsInRootFromRepositoryByPath.Count);
+            Assert.That(assetsInRootFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.AreEqual(1, assetsInImageDeletedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInImageUpdatedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.AreEqual(1, assetsInSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.AreEqual(0, assetsInSubSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath.Count, Is.EqualTo(0));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(1, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             List<Folder> expectedFolders = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, videoFirstFrameFolder!, subDirFolder!];
             List<string> expectedDirectories = [assetsDirectory, imageDeletedDirectory, imageUpdatedDirectory, firstFrameVideosDirectory, subDirDirectory];
@@ -9045,7 +9045,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -9062,7 +9062,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
 
-            Assert.AreEqual(20, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(20));
 
             int increment = 0;
 
@@ -9143,29 +9143,29 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(22, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(22));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -9177,14 +9177,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(5, folderAddedEvents.Count);
-            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
-            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[2]);
-            Assert.AreEqual(subDirFolder, folderAddedEvents[3]);
-            Assert.AreEqual(subSubDirFolder, folderAddedEvents[4]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(5));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(imageDeletedFolder));
+            Assert.That(folderAddedEvents[1], Is.EqualTo(imageUpdatedFolder));
+            Assert.That(folderAddedEvents[2], Is.EqualTo(videoFirstFrameFolder));
+            Assert.That(folderAddedEvents[3], Is.EqualTo(subDirFolder));
+            Assert.That(folderAddedEvents[4], Is.EqualTo(subSubDirFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
             
             // Second Sync
 
@@ -9194,42 +9194,42 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
             assetsInDirectory = Directory.GetFiles(imageDeletedDirectory);
-            Assert.AreEqual(0, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory.Length, Is.EqualTo(0));
             assetsInDirectory = Directory.GetFiles(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subSubDirDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(rootFolder);
+            Assert.That(rootFolder, Is.Not.Null);
 
             imageDeletedFolder = _testableAssetRepository!.GetFolderByPath(imageDeletedDirectory);
-            Assert.IsNotNull(imageDeletedFolder);
+            Assert.That(imageDeletedFolder, Is.Not.Null);
 
             imageUpdatedFolder = _testableAssetRepository!.GetFolderByPath(imageUpdatedDirectory);
-            Assert.IsNotNull(imageUpdatedFolder);
+            Assert.That(imageUpdatedFolder, Is.Not.Null);
 
             subDirFolder = _testableAssetRepository!.GetFolderByPath(subDirDirectory);
-            Assert.IsNotNull(subDirFolder);
+            Assert.That(subDirFolder, Is.Not.Null);
 
             subSubDirFolder = _testableAssetRepository!.GetFolderByPath(subSubDirDirectory);
-            Assert.IsNotNull(subSubDirFolder);
+            Assert.That(subSubDirFolder, Is.Not.Null);
 
             videoFirstFrameFolder = _testableAssetRepository!.GetFolderByPath(firstFrameVideosDirectory);
-            Assert.IsNotNull(videoFirstFrameFolder);
+            Assert.That(videoFirstFrameFolder, Is.Not.Null);
 
             assetsInDirectory = Directory.GetFiles(firstFrameVideosDirectory);
-            Assert.AreEqual(2, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(firstFramePath1));
-            Assert.IsTrue(File.Exists(firstFramePath2));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
+            Assert.That(File.Exists(firstFramePath1), Is.True);
+            Assert.That(File.Exists(firstFramePath2), Is.True);
 
             _asset4 = _asset4!.WithFolder(rootFolder!);
             _asset2Temp = _asset2Temp!.WithFolder(imageUpdatedFolder!);
@@ -9254,28 +9254,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(1, assetsInRootFromRepositoryByPath.Count);
+            Assert.That(assetsInRootFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInImageDeletedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageDeletedDirectory);
-            Assert.IsEmpty(assetsInImageDeletedFolderFromRepositoryByPath);
+            Assert.That(assetsInImageDeletedFolderFromRepositoryByPath, Is.Empty);
 
             assetsInImageUpdatedFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(imageUpdatedDirectory);
-            Assert.AreEqual(1, assetsInImageUpdatedFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInImageUpdatedFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subDirDirectory);
-            Assert.AreEqual(1, assetsInSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubDirFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.AreEqual(0, assetsInSubSubDirFolderFromRepositoryByPath.Count);
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath.Count, Is.EqualTo(0));
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
-            Assert.AreEqual(2, videoFirstFramesFromRepositoryByPath.Count);
+            Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(2));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             assetPathsAfterSync = [imagePath1ToCopy, firstFramePath1, imagePath4ToCopy, imagePath3ToCopy, firstFramePath2];
             expectedFolders = [rootFolder!, videoFirstFrameFolder!, subDirFolder!, imageUpdatedFolder!, videoFirstFrameFolder!];
@@ -9286,10 +9286,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNull(assetsFromRepository[1].ImageData);
-            Assert.IsNull(assetsFromRepository[2].ImageData);
-            Assert.IsNull(assetsFromRepository[3].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Null);
+            Assert.That(assetsFromRepository[3].ImageData, Is.Null);
 
             CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
@@ -9304,7 +9304,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -9321,7 +9321,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
 
-            Assert.AreEqual(38, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(38));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -9367,47 +9367,47 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(40, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[25]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[26]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[27]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[28]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[29]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[30]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[31]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[32]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[33]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[34]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[35]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[36]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[37]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[38]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[39]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(40));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -9419,21 +9419,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.AreEqual(5, folderAddedEvents.Count);
-            Assert.AreEqual(imageDeletedFolder, folderAddedEvents[0]);
-            Assert.AreEqual(imageUpdatedFolder, folderAddedEvents[1]);
-            Assert.AreEqual(videoFirstFrameFolder, folderAddedEvents[2]);
-            Assert.AreEqual(subDirFolder, folderAddedEvents[3]);
-            Assert.AreEqual(subSubDirFolder, folderAddedEvents[4]);
+            Assert.That(folderAddedEvents, Has.Count.EqualTo(5));
+            Assert.That(folderAddedEvents[0], Is.EqualTo(imageDeletedFolder));
+            Assert.That(folderAddedEvents[1], Is.EqualTo(imageUpdatedFolder));
+            Assert.That(folderAddedEvents[2], Is.EqualTo(videoFirstFrameFolder));
+            Assert.That(folderAddedEvents[3], Is.EqualTo(subDirFolder));
+            Assert.That(folderAddedEvents[4], Is.EqualTo(subSubDirFolder));
 
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Changing to imageDeletedFolder -> imageDeletedDirectory
-            Assert.AreEqual(1, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(1));
 
             GoToFolderEmulation(imageDeletedDirectory);
 
-            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            Assert.That(_applicationViewModel.ObservableAssets, Is.Empty);
             AssertObservableAssets(imageDeletedDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -9447,7 +9447,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to imageUpdatedFolder -> imageUpdatedDirectory
             GoToFolderEmulation(imageUpdatedDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(imageUpdatedDirectory, folderToAssetsMappingSecondSync[imageUpdatedFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -9461,7 +9461,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to videoFirstFrameFolder -> firstFrameVideosDirectory
             GoToFolderEmulation(firstFrameVideosDirectory);
 
-            Assert.AreEqual(2, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(2));
             AssertObservableAssets(firstFrameVideosDirectory, folderToAssetsMappingSecondSync[videoFirstFrameFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -9475,7 +9475,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to subDirFolder -> subDirDirectory
             GoToFolderEmulation(subDirDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(subDirDirectory, folderToAssetsMappingSecondSync[subDirFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -9489,7 +9489,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to subSubDirFolder -> subSubDirDirectory
             GoToFolderEmulation(subSubDirDirectory);
 
-            Assert.IsEmpty(_applicationViewModel.ObservableAssets);
+            Assert.That(_applicationViewModel.ObservableAssets, Is.Empty);
             AssertObservableAssets(subSubDirDirectory, [], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -9503,7 +9503,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Changing to rootFolder -> assetsDirectory
             GoToFolderEmulation(assetsDirectory);
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
             AssertObservableAssets(assetsDirectory, folderToAssetsMappingSecondSync[rootFolder!], _applicationViewModel!.ObservableAssets);
             CheckInstance(
                 applicationViewModelInstances,
@@ -9514,31 +9514,31 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(64, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[40]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[41]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[42]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[43]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[44]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[45]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[46]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[47]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[48]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[49]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[50]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[51]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[52]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[53]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[54]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[55]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[56]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[57]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[58]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[59]);
-            Assert.AreEqual("CurrentFolder", notifyPropertyChangedEvents[60]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[61]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[62]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[63]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(64));
+            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("AppTitle"));
         }
         finally
         {
@@ -9574,10 +9574,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(_defaultAssetsDirectory!);
 
             string[] assetsInDirectory = Directory.GetFiles(_defaultAssetsDirectory!);
-            Assert.IsEmpty(assetsInDirectory);
+            Assert.That(assetsInDirectory, Is.Empty);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -9587,36 +9587,36 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService, blobsPath, tablesPath, true, true, folder!);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
                 _database!,
@@ -9630,7 +9630,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true,
                 folder!);
 
-            Assert.AreEqual(5, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(5));
 
             int increment = 0;
 
@@ -9650,12 +9650,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 false);
 
-            Assert.AreEqual(5, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -9667,8 +9667,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -9695,7 +9695,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckBeforeNotifyCatalogChanges(_defaultAssetsDirectory!);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -9705,36 +9705,36 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService, blobsPath, tablesPath, true, false, folder!);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
                 _database!,
@@ -9748,7 +9748,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false,
                 folder!);
 
-            Assert.AreEqual(5, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(5));
 
             int increment = 0;
 
@@ -9768,12 +9768,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 false);
 
-            Assert.AreEqual(5, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -9785,10 +9785,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
 
-            Assert.AreEqual(1, folderRemovedEvents.Count);
-            Assert.AreEqual(_defaultAssetsDirectory, folderRemovedEvents[0].Path);
+            Assert.That(folderRemovedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderRemovedEvents[0].Path, Is.EqualTo(_defaultAssetsDirectory));
         }
         finally
         {
@@ -9816,7 +9816,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -9826,36 +9826,36 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository!.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService, blobsPath, tablesPath, true, false, folder!);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
                 _database!,
@@ -9869,7 +9869,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false,
                 folder!);
 
-            Assert.AreEqual(5, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(5));
 
             int increment = 0;
 
@@ -9889,12 +9889,12 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 false);
 
-            Assert.AreEqual(5, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -9906,10 +9906,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
 
-            Assert.AreEqual(1, folderRemovedEvents.Count);
-            Assert.AreEqual(assetsDirectory, folderRemovedEvents[0].Path);
+            Assert.That(folderRemovedEvents, Has.Count.EqualTo(1));
+            Assert.That(folderRemovedEvents[0].Path, Is.EqualTo(assetsDirectory));
         }
         finally
         {
@@ -9943,11 +9943,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 Directory.CreateDirectory(_defaultAssetsDirectory!);
 
                 string[] assetsInDirectory = Directory.GetFiles(_defaultAssetsDirectory!);
-                Assert.IsEmpty(assetsInDirectory);
+                Assert.That(assetsInDirectory, Is.Empty);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -9957,17 +9957,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
             CancellationToken cancellationToken = new (true);
@@ -9975,19 +9975,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(_defaultAssetsDirectory!);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService, blobsPath, tablesPath, false, false, folder!);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges()); // SaveCatalog has not been done due to the Cancellation
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True); // SaveCatalog has not been done due to the Cancellation
 
             CatalogAssetsAsyncAsserts.CheckDefaultEmptyBackup(
                 _database!,
@@ -10001,7 +10001,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false,
                 folder!);
 
-            Assert.AreEqual(4, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(4));
 
             int increment = 0;
 
@@ -10018,11 +10018,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 false);
 
-            Assert.AreEqual(4, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[3]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -10034,8 +10034,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -10078,15 +10078,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -10096,24 +10096,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
@@ -10123,13 +10123,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -10158,7 +10158,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -10175,7 +10175,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(9, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(9));
 
             int increment = 0;
 
@@ -10209,24 +10209,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(17, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -10238,23 +10238,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -10274,7 +10274,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -10291,7 +10291,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(13, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(13));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -10309,28 +10309,28 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(21, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[20]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -10342,8 +10342,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -10380,15 +10380,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -10398,24 +10398,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset2 = _asset2!.WithFolder(folder!);
@@ -10424,13 +10424,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -10459,7 +10459,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -10476,7 +10476,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(9, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(9));
 
             int increment = 0;
 
@@ -10510,24 +10510,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(17, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -10539,8 +10539,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -10555,13 +10555,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(destinationFilePathToCopy));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
+            Assert.That(File.Exists(destinationFilePathToCopy), Is.True);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
 
@@ -10569,24 +10569,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Add(_asset1Temp);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
-            Assert.IsNotNull(assetsFromRepository[2].ImageData);
-            Assert.IsNotNull(assetsFromRepository[3].ImageData);
-            Assert.IsNull(assetsFromRepository[4].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
@@ -10611,7 +10611,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -10628,7 +10628,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(15, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(15));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -10655,32 +10655,32 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(25, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(25));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -10692,8 +10692,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -10733,15 +10733,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(4, assetsInDirectory.Length);
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(4));
 
             foreach (string assetPath in assetPaths)
             {
-                Assert.IsTrue(File.Exists(assetPath));
+                Assert.That(File.Exists(assetPath), Is.True);
             }
 
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(folder);
+            Assert.That(folder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -10749,24 +10749,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsFromRepositoryByPath);
+            Assert.That(assetsFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1 = _asset1!.WithFolder(folder!);
             _asset2 = _asset2!.WithFolder(folder!);
@@ -10775,13 +10775,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(4, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(4));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(4, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(4));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
@@ -10810,7 +10810,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -10827,7 +10827,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMapping,
                 assetNameToByteSizeMapping);
 
-            Assert.AreEqual(9, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(9));
 
             int increment = 0;
 
@@ -10861,24 +10861,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(17, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -10890,8 +10890,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
 
             // Second sync
 
@@ -10913,13 +10913,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             assetsImageByteSizeUpdated.Add(ASSET1_TEMP_IMAGE_BYTE_SIZE);
 
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(5, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(destinationFilePathToCopy));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(5));
+            Assert.That(File.Exists(destinationFilePathToCopy), Is.True);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(folder);
+            Assert.That(folder, Is.Not.Null);
 
             _asset1Temp = _asset1Temp!.WithFolder(folder!);
 
@@ -10927,24 +10927,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets.ForEach(expectedAssetsUpdated.Add);
             expectedAssetsUpdated.Add(_asset1Temp);
 
-            Assert.IsTrue(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
 
             assetsFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.AreEqual(5, assetsFromRepositoryByPath.Count);
+            Assert.That(assetsFromRepositoryByPath, Has.Count.EqualTo(5));
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.AreEqual(5, assetsFromRepository.Count);
+            Assert.That(assetsFromRepository, Has.Count.EqualTo(5));
 
             for (int i = 0; i < assetsFromRepository.Count; i++)
             {
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(assetsFromRepository[i], expectedAssetsUpdated[i], assetPathsUpdated[i], assetsDirectory, folder!);
             }
 
-            Assert.IsNotNull(assetsFromRepository[0].ImageData);
-            Assert.IsNotNull(assetsFromRepository[1].ImageData);
-            Assert.IsNotNull(assetsFromRepository[2].ImageData);
-            Assert.IsNotNull(assetsFromRepository[3].ImageData);
-            Assert.IsNull(assetsFromRepository[4].ImageData);
+            Assert.That(assetsFromRepository[0].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[1].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[2].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[3].ImageData, Is.Not.Null);
+            Assert.That(assetsFromRepository[4].ImageData, Is.Null);
 
             Dictionary<Folder, List<Asset>> folderToAssetsMappingUpdated = new() { { folder!, expectedAssetsUpdated } };
             Dictionary<string, int> assetNameToByteSizeMappingUpdated = new()
@@ -10969,7 +10969,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             CatalogAssetsAsyncAsserts.CheckBackupAfter(
                 _blobStorage!,
@@ -10986,7 +10986,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folderToAssetsMappingUpdated,
                 assetNameToByteSizeMappingUpdated);
 
-            Assert.AreEqual(15, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(15));
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
@@ -11004,8 +11004,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            Assert.IsTrue(File.Exists(oldBackupFilePath));
-            Assert.IsTrue(File.Exists(backupFilePath));
+            Assert.That(File.Exists(oldBackupFilePath), Is.True);
+            Assert.That(File.Exists(backupFilePath), Is.True);
 
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
@@ -11016,32 +11016,32 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 folder!,
                 true);
 
-            Assert.AreEqual(25, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[2]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[3]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[4]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[5]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[6]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[7]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[8]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[9]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[10]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[11]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[12]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[13]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[14]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[15]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[16]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[17]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[18]);
-            Assert.AreEqual("ObservableAssets", notifyPropertyChangedEvents[19]);
-            Assert.AreEqual("AppTitle", notifyPropertyChangedEvents[20]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[21]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[22]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[23]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[24]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(25));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -11053,8 +11053,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 true);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -11126,11 +11126,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             File.Copy(imagePath, imagePathToCopy);
 
             string[] assetsInDirectory = Directory.GetFiles(assetsDirectory);
-            Assert.AreEqual(1, assetsInDirectory.Length);
-            Assert.IsTrue(File.Exists(imagePathToCopy));
+            Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
+            Assert.That(File.Exists(imagePathToCopy), Is.True);
 
             Folder? rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNull(rootFolder);
+            Assert.That(rootFolder, Is.Null);
 
             string blobsPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
             string tablesPath = Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables);
@@ -11140,17 +11140,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
             List<Asset> assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsInRootFromRepositoryByPath);
+            Assert.That(assetsInRootFromRepositoryByPath, Is.Empty);
 
             List<Asset> assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesBeforeSaveCatalog(blobsPath, tablesPath);
 
-            Assert.IsFalse(_testableAssetRepository.HasChanges());
+            Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             DirectoryHelper.DenyAccess(assetsDirectory);
 
@@ -11159,27 +11159,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
 
             rootFolder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
-            Assert.IsNotNull(rootFolder);
+            Assert.That(rootFolder, Is.Not.Null);
 
             _asset2Temp = _asset2Temp!.WithFolder(rootFolder!);
 
-            Assert.IsFalse(_testableAssetRepository!.BackupExists());
+            Assert.That(_testableAssetRepository!.BackupExists(), Is.False);
 
             assetsInRootFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(assetsDirectory);
-            Assert.IsEmpty(assetsInRootFromRepositoryByPath);
+            Assert.That(assetsInRootFromRepositoryByPath, Is.Empty);
 
             assetsFromRepository = _testableAssetRepository.GetCataloguedAssets();
-            Assert.IsEmpty(assetsFromRepository);
+            Assert.That(assetsFromRepository, Is.Empty);
 
             List<Folder> folders = [rootFolder!];
 
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalogEmpty(_database!, _userConfigurationService, blobsPath, tablesPath, false, false, rootFolder!);
 
-            Assert.IsTrue(_testableAssetRepository.HasChanges()); // SaveCatalog has not been done due to the exception
+            Assert.That(_testableAssetRepository.HasChanges(), Is.True); // SaveCatalog has not been done due to the exception
 
             CatalogAssetsAsyncAsserts.CheckBackupBefore(_testableAssetRepository, backupFilePath);
 
-            Assert.AreEqual(3, catalogChanges.Count);
+            Assert.That(catalogChanges, Has.Count.EqualTo(3));
 
             int increment = 0;
 
@@ -11204,10 +11204,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 rootFolder!,
                 false);
 
-            Assert.AreEqual(3, notifyPropertyChangedEvents.Count);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[0]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[1]);
-            Assert.AreEqual("StatusMessage", notifyPropertyChangedEvents[2]);
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
@@ -11219,8 +11219,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             // Because the root folder is already added
-            Assert.IsEmpty(folderAddedEvents);
-            Assert.IsEmpty(folderRemovedEvents);
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -11267,27 +11267,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     private void CheckBeforeNotifyCatalogChanges(string expectedRootDirectory)
     {
-        Assert.IsTrue(_applicationViewModel!.SortAscending);
-        Assert.IsNull(_applicationViewModel!.Product);
-        Assert.IsNull(_applicationViewModel!.Version);
-        Assert.IsFalse(_applicationViewModel!.IsRefreshingFolders);
-        Assert.AreEqual(AppMode.Thumbnails, _applicationViewModel!.AppMode);
-        Assert.AreEqual(SortCriteria.FileName, _applicationViewModel!.SortCriteria);
-        Assert.AreEqual(Visibility.Visible, _applicationViewModel!.ThumbnailsVisible);
-        Assert.AreEqual(Visibility.Hidden, _applicationViewModel!.ViewerVisible);
-        Assert.AreEqual(0, _applicationViewModel!.ViewerPosition);
-        Assert.IsEmpty(_applicationViewModel!.SelectedAssets);
-        Assert.AreEqual(expectedRootDirectory, _applicationViewModel!.CurrentFolder);
-        Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
-        Assert.IsNull(_applicationViewModel!.GlobaleAssetsCounter);
-        Assert.IsNull(_applicationViewModel!.ExecutionTime);
-        Assert.IsNull(_applicationViewModel!.TotalFilesNumber);
-        Assert.AreEqual($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending", _applicationViewModel!.AppTitle);
-        Assert.IsNull(_applicationViewModel!.StatusMessage);
-        Assert.IsNull(_applicationViewModel!.CurrentAsset);
-        Assert.IsNull(_applicationViewModel!.LastSelectedFolder); // TODO: Should it be the root folder (add it in the ctor) ?
-        Assert.IsFalse(_applicationViewModel!.CanGoToPreviousAsset);
-        Assert.IsFalse(_applicationViewModel!.CanGoToNextAsset);
+        Assert.That(_applicationViewModel!.SortAscending, Is.True);
+        Assert.That(_applicationViewModel!.Product, Is.Null);
+        Assert.That(_applicationViewModel!.Version, Is.Null);
+        Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
+        Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
+        Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
+        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
+        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
+        Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
+        Assert.That(_applicationViewModel!.CurrentFolder, Is.EqualTo(expectedRootDirectory));
+        Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
+        Assert.That(_applicationViewModel!.GlobaleAssetsCounter, Is.Null);
+        Assert.That(_applicationViewModel!.ExecutionTime, Is.Null);
+        Assert.That(_applicationViewModel!.TotalFilesNumber, Is.Null);
+        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
+        Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
+        Assert.That(_applicationViewModel!.LastSelectedFolder, Is.Null); // TODO: Should it be the root folder (add it in the ctor) ?
+        Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
+        Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
     }
 
     private static void CheckAfterNotifyCatalogChanges(
@@ -11299,99 +11299,99 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Folder expectedFolder,
         bool expectedCanGoToNextAsset)
     {
-        Assert.IsTrue(applicationViewModelInstance.SortAscending);
-        Assert.IsNull(applicationViewModelInstance.Product);
-        Assert.IsNull(applicationViewModelInstance.Version);
-        Assert.IsFalse(applicationViewModelInstance.IsRefreshingFolders);
-        Assert.AreEqual(AppMode.Thumbnails, applicationViewModelInstance.AppMode);
-        Assert.AreEqual(SortCriteria.FileName, applicationViewModelInstance.SortCriteria);
-        Assert.AreEqual(Visibility.Visible, applicationViewModelInstance.ThumbnailsVisible);
-        Assert.AreEqual(Visibility.Hidden, applicationViewModelInstance.ViewerVisible);
-        Assert.AreEqual(0, applicationViewModelInstance.ViewerPosition);
-        Assert.IsEmpty(applicationViewModelInstance.SelectedAssets);
-        Assert.AreEqual(expectedLastDirectoryInspected, applicationViewModelInstance.CurrentFolder);
-        Assert.AreEqual(expectedObservableAssets.Count, applicationViewModelInstance.ObservableAssets.Count);
-        Assert.IsNull(applicationViewModelInstance.GlobaleAssetsCounter);
-        Assert.IsNull(applicationViewModelInstance.ExecutionTime);
-        Assert.IsNull(applicationViewModelInstance.TotalFilesNumber);
-        Assert.AreEqual($"  - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending", applicationViewModelInstance.AppTitle);
-        Assert.AreEqual("The catalog process has ended.", applicationViewModelInstance.StatusMessage);
+        Assert.That(applicationViewModelInstance.SortAscending, Is.True);
+        Assert.That(applicationViewModelInstance.Product, Is.Null);
+        Assert.That(applicationViewModelInstance.Version, Is.Null);
+        Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
+        Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
+        Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
+        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
+        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
+        Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
+        Assert.That(applicationViewModelInstance.CurrentFolder, Is.EqualTo(expectedLastDirectoryInspected));
+        Assert.That(applicationViewModelInstance.ObservableAssets, Has.Count.EqualTo(expectedObservableAssets.Count));
+        Assert.That(applicationViewModelInstance.GlobaleAssetsCounter, Is.Null);
+        Assert.That(applicationViewModelInstance.ExecutionTime, Is.Null);
+        Assert.That(applicationViewModelInstance.TotalFilesNumber, Is.Null);
+        Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo($"  - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
+        Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo("The catalog process has ended."));
 
         if (applicationViewModelInstance.CurrentAsset != null)
         {
             AssertCurrentAssetPropertyValidity(applicationViewModelInstance.CurrentAsset, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
         }
 
-        Assert.IsNull(applicationViewModelInstance.LastSelectedFolder); // TODO: Should it be the root folder (add it in the ctor) ?
-        Assert.IsFalse(applicationViewModelInstance.CanGoToPreviousAsset);
-        Assert.AreEqual(expectedCanGoToNextAsset, applicationViewModelInstance.CanGoToNextAsset);
+        Assert.That(applicationViewModelInstance.LastSelectedFolder, Is.Null); // TODO: Should it be the root folder (add it in the ctor) ?
+        Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
+        Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
     }
 
     private void NotifyCatalogChangeFolderInspectionInProgress(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.AreEqual(expectedFoldersCount, folders.Count);
-        Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(folders.First(x => x.Id == catalogChange.Folder!.Id), catalogChange.Folder);
-        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(CatalogChangeReason.FolderInspectionInProgress, catalogChange.Reason);
-        Assert.AreEqual($"Inspecting folder {assetsDirectory}.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(folders, Has.Count.EqualTo(expectedFoldersCount));
+        Assert.That(catalogChange.Folder, Is.Not.Null);
+        Assert.That(catalogChange.Folder, Is.EqualTo(folders.First(x => x.Id == catalogChange.Folder!.Id)));
+        Assert.That(catalogChange.Folder!.Path, Is.EqualTo(assetsDirectory));
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.FolderInspectionInProgress));
+        Assert.That(catalogChange.Message, Is.EqualTo($"Inspecting folder {assetsDirectory}."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual($"Inspecting folder {assetsDirectory}.", _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Inspecting folder {assetsDirectory}."));
         increment++;
     }
 
     private void NotifyCatalogChangeFolderInspectionCompleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(CatalogChangeReason.FolderInspectionCompleted, catalogChange.Reason);
-        Assert.AreEqual($"Folder inspection for {assetsDirectory}, subfolders included, has been completed.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.FolderInspectionCompleted));
+        Assert.That(catalogChange.Message, Is.EqualTo($"Folder inspection for {assetsDirectory}, subfolders included, has been completed."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual($"Folder inspection for {assetsDirectory}, subfolders included, has been completed.", _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Folder inspection for {assetsDirectory}, subfolders included, has been completed."));
         increment++;
     }
 
     private void NotifyCatalogChangeFolderCreated(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.AreEqual(expectedFoldersCount, folders.Count);
-        Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(folders.First(x => x.Id == catalogChange.Folder!.Id), catalogChange.Folder);
-        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(CatalogChangeReason.FolderCreated, catalogChange.Reason);
-        Assert.AreEqual($"Folder {assetsDirectory} added to catalog.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(folders, Has.Count.EqualTo(expectedFoldersCount));
+        Assert.That(catalogChange.Folder, Is.Not.Null);
+        Assert.That(catalogChange.Folder, Is.EqualTo(folders.First(x => x.Id == catalogChange.Folder!.Id)));
+        Assert.That(catalogChange.Folder!.Path, Is.EqualTo(assetsDirectory));
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.FolderCreated));
+        Assert.That(catalogChange.Message, Is.EqualTo($"Folder {assetsDirectory} added to catalog."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual($"Folder {assetsDirectory} added to catalog.", _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Folder {assetsDirectory} added to catalog."));
         increment++;
     }
 
     private void NotifyCatalogChangeFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.AreEqual(expectedFoldersCount, foldersCount);
-        Assert.IsNotNull(catalogChange.Folder);
-        Assert.AreEqual(assetsDirectory, catalogChange.Folder!.Path);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(CatalogChangeReason.FolderDeleted, catalogChange.Reason);
-        Assert.AreEqual($"Folder {assetsDirectory} deleted from catalog.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(foldersCount, Is.EqualTo(expectedFoldersCount));
+        Assert.That(catalogChange.Folder, Is.Not.Null);
+        Assert.That(catalogChange.Folder!.Path, Is.EqualTo(assetsDirectory));
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.FolderDeleted));
+        Assert.That(catalogChange.Message, Is.EqualTo($"Folder {assetsDirectory} deleted from catalog."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual($"Folder {assetsDirectory} deleted from catalog.", _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Folder {assetsDirectory} deleted from catalog."));
         increment++;
     }
 
@@ -11408,24 +11408,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         int cataloguedAssetsByPathCount = catalogChange.CataloguedAssetsByPath.Count;
 
-        Assert.IsNotNull(catalogChange.Asset);
+        Assert.That(catalogChange.Asset, Is.Not.Null);
         CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Has.Count.EqualTo(expectedAssets.Count));
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange, cataloguedAssetsByPathCount);
-        Assert.AreEqual(CatalogChangeReason.AssetCreated, catalogChange.Reason);
-        Assert.AreEqual($"Image {expectedAsset.FullPath} added to catalog.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetCreated));
+        Assert.That(catalogChange.Message, Is.EqualTo($"Image {expectedAsset.FullPath} added to catalog."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         // Cases when having multiple sync, assets in the firsts sync has ImageData loaded, unlike the new ones (added, updated)
         if (string.Equals(expectedAsset.FullPath, catalogChange.Asset!.FullPath))
         {
-            Assert.IsNull(catalogChange.Asset!.ImageData);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Null);
         }
         else
         {
-            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Not.Null);
         }
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
@@ -11433,17 +11433,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         // While the user has not clicked on another folder, ImageData stays null for all other assets
         if (string.Equals(catalogChange.Asset.Folder.Path, currentDirectory))
         {
-            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Not.Null);
             AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
         }
         else
         {
-            Assert.IsNull(catalogChange.Asset!.ImageData);
-            Assert.IsEmpty(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList());
+            Assert.That(catalogChange.Asset!.ImageData, Is.Null);
+            Assert.That(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList(), Is.Empty);
         }
 
-        Assert.AreEqual($"Image {expectedAsset.FullPath} added to catalog.", _applicationViewModel!.StatusMessage);
-        Assert.AreEqual($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending", _applicationViewModel!.AppTitle);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Image {expectedAsset.FullPath} added to catalog."));
+        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
         increment++;
     }
 
@@ -11458,21 +11458,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         int cataloguedAssetsByPathCount = catalogChange.CataloguedAssetsByPath.Count;
 
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.AreEqual(expectedAssets.Count, cataloguedAssetsByPathCount);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(cataloguedAssetsByPathCount, Is.EqualTo(expectedAssets.Count));
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
-        Assert.IsTrue(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData != null));
-        Assert.AreEqual(CatalogChangeReason.AssetNotCreated, catalogChange.Reason);
-        Assert.AreEqual($"Image {expectedAssetPath} not added to catalog (corrupted).", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData != null), Is.True);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetNotCreated));
+        Assert.That(catalogChange.Message, Is.EqualTo($"Image {expectedAssetPath} not added to catalog (corrupted)."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
 
         AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
 
-        Assert.AreEqual($"Image {expectedAssetPath} not added to catalog (corrupted).", _applicationViewModel!.StatusMessage);
-        Assert.AreEqual($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending", _applicationViewModel!.AppTitle);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Image {expectedAssetPath} not added to catalog (corrupted)."));
+        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
         increment++;
     }
 
@@ -11488,24 +11488,24 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         int cataloguedAssetsByPathCount = catalogChange.CataloguedAssetsByPath.Count;
 
-        Assert.IsNotNull(catalogChange.Asset);
+        Assert.That(catalogChange.Asset, Is.Not.Null);
         CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.AreEqual(expectedAssets.Count, catalogChange.CataloguedAssetsByPath.Count);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Has.Count.EqualTo(expectedAssets.Count));
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathImageData(expectedAsset, currentDirectory, catalogChange, cataloguedAssetsByPathCount);
-        Assert.AreEqual(CatalogChangeReason.AssetUpdated, catalogChange.Reason);
-        Assert.AreEqual($"Image {expectedAsset.FullPath} updated in catalog.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetUpdated));
+        Assert.That(catalogChange.Message, Is.EqualTo($"Image {expectedAsset.FullPath} updated in catalog."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         // Cases when having multiple sync, assets in the firsts sync has ImageData loaded, unlike the new ones (added, updated)
         if (string.Equals(expectedAsset.FullPath, catalogChange.Asset!.FullPath))
         {
-            Assert.IsNull(catalogChange.Asset!.ImageData);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Null);
         }
         else
         {
-            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Not.Null);
         }
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
@@ -11513,17 +11513,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         // While the user has not clicked on another folder, ImageData stays null for all other assets
         if (string.Equals(catalogChange.Asset.Folder.Path, currentDirectory))
         {
-            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Not.Null);
             AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
         }
         else
         {
-            Assert.IsNull(catalogChange.Asset!.ImageData);
-            Assert.IsEmpty(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList());
+            Assert.That(catalogChange.Asset!.ImageData, Is.Null);
+            Assert.That(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList(), Is.Empty);
         }
 
-        Assert.AreEqual($"Image {expectedAsset.FullPath} updated in catalog.", _applicationViewModel!.StatusMessage);
-        Assert.AreEqual($"  - {currentDirectory} - image 1 of {expectedAssets.Count} - sorted by file name ascending", _applicationViewModel!.AppTitle);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Image {expectedAsset.FullPath} updated in catalog."));
+        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {currentDirectory} - image 1 of {expectedAssets.Count} - sorted by file name ascending"));
         increment++;
     }
 
@@ -11543,32 +11543,32 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         int cataloguedAssetsByPathCount = catalogChange.CataloguedAssetsByPath.Count;
 
-        Assert.IsNotNull(catalogChange.Asset);
+        Assert.That(catalogChange.Asset, Is.Not.Null);
         CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(catalogChange.Asset!, expectedAsset, expectedAsset.FullPath, assetsDirectory, folder);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.AreEqual(expectedAssets.Count, cataloguedAssetsByPathCount);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(cataloguedAssetsByPathCount, Is.EqualTo(expectedAssets.Count));
         AssertCataloguedAssetsByPathPropertyValidity(expectedAssets, catalogChange, cataloguedAssetsByPathCount);
         AssertCataloguedAssetsByPathImageDataAssetDeleted(currentDirectory, catalogChange, cataloguedAssetsByPathCount);
-        Assert.AreEqual(CatalogChangeReason.AssetDeleted, catalogChange.Reason);
-        Assert.AreEqual(expectedStatusMessage, catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.AssetDeleted));
+        Assert.That(catalogChange.Message, Is.EqualTo(expectedStatusMessage));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
 
         // While the user has not clicked on another folder, ImageData stays null for all other assets
         if (string.Equals(catalogChange.Asset!.Folder.Path, currentDirectory))
         {
-            Assert.IsNotNull(catalogChange.Asset!.ImageData);
+            Assert.That(catalogChange.Asset!.ImageData, Is.Not.Null);
             AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
         }
         else
         {
-            Assert.IsNull(catalogChange.Asset!.ImageData);
-            Assert.IsEmpty(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList());
+            Assert.That(catalogChange.Asset!.ImageData, Is.Null);
+            Assert.That(_applicationViewModel!.ObservableAssets.Where(x => string.Equals(x.Folder.Path, catalogChange.Asset.Folder.Path)).ToList(), Is.Empty);
         }
 
-        Assert.AreEqual(expectedStatusMessage, _applicationViewModel!.StatusMessage);
-        Assert.AreEqual($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending", _applicationViewModel!.AppTitle);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(expectedStatusMessage));
+        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
         increment++;
     }
 
@@ -11577,74 +11577,74 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         CatalogChangeReason catalogChangeReason = string.Equals(expectedMessage, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE) ? CatalogChangeReason.BackupCreationStarted : CatalogChangeReason.BackupUpdateStarted;
 
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(catalogChangeReason, catalogChange.Reason);
-        Assert.AreEqual(expectedMessage, catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(catalogChangeReason));
+        Assert.That(catalogChange.Message, Is.EqualTo(expectedMessage));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual(expectedMessage, _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(expectedMessage));
         increment++;
 
         catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(CatalogChangeReason.BackupCompleted, catalogChange.Reason);
-        Assert.AreEqual("Backup completed successfully.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.BackupCompleted));
+        Assert.That(catalogChange.Message, Is.EqualTo("Backup completed successfully."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual("Backup completed successfully.", _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo("Backup completed successfully."));
         increment++;
     }
 
     private void NotifyCatalogChangesNoBackupChanges(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(CatalogChangeReason.NoBackupChangesDetected, catalogChange.Reason);
-        Assert.AreEqual("No changes made to the backup.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.NoBackupChangesDetected));
+        Assert.That(catalogChange.Message, Is.EqualTo("No changes made to the backup."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual("No changes made to the backup.", _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo("No changes made to the backup."));
         increment++;
     }
 
     private void NotifyCatalogChangeEnd(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(CatalogChangeReason.CatalogProcessEnded, catalogChange.Reason);
-        Assert.AreEqual("The catalog process has ended.", catalogChange.Message);
-        Assert.IsNull(catalogChange.Exception);
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.CatalogProcessEnded));
+        Assert.That(catalogChange.Message, Is.EqualTo("The catalog process has ended."));
+        Assert.That(catalogChange.Exception, Is.Null);
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual("The catalog process has ended.", _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo("The catalog process has ended."));
         increment++;
     }
 
     private void NotifyCatalogChangeException(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
-        Assert.IsNull(catalogChange.Asset);
-        Assert.IsNull(catalogChange.Folder);
-        Assert.IsEmpty(catalogChange.CataloguedAssetsByPath);
-        Assert.AreEqual(CatalogChangeReason.CatalogProcessFailed, catalogChange.Reason);
-        Assert.AreEqual("The catalog process has failed.", catalogChange.Message);
-        Assert.IsNotNull(catalogChange.Exception);
-        Assert.AreEqual(exceptionExpected.Message, catalogChange.Exception!.Message);
-        Assert.AreEqual(exceptionExpected.GetType(), catalogChange.Exception.GetType());
+        Assert.That(catalogChange.Asset, Is.Null);
+        Assert.That(catalogChange.Folder, Is.Null);
+        Assert.That(catalogChange.CataloguedAssetsByPath, Is.Empty);
+        Assert.That(catalogChange.Reason, Is.EqualTo(CatalogChangeReason.CatalogProcessFailed));
+        Assert.That(catalogChange.Message, Is.EqualTo("The catalog process has failed."));
+        Assert.That(catalogChange.Exception, Is.Not.Null);
+        Assert.That(catalogChange.Exception!.Message, Is.EqualTo(exceptionExpected.Message));
+        Assert.That(catalogChange.Exception.GetType(), Is.EqualTo(exceptionExpected.GetType()));
 
         _applicationViewModel!.NotifyCatalogChange(catalogChange);
-        Assert.AreEqual("The catalog process has failed.", _applicationViewModel!.StatusMessage);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo("The catalog process has failed."));
         increment++;
     }
 
@@ -11678,19 +11678,19 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 // Cases when having multiple sync, assets in the firsts sync has ImageData loaded, unlike the new ones (added, updated)
                 if (string.Equals(currentCataloguedAssetsByPath.FullPath, expectedNewAsset.FullPath))
                 {
-                    Assert.IsNull(currentCataloguedAssetsByPath.ImageData);
+                    Assert.That(currentCataloguedAssetsByPath.ImageData, Is.Null);
                 }
                 else if (!string.Equals(currentDirectory, currentCataloguedAssetsByPath.Folder.Path)) // All assets in other directories have ImageData null
                 {
-                    Assert.IsNull(currentCataloguedAssetsByPath.ImageData);
+                    Assert.That(currentCataloguedAssetsByPath.ImageData, Is.Null);
                 }
                 else
                 {
-                    Assert.IsNotNull(currentCataloguedAssetsByPath.ImageData);
+                    Assert.That(currentCataloguedAssetsByPath.ImageData, Is.Not.Null);
                 }
             }
 
-            Assert.IsNull(catalogChange.CataloguedAssetsByPath[^1].ImageData);
+            Assert.That(catalogChange.CataloguedAssetsByPath[^1].ImageData, Is.Null);
         }
     }
 
@@ -11701,23 +11701,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     {
         if (cataloguedAssetsByPathCount > 0 && string.Equals(currentDirectory, catalogChange.CataloguedAssetsByPath[0].Folder.Path))
         {
-            Assert.IsTrue(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData != null));
+            Assert.That(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData != null), Is.True);
         }
         else
         {
-            Assert.IsTrue(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData == null)); 
+            Assert.That(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData == null), Is.True); 
         }
     }
 
     private static void AssertCurrentAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
     {
         CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(asset, expectedAsset, assetPath, folderPath, folder);
-        Assert.IsNotNull(asset.ImageData); // Unlike below (Application, CatalogAssetsService), it is set here
+        Assert.That(asset.ImageData, Is.Not.Null); // Unlike below (Application, CatalogAssetsService), it is set here
     }
 
     private static void AssertObservableAssets(string currentDirectory, IReadOnlyList<Asset> expectedAssets, IReadOnlyList<Asset> observableAssets)
     {
-        Assert.AreEqual(expectedAssets.Count, observableAssets.Count);
+        Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Count));
 
         for (int i = 0; i < observableAssets.Count; i++)
         {
@@ -11728,11 +11728,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             if (string.Equals(currentObservableAssets.Folder.Path, currentDirectory))
             {
-                Assert.IsNotNull(currentObservableAssets.ImageData);
+                Assert.That(currentObservableAssets.ImageData, Is.Not.Null);
             }
             else
             {
-                Assert.IsNull(currentObservableAssets.ImageData);
+                Assert.That(currentObservableAssets.ImageData, Is.Null);
             }
         }
     }
@@ -11747,9 +11747,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         bool expectedCanGoToNextAsset)
     {
         int applicationViewModelInstancesCount = applicationViewModelInstances.Count;
-        Assert.AreEqual(applicationViewModelInstances[0], applicationViewModelInstances[applicationViewModelInstancesCount - 2]);
+        Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
         // No need to go deeper same instance because ref updated each time
-        Assert.AreEqual(applicationViewModelInstances[applicationViewModelInstancesCount - 2], applicationViewModelInstances[applicationViewModelInstancesCount - 1]);
+        Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
 
         CheckAfterNotifyCatalogChanges(
             applicationViewModelInstances[0],

@@ -10,11 +10,11 @@ public class FolderConfigsTests
     {
         ColumnProperties[] columns = FolderConfigs.ConfigureDataTable();
 
-        Assert.IsNotNull(columns);
-        Assert.AreEqual(2, columns.Length);
+        Assert.That(columns, Is.Not.Null);
+        Assert.That(columns, Has.Length.EqualTo(2));
 
-        Assert.AreEqual("Id", columns[0].ColumnName);
-        Assert.AreEqual("Path", columns[1].ColumnName);
+        Assert.That(columns[0].ColumnName, Is.EqualTo("Id"));
+        Assert.That(columns[1].ColumnName, Is.EqualTo("Path"));
     }
 
     [Test]
@@ -28,9 +28,9 @@ public class FolderConfigsTests
 
         Folder folder = FolderConfigs.ReadFunc(validValues);
 
-        Assert.IsNotNull(folder);
-        Assert.AreEqual(_folderId, folder.Id);
-        Assert.AreEqual("D:\\folder\\newFolder", folder.Path);
+        Assert.That(folder, Is.Not.Null);
+        Assert.That(folder.Id, Is.EqualTo(_folderId));
+        Assert.That(folder.Path, Is.EqualTo("D:\\folder\\newFolder"));
     }
 
     [Test]
@@ -46,9 +46,9 @@ public class FolderConfigsTests
 
         Folder folder = FolderConfigs.ReadFunc(tooManyValues);
 
-        Assert.IsNotNull(folder);
-        Assert.AreEqual(_folderId, folder.Id);
-        Assert.AreEqual("D:\\folder\\newFolder", folder.Path);
+        Assert.That(folder, Is.Not.Null);
+        Assert.That(folder.Id, Is.EqualTo(_folderId));
+        Assert.That(folder.Path, Is.EqualTo("D:\\folder\\newFolder"));
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class FolderConfigsTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => FolderConfigs.ReadFunc(nullValues));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'g')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'g')"));
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class FolderConfigsTests
 
         IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => FolderConfigs.ReadFunc(emptyArray));
 
-        Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Index was outside the bounds of the array."));
     }
 
     [Test]
@@ -86,8 +86,8 @@ public class FolderConfigsTests
             result[i] = FolderConfigs.WriteFunc(folder, i);
         }
 
-        Assert.AreEqual(_folderId, result[0]);
-        Assert.AreEqual("D:\\folder\\newFolder", result[1]);
+        Assert.That(result[0], Is.EqualTo(_folderId));
+        Assert.That(result[1], Is.EqualTo("D:\\folder\\newFolder"));
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class FolderConfigsTests
 
         ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => FolderConfigs.WriteFunc(folder, 15));
 
-        Assert.AreEqual("Specified argument was out of the range of valid values. (Parameter 'i')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
     }
 
     [Test]
@@ -113,7 +113,7 @@ public class FolderConfigsTests
         {
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => FolderConfigs.WriteFunc(folder!, i));
 
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
     }
 }

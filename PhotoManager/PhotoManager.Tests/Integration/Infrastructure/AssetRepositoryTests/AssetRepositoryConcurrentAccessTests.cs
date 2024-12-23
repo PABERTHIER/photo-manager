@@ -221,10 +221,10 @@ public class AssetRepositoryConcurrentAccessTests
             ];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
-            Assert.IsEmpty(cataloguedAssets);
+            Assert.That(cataloguedAssets, Is.Empty);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
-            Assert.IsEmpty(thumbnails);
+            Assert.That(thumbnails, Is.Empty);
 
             // DeleteAsset
             string folderPath5 = Path.Combine(_dataDirectory!, "NewFolder5");
@@ -303,51 +303,51 @@ public class AssetRepositoryConcurrentAccessTests
                 () => _testableAssetRepository.GetAssetsByPath(folderPath2)
             );
 
-            Assert.AreEqual(3, cataloguedAssets.Count);
-            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == _asset1.FileName));
-            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == _asset2.FileName));
-            Assert.IsTrue(cataloguedAssets.Any(x => x.FileName == _asset3.FileName));
+            Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
+            Assert.That(cataloguedAssets.Any(x => x.FileName == _asset1.FileName), Is.True);
+            Assert.That(cataloguedAssets.Any(x => x.FileName == _asset2.FileName), Is.True);
+            Assert.That(cataloguedAssets.Any(x => x.FileName == _asset3.FileName), Is.True);
 
-            Assert.AreEqual(4, thumbnails.Count);
-            Assert.IsTrue(thumbnails.ContainsKey(folderPath1));
-            Assert.IsTrue(thumbnails.ContainsKey(folderPath2));
-            Assert.IsTrue(thumbnails.ContainsKey(folderPath5));
-            Assert.IsTrue(thumbnails.ContainsKey(folderPath6));
+            Assert.That(thumbnails, Has.Count.EqualTo(4));
+            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
+            Assert.That(thumbnails.ContainsKey(folderPath2), Is.True);
+            Assert.That(thumbnails.ContainsKey(folderPath5), Is.True);
+            Assert.That(thumbnails.ContainsKey(folderPath6), Is.True);
 
-            Assert.AreEqual(2, thumbnails[folderPath1].Count);
-            Assert.AreEqual(1, thumbnails[folderPath2].Count);
-            Assert.IsEmpty(thumbnails[folderPath5]);
-            Assert.IsEmpty(thumbnails[folderPath6]);
+            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(2));
+            Assert.That(thumbnails[folderPath2], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[folderPath5], Is.Empty);
+            Assert.That(thumbnails[folderPath6], Is.Empty);
 
-            Assert.IsTrue(thumbnails[folderPath1].ContainsKey(_asset1.FileName));
-            Assert.IsTrue(thumbnails[folderPath1].ContainsKey(_asset2.FileName));
-            Assert.IsTrue(thumbnails[folderPath2].ContainsKey(_asset3.FileName));
+            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[folderPath1].ContainsKey(_asset2.FileName), Is.True);
+            Assert.That(thumbnails[folderPath2].ContainsKey(_asset3.FileName), Is.True);
 
-            Assert.AreEqual(new byte[] { 1, 2, 3 }, thumbnails[folderPath1][_asset1.FileName]);
-            Assert.AreEqual(Array.Empty<byte>(), thumbnails[folderPath1][_asset2.FileName]);
-            Assert.AreEqual(new byte[] { 4, 5, 6 }, thumbnails[folderPath2][_asset3.FileName]);
+            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(new byte[] { 4, 5, 6 }));
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
-            Assert.GreaterOrEqual(folders.Length, 4);
-            Assert.IsTrue(folders.Any(x => x.Path == folderPath1));
-            Assert.IsTrue(folders.Any(x => x.Path == folderPath2));
-            Assert.IsTrue(folders.Any(x => x.Path == folderPath5));
-            Assert.IsTrue(folders.Any(x => x.Path == folderPath6));
+            Assert.That(folders, Has.Length.GreaterThanOrEqualTo(4));
+            Assert.That(folders.Any(x => x.Path == folderPath1), Is.True);
+            Assert.That(folders.Any(x => x.Path == folderPath2), Is.True);
+            Assert.That(folders.Any(x => x.Path == folderPath5), Is.True);
+            Assert.That(folders.Any(x => x.Path == folderPath6), Is.True);
 
-            Assert.IsTrue(folderExists1);
-            Assert.IsTrue(folderExists2);
+            Assert.That(folderExists1, Is.True);
+            Assert.That(folderExists2, Is.True);
 
-            Assert.IsNotNull(folderByPath1);
-            Assert.IsNotNull(folderByPath2);
+            Assert.That(folderByPath1, Is.Not.Null);
+            Assert.That(folderByPath2, Is.Not.Null);
 
-            Assert.AreEqual(7, assetsUpdatedEvents.Count);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[0]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[1]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[2]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[3]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[4]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[5]);
-            Assert.AreEqual(Reactive.Unit.Default, assetsUpdatedEvents[6]);
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(7));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[3], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[4], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[5], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[6], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {

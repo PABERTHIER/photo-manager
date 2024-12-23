@@ -44,8 +44,8 @@ public class DatabaseWriteBackupTests
 
             bool backupCreated = _database!.WriteBackup(backupDate);
 
-            Assert.IsTrue(backupCreated);
-            Assert.AreEqual(filePath, _database!.Diagnostics.LastWriteFilePath);
+            Assert.That(backupCreated, Is.True);
+            Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(filePath));
         }
         finally
         {
@@ -74,9 +74,9 @@ public class DatabaseWriteBackupTests
             bool backupCreated1 = _database!.WriteBackup(backupDate);
             bool backupCreated2 = _database!.WriteBackup(backupDate);
 
-            Assert.IsTrue(backupCreated1);
-            Assert.IsTrue(backupCreated2);
-            Assert.AreEqual(filePath, _database!.Diagnostics.LastWriteFilePath);
+            Assert.That(backupCreated1, Is.True);
+            Assert.That(backupCreated2, Is.True);
+            Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(filePath));
         }
         finally
         {

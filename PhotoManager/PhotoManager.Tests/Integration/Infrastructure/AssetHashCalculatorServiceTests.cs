@@ -35,9 +35,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(128, hash.Length); // SHA-512 generates a 128-character long hash in hexadecimal representation
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(128)); // SHA-512 generates a 128-character long hash in hexadecimal representation
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -52,9 +52,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath!);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(128, hash.Length);
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(128));
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class AssetHashCalculatorServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -90,9 +90,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, null!);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(128, hash.Length); // SHA-512 generates a 128-character long hash in hexadecimal representation
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(128)); // SHA-512 generates a 128-character long hash in hexadecimal representation
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -114,9 +114,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, "invalid_path/nonexistent.jpg");
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(128, hash.Length); // SHA-512 generates a 128-character long hash in hexadecimal representation
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(128)); // SHA-512 generates a 128-character long hash in hexadecimal representation
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -138,9 +138,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, _dataDirectory!);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(128, hash.Length); // SHA-512 generates a 128-character long hash in hexadecimal representation
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(128)); // SHA-512 generates a 128-character long hash in hexadecimal representation
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -165,9 +165,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(210, hash.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(210)); // The PHash is a 210-character hexadecimal string
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -189,9 +189,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(210, hash.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(210)); // The PHash is a 210-character hexadecimal string
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -213,9 +213,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(210, hash.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(210)); // The PHash is a 210-character hexadecimal string
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -229,7 +229,7 @@ public class AssetHashCalculatorServiceTests
 
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath));
 
-        Assert.AreEqual($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3571", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3571"));
     }
 
     [Test]
@@ -242,7 +242,7 @@ public class AssetHashCalculatorServiceTests
 
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
 
-        Assert.AreEqual($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3571", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3571"));
     }
 
     [Test]
@@ -256,7 +256,7 @@ public class AssetHashCalculatorServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
 
-        Assert.AreEqual("Value cannot be null or empty. (Parameter 'fileName')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null or empty. (Parameter 'fileName')"));
     }
 
     [Test]
@@ -278,9 +278,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(17, hash.Length); // The DHash is a 17-character number
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(17)); // The DHash is a 17-character number
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -297,9 +297,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(1, hash.Length);
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(1));
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -320,9 +320,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(17, hash.Length); // The DHash is a 17-character number
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(17)); // The DHash is a 17-character number
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -338,9 +338,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(1, hash.Length);
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(1));
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -361,9 +361,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(17, hash.Length); // The DHash is a 17-character number
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(17)); // The DHash is a 17-character number
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -379,9 +379,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(1, hash.Length);
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(1));
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -395,7 +395,7 @@ public class AssetHashCalculatorServiceTests
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath));
 
-        Assert.AreEqual("Parameter is not valid.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
     }
 
     [Test]
@@ -408,7 +408,7 @@ public class AssetHashCalculatorServiceTests
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
 
-        Assert.AreEqual("Parameter is not valid.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
     }
 
     [Test]
@@ -422,7 +422,7 @@ public class AssetHashCalculatorServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'path')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
     }
 
     [Test]
@@ -447,9 +447,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(32, hash.Length); // The MD5Hash is a 32-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(32)); // The MD5Hash is a 32-character hexadecimal string
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -464,9 +464,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath!);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(32, hash.Length);
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(32));
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -480,7 +480,7 @@ public class AssetHashCalculatorServiceTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'source')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
 
     [Test]
@@ -502,9 +502,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(32, hash.Length); // The MD5Hash is a 32-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(32)); // The MD5Hash is a 32-character hexadecimal string
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -526,9 +526,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(32, hash.Length); // The MD5Hash is a 32-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(32)); // The MD5Hash is a 32-character hexadecimal string
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -550,9 +550,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(32, hash.Length); // The MD5Hash is a 32-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(32)); // The MD5Hash is a 32-character hexadecimal string
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -574,9 +574,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(210, hash.Length); // The PHash is a 210-character hexadecimal string
-        Assert.AreEqual(expectedHash, hash.ToLower());
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(210)); // The PHash is a 210-character hexadecimal string
+        Assert.That(hash.ToLower(), Is.EqualTo(expectedHash));
     }
 
     [Test]
@@ -596,9 +596,9 @@ public class AssetHashCalculatorServiceTests
 
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.IsFalse(string.IsNullOrWhiteSpace(hash));
-        Assert.AreEqual(17, hash.Length); // The DHash is a 17-character number
-        Assert.AreEqual(expectedHash, hash);
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(17)); // The DHash is a 17-character number
+        Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
     private static UserConfigurationService GetUserConfigurationService(bool usingPHash, bool usingDHash, bool usingMd5Hash)

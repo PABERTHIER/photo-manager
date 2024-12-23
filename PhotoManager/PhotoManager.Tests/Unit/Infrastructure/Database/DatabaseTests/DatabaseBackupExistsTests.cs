@@ -43,8 +43,8 @@ public class DatabaseBackupExistsTests
             bool backupCreated = _database!.WriteBackup(backupDate);
             bool backupExists = _database!.BackupExists(backupDate);
 
-            Assert.IsTrue(backupCreated);
-            Assert.IsTrue(backupExists);
+            Assert.That(backupCreated, Is.True);
+            Assert.That(backupExists, Is.True);
         }
         finally
         {
@@ -70,7 +70,7 @@ public class DatabaseBackupExistsTests
 
             bool backupExists = _database!.BackupExists(backupDate);
 
-            Assert.IsFalse(backupExists);
+            Assert.That(backupExists, Is.False);
         }
         finally
         {

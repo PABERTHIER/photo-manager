@@ -48,9 +48,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
 
             bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
 
-            Assert.IsTrue(folderHasThumbnails);
+            Assert.That(folderHasThumbnails, Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -71,9 +71,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
 
             bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
 
-            Assert.IsFalse(folderHasThumbnails);
+            Assert.That(folderHasThumbnails, Is.False);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -94,9 +94,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetRepository!.FolderHasThumbnails(folder!));
 
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

@@ -47,15 +47,15 @@
 //        Folder folder = repository.AddFolder(dataDirectory);
 
 //        string imagePath = Path.Combine(dataDirectory, "Image 2.jpg");
-//        Assert.IsTrue(File.Exists(imagePath));
+//        Assert.That(File.Exists(imagePath), Is.True);
 //        Asset asset = catalogAssetsService.CreateAsset(dataDirectory, "Image 2.jpg");
 
 //        imagePath = Path.Combine(dataDirectory, "Image 1.jpg");
-//        Assert.IsTrue(File.Exists(imagePath));
+//        Assert.That(File.Exists(imagePath), Is.True);
 //        Asset anotherAsset = catalogAssetsService.CreateAsset(dataDirectory, "Image 1.jpg");
 
 //        imagePath = Path.Combine(dataDirectory, "Image 2 duplicated.jpg");
-//        Assert.IsTrue(File.Exists(imagePath));
+//        Assert.That(File.Exists(imagePath), Is.True);
 //        Asset duplicatedAsset = catalogAssetsService.CreateAsset(dataDirectory, "Image 2 duplicated.jpg");
 
 //        Console.WriteLine("database.DataDirectory: " + database.DataDirectory);

@@ -13,9 +13,9 @@ public class DatabaseServiceConfigurationMockTests
         containerBuilder.RegisterDatabaseTypes();
         IContainer container = containerBuilder.Build();
 
-        Assert.IsTrue(container.IsRegistered<IObjectListStorage>());
-        Assert.IsTrue(container.IsRegistered<IBlobStorage>());
-        Assert.IsTrue(container.IsRegistered<IBackupStorage>());
-        Assert.IsTrue(container.IsRegistered<IDatabase>());
+        Assert.That(container.IsRegistered<IObjectListStorage>(), Is.True);
+        Assert.That(container.IsRegistered<IBlobStorage>(), Is.True);
+        Assert.That(container.IsRegistered<IBackupStorage>(), Is.True);
+        Assert.That(container.IsRegistered<IDatabase>(), Is.True);
     }
 }

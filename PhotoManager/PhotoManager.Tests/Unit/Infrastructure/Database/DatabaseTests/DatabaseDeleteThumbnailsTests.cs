@@ -47,11 +47,11 @@ public class DatabaseDeleteThumbnailsTests
 
             _database!.WriteBlob(blobToWrite, blobName);
 
-            Assert.IsTrue(File.Exists(blobFilePath));
+            Assert.That(File.Exists(blobFilePath), Is.True);
 
             _database!.DeleteThumbnails(blobName);
 
-            Assert.IsFalse(File.Exists(blobFilePath));
+            Assert.That(File.Exists(blobFilePath), Is.False);
         }
         finally
         {
@@ -75,11 +75,11 @@ public class DatabaseDeleteThumbnailsTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            Assert.IsFalse(File.Exists(blobFilePath));
+            Assert.That(File.Exists(blobFilePath), Is.False);
 
             _database!.DeleteThumbnails(blobName);
 
-            Assert.IsFalse(File.Exists(blobFilePath));
+            Assert.That(File.Exists(blobFilePath), Is.False);
         }
         finally
         {

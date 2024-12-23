@@ -26,7 +26,7 @@ public class PixelSizeConverterTests
 
         string result = (string)pixelSizeConverter.Convert(asset, typeof(Asset), parameter!, CultureInfo.InvariantCulture);
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class PixelSizeConverterTests
 
         object result = pixelSizeConverter.Convert(input!, typeof(string), parameter!, CultureInfo.InvariantCulture);
 
-        Assert.AreEqual("", result);
+        Assert.That(result, Is.EqualTo(""));
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class PixelSizeConverterTests
 
         object result = pixelSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);
 
-        Assert.AreEqual("", result);
+        Assert.That(result, Is.EqualTo(""));
     }
 
     [Test]
@@ -61,6 +61,6 @@ public class PixelSizeConverterTests
 
         NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => pixelSizeConverter.ConvertBack("1920x1080 pixels", typeof(string), parameter!, CultureInfo.InvariantCulture));
 
-        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }
 }

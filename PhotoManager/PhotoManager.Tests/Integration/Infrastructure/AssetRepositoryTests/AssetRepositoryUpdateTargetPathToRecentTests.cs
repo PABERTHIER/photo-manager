@@ -53,14 +53,14 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.AreEqual(3, recentTargetPaths.Count);
-            Assert.AreEqual(folder1.Path, recentTargetPaths[2]);
-            Assert.AreEqual(folder2.Path, recentTargetPaths[0]);
-            Assert.AreEqual(folder3.Path, recentTargetPaths[1]);
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
+            Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
+            Assert.That(recentTargetPaths[1], Is.EqualTo(folder3.Path));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -84,14 +84,14 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.AreEqual(20, recentTargetPaths.Count);
-            Assert.AreEqual("D:\\Workspace\\PhotoManager\\Folder29", recentTargetPaths[0]);
-            Assert.AreEqual("D:\\Workspace\\PhotoManager\\Folder28", recentTargetPaths[1]);
-            Assert.AreEqual("D:\\Workspace\\PhotoManager\\Folder10", recentTargetPaths[19]);
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(20));
+            Assert.That(recentTargetPaths[0], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder29"));
+            Assert.That(recentTargetPaths[1], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder28"));
+            Assert.That(recentTargetPaths[19], Is.EqualTo("D:\\Workspace\\PhotoManager\\Folder10"));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -120,14 +120,14 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.AreEqual(3, recentTargetPaths.Count);
-            Assert.AreEqual(folder1.Path, recentTargetPaths[2]);
-            Assert.AreEqual(folder2.Path, recentTargetPaths[1]);
-            Assert.AreEqual(folder3.Path, recentTargetPaths[0]);
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
+            Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
+            Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -156,14 +156,14 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.AreEqual(3, recentTargetPaths.Count);
-            Assert.AreEqual(folder1.Path, recentTargetPaths[2]);
-            Assert.AreEqual(folder2.Path, recentTargetPaths[1]);
-            Assert.AreEqual(folder3.Path, recentTargetPaths[0]);
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths[2], Is.EqualTo(folder1.Path));
+            Assert.That(recentTargetPaths[1], Is.EqualTo(folder2.Path));
+            Assert.That(recentTargetPaths[0], Is.EqualTo(folder3.Path));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -189,17 +189,17 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetRepository!.UpdateTargetPathToRecent(folder3!));
 
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.AreEqual(2, recentTargetPaths.Count);
-            Assert.AreEqual(folder1.Path, recentTargetPaths[1]);
-            Assert.AreEqual(folder2.Path, recentTargetPaths[0]);
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(2));
+            Assert.That(recentTargetPaths[1], Is.EqualTo(folder1.Path));
+            Assert.That(recentTargetPaths[0], Is.EqualTo(folder2.Path));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -230,14 +230,14 @@ public class AssetRepositoryUpdateTargetPathToRecentTests
 
             List<string> recentTargetPaths = _assetRepository!.GetRecentTargetPaths();
 
-            Assert.AreEqual(3, recentTargetPaths.Count);
-            Assert.IsTrue(recentTargetPaths.Any(x => x == folder1.Path));
-            Assert.IsTrue(recentTargetPaths.Any(x => x == folder2.Path));
-            Assert.IsTrue(recentTargetPaths.Any(x => x == folder3.Path));
+            Assert.That(recentTargetPaths, Has.Count.EqualTo(3));
+            Assert.That(recentTargetPaths.Any(x => x == folder1.Path), Is.True);
+            Assert.That(recentTargetPaths.Any(x => x == folder2.Path), Is.True);
+            Assert.That(recentTargetPaths.Any(x => x == folder3.Path), Is.True);
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

@@ -72,13 +72,13 @@ public class ApplicationViewModelTests
 
         try
         {
-            Assert.AreEqual(AppMode.Thumbnails, _applicationViewModel!.AppMode);
+            Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
             _applicationViewModel!.ChangeAppMode();
-            Assert.AreEqual(AppMode.Viewer, _applicationViewModel!.AppMode);
+            Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Viewer));
             _applicationViewModel!.ChangeAppMode();
-            Assert.AreEqual(AppMode.Thumbnails, _applicationViewModel!.AppMode);
+            Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
             _applicationViewModel!.ChangeAppMode(AppMode.Viewer);
-            Assert.AreEqual(AppMode.Viewer, _applicationViewModel!.AppMode);
+            Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Viewer));
         }
         finally
         {
@@ -100,7 +100,7 @@ public class ApplicationViewModelTests
         {
             _applicationViewModel!.ChangeAppMode(appMode);
 
-            Assert.AreEqual(visibilityExpected, _applicationViewModel!.ThumbnailsVisible);
+            Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(visibilityExpected));
         }
         finally
         {
@@ -122,7 +122,7 @@ public class ApplicationViewModelTests
         {
             _applicationViewModel!.ChangeAppMode(appMode);
 
-            Assert.AreEqual(visibilityExpected, _applicationViewModel!.ViewerVisible);
+            Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(visibilityExpected));
         }
         finally
         {
@@ -236,14 +236,14 @@ public class ApplicationViewModelTests
                 Message = statusMessage
             });
 
-            Assert.AreEqual(6, _applicationViewModel.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel.ObservableAssets[4].FileName);
-            Assert.AreEqual("NewImage.jpg", _applicationViewModel.ObservableAssets[5].FileName);
-            Assert.AreEqual(statusMessage, _applicationViewModel.StatusMessage);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(6));
+            Assert.That(_applicationViewModel.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[3].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[5].FileName, Is.EqualTo("NewImage.jpg"));
+            Assert.That(_applicationViewModel.StatusMessage, Is.EqualTo(statusMessage));
         }
         finally
         {
@@ -359,13 +359,13 @@ public class ApplicationViewModelTests
                 Message = statusMessage
             });
 
-            Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel.ObservableAssets[4].FileName);
-            Assert.AreEqual(statusMessage, _applicationViewModel.StatusMessage);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[3].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
+            Assert.That(_applicationViewModel.StatusMessage, Is.EqualTo(statusMessage));
         }
         finally
         {
@@ -469,13 +469,13 @@ public class ApplicationViewModelTests
                 Message = statusMessage
             });
 
-            Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel.ObservableAssets[4].FileName);
-            Assert.AreEqual(statusMessage, _applicationViewModel.StatusMessage);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[3].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
+            Assert.That(_applicationViewModel.StatusMessage, Is.EqualTo(statusMessage));
         }
         finally
         {
@@ -519,7 +519,7 @@ public class ApplicationViewModelTests
                 Message = string.Empty
             });
 
-            Assert.AreEqual(1, _applicationViewModel.ObservableAssets.Count);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(1));
         }
         finally
         {
@@ -632,12 +632,12 @@ public class ApplicationViewModelTests
                 Message = string.Empty
             });
 
-            Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel.ObservableAssets[4].FileName);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[3].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
         }
         finally
         {
@@ -758,12 +758,12 @@ public class ApplicationViewModelTests
                 Message = string.Empty
             });
 
-            Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel.ObservableAssets[4].FileName);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[3].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
         }
         finally
         {
@@ -895,12 +895,12 @@ public class ApplicationViewModelTests
                 Message = string.Empty
             });
 
-            Assert.AreEqual(5, _applicationViewModel.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel.ObservableAssets[4].FileName);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[3].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
         }
         finally
         {
@@ -1000,12 +1000,12 @@ public class ApplicationViewModelTests
                 Message = statusMessage
             });
 
-            Assert.AreEqual(4, _applicationViewModel.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel.ObservableAssets[3].FileName);
-            Assert.AreEqual(statusMessage, _applicationViewModel.StatusMessage);
+            Assert.That(_applicationViewModel.ObservableAssets, Has.Count.EqualTo(4));
+            Assert.That(_applicationViewModel.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel.ObservableAssets[3].FileName, Is.EqualTo("Image 5.jpg"));
+            Assert.That(_applicationViewModel.StatusMessage, Is.EqualTo(statusMessage));
         }
         finally
         {
@@ -1105,7 +1105,7 @@ public class ApplicationViewModelTests
             // TODO: Need to add assert about UpdateAppTitle (been updated)
             _applicationViewModel!.GoToPreviousAsset();
 
-            Assert.AreEqual(expectedViewerPosition, _applicationViewModel!.ViewerPosition);
+            Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         }
         finally
         {
@@ -1203,7 +1203,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.ViewerPosition = currentPosition;
             // TODO: Need to add assert about UpdateAppTitle (been updated)
-            Assert.AreEqual(expectedCanGoToPreviousAsset, _applicationViewModel!.CanGoToPreviousAsset);
+            Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.EqualTo(expectedCanGoToPreviousAsset));
         }
         finally
         {
@@ -1301,7 +1301,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.ViewerPosition = currentPosition;
             // TODO: Need to add assert about UpdateAppTitle (been updated)
-            Assert.AreEqual(expectedCanGoToNextAsset, _applicationViewModel!.CanGoToNextAsset);
+            Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
         }
         finally
         {
@@ -1401,7 +1401,7 @@ public class ApplicationViewModelTests
             // TODO: Need to add assert about UpdateAppTitle (been updated)
             _applicationViewModel!.GoToNextAsset();
 
-            Assert.AreEqual(expectedViewerPosition, _applicationViewModel!.ViewerPosition);
+            Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         }
         finally
         {
@@ -1544,7 +1544,7 @@ public class ApplicationViewModelTests
             // TODO: Need to add assert about UpdateAppTitle (been updated)
             _applicationViewModel!.GoToAsset(assets[goToAssetIndex]);
 
-            Assert.AreEqual(goToAssetIndex, _applicationViewModel!.ViewerPosition);
+            Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(goToAssetIndex));
         }
         finally
         {
@@ -1652,7 +1652,7 @@ public class ApplicationViewModelTests
             // TODO: Need to add assert about UpdateAppTitle (not updated)
             _applicationViewModel!.GoToAsset(assetNotInList);
 
-            Assert.AreEqual(4, _applicationViewModel!.ViewerPosition);
+            Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(4));
         }
         finally
         {
@@ -1754,8 +1754,8 @@ public class ApplicationViewModelTests
             // TODO: Need to add assert about UpdateAppTitle (been updated)
             _applicationViewModel!.RemoveAssets([assets[index]]);
 
-            Assert.AreEqual(expectedPosition, _applicationViewModel!.ViewerPosition);
-            Assert.AreEqual(4, _applicationViewModel!.ObservableAssets.Count);
+            Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(expectedPosition));
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(4));
         }
         finally
         {
@@ -1795,8 +1795,8 @@ public class ApplicationViewModelTests
 
             _applicationViewModel!.RemoveAssets([assets[0]]);
 
-            Assert.AreEqual(0, _applicationViewModel!.ViewerPosition);
-            Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
+            Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
+            Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
         }
         finally
         {
@@ -1821,8 +1821,8 @@ public class ApplicationViewModelTests
 
             _applicationViewModel!.RemoveAssets(null!);
 
-            Assert.AreEqual(-1, _applicationViewModel!.ViewerPosition);
-            Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
+            Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(-1));
+            Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
         }
         finally
         {
@@ -1845,8 +1845,8 @@ public class ApplicationViewModelTests
 
             _applicationViewModel!.RemoveAssets(null!);
 
-            Assert.AreEqual(-1, _applicationViewModel!.ViewerPosition);
-            Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
+            Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(-1));
+            Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
         }
         finally
         {
@@ -1945,7 +1945,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.ViewerPosition = 3;
 
-            Assert.AreEqual(expectedTitle, _applicationViewModel!.AppTitle);
+            Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo(expectedTitle));
         }
         finally
         {
@@ -1968,7 +1968,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
-            Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
+            Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
         }
         finally
         {
@@ -1991,7 +1991,7 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
-            Assert.IsEmpty(_applicationViewModel!.ObservableAssets);
+            Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
         }
         finally
         {
@@ -2046,8 +2046,8 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
-            Assert.AreEqual(1, _applicationViewModel!.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(1));
+            Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
         }
         finally
         {
@@ -2139,12 +2139,12 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
-            Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
         }
         finally
         {
@@ -2238,25 +2238,25 @@ public class ApplicationViewModelTests
             {
                 _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileName);
 
-                Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
+                Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
 
                 if (i % 2 == 0) // Ascending
                 {
-                    Assert.IsTrue(_applicationViewModel!.SortAscending);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.SortAscending, Is.True);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
                 }
                 else // Descending
                 {
-                    Assert.IsFalse(_applicationViewModel!.SortAscending);
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.SortAscending, Is.False);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 5.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 3.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 1.jpg"));
                 }
             }
         }
@@ -2378,12 +2378,12 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
 
-            Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
         }
         finally
         {
@@ -2506,25 +2506,25 @@ public class ApplicationViewModelTests
             {
                 _applicationViewModel!.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
 
-                Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
+                Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
 
                 if (i % 2 == 0) // Ascending
                 {
-                    Assert.IsTrue(_applicationViewModel!.SortAscending);
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.SortAscending, Is.True);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 3.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
                 }
                 else // Descending
                 {
-                    Assert.IsFalse(_applicationViewModel!.SortAscending);
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.SortAscending, Is.False);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 5.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 3.jpg"));
                 }
             }
         }
@@ -2646,12 +2646,12 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileCreationDateTime);
 
-            Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
         }
         finally
         {
@@ -2774,25 +2774,25 @@ public class ApplicationViewModelTests
             {
                 _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileCreationDateTime);
 
-                Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
+                Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
 
                 if (i % 2 == 0) // Ascending
                 {
-                    Assert.IsTrue(_applicationViewModel!.SortAscending);
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.SortAscending, Is.True);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 3.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
                 }
                 else // Descending
                 {
-                    Assert.IsFalse(_applicationViewModel!.SortAscending);
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.SortAscending, Is.False);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 5.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 3.jpg"));
                 }
             }
         }
@@ -2914,12 +2914,12 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileModificationDateTime);
 
-            Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
         }
         finally
         {
@@ -3042,23 +3042,23 @@ public class ApplicationViewModelTests
             {
                 _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileModificationDateTime);
 
-                Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
+                Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
 
                 if (i % 2 == 0) // Ascending
                 {
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 3.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
                 }
                 else // Descending
                 {
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 5.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 3.jpg"));
                 }
             }
         }
@@ -3155,12 +3155,12 @@ public class ApplicationViewModelTests
             _applicationViewModel!.SetAssets(assets);
             _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileSize);
 
-            Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
-            Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-            Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-            Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-            Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-            Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+            Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
+            Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 3.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+            Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
         }
         finally
         {
@@ -3258,23 +3258,23 @@ public class ApplicationViewModelTests
             {
                 _applicationViewModel!.SortAssetsByCriteria(SortCriteria.FileSize);
 
-                Assert.AreEqual(5, _applicationViewModel!.ObservableAssets.Count);
+                Assert.That(_applicationViewModel!.ObservableAssets, Has.Count.EqualTo(5));
 
                 if (i % 2 == 0) // Ascending
                 {
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 3.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 5.jpg"));
                 }
                 else // Descending
                 {
-                    Assert.AreEqual("Image 5.jpg", _applicationViewModel!.ObservableAssets[0].FileName);
-                    Assert.AreEqual("Image 2.jpg", _applicationViewModel!.ObservableAssets[1].FileName);
-                    Assert.AreEqual("Image 4.jpg", _applicationViewModel!.ObservableAssets[2].FileName);
-                    Assert.AreEqual("Image 1.jpg", _applicationViewModel!.ObservableAssets[3].FileName);
-                    Assert.AreEqual("Image 3.jpg", _applicationViewModel!.ObservableAssets[4].FileName);
+                    Assert.That(_applicationViewModel!.ObservableAssets[0].FileName, Is.EqualTo("Image 5.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[1].FileName, Is.EqualTo("Image 2.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[2].FileName, Is.EqualTo("Image 4.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[3].FileName, Is.EqualTo("Image 1.jpg"));
+                    Assert.That(_applicationViewModel!.ObservableAssets[4].FileName, Is.EqualTo("Image 3.jpg"));
                 }
             }
         }
