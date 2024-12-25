@@ -36,8 +36,7 @@ public class ExifHelperTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(expectedOrientation));
     }
 
     [Test]
@@ -54,8 +53,7 @@ public class ExifHelperTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.IsNotNull(orientation);
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -68,7 +66,7 @@ public class ExifHelperTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -81,7 +79,7 @@ public class ExifHelperTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -94,7 +92,7 @@ public class ExifHelperTests
             _userConfigurationService!.AssetSettings.DefaultExifOrientation,
             _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -112,7 +110,7 @@ public class ExifHelperTests
                 _userConfigurationService!.AssetSettings.DefaultExifOrientation,
                 _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-            Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+            Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
         }
     }
 
@@ -128,8 +126,7 @@ public class ExifHelperTests
 
         ushort orientation = ExifHelper.GetHeicExifOrientation(buffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.IsNotNull(orientation);
-        Assert.AreEqual(expectedOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(expectedOrientation));
     }
 
     [Test]
@@ -139,7 +136,7 @@ public class ExifHelperTests
 
         ushort orientation = ExifHelper.GetHeicExifOrientation(invalidHeicBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
 
-        Assert.AreEqual(_userConfigurationService!.AssetSettings.CorruptedImageOrientation, orientation);
+        Assert.That(orientation, Is.EqualTo(_userConfigurationService!.AssetSettings.CorruptedImageOrientation));
     }
 
     [Test]
@@ -152,7 +149,7 @@ public class ExifHelperTests
             ExifHelper.GetHeicExifOrientation(nullBuffer!, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         });
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'buffer')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
 
     [Test]
@@ -165,7 +162,7 @@ public class ExifHelperTests
             ExifHelper.GetHeicExifOrientation(emptyBuffer, _userConfigurationService!.AssetSettings.CorruptedImageOrientation);
         });
 
-        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
     }
 
     [Test]
@@ -187,7 +184,7 @@ public class ExifHelperTests
     {
         Rotation rotation = ExifHelper.GetImageRotation(exifOrientation);
 
-        Assert.AreEqual(expectedRotation, rotation);
+        Assert.That(rotation, Is.EqualTo(expectedRotation));
     }
 
     [Test]
@@ -196,7 +193,7 @@ public class ExifHelperTests
         int exifOrientation = -10;
         Rotation rotation = ExifHelper.GetImageRotation((ushort)(short)exifOrientation);
 
-        Assert.AreEqual(Rotation.Rotate0, rotation);
+        Assert.That(rotation, Is.EqualTo(Rotation.Rotate0));
     }
 
     [Test]
@@ -206,7 +203,7 @@ public class ExifHelperTests
 
         InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => ExifHelper.GetImageRotation((ushort)exifOrientation!));
 
-        Assert.AreEqual("Nullable object must have a value.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Nullable object must have a value."));
     }
 
     [Test]
@@ -221,7 +218,7 @@ public class ExifHelperTests
 
         bool result = ExifHelper.IsValidGDIPlusImage(validImageData);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -232,7 +229,7 @@ public class ExifHelperTests
 
         bool result = ExifHelper.IsValidGDIPlusImage(invalidImageData);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -242,7 +239,7 @@ public class ExifHelperTests
 
         bool result = ExifHelper.IsValidGDIPlusImage(emptyHeicData);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -253,7 +250,7 @@ public class ExifHelperTests
 
         bool result = ExifHelper.IsValidHeic(validHeicData);
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -263,7 +260,7 @@ public class ExifHelperTests
 
         bool result = ExifHelper.IsValidHeic(invalidHeicData);
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -273,6 +270,6 @@ public class ExifHelperTests
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => ExifHelper.IsValidHeic(emptyHeicData));
 
-        Assert.AreEqual("Value cannot be empty. (Parameter 'stream')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
     }
 }

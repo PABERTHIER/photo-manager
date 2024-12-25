@@ -47,12 +47,12 @@ public class DatabaseSetDataTablePropertiesTests
             _testableDatabase!.SetDataTableProperties(properties);
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
-            Assert.IsNotNull(dataTablePropertiesDictionary);
-            Assert.IsNotEmpty(dataTablePropertiesDictionary);
-            Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].ColumnProperties);
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Null);
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Empty);
+            Assert.That(dataTablePropertiesDictionary, Has.Count.EqualTo(1));
+            Assert.That(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName), Is.True);
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].TableName, Is.EqualTo(properties.TableName));
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName].ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
         }
         finally
         {
@@ -81,12 +81,12 @@ public class DatabaseSetDataTablePropertiesTests
             _testableDatabase!.SetDataTableProperties(properties);
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
-            Assert.IsNotNull(dataTablePropertiesDictionary);
-            Assert.IsNotEmpty(dataTablePropertiesDictionary);
-            Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].ColumnProperties);
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Null);
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Empty);
+            Assert.That(dataTablePropertiesDictionary, Has.Count.EqualTo(1));
+            Assert.That(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName), Is.True);
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].TableName, Is.EqualTo(properties.TableName));
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName].ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
         }
         finally
         {
@@ -115,12 +115,12 @@ public class DatabaseSetDataTablePropertiesTests
             _testableDatabase!.SetDataTableProperties(properties);
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
-            Assert.IsNotNull(dataTablePropertiesDictionary);
-            Assert.IsNotEmpty(dataTablePropertiesDictionary);
-            Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].ColumnProperties);
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Null);
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Empty);
+            Assert.That(dataTablePropertiesDictionary, Has.Count.EqualTo(1));
+            Assert.That(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName), Is.True);
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].TableName, Is.EqualTo(properties.TableName));
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName].ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
         }
         finally
         {
@@ -149,12 +149,12 @@ public class DatabaseSetDataTablePropertiesTests
             _testableDatabase!.SetDataTableProperties(properties);
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
-            Assert.IsNotNull(dataTablePropertiesDictionary);
-            Assert.IsNotEmpty(dataTablePropertiesDictionary);
-            Assert.AreEqual(1, dataTablePropertiesDictionary.Count);
-            Assert.IsTrue(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName));
-            CollectionAssert.AreEqual(properties.TableName, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].TableName);
-            CollectionAssert.AreEqual(properties.ColumnProperties, dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].ColumnProperties);
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Null);
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Empty);
+            Assert.That(dataTablePropertiesDictionary, Has.Count.EqualTo(1));
+            Assert.That(dataTablePropertiesDictionary.ContainsKey(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName), Is.True);
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].TableName, Is.EqualTo(properties.TableName));
+            Assert.That(dataTablePropertiesDictionary[_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName].ColumnProperties, Is.EqualTo(properties.ColumnProperties).AsCollection);
         }
         finally
         {
@@ -169,7 +169,7 @@ public class DatabaseSetDataTablePropertiesTests
         DataTableProperties? dataTableProperties = null;
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _database!.SetDataTableProperties(dataTableProperties!));
-        Assert.AreEqual("dataTableProperties", exception?.ParamName);
+        Assert.That(exception?.ParamName, Is.EqualTo("dataTableProperties"));
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class DatabaseSetDataTablePropertiesTests
         };
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
-        Assert.AreEqual("Column properties must not be empty.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Column properties must not be empty."));
     }
 
     [Test]
@@ -195,11 +195,11 @@ public class DatabaseSetDataTablePropertiesTests
         };
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
-        Assert.AreEqual("Column properties must not be empty.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Column properties must not be empty."));
     }
 
     [Test]
-    [TestCase(null)]
+    [TestCase(null!)]
     [TestCase("")]
     [TestCase(" ")]
     public void SetDataTableProperties_WithInvalidColumnName_ThrowsArgumentNullException(string columnName)
@@ -215,8 +215,8 @@ public class DatabaseSetDataTablePropertiesTests
         };
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _database!.SetDataTableProperties(properties));
-        Assert.AreEqual("All column properties should have a ColumnName (Parameter 'ColumnName')", exception?.Message);
-        Assert.AreEqual(nameof(ColumnProperties.ColumnName), exception?.ParamName);
+        Assert.That(exception?.Message, Is.EqualTo("All column properties should have a ColumnName (Parameter 'ColumnName')"));
+        Assert.That(exception?.ParamName, Is.EqualTo(nameof(ColumnProperties.ColumnName)));
     }
 
     [Test]
@@ -233,7 +233,7 @@ public class DatabaseSetDataTablePropertiesTests
         };
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => _database!.SetDataTableProperties(properties));
-        Assert.AreEqual("Duplicated column properties. (Parameter 'Column1')", exception?.Message);
-        Assert.AreEqual("Column1", exception?.ParamName);
+        Assert.That(exception?.Message, Is.EqualTo("Duplicated column properties. (Parameter 'Column1')"));
+        Assert.That(exception?.ParamName, Is.EqualTo("Column1"));
     }
 }

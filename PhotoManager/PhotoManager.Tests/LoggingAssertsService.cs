@@ -24,7 +24,7 @@ public class LoggingAssertsService
     {
         LoggingEvent[] loggingEvents = GetLoggingEvents();
 
-        Assert.AreEqual(expectedExceptions.Length, loggingEvents.Length);
+        Assert.That(loggingEvents, Has.Length.EqualTo(expectedExceptions.Length));
 
         for (int i = 0; i < loggingEvents.Length; i++)
         {
@@ -40,8 +40,8 @@ public class LoggingAssertsService
             }
 
             AssertMessage(expectedExceptions[i].Message, messageObject);
-            
-            Assert.AreEqual(typeOfService.ToString(), loggingEvents[i].LoggerName);
+
+            Assert.That(loggingEvents[i].LoggerName, Is.EqualTo(typeOfService.ToString()));
         }
     }
 
@@ -49,13 +49,13 @@ public class LoggingAssertsService
     {
         LoggingEvent[] loggingEvents = GetLoggingEvents();
 
-        Assert.AreEqual(expectedMessages.Length, loggingEvents.Length);
+        Assert.That(loggingEvents, Has.Length.EqualTo(expectedMessages.Length));
 
         for (int i = 0; i < loggingEvents.Length; i++)
         {
             string? messageObject = loggingEvents[i].MessageObject as string;
             AssertMessage(expectedMessages[i], messageObject);
-            Assert.AreEqual(typeOfService.ToString(), loggingEvents[i].LoggerName);
+            Assert.That(loggingEvents[i].LoggerName, Is.EqualTo(typeOfService.ToString()));
         }
     }
 
@@ -74,7 +74,7 @@ public class LoggingAssertsService
 
     private static void AssertMessage(string expectedMessage, string? message)
     {
-        Assert.IsNotNull(message);
-        Assert.AreEqual(expectedMessage, message);
+        Assert.That(message, Is.Not.Null);
+        Assert.That(message, Is.EqualTo(expectedMessage));
     }
 }

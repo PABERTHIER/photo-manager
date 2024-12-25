@@ -53,22 +53,22 @@ public class AssetConfigsTests
     {
         ColumnProperties[] columns = AssetConfigs.ConfigureDataTable();
 
-        Assert.IsNotNull(columns);
-        Assert.AreEqual(13, columns.Length);
+        Assert.That(columns, Is.Not.Null);
+        Assert.That(columns, Has.Length.EqualTo(13));
 
-        Assert.AreEqual("FolderId", columns[0].ColumnName);
-        Assert.AreEqual("FileName", columns[1].ColumnName);
-        Assert.AreEqual("ImageRotation", columns[2].ColumnName);
-        Assert.AreEqual("PixelWidth", columns[3].ColumnName);
-        Assert.AreEqual("PixelHeight", columns[4].ColumnName);
-        Assert.AreEqual("ThumbnailPixelWidth", columns[5].ColumnName);
-        Assert.AreEqual("ThumbnailPixelHeight", columns[6].ColumnName);
-        Assert.AreEqual("ThumbnailCreationDateTime", columns[7].ColumnName);
-        Assert.AreEqual("Hash", columns[8].ColumnName);
-        Assert.AreEqual("CorruptedMessage", columns[9].ColumnName);
-        Assert.AreEqual("IsCorrupted", columns[10].ColumnName);
-        Assert.AreEqual("RotatedMessage", columns[11].ColumnName);
-        Assert.AreEqual("IsRotated", columns[12].ColumnName);
+        Assert.That(columns[0].ColumnName, Is.EqualTo("FolderId"));
+        Assert.That(columns[1].ColumnName, Is.EqualTo("FileName"));
+        Assert.That(columns[2].ColumnName, Is.EqualTo("ImageRotation"));
+        Assert.That(columns[3].ColumnName, Is.EqualTo("PixelWidth"));
+        Assert.That(columns[4].ColumnName, Is.EqualTo("PixelHeight"));
+        Assert.That(columns[5].ColumnName, Is.EqualTo("ThumbnailPixelWidth"));
+        Assert.That(columns[6].ColumnName, Is.EqualTo("ThumbnailPixelHeight"));
+        Assert.That(columns[7].ColumnName, Is.EqualTo("ThumbnailCreationDateTime"));
+        Assert.That(columns[8].ColumnName, Is.EqualTo("Hash"));
+        Assert.That(columns[9].ColumnName, Is.EqualTo("CorruptedMessage"));
+        Assert.That(columns[10].ColumnName, Is.EqualTo("IsCorrupted"));
+        Assert.That(columns[11].ColumnName, Is.EqualTo("RotatedMessage"));
+        Assert.That(columns[12].ColumnName, Is.EqualTo("IsRotated"));
     }
 
     [Test]
@@ -76,20 +76,20 @@ public class AssetConfigsTests
     {
         Asset asset = AssetConfigs.ReadFunc(_validValues!);
 
-        Assert.IsNotNull(asset);
-        Assert.AreEqual(_folderId, asset.FolderId);
-        Assert.AreEqual("Image 1.jpg", asset.FileName);
-        Assert.AreEqual(Rotation.Rotate0, asset.ImageRotation);
-        Assert.AreEqual(1920, asset.Pixel.Asset.Width);
-        Assert.AreEqual(1080, asset.Pixel.Asset.Height);
-        Assert.AreEqual(120, asset.Pixel.Thumbnail.Width);
-        Assert.AreEqual(60, asset.Pixel.Thumbnail.Height);
-        Assert.AreEqual(new DateTime(2023, 12, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
-        Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset.Hash);
-        Assert.IsTrue(asset.Metadata.Corrupted.IsTrue);
-        Assert.AreEqual("The asset is corrupted", asset.Metadata.Corrupted.Message);
-        Assert.IsFalse(asset.Metadata.Rotated.IsTrue);
-        Assert.AreEqual(null, asset.Metadata.Rotated.Message);
+        Assert.That(asset, Is.Not.Null);
+        Assert.That(asset.FolderId, Is.EqualTo(_folderId));
+        Assert.That(asset.FileName, Is.EqualTo("Image 1.jpg"));
+        Assert.That(asset.ImageRotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(asset.Pixel.Asset.Width, Is.EqualTo(1920));
+        Assert.That(asset.Pixel.Asset.Height, Is.EqualTo(1080));
+        Assert.That(asset.Pixel.Thumbnail.Width, Is.EqualTo(120));
+        Assert.That(asset.Pixel.Thumbnail.Height, Is.EqualTo(60));
+        Assert.That(asset.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 12, 30, 12, 0, 0)));
+        Assert.That(asset.Hash, Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(asset.Metadata.Corrupted.IsTrue, Is.True);
+        Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
+        Assert.That(asset.Metadata.Rotated.IsTrue, Is.False);
+        Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo(null));
     }
 
     [Test]
@@ -97,20 +97,20 @@ public class AssetConfigsTests
     {
         Asset asset = AssetConfigs.ReadFunc(_tooManyValues!);
 
-        Assert.IsNotNull(asset);
-        Assert.AreEqual(_folderId, asset.FolderId);
-        Assert.AreEqual("Image 1.jpg", asset.FileName);
-        Assert.AreEqual(Rotation.Rotate0, asset.ImageRotation);
-        Assert.AreEqual(1920, asset.Pixel.Asset.Width);
-        Assert.AreEqual(1080, asset.Pixel.Asset.Height);
-        Assert.AreEqual(120, asset.Pixel.Thumbnail.Width);
-        Assert.AreEqual(60, asset.Pixel.Thumbnail.Height);
-        Assert.AreEqual(new DateTime(2023, 12, 30, 12, 0, 0), asset.ThumbnailCreationDateTime);
-        Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", asset.Hash);
-        Assert.IsTrue(asset.Metadata.Corrupted.IsTrue);
-        Assert.AreEqual("The asset is corrupted", asset.Metadata.Corrupted.Message);
-        Assert.IsFalse(asset.Metadata.Rotated.IsTrue);
-        Assert.AreEqual(null, asset.Metadata.Rotated.Message);
+        Assert.That(asset, Is.Not.Null);
+        Assert.That(asset.FolderId, Is.EqualTo(_folderId));
+        Assert.That(asset.FileName, Is.EqualTo("Image 1.jpg"));
+        Assert.That(asset.ImageRotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(asset.Pixel.Asset.Width, Is.EqualTo(1920));
+        Assert.That(asset.Pixel.Asset.Height, Is.EqualTo(1080));
+        Assert.That(asset.Pixel.Thumbnail.Width, Is.EqualTo(120));
+        Assert.That(asset.Pixel.Thumbnail.Height, Is.EqualTo(60));
+        Assert.That(asset.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 12, 30, 12, 0, 0)));
+        Assert.That(asset.Hash, Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(asset.Metadata.Corrupted.IsTrue, Is.True);
+        Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
+        Assert.That(asset.Metadata.Rotated.IsTrue, Is.False);
+        Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo(null));
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class AssetConfigsTests
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => AssetConfigs.ReadFunc(nullValues));
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'g')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'g')"));
     }
 
     [Test]
@@ -130,7 +130,7 @@ public class AssetConfigsTests
 
         IndexOutOfRangeException? exception = Assert.Throws<IndexOutOfRangeException>(() => AssetConfigs.ReadFunc(emptyArray));
 
-        Assert.AreEqual("Index was outside the bounds of the array.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Index was outside the bounds of the array."));
     }
 
     [Test]
@@ -155,7 +155,7 @@ public class AssetConfigsTests
 
         FormatException? exception = Assert.Throws<FormatException>(() => AssetConfigs.ReadFunc(invalidValues));
 
-        Assert.AreEqual("The input string 'toto' was not in a correct format.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("The input string 'toto' was not in a correct format."));
     }
 
     [Test]
@@ -188,19 +188,19 @@ public class AssetConfigsTests
             result[i] = AssetConfigs.WriteFunc(asset, i);
         }
 
-        Assert.AreEqual(_folderId, result[0]);
-        Assert.AreEqual("Image 1.jpg", result[1]);
-        Assert.AreEqual(Rotation.Rotate0, result[2]);
-        Assert.AreEqual(1920, result[3]);
-        Assert.AreEqual(1080, result[4]);
-        Assert.AreEqual(120, result[5]);
-        Assert.AreEqual(60, result[6]);
-        Assert.AreEqual(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss"), result[7]);
-        Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", result[8]);
-        Assert.AreEqual("The asset is corrupted", result[9]);
-        Assert.AreEqual(true, result[10]);
-        Assert.AreEqual(null, result[11]);
-        Assert.AreEqual(false, result[12]);
+        Assert.That(result[0], Is.EqualTo(_folderId));
+        Assert.That(result[1], Is.EqualTo("Image 1.jpg"));
+        Assert.That(result[2], Is.EqualTo(Rotation.Rotate0));
+        Assert.That(result[3], Is.EqualTo(1920));
+        Assert.That(result[4], Is.EqualTo(1080));
+        Assert.That(result[5], Is.EqualTo(120));
+        Assert.That(result[6], Is.EqualTo(60));
+        Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
+        Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(result[9], Is.EqualTo("The asset is corrupted"));
+        Assert.That(result[10], Is.EqualTo(true));
+        Assert.That(result[11], Is.EqualTo(null));
+        Assert.That(result[12], Is.EqualTo(false));
     }
 
     [Test]
@@ -231,19 +231,19 @@ public class AssetConfigsTests
             result[i] = AssetConfigs.WriteFunc(asset, i);
         }
 
-        Assert.AreEqual(_folderId, result[0]);
-        Assert.AreEqual("toto.jpg", result[1]);
-        Assert.AreEqual(Rotation.Rotate0, result[2]);
-        Assert.AreEqual(0, result[3]);
-        Assert.AreEqual(0, result[4]);
-        Assert.AreEqual(0, result[5]);
-        Assert.AreEqual(0, result[6]);
-        Assert.AreEqual(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss"), result[7]);
-        Assert.AreEqual("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4", result[8]);
-        Assert.AreEqual("The asset is corrupted", result[9]);
-        Assert.AreEqual(false, result[10]);
-        Assert.AreEqual(null, result[11]);
-        Assert.AreEqual(false, result[12]);
+        Assert.That(result[0], Is.EqualTo(_folderId));
+        Assert.That(result[1], Is.EqualTo("toto.jpg"));
+        Assert.That(result[2], Is.EqualTo(Rotation.Rotate0));
+        Assert.That(result[3], Is.EqualTo(0));
+        Assert.That(result[4], Is.EqualTo(0));
+        Assert.That(result[5], Is.EqualTo(0));
+        Assert.That(result[6], Is.EqualTo(0));
+        Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
+        Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
+        Assert.That(result[9], Is.EqualTo("The asset is corrupted"));
+        Assert.That(result[10], Is.EqualTo(false));
+        Assert.That(result[11], Is.EqualTo(null));
+        Assert.That(result[12], Is.EqualTo(false));
     }
 
     [Test]
@@ -272,7 +272,7 @@ public class AssetConfigsTests
 
         ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => AssetConfigs.WriteFunc(asset, 15));
 
-        Assert.AreEqual("Specified argument was out of the range of valid values. (Parameter 'i')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Specified argument was out of the range of valid values. (Parameter 'i')"));
     }
 
     [Test]
@@ -284,7 +284,7 @@ public class AssetConfigsTests
         {
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => AssetConfigs.WriteFunc(asset!, i));
 
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
     }
 }

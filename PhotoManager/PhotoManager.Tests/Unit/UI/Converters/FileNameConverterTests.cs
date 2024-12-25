@@ -31,7 +31,7 @@ public class FileNameConverterTests
         object? parameter = null;
 
         string result = (string)fileNameConverter.Convert(asset.FileName, typeof(string), parameter!, CultureInfo.InvariantCulture);
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class FileNameConverterTests
 
         object result = fileNameConverter.Convert(fileName!, typeof(string), parameter!, CultureInfo.InvariantCulture);
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class FileNameConverterTests
 
         object result = fileNameConverter.Convert(input, typeof(int), parameter!, CultureInfo.InvariantCulture);
 
-        Assert.AreEqual(input, result);
+        Assert.That(result, Is.EqualTo(input));
     }
 
     [Test]
@@ -66,6 +66,6 @@ public class FileNameConverterTests
 
         NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => fileNameConverter.ConvertBack("toto.jpg", typeof(string), targetType!, CultureInfo.InvariantCulture));
 
-        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }
 }

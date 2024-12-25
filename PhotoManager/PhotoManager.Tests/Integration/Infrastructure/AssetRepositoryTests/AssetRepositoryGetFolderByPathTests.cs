@@ -51,16 +51,16 @@ public class AssetRepositoryGetFolderByPathTests
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
             Folder? folderByPath2 = _assetRepository!.GetFolderByPath(folderPath2);
 
-            Assert.IsNotNull(folderByPath1);
-            Assert.IsNotNull(folderByPath2);
+            Assert.That(folderByPath1, Is.Not.Null);
+            Assert.That(folderByPath2, Is.Not.Null);
 
-            Assert.AreEqual(folderPath1, folderByPath1!.Path);
-            Assert.AreEqual(addedFolder1.Id, folderByPath1.Id);
+            Assert.That(folderByPath1!.Path, Is.EqualTo(folderPath1));
+            Assert.That(folderByPath1.Id, Is.EqualTo(addedFolder1.Id));
 
-            Assert.AreEqual(folderPath2, folderByPath2!.Path);
-            Assert.AreEqual(addedFolder2.Id, folderByPath2.Id);
+            Assert.That(folderByPath2!.Path, Is.EqualTo(folderPath2));
+            Assert.That(folderByPath2.Id, Is.EqualTo(addedFolder2.Id));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -85,16 +85,16 @@ public class AssetRepositoryGetFolderByPathTests
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
             Folder? folderByPath2 = _assetRepository!.GetFolderByPath(folderPath1);
 
-            Assert.IsNotNull(folderByPath1);
-            Assert.IsNotNull(folderByPath2);
+            Assert.That(folderByPath1, Is.Not.Null);
+            Assert.That(folderByPath2, Is.Not.Null);
 
-            Assert.AreEqual(folderPath1, folderByPath1!.Path);
-            Assert.AreEqual(addedFolder1.Id, folderByPath1.Id);
+            Assert.That(folderByPath1!.Path, Is.EqualTo(folderPath1));
+            Assert.That(folderByPath1.Id, Is.EqualTo(addedFolder1.Id));
 
-            Assert.AreEqual(folderPath1, folderByPath2!.Path);
-            Assert.AreNotEqual(addedFolder2.Id, folderByPath2.Id);
+            Assert.That(folderByPath2!.Path, Is.EqualTo(folderPath1));
+            Assert.That(folderByPath2.Id, Is.Not.EqualTo(addedFolder2.Id));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -115,9 +115,9 @@ public class AssetRepositoryGetFolderByPathTests
 
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1);
 
-            Assert.IsNull(folderByPath1);
+            Assert.That(folderByPath1, Is.Null);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
 
         }
         finally
@@ -141,9 +141,9 @@ public class AssetRepositoryGetFolderByPathTests
 
             Folder? folderByPath1 = _assetRepository!.GetFolderByPath(folderPath1!);
 
-            Assert.IsNull(folderByPath1);
+            Assert.That(folderByPath1, Is.Null);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -175,16 +175,16 @@ public class AssetRepositoryGetFolderByPathTests
                 () => folderByPath2 = _assetRepository!.GetFolderByPath(folderPath2)
             );
 
-            Assert.IsNotNull(folderByPath1);
-            Assert.IsNotNull(folderByPath2);
+            Assert.That(folderByPath1, Is.Not.Null);
+            Assert.That(folderByPath2, Is.Not.Null);
 
-            Assert.AreEqual(folderPath1, folderByPath1!.Path);
-            Assert.AreEqual(addedFolder1.Id, folderByPath1.Id);
+            Assert.That(folderByPath1!.Path, Is.EqualTo(folderPath1));
+            Assert.That(folderByPath1.Id, Is.EqualTo(addedFolder1.Id));
 
-            Assert.AreEqual(folderPath2, folderByPath2!.Path);
-            Assert.AreEqual(addedFolder2.Id, folderByPath2.Id);
+            Assert.That(folderByPath2!.Path, Is.EqualTo(folderPath2));
+            Assert.That(folderByPath2.Id, Is.EqualTo(addedFolder2.Id));
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

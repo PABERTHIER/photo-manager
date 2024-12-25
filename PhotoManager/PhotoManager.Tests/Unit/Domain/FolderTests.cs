@@ -25,7 +25,7 @@ public class FolderTests
 
         bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
 
-        Assert.AreEqual(expected, isFolderParentOfChild);
+        Assert.That(isFolderParentOfChild, Is.EqualTo(expected));
     }
 
     [Test]
@@ -40,7 +40,7 @@ public class FolderTests
 
         bool isFolderParentOfChild = parentFolder1.IsParentOf(childFolder2);
 
-        Assert.AreEqual(expected, isFolderParentOfChild);
+        Assert.That(isFolderParentOfChild, Is.EqualTo(expected));
     }
 
     [Test]
@@ -51,7 +51,7 @@ public class FolderTests
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);
 
-        Assert.IsFalse(isFolderParentOfChild);
+        Assert.That(isFolderParentOfChild, Is.False);
     }
 
     [Test]
@@ -62,6 +62,6 @@ public class FolderTests
 
         bool isFolderParentOfChild = folder.IsParentOf(childFolder);
 
-        Assert.IsFalse(isFolderParentOfChild);
+        Assert.That(isFolderParentOfChild, Is.False);
     }
 }

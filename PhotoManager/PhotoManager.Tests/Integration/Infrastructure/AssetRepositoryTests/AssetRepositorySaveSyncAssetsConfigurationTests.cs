@@ -63,22 +63,22 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfigurationToSave);
             SyncAssetsConfiguration syncAssetsConfiguration = _assetRepository.GetSyncAssetsConfiguration();
 
-            Assert.AreEqual(2, syncAssetsConfiguration.Definitions.Count);
-            Assert.AreEqual("C:\\Toto\\Screenshots", syncAssetsConfiguration.Definitions[0].SourceDirectory);
-            Assert.AreEqual("C:\\Images\\Toto", syncAssetsConfiguration.Definitions[0].DestinationDirectory);
-            Assert.AreEqual("C:\\Tutu\\Screenshots", syncAssetsConfiguration.Definitions[1].SourceDirectory);
-            Assert.AreEqual("C:\\Images\\Tutu", syncAssetsConfiguration.Definitions[1].DestinationDirectory);
+            Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
+            Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+            Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+            Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
             _assetRepository!.SaveSyncAssetsConfiguration(new SyncAssetsConfiguration());
             syncAssetsConfiguration = _assetRepository.GetSyncAssetsConfiguration();
 
-            Assert.AreEqual(0, syncAssetsConfiguration.Definitions.Count);
+            Assert.That(syncAssetsConfiguration.Definitions.Count, Is.EqualTo(0));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
@@ -122,15 +122,15 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = _assetRepository!.GetSyncAssetsConfiguration();
 
-            Assert.AreEqual(2, syncAssetsConfiguration.Definitions.Count);
-            Assert.AreEqual("C:\\Toto\\Screenshots", syncAssetsConfiguration.Definitions[0].SourceDirectory);
-            Assert.AreEqual("C:\\Images\\Toto", syncAssetsConfiguration.Definitions[0].DestinationDirectory);
-            Assert.AreEqual("C:\\Tutu\\Screenshots", syncAssetsConfiguration.Definitions[1].SourceDirectory);
-            Assert.AreEqual("C:\\Images\\Tutu", syncAssetsConfiguration.Definitions[1].DestinationDirectory);
+            Assert.That(syncAssetsConfiguration.Definitions, Has.Count.EqualTo(2));
+            Assert.That(syncAssetsConfiguration.Definitions[0].SourceDirectory, Is.EqualTo("C:\\Toto\\Screenshots"));
+            Assert.That(syncAssetsConfiguration.Definitions[0].DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
+            Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
+            Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            Assert.IsTrue(_assetRepository.HasChanges());
+            Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            Assert.IsEmpty(assetsUpdatedEvents);
+            Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {

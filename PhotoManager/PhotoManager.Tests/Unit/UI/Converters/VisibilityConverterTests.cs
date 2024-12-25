@@ -13,7 +13,7 @@ public class VisibilityConverterTests
         object? parameter = null;
 
         Visibility result = (Visibility)visibilityConverter.Convert(new NamedObject(), typeof(Visibility), parameter!, CultureInfo.InvariantCulture);
-        Assert.AreEqual(Visibility.Hidden, result);
+        Assert.That(result, Is.EqualTo(Visibility.Hidden));
     }
 
     [Test]
@@ -25,7 +25,7 @@ public class VisibilityConverterTests
 
         object result = visibilityConverter.Convert(value, typeof(Visibility), parameter!, CultureInfo.InvariantCulture);
 
-        Assert.AreEqual(Visibility.Visible, result);
+        Assert.That(result, Is.EqualTo(Visibility.Visible));
     }
 
     [Test]
@@ -35,7 +35,7 @@ public class VisibilityConverterTests
         object? parameter = null;
 
         Visibility result = (Visibility)visibilityConverter.Convert("A string", typeof(Visibility), parameter!, CultureInfo.InvariantCulture);
-        Assert.AreEqual(Visibility.Visible, result);
+        Assert.That(result, Is.EqualTo(Visibility.Visible));
     }
 
     [Test]
@@ -46,7 +46,7 @@ public class VisibilityConverterTests
 
         NotImplementedException? exception = Assert.Throws<NotImplementedException>(() => visibilityConverter.ConvertBack(Visibility.Visible, typeof(Visibility), parameter!, CultureInfo.InvariantCulture));
 
-        Assert.AreEqual("The method or operation is not implemented.", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }
 
     private class NamedObject

@@ -48,21 +48,21 @@ public class DatabaseWriteBlobTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
-            Assert.IsTrue(File.Exists(blobFilePath));
-            Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastWriteFilePath);
-            Assert.IsInstanceOf<Dictionary<string, byte[]>?>(_database!.Diagnostics.LastWriteFileRaw);
-            Assert.AreEqual(blobToWrite, _database!.Diagnostics.LastWriteFileRaw);
+            Assert.That(File.Exists(blobFilePath), Is.True);
+            Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(blobFilePath));
+            Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.InstanceOf<Dictionary<string, byte[]>?>());
+            Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.EqualTo(blobToWrite));
 
             Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
-            Assert.IsNotNull(blob);
-            Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
-            Assert.AreEqual(blobToWrite.Count, blob!.Count);
-            Assert.IsTrue(blob.ContainsKey("Image1.jpg"));
-            CollectionAssert.AreEqual(blobToWrite["Image1.jpg"], blob["Image1.jpg"]);
-            CollectionAssert.AreEqual(blobToWrite["Image2.png"], blob["Image2.png"]);
+            Assert.That(blob, Is.Not.Null);
+            Assert.That(blob, Is.InstanceOf<Dictionary<string, byte[]>?>());
+            Assert.That(blob!, Has.Count.EqualTo(blobToWrite.Count));
+            Assert.That(blob.ContainsKey("Image1.jpg"), Is.True);
+            Assert.That(blob["Image1.jpg"], Is.EqualTo(blobToWrite["Image1.jpg"]).AsCollection);
+            Assert.That(blob["Image2.png"], Is.EqualTo(blobToWrite["Image2.png"]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
-            Assert.AreEqual(blobToWrite, blob);
+            Assert.That(blob, Is.EqualTo(blobToWrite));
         }
         finally
         {
@@ -92,21 +92,21 @@ public class DatabaseWriteBlobTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
-            Assert.IsTrue(File.Exists(blobFilePath));
-            Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastWriteFilePath);
-            Assert.IsInstanceOf<Dictionary<string, byte[]>?>(_database!.Diagnostics.LastWriteFileRaw);
-            Assert.AreEqual(blobToWrite, _database!.Diagnostics.LastWriteFileRaw);
+            Assert.That(File.Exists(blobFilePath), Is.True);
+            Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(blobFilePath));
+            Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.InstanceOf<Dictionary<string, byte[]>?>());
+            Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.EqualTo(blobToWrite));
 
             Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
-            Assert.IsNotNull(blob);
-            Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
-            Assert.AreEqual(blobToWrite.Count, blob!.Count);
-            Assert.IsTrue(blob.ContainsKey("Image1.jpg"));
-            CollectionAssert.AreEqual(blobToWrite["Image1.jpg"], blob["Image1.jpg"]);
-            CollectionAssert.AreEqual(blobToWrite["Image2.png"], blob["Image2.png"]);
+            Assert.That(blob, Is.Not.Null);
+            Assert.That(blob, Is.InstanceOf<Dictionary<string, byte[]>?>());
+            Assert.That(blob!, Has.Count.EqualTo(blobToWrite.Count));
+            Assert.That(blob.ContainsKey("Image1.jpg"), Is.True);
+            Assert.That(blob["Image1.jpg"], Is.EqualTo(blobToWrite["Image1.jpg"]).AsCollection);
+            Assert.That(blob["Image2.png"], Is.EqualTo(blobToWrite["Image2.png"]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
-            Assert.AreEqual(blobToWrite, blob);
+            Assert.That(blob, Is.EqualTo(blobToWrite));
         }
         finally
         {
@@ -133,10 +133,10 @@ public class DatabaseWriteBlobTests
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _database!.WriteBlob(blobToWrite!, blobName));
 
-            Assert.AreEqual("Object reference not set to an instance of an object.", exception?.Message);
-            Assert.IsTrue(File.Exists(blobFilePath));
-            Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastWriteFilePath);
-            Assert.AreEqual(blobToWrite, _database!.Diagnostics.LastWriteFileRaw);
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+            Assert.That(File.Exists(blobFilePath), Is.True);
+            Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(blobFilePath));
+            Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.EqualTo(blobToWrite));
         }
         finally
         {
@@ -162,15 +162,15 @@ public class DatabaseWriteBlobTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             _database!.WriteBlob(blobToWrite, blobName);
-            Assert.IsTrue(File.Exists(blobFilePath));
-            Assert.AreEqual(blobFilePath, _database!.Diagnostics.LastWriteFilePath);
-            Assert.AreEqual(blobToWrite, _database!.Diagnostics.LastWriteFileRaw);
+            Assert.That(File.Exists(blobFilePath), Is.True);
+            Assert.That(_database!.Diagnostics.LastWriteFilePath, Is.EqualTo(blobFilePath));
+            Assert.That(_database!.Diagnostics.LastWriteFileRaw, Is.EqualTo(blobToWrite));
 
             Dictionary<string, byte[]>? blob = _database!.ReadBlob(blobName);
 
-            Assert.IsNotNull(blob);
-            Assert.IsInstanceOf<Dictionary<string, byte[]>?>(blob);
-            Assert.AreEqual(blobToWrite.Count, blob!.Count);
+            Assert.That(blob, Is.Not.Null);
+            Assert.That(blob, Is.InstanceOf<Dictionary<string, byte[]>?>());
+            Assert.That(blob!, Has.Count.EqualTo(blobToWrite.Count));
         }
         finally
         {

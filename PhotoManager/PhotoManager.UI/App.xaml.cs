@@ -109,9 +109,9 @@ public partial class App : System.Windows.Application
     //    services.AddDatabaseServices();
 
     //    // Assert
-    //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IObjectListStorage)));
-    //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IBlobStorage)));
-    //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IBackupStorage)));
-    //    Assert.IsTrue(services.Any(descriptor => descriptor.ServiceType == typeof(IDatabase)));
+    //    Assert.That(services.Any(descriptor => descriptor.ServiceType == typeof(IObjectListStorage)), Is.True);
+    //    Assert.That(services.Any(descriptor => descriptor.ServiceType == typeof(IBlobStorage)), Is.True);
+    //    Assert.That(services.Any(descriptor => descriptor.ServiceType == typeof(IBackupStorage)), Is.True);
+    //    Assert.That(services.Any(descriptor => descriptor.ServiceType == typeof(IDatabase)), Is.True);
     //}
 }

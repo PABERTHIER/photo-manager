@@ -63,7 +63,7 @@ public class ApplicationGetTotalFilesCountTests
         try
         {
             int totalFilesCount = _application!.GetTotalFilesCount();
-            Assert.AreEqual(67, totalFilesCount);
+            Assert.That(totalFilesCount, Is.EqualTo(67));
         }
         finally
         {
@@ -90,7 +90,7 @@ public class ApplicationGetTotalFilesCountTests
             _application = new (_testableAssetRepository!, _syncAssetsService!, _catalogAssetsService!, _moveAssetsService!, _findDuplicatedAssetsService!, userConfigurationService, storageService);
 
             int totalFilesCount = _application.GetTotalFilesCount();
-            Assert.AreEqual(0, totalFilesCount);
+            Assert.That(totalFilesCount, Is.EqualTo(0));
         }
         finally
         {

@@ -43,17 +43,17 @@ public class DatabaseInitializeTests
             string backupsDirectory = _testableDatabase!.GetBackupsDirectory();
             Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
-            Assert.AreEqual(directoryPath, _testableDatabase!.DataDirectory);
-            Assert.AreEqual(Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables), tablesDirectory);
-            Assert.AreEqual(Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs), blobsDirectory);
-            Assert.AreEqual(directoryPath + "_Backups", backupsDirectory);
-            Assert.AreEqual(_userConfigurationService!.StorageSettings.Separator, _testableDatabase!.Separator);
-            Assert.IsNotNull(dataTablePropertiesDictionary);
-            Assert.IsEmpty(dataTablePropertiesDictionary);
-            Assert.IsTrue(Directory.Exists(directoryPath));
-            Assert.IsTrue(Directory.Exists(tablesDirectory));
-            Assert.IsTrue(Directory.Exists(blobsDirectory));
-            Assert.IsTrue(Directory.Exists(backupsDirectory));
+            Assert.That(_testableDatabase!.DataDirectory, Is.EqualTo(directoryPath));
+            Assert.That(tablesDirectory, Is.EqualTo(Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables)));
+            Assert.That(blobsDirectory, Is.EqualTo(Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs)));
+            Assert.That(backupsDirectory, Is.EqualTo(directoryPath + "_Backups"));
+            Assert.That(_testableDatabase!.Separator, Is.EqualTo(_userConfigurationService!.StorageSettings.Separator));
+            Assert.That(dataTablePropertiesDictionary, Is.Not.Null);
+            Assert.That(dataTablePropertiesDictionary, Is.Empty);
+            Assert.That(Directory.Exists(directoryPath), Is.True);
+            Assert.That(Directory.Exists(tablesDirectory), Is.True);
+            Assert.That(Directory.Exists(blobsDirectory), Is.True);
+            Assert.That(Directory.Exists(backupsDirectory), Is.True);
         }
         finally
         {
@@ -76,19 +76,19 @@ public class DatabaseInitializeTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
         });
 
-        Assert.AreEqual("Value cannot be null. (Parameter 'path1')", exception?.Message);
+        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
 
         string tablesDirectory = _testableDatabase!.GetTablesDirectory();
         string blobsDirectory = _testableDatabase!.GetBlobsDirectory();
         string backupsDirectory = _testableDatabase!.GetBackupsDirectory();
         Dictionary<string, DataTableProperties> dataTablePropertiesDictionary = _testableDatabase!.GetDataTablePropertiesDictionary();
 
-        Assert.AreEqual(directoryPath, _testableDatabase!.DataDirectory);
-        Assert.AreEqual(string.Empty, tablesDirectory);
-        Assert.AreEqual(string.Empty, blobsDirectory);
-        Assert.AreEqual(string.Empty, backupsDirectory);
-        Assert.AreEqual('\0', _testableDatabase!.Separator);
-        Assert.IsNotNull(dataTablePropertiesDictionary);
-        Assert.IsEmpty(dataTablePropertiesDictionary);
+        Assert.That(_testableDatabase!.DataDirectory, Is.EqualTo(directoryPath));
+        Assert.That(tablesDirectory, Is.EqualTo(string.Empty));
+        Assert.That(blobsDirectory, Is.EqualTo(string.Empty));
+        Assert.That(backupsDirectory, Is.EqualTo(string.Empty));
+        Assert.That(_testableDatabase!.Separator, Is.EqualTo('\0'));
+        Assert.That(dataTablePropertiesDictionary, Is.Not.Null);
+        Assert.That(dataTablePropertiesDictionary, Is.Empty);
     }
 }

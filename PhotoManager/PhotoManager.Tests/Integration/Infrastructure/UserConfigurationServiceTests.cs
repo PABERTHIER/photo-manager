@@ -54,7 +54,7 @@ public class UserConfigurationServiceTests
         string consoleOutput = stringWriter.ToString();
 
         // Assert that the expected error message was printed to the console
-        Assert.IsTrue(consoleOutput.Contains($"Wallpaper set for style {expectedStyleValue} and tile {expectedTileValue}"));
+        Assert.That(consoleOutput.Contains($"Wallpaper set for style {expectedStyleValue} and tile {expectedTileValue}"), Is.True);
     }
 
     [Test]
@@ -62,11 +62,11 @@ public class UserConfigurationServiceTests
     {
         AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(typeof(App).Assembly);
 
-        Assert.AreEqual("PhotoManager", aboutInformation.Product);
-        Assert.AreEqual("Toto", aboutInformation.Author);
-        Assert.IsFalse(string.IsNullOrWhiteSpace(aboutInformation.Version));
+        Assert.That(aboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
         Assert.That(aboutInformation.Version, Does.StartWith("v"));
-        Assert.AreEqual("v1.0.0", aboutInformation.Version);
+        Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     [Test]
@@ -74,9 +74,9 @@ public class UserConfigurationServiceTests
     {
         AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(typeof(int).Assembly);
 
-        Assert.AreNotEqual("PhotoManager", aboutInformation.Product);
-        Assert.AreEqual("Toto", aboutInformation.Author);
-        Assert.AreEqual("v1.0.0", aboutInformation.Version);
+        Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
+        Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class UserConfigurationServiceTests
     {
         bool analyseVideos = _userConfigurationService!.AssetSettings.AnalyseVideos;
 
-        Assert.IsFalse(analyseVideos);
+        Assert.That(analyseVideos, Is.False);
     }
 
     [Test]
@@ -92,8 +92,8 @@ public class UserConfigurationServiceTests
     {
         string corruptedMessage = _userConfigurationService!.AssetSettings.CorruptedMessage;
 
-        Assert.IsNotNull(corruptedMessage);
-        Assert.AreEqual("The asset is corrupted", corruptedMessage);
+        Assert.That(corruptedMessage, Is.Not.Null);
+        Assert.That(corruptedMessage, Is.EqualTo("The asset is corrupted"));
     }
 
     [Test]
@@ -101,8 +101,8 @@ public class UserConfigurationServiceTests
     {
         string rotatedMessage = _userConfigurationService!.AssetSettings.RotatedMessage;
 
-        Assert.IsNotNull(rotatedMessage);
-        Assert.AreEqual("The asset has been rotated", rotatedMessage);
+        Assert.That(rotatedMessage, Is.Not.Null);
+        Assert.That(rotatedMessage, Is.EqualTo("The asset has been rotated"));
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class UserConfigurationServiceTests
     {
         int catalogBatchSize = _userConfigurationService!.AssetSettings.CatalogBatchSize;
 
-        Assert.AreEqual(100000, catalogBatchSize);
+        Assert.That(catalogBatchSize, Is.EqualTo(100000));
     }
 
     [Test]
@@ -118,7 +118,7 @@ public class UserConfigurationServiceTests
     {
         ushort catalogCooldownMinutes = _userConfigurationService!.AssetSettings.CatalogCooldownMinutes;
 
-        Assert.AreEqual(2, catalogCooldownMinutes);
+        Assert.That(catalogCooldownMinutes, Is.EqualTo(2));
     }
 
     [Test]
@@ -126,7 +126,7 @@ public class UserConfigurationServiceTests
     {
         ushort corruptedImageOrientation = _userConfigurationService!.AssetSettings.CorruptedImageOrientation;
 
-        Assert.AreEqual(10000, corruptedImageOrientation);
+        Assert.That(corruptedImageOrientation, Is.EqualTo(10000));
     }
 
     [Test]
@@ -134,7 +134,7 @@ public class UserConfigurationServiceTests
     {
         ushort defaultExifOrientation = _userConfigurationService!.AssetSettings.DefaultExifOrientation;
 
-        Assert.AreEqual(1, defaultExifOrientation);
+        Assert.That(defaultExifOrientation, Is.EqualTo(1));
     }
 
     [Test]
@@ -142,7 +142,7 @@ public class UserConfigurationServiceTests
     {
         bool detectThumbnails = _userConfigurationService!.AssetSettings.DetectThumbnails;
 
-        Assert.IsFalse(detectThumbnails);
+        Assert.That(detectThumbnails, Is.False);
     }
 
     [Test]
@@ -150,7 +150,7 @@ public class UserConfigurationServiceTests
     {
         bool syncAssetsEveryXMinutes = _userConfigurationService!.AssetSettings.SyncAssetsEveryXMinutes;
 
-        Assert.IsFalse(syncAssetsEveryXMinutes);
+        Assert.That(syncAssetsEveryXMinutes, Is.False);
     }
 
     [Test]
@@ -158,7 +158,7 @@ public class UserConfigurationServiceTests
     {
         int thumbnailMaxHeight = _userConfigurationService!.AssetSettings.ThumbnailMaxHeight;
 
-        Assert.AreEqual(150, thumbnailMaxHeight);
+        Assert.That(thumbnailMaxHeight, Is.EqualTo(150));
     }
 
     [Test]
@@ -166,7 +166,7 @@ public class UserConfigurationServiceTests
     {
         int thumbnailMaxWidth = _userConfigurationService!.AssetSettings.ThumbnailMaxWidth;
 
-        Assert.AreEqual(200, thumbnailMaxWidth);
+        Assert.That(thumbnailMaxWidth, Is.EqualTo(200));
     }
 
     [Test]
@@ -174,7 +174,7 @@ public class UserConfigurationServiceTests
     {
         ushort pHashThreshold = _userConfigurationService!.HashSettings.PHashThreshold;
 
-        Assert.AreEqual(40, pHashThreshold);
+        Assert.That(pHashThreshold, Is.EqualTo(40));
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class UserConfigurationServiceTests
     {
         bool usingDHash = _userConfigurationService!.HashSettings.UsingDHash;
 
-        Assert.IsFalse(usingDHash);
+        Assert.That(usingDHash, Is.False);
     }
 
     [Test]
@@ -190,7 +190,7 @@ public class UserConfigurationServiceTests
     {
         bool usingMD5Hash = _userConfigurationService!.HashSettings.UsingMD5Hash;
 
-        Assert.IsFalse(usingMD5Hash);
+        Assert.That(usingMD5Hash, Is.False);
     }
 
     [Test]
@@ -198,7 +198,7 @@ public class UserConfigurationServiceTests
     {
         bool usingPHash = _userConfigurationService!.HashSettings.UsingPHash;
 
-        Assert.IsFalse(usingPHash);
+        Assert.That(usingPHash, Is.False);
     }
 
     [Test]
@@ -206,8 +206,8 @@ public class UserConfigurationServiceTests
     {
         string assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
 
-        Assert.IsNotNull(assetsDirectory);
-        Assert.AreEqual("E:\\Workspace\\PhotoManager\\Test", assetsDirectory);
+        Assert.That(assetsDirectory, Is.Not.Null);
+        Assert.That(assetsDirectory, Is.EqualTo("E:\\Workspace\\PhotoManager\\Test"));
     }
 
     [Test]
@@ -215,8 +215,8 @@ public class UserConfigurationServiceTests
     {
         string backupPath = _userConfigurationService!.PathSettings.BackupPath;
 
-        Assert.IsNotNull(backupPath);
-        Assert.AreEqual("E:\\Workspace\\PhotoManager\\Backup", backupPath);
+        Assert.That(backupPath, Is.Not.Null);
+        Assert.That(backupPath, Is.EqualTo("E:\\Workspace\\PhotoManager\\Backup"));
     }
 
     [Test]
@@ -224,8 +224,8 @@ public class UserConfigurationServiceTests
     {
         string exemptedFolderPath = _userConfigurationService!.PathSettings.ExemptedFolderPath;
 
-        Assert.IsNotNull(exemptedFolderPath);
-        Assert.AreEqual("E:\\Workspace\\PhotoManager\\Test\\test1", exemptedFolderPath);
+        Assert.That(exemptedFolderPath, Is.Not.Null);
+        Assert.That(exemptedFolderPath, Is.EqualTo("E:\\Workspace\\PhotoManager\\Test\\test1"));
     }
 
     [Test]
@@ -234,11 +234,11 @@ public class UserConfigurationServiceTests
         string assetsDirectory = _userConfigurationService!.PathSettings.AssetsDirectory;
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
-        Assert.IsNotNull(assetsDirectory);
-        Assert.IsNotNull(firstFrameVideosPath);
+        Assert.That(assetsDirectory, Is.Not.Null);
+        Assert.That(firstFrameVideosPath, Is.Not.Null);
 
-        Assert.AreEqual(Path.Combine(assetsDirectory, "OutputVideoFirstFrame"), firstFrameVideosPath);
-        Assert.AreEqual(Path.Combine("E:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame"), firstFrameVideosPath);
+        Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine(assetsDirectory, "OutputVideoFirstFrame")));
+        Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine("E:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame")));
     }
 
     [Test]
@@ -246,8 +246,8 @@ public class UserConfigurationServiceTests
     {
         string projectName = _userConfigurationService!.ProjectSettings.Name;
 
-        Assert.IsNotNull(projectName);
-        Assert.AreEqual("PhotoManager", projectName);
+        Assert.That(projectName, Is.Not.Null);
+        Assert.That(projectName, Is.EqualTo("PhotoManager"));
     }
 
     [Test]
@@ -255,8 +255,8 @@ public class UserConfigurationServiceTests
     {
         string projectOwner = _userConfigurationService!.ProjectSettings.Owner;
 
-        Assert.IsNotNull(projectOwner);
-        Assert.AreEqual("Toto", projectOwner);
+        Assert.That(projectOwner, Is.Not.Null);
+        Assert.That(projectOwner, Is.EqualTo("Toto"));
     }
 
     [Test]
@@ -264,7 +264,7 @@ public class UserConfigurationServiceTests
     {
         ushort backupsToKeep = _userConfigurationService!.StorageSettings.BackupsToKeep;
 
-        Assert.AreEqual(2, backupsToKeep);
+        Assert.That(backupsToKeep, Is.EqualTo(2));
     }
 
     [Test]
@@ -272,8 +272,8 @@ public class UserConfigurationServiceTests
     {
         string folderNameBlobs = _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs;
 
-        Assert.IsNotNull(folderNameBlobs);
-        Assert.AreEqual("Blobs", folderNameBlobs);
+        Assert.That(folderNameBlobs, Is.Not.Null);
+        Assert.That(folderNameBlobs, Is.EqualTo("Blobs"));
     }
 
     [Test]
@@ -281,8 +281,8 @@ public class UserConfigurationServiceTests
     {
         string foldersNameTables = _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables;
 
-        Assert.IsNotNull(foldersNameTables);
-        Assert.AreEqual("Tables", foldersNameTables);
+        Assert.That(foldersNameTables, Is.Not.Null);
+        Assert.That(foldersNameTables, Is.EqualTo("Tables"));
     }
 
     [Test]
@@ -290,8 +290,7 @@ public class UserConfigurationServiceTests
     {
         char separator = _userConfigurationService!.StorageSettings.Separator;
 
-        Assert.IsNotNull(separator);
-        Assert.AreEqual('|', separator);
+        Assert.That(separator, Is.EqualTo('|'));
     }
 
     [Test]
@@ -299,8 +298,8 @@ public class UserConfigurationServiceTests
     {
         string storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
 
-        Assert.IsNotNull(storageVersion);
-        Assert.AreEqual("1.0", storageVersion);
+        Assert.That(storageVersion, Is.Not.Null);
+        Assert.That(storageVersion, Is.EqualTo("1.0"));
     }
 
     [Test]
@@ -308,8 +307,8 @@ public class UserConfigurationServiceTests
     {
         string tablesSettingsAssetsTableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName;
 
-        Assert.IsNotNull(tablesSettingsAssetsTableName);
-        Assert.AreEqual("Assets", tablesSettingsAssetsTableName);
+        Assert.That(tablesSettingsAssetsTableName, Is.Not.Null);
+        Assert.That(tablesSettingsAssetsTableName, Is.EqualTo("Assets"));
     }
 
     [Test]
@@ -317,8 +316,8 @@ public class UserConfigurationServiceTests
     {
         string tablesSettingsFoldersTableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName;
 
-        Assert.IsNotNull(tablesSettingsFoldersTableName);
-        Assert.AreEqual("Folders", tablesSettingsFoldersTableName);
+        Assert.That(tablesSettingsFoldersTableName, Is.Not.Null);
+        Assert.That(tablesSettingsFoldersTableName, Is.EqualTo("Folders"));
     }
 
     [Test]
@@ -326,8 +325,8 @@ public class UserConfigurationServiceTests
     {
         string tablesSettingsRecentTargetPathsTableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName;
 
-        Assert.IsNotNull(tablesSettingsRecentTargetPathsTableName);
-        Assert.AreEqual("RecentTargetPaths", tablesSettingsRecentTargetPathsTableName);
+        Assert.That(tablesSettingsRecentTargetPathsTableName, Is.Not.Null);
+        Assert.That(tablesSettingsRecentTargetPathsTableName, Is.EqualTo("RecentTargetPaths"));
     }
 
     [Test]
@@ -335,8 +334,8 @@ public class UserConfigurationServiceTests
     {
         string tablesSettingsSyncAssetsDirectoriesDefinitionsTableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
 
-        Assert.IsNotNull(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName);
-        Assert.AreEqual("SyncAssetsDirectoriesDefinitions", tablesSettingsSyncAssetsDirectoriesDefinitionsTableName);
+        Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName, Is.Not.Null);
+        Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName, Is.EqualTo("SyncAssetsDirectoriesDefinitions"));
     }
 
     [Test]
@@ -344,7 +343,7 @@ public class UserConfigurationServiceTests
     {
         ushort thumbnailsDictionaryEntriesToKeep = _userConfigurationService!.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
 
-        Assert.AreEqual(5, thumbnailsDictionaryEntriesToKeep);
+        Assert.That(thumbnailsDictionaryEntriesToKeep, Is.EqualTo(5));
     }
 
     [Test]
@@ -352,8 +351,8 @@ public class UserConfigurationServiceTests
     {
         string[] paths = _userConfigurationService!.GetRootCatalogFolderPaths();
 
-        Assert.AreEqual(1, paths.Length);
-        Assert.AreEqual("E:\\Workspace\\PhotoManager\\Test", paths[0]);
+        Assert.That(paths, Has.Length.EqualTo(1));
+        Assert.That(paths[0], Is.EqualTo("E:\\Workspace\\PhotoManager\\Test"));
     }
 }
 
