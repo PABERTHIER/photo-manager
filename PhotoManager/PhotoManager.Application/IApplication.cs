@@ -6,7 +6,7 @@ namespace PhotoManager.Application;
 
 public interface IApplication
 {
-    Asset[] GetAssets(string directory);
+    Asset[] GetAssetsByPath(string directory);
     int GetAssetsCounter();
     int GetTotalFilesCount();
     void LoadThumbnail(Asset asset);

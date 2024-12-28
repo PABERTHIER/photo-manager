@@ -33,11 +33,11 @@ public class Application : IApplication
         _storageService = storageService;
     }
 
-    public Asset[] GetAssets(string directory)
+    public Asset[] GetAssetsByPath(string directory)
     {
         if (string.IsNullOrWhiteSpace(directory))
         {
-            throw new ArgumentException("Directory cannot be null or empty.", directory);
+            throw new ArgumentException("Directory cannot be null or empty.");
         }
 
         if (!_assetRepository.FolderExists(directory))

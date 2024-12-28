@@ -11764,7 +11764,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private void GoToFolderEmulation(string assetsDirectory)
     {
         _applicationViewModel!.CurrentFolder = assetsDirectory;
-        Asset[] assets = _application!.GetAssets(assetsDirectory);
+        Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
         _applicationViewModel!.SetAssets(assets);
     }
 }

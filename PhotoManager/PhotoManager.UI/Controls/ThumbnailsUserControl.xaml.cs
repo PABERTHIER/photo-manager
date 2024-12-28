@@ -67,7 +67,7 @@ public partial class ThumbnailsUserControl : UserControl
 
     private static Task<Asset[]> GetAssets(IApplication application, string directory)
     {
-        return Task.Run(() => application.GetAssets(directory));
+        return Task.Run(() => application.GetAssetsByPath(directory));
     }
 
     private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)
