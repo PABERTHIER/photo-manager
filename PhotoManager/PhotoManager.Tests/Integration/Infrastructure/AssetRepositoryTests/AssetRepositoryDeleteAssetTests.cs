@@ -173,7 +173,7 @@ public class AssetRepositoryDeleteAssetTests
     }
 
     [Test]
-    public void DeleteAsset_FolderIsNull_ReturnsNullAndDoesNothingAndAssetsUpdatedIsNotUpdated()
+    public void DeleteAsset_DirectoryDoesNotExist_ReturnsNullAndDoesNothingAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);

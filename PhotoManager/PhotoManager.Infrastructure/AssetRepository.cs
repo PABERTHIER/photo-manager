@@ -99,7 +99,7 @@ public class AssetRepository : IAssetRepository
 
             if (string.IsNullOrWhiteSpace(asset.Folder.Path))
             {
-                return; // TODO: log.Error($"The asset could not be added, folder is null, asset.FileName: {asset.FileName}");
+                return; // TODO: log.Error($"The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}");
             }
 
             if (folder == null)

@@ -375,7 +375,7 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_AssetFolderIsNull_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
+    public void AddAsset_AssetFolderIsDefault_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
