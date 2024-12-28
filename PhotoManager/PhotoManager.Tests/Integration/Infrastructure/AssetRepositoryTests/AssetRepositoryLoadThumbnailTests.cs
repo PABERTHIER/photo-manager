@@ -453,7 +453,7 @@ public class AssetRepositoryLoadThumbnailTests
     }
 
     [Test]
-    public void LoadThumbnail_ConcurrentAccess_ThumbnailsIsHandledSafely()
+    public void LoadThumbnail_ConcurrentAccess_ThumbnailsAreHandledSafely()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);

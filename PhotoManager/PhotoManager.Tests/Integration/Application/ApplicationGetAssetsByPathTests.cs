@@ -1076,7 +1076,7 @@ public class ApplicationGetAssetsByPathTests
 
             Dictionary<string, byte[]> blobToWrite = new()
             {
-                { _asset1!.FileName, assetData},
+                { _asset1!.FileName, assetData },
                 { _asset2!.FileName, [] }
             };
 
