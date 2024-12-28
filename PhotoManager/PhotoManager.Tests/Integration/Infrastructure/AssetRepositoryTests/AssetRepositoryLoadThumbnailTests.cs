@@ -74,9 +74,9 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
-            _asset1 = _asset1!.WithFolder(addedFolder1);
+            _asset1 = _asset1!.WithFolder(addedFolder);
 
             _testableAssetRepository!.AddAsset(_asset1!, [1, 2, 3]);
 
@@ -140,9 +140,9 @@ public class AssetRepositoryLoadThumbnailTests
                 { fileName, [4, 5, 6]}
             };
 
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
-            _database!.WriteBlob(blobToWrite, addedFolder1.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, addedFolder.ThumbnailsFilename);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
@@ -164,7 +164,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[_dataDirectory!][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
 
             Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
             Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
@@ -202,9 +202,9 @@ public class AssetRepositoryLoadThumbnailTests
                 { fileName, [4, 5, 6]}
             };
 
-            Folder addedFolder1 = testableAssetRepository.AddFolder(_dataDirectory!);
+            Folder addedFolder = testableAssetRepository.AddFolder(_dataDirectory!);
 
-            _database!.WriteBlob(blobToWrite, addedFolder1.ThumbnailsFilename);
+            _database!.WriteBlob(blobToWrite, addedFolder.ThumbnailsFilename);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = testableAssetRepository.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
@@ -222,7 +222,7 @@ public class AssetRepositoryLoadThumbnailTests
 
             Assert.That(thumbnails, Is.Empty);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
 
             Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
             Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
@@ -246,9 +246,9 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
-            _database!.WriteBlob([], addedFolder1.ThumbnailsFilename);
+            _database!.WriteBlob([], addedFolder.ThumbnailsFilename);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
@@ -268,7 +268,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
             Assert.That(thumbnails[_dataDirectory!], Is.Empty);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder1.ThumbnailsFilename)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
 
             Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
             Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
@@ -389,9 +389,9 @@ public class AssetRepositoryLoadThumbnailTests
         try
         {
             string? directoryName = null;
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
-            _asset1 = _asset1!.WithFolder(addedFolder1);
+            _asset1 = _asset1!.WithFolder(addedFolder);
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
@@ -427,9 +427,9 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
-            _asset1 = _asset1!.WithFolder(addedFolder1);
+            _asset1 = _asset1!.WithFolder(addedFolder);
 
             _testableAssetRepository!.AddAsset(_asset1!, []);
 
@@ -460,9 +460,9 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            Folder addedFolder1 = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
 
-            _asset1 = _asset1!.WithFolder(addedFolder1);
+            _asset1 = _asset1!.WithFolder(addedFolder);
 
             _testableAssetRepository!.AddAsset(_asset1!, [1, 2, 3]);
 
