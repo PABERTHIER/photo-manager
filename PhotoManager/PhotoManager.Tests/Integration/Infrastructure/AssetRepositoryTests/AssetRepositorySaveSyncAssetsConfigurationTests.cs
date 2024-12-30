@@ -35,7 +35,7 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
     }
 
     [Test]
-    public void SaveSyncAssetsConfiguration_SyncAssetsConfiguration_SaveConfiguration()
+    public void SaveSyncAssetsConfiguration_SyncAssetsConfiguration_SavesConfiguration()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);

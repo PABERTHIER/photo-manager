@@ -4,18 +4,15 @@ public class SyncAssetsConfiguration
 {
     public List<SyncAssetsDirectoriesDefinition> Definitions { get; } = [];
 
-    // TODO: transform to fluent to have syncConfiguration.Validate().Normalize()
-    public void Validate() // ISyncAssetsConfiguration Validate();
+    public SyncAssetsConfiguration Validate()
     {
         Definitions.RemoveAll(d => !d.IsValid());
 
-        // return this;
+        return this;
     }
 
-    public void Normalize() // ISyncAssetsConfiguration Normalize()
+    public void Normalize()
     {
         Definitions.ForEach(d => d.Normalize());
-
-        // return this;
     }
 }

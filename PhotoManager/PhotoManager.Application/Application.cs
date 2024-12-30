@@ -48,32 +48,20 @@ public class Application : IApplication
         return _assetRepository.GetAssetsByPath(directory);
     }
 
-    public int GetAssetsCounter()
-    {
-        return _assetRepository.GetAssetsCounter();
-    }
+    public int GetAssetsCounter() => _assetRepository.GetAssetsCounter();
 
-    public int GetTotalFilesCount()
-    {
-        return _storageService.GetTotalFilesCount();
-    }
+    public int GetTotalFilesCount() => _storageService.GetTotalFilesCount();
 
     public void LoadThumbnail(Asset asset)
     {
         asset.ImageData = _assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
     }
 
-    public SyncAssetsConfiguration GetSyncAssetsConfiguration()
-    {
-        return _assetRepository.GetSyncAssetsConfiguration();
-    }
+    public SyncAssetsConfiguration GetSyncAssetsConfiguration() => _assetRepository.GetSyncAssetsConfiguration();
 
     public void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration)
     {
-        // TODO: transform to fluent to have syncConfiguration.Validate().Normalize(); -> Needs SyncAssetsConfiguration : ISyncAssetsConfiguration
-        // When tested here, update SyncAssetsConfiguration and Create ISyncAssetsConfiguration
-        syncConfiguration.Validate(); // syncConfiguration.Validate().Normalize();
-        syncConfiguration.Normalize();
+        syncConfiguration.Validate().Normalize();
         _assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
         _assetRepository.SaveCatalog(null);
     }
