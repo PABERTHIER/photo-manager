@@ -88,7 +88,7 @@ public class AssetRepositoryGetSyncAssetsConfigurationTests
         {
             SyncAssetsConfiguration syncAssetsConfiguration = _assetRepository!.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfiguration.Definitions.Count, Is.EqualTo(0));
+            Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }

@@ -327,7 +327,7 @@ public class SyncAssetsServiceTests
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(0));
             Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
-            Assert.That(statusChanges.Count, Is.EqualTo(0));
+            Assert.That(statusChanges, Is.Empty);
         }
         finally
         {

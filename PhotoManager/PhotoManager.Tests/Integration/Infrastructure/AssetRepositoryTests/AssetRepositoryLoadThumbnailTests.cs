@@ -156,7 +156,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(bitmapImage, Is.Not.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assets.Count, Is.EqualTo(0));
+            Assert.That(assets, Is.Empty);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
@@ -218,7 +218,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(bitmapImage, Is.Null);
 
             List<Asset> assets = testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assets.Count, Is.EqualTo(0));
+            Assert.That(assets, Is.Empty);
 
             Assert.That(thumbnails, Is.Empty);
 
@@ -262,7 +262,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(bitmapImage, Is.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assets.Count, Is.EqualTo(0));
+            Assert.That(assets, Is.Empty);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
@@ -360,7 +360,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(bitmapImage, Is.Null);
 
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assets.Count, Is.EqualTo(0));
+            Assert.That(assets, Is.Empty);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);

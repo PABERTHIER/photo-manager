@@ -130,7 +130,7 @@ public class SyncAssetsConfigurationTests
     {
         _syncAssetsConfiguration!.Validate();
 
-        Assert.That(_syncAssetsConfiguration.Definitions.Count, Is.EqualTo(0));
+        Assert.That(_syncAssetsConfiguration.Definitions, Is.Empty);
     }
 
     [Test]
@@ -160,7 +160,7 @@ public class SyncAssetsConfigurationTests
 
         _syncAssetsConfiguration.Validate();
 
-        Assert.That(_syncAssetsConfiguration.Definitions.Count, Is.EqualTo(0));
+        Assert.That(_syncAssetsConfiguration.Definitions, Is.Empty);
     }
 
     [Test]
@@ -340,6 +340,6 @@ public class SyncAssetsConfigurationTests
     {
         _syncAssetsConfiguration!.Normalize();
 
-        Assert.That(_syncAssetsConfiguration.Definitions.Count, Is.EqualTo(0));
+        Assert.That(_syncAssetsConfiguration.Definitions, Is.Empty);
     }
 }

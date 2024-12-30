@@ -258,7 +258,7 @@ public static class CatalogAssetsAsyncAsserts
 
         Assert.That(blobsPath, Is.EqualTo(sourceDirectories[0]));
         string[] blobs = Directory.GetFiles(blobsPath);
-        Assert.That(blobs.Length, Is.EqualTo(0));
+        Assert.That(blobs, Is.Empty);
 
         Assert.That(tablesPath, Is.EqualTo(sourceDirectories[1]));
         string[] tables = Directory.GetFiles(tablesPath);
@@ -266,7 +266,7 @@ public static class CatalogAssetsAsyncAsserts
 
         Assert.That(backupBlobsDirectory, Is.EqualTo(backupDirectories[0]));
         string[] blobsBackup = Directory.GetFiles(backupBlobsDirectory);
-        Assert.That(blobsBackup.Length, Is.EqualTo(0));
+        Assert.That(blobsBackup, Is.Empty);
 
         Assert.That(backupTablesDirectory, Is.EqualTo(backupDirectories[1]));
         string[] tablesBackup = Directory.GetFiles(backupTablesDirectory);
