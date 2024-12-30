@@ -323,9 +323,9 @@ public class AssetRepositoryConcurrentAccessTests
             Assert.That(thumbnails[folderPath1].ContainsKey(_asset2.FileName), Is.True);
             Assert.That(thumbnails[folderPath2].ContainsKey(_asset3.FileName), Is.True);
 
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
-            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(new byte[] { 4, 5, 6 }));
+            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(assetData2));
+            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(assetData3));
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
             Assert.That(folders, Has.Length.GreaterThanOrEqualTo(4));

@@ -652,14 +652,16 @@ public class ApplicationLoadThumbnailTests
 
             _asset1 = _asset1!.WithFolder(new() { Id = folderId, Path = assetsDirectory });
 
-            _testableAssetRepository!.AddAsset(_asset1!, []);
+            byte[] assetData = [];
+
+            _testableAssetRepository!.AddAsset(_asset1!, assetData);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(assetsDirectory), Is.True);
             Assert.That(thumbnails[assetsDirectory], Has.Count.EqualTo(1));
             Assert.That(thumbnails[assetsDirectory].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[assetsDirectory][_asset1.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[assetsDirectory][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -677,7 +679,7 @@ public class ApplicationLoadThumbnailTests
             Assert.That(thumbnails.ContainsKey(assetsDirectory), Is.True);
             Assert.That(thumbnails[assetsDirectory], Has.Count.EqualTo(1));
             Assert.That(thumbnails[assetsDirectory].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[assetsDirectory][_asset1.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[assetsDirectory][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);

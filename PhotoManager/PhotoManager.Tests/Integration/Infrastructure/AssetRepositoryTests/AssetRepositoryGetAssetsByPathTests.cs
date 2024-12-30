@@ -174,9 +174,9 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails[folderPath1].ContainsKey(_asset2.FileName), Is.True);
             Assert.That(thumbnails[folderPath2].ContainsKey(_asset3.FileName), Is.True);
 
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
-            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(new byte[] { 4, 5, 6 }));
+            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(assetData2));
+            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(assetData3));
 
             Assert.That(assets1, Has.Length.EqualTo(2));
             Assert.That(assets2, Has.Length.EqualTo(1));
@@ -240,7 +240,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assets, Is.Empty);
 
@@ -264,10 +264,13 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
+            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData2 = [4, 5, 6];
+
             Dictionary<string, byte[]> blobToWrite = new()
             {
-                { _asset1!.FileName, [1, 2, 3]},
-                { _asset2!.FileName, [4, 5, 6]}
+                { _asset1!.FileName, assetData1 },
+                { _asset2!.FileName, assetData2 }
             };
 
             string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
@@ -275,7 +278,6 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
-            byte[] assetData = [1, 2, 3];
 
             _database!.WriteBlob(blobToWrite, _asset1!.Folder.ThumbnailsFilename);
 
@@ -285,7 +287,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            _testableAssetRepository.AddAsset(_asset1, assetData);
+            _testableAssetRepository.AddAsset(_asset1, assetData1);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -307,10 +309,10 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails[folderPath2].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[folderPath2].ContainsKey(_asset2.FileName), Is.True);
 
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(new byte[] { 4, 5, 6 }));
-            Assert.That(thumbnails[folderPath2][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath2][_asset2.FileName], Is.EqualTo(new byte[] { 4, 5, 6 }));
+            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(assetData2));
+            Assert.That(thumbnails[folderPath2][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath2][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
@@ -364,7 +366,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails[folderPath1], Is.Empty);
             Assert.That(thumbnails[folderPath2], Has.Count.EqualTo(1));
             Assert.That(thumbnails[folderPath2].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath2][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(thumbnails[folderPath2][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
@@ -454,7 +456,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
             Assert.That(thumbnails[folderPath], Has.Count.EqualTo(1));
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assets, Is.Empty);
 
@@ -519,10 +521,13 @@ public class AssetRepositoryGetAssetsByPathTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
+            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData2 = [];
+
             Dictionary<string, byte[]> blobToWrite = new()
             {
-                { _asset1!.FileName, [1, 2, 3]},
-                { _asset2!.FileName, [] }
+                { _asset1!.FileName, assetData1 },
+                { _asset2!.FileName, assetData2 }
             };
 
             _database!.WriteBlob(blobToWrite, folder.ThumbnailsFilename);
@@ -542,8 +547,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assets, Is.Empty);
 
@@ -604,7 +609,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
-            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData = [1, 2, 3];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -612,7 +617,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            _testableAssetRepository.AddAsset(_asset1, assetData1);
+            _testableAssetRepository.AddAsset(_asset1, assetData);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -626,7 +631,7 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
             Assert.That(thumbnails[folderPath], Has.Count.EqualTo(1));
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assets, Is.Empty);
 
@@ -693,8 +698,8 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
 
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assets, Has.Length.EqualTo(2));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
@@ -775,9 +780,9 @@ public class AssetRepositoryGetAssetsByPathTests
             Assert.That(thumbnails[folderPath1].ContainsKey(_asset2.FileName), Is.True);
             Assert.That(thumbnails[folderPath2].ContainsKey(_asset3.FileName), Is.True);
 
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
-            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(new byte[] { 4, 5, 6 }));
+            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(assetData2));
+            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(assetData3));
 
             Assert.That(assets1, Has.Length.EqualTo(2));
             Assert.That(assets2, Has.Length.EqualTo(1));

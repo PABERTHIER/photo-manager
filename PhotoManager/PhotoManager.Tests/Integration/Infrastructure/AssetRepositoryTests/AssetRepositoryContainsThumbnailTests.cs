@@ -308,11 +308,16 @@ public class AssetRepositoryContainsThumbnailTests
         try
         {
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+
+            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData2 = [4, 5, 6];
+
             Dictionary<string, byte[]> blobToWrite = new()
             {
-                { _asset1!.FileName, [1, 2, 3]},
-                { "Image2.png", [4, 5, 6]}
+                { _asset1!.FileName, assetData1 },
+                { "Image2.png", assetData2 }
             };
+
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -333,7 +338,7 @@ public class AssetRepositoryContainsThumbnailTests
             Assert.That(thumbnails.ContainsKey(_asset1.Folder.Path), Is.True);
             Assert.That(thumbnails[_asset1.Folder.Path], Has.Count.EqualTo(2));
             Assert.That(thumbnails[_asset1.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_asset1.Folder.Path][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(thumbnails[_asset1.Folder.Path][_asset1.FileName], Is.EqualTo(assetData1));
 
             Assert.That(isContainingThumbnail, Is.True);
 
