@@ -1,56 +1,68 @@
-﻿namespace PhotoManager.Tests.Integration.Domain;
+﻿namespace PhotoManager.Tests.Integration.Application;
 
 [TestFixture]
-public class SyncAssetsServiceTests
+public class ApplicationSyncAssetsAsyncTests
 {
     private string? _dataDirectory;
+    private string? _databaseDirectory;
     private string? _databasePath;
-    private string? _backupPath;
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+    private const string DATABASE_END_PATH = "v1.0";
 
-    private SyncAssetsService? _syncAssetsService;
-    private UserConfigurationService? _userConfigurationService;
+    private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
-    private Database? _database;
     private StorageService? _storageService;
+    private UserConfigurationService? _userConfigurationService;
+    private Database? _database;
     private MoveAssetsService? _moveAssetsService;
     private Mock<IStorageService>? _storageServiceMock;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databasePath = Path.Combine(_dataDirectory, "DatabaseTests");
-        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
-
-        _configurationRootMock = new Mock<IConfigurationRoot>();
-        _configurationRootMock.GetDefaultMockConfig();
-
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
-        _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
+        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
     }
 
-    [SetUp]
-    public void SetUp()
+    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH, thumbnailMaxWidth.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT, thumbnailMaxHeight.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_DHASH, usingDHash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMD5Hash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
+
+        _userConfigurationService = new (configurationRootMock.Object);
+
+        _storageServiceMock = new Mock<IStorageService>();
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new (_configurationRootMock!.Object);
         _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
         _storageService = new (_userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
         AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
+        CatalogAssetsService catalogAssetsService = new (_assetRepository, _storageService, assetCreationService, _userConfigurationService, assetsComparator);
         _moveAssetsService = new (_assetRepository, _storageService, assetCreationService);
-        _syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        SyncAssetsService syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, _storageService, _userConfigurationService);
+        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, _storageService);
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreEmpty_NoStatusChangesAndNoImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreEmpty_NoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToSync");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -61,8 +73,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -72,7 +84,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Has.Count.EqualTo(1));
@@ -86,15 +98,17 @@ public class SyncAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmpty_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmpty_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -139,8 +153,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -150,7 +164,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -191,16 +205,18 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsEmptyAndDestinationIsNotEmpty_NoStatusChangesAndNoImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceIsEmptyAndDestinationIsNotEmpty_NoStatusChangesAndNoImagesAreAdded()
     {
         string sourceToCopyPath = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceDirectory = Path.Combine(sourceToCopyPath, "Source");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -266,8 +282,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -277,7 +293,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Is.Empty);
@@ -321,15 +337,17 @@ public class SyncAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyMultipleNewImages_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyMultipleNewImages_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -381,8 +399,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -392,7 +410,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -431,15 +449,17 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyOneNewImage_StatusChangesAndImageAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyOneNewImage_StatusChangesAndImageAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -494,8 +514,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -505,7 +525,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -543,17 +563,19 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyMultipleNewImagesAndTwoDefinitions_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyMultipleNewImagesAndTwoDefinitions_StatusChangesAndImagesAreAdded()
     {
         string firstSourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string secondSourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
         string firstDestinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync1");
         string secondDestinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync2");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -649,8 +671,8 @@ public class SyncAssetsServiceTests
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = firstSourceDirectory, DestinationDirectory = firstDestinationDirectory });
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = secondSourceDirectory, DestinationDirectory = secondDestinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -664,7 +686,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource1 = _storageService!.GetFileNames(firstSourceDirectory);
             Assert.That(fileNamesInSource1, Has.Length.EqualTo(4));
@@ -737,17 +759,19 @@ public class SyncAssetsServiceTests
         {
             Directory.Delete(firstDestinationDirectory, true);
             Directory.Delete(secondDestinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -830,8 +854,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -841,7 +865,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -895,17 +919,19 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyAllImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndNoImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyAllImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -991,8 +1017,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1002,7 +1028,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1055,12 +1081,12 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsFalse_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsFalse_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
@@ -1069,6 +1095,8 @@ public class SyncAssetsServiceTests
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -1147,8 +1175,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1158,7 +1186,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1215,12 +1243,12 @@ public class SyncAssetsServiceTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory2, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
@@ -1229,6 +1257,8 @@ public class SyncAssetsServiceTests
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -1316,8 +1346,8 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1327,7 +1357,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1405,12 +1435,12 @@ public class SyncAssetsServiceTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory2, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceAndDestinationSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceAndDestinationSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
@@ -1419,6 +1449,8 @@ public class SyncAssetsServiceTests
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -1516,8 +1548,8 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1527,7 +1559,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1603,17 +1635,19 @@ public class SyncAssetsServiceTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory2, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreMultipleLevel_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreMultipleLevel_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory2//SubDirectory2");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory3//SubDirectory4//SubDirectory5");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -1696,8 +1730,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1707,7 +1741,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1761,12 +1795,12 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreMultipleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreMultipleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
@@ -1777,6 +1811,8 @@ public class SyncAssetsServiceTests
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationSubDirectory1, "SubDirectory2");
         string destinationSubDirectory3 = Path.Combine(destinationDirectory, "SubDirectory3");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -1869,8 +1905,8 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1880,7 +1916,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1970,17 +2006,19 @@ public class SyncAssetsServiceTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory3, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndDuplicatedAssetInSourceAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndDuplicatedAssetInSourceAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2050,8 +2088,8 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2061,7 +2099,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2119,16 +2157,18 @@ public class SyncAssetsServiceTests
         {
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyBothContainDifferentImagesAndDeleteAssetsNotInSourceIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyBothContainDifferentImagesAndDeleteAssetsNotInSourceIsTrue_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationToCopy = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2210,8 +2250,8 @@ public class SyncAssetsServiceTests
                     DeleteAssetsNotInSource = true,
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2221,7 +2261,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2270,15 +2310,17 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsEmpty_NoStatusChangesAndNoImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsEmpty_NoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2321,13 +2363,13 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Is.Empty);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2354,15 +2396,17 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public void ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsNull_ThrowsNullReferenceException()
+    public void SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsNull_ThrowsNullReferenceException()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2409,28 +2453,31 @@ public class SyncAssetsServiceTests
             syncAssetsConfiguration.Definitions.Add(definition!);
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref in Validate and Normalize methods
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(1));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.EqualTo(null));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _syncAssetsService!.ExecuteAsync(statusChanges.Add));
+            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _application!.SyncAssetsAsync(statusChanges.Add));
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationNotSaved_NoStatusChangesAndNoImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationNotSaved_NoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2471,12 +2518,12 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository!.GetSyncAssetsConfiguration();
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Is.Empty);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2503,15 +2550,17 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public void ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationIsNull_ThrowsNullReferenceException()
+    public void SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationIsNull_ThrowsNullReferenceException()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2555,26 +2604,29 @@ public class SyncAssetsServiceTests
             SyncAssetsConfiguration? syncAssetsConfiguration = null;
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration!);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration!); // Using instead _assetRepository to prevent null ref for Validate and Normalize methods
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository, Is.Null);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _syncAssetsService!.ExecuteAsync(statusChanges.Add));
+            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _application!.SyncAssetsAsync(statusChanges.Add));
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         }
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceDirectoryDoesNotExist_NoStatusChangesAndNoImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceDirectoryDoesNotExist_NoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToSync");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2584,8 +2636,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2595,7 +2647,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Has.Count.EqualTo(1));
@@ -2608,15 +2660,17 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceDirectoryIsNull_NoStatusChangesAndNoImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceDirectoryIsNull_NoStatusChangesAndNoImagesAreAdded()
     {
         string? sourceDirectory = null;
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2627,7 +2681,8 @@ public class SyncAssetsServiceTests
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory!, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref during regex verification
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2637,7 +2692,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Has.Count.EqualTo(1));
@@ -2650,15 +2705,17 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationDirectoryDoesNotExist_StatusChangesAndImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationDirectoryDoesNotExist_StatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2695,8 +2752,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2706,7 +2763,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2747,15 +2804,17 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationDirectoryIsNull_NoStatusChangesAndNoImagesAreAdded()
+    public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationDirectoryIsNull_NoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string? destinationDirectory = null;
+
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
@@ -2788,7 +2847,8 @@ public class SyncAssetsServiceTests
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory! });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            // _application!.SetSyncAssetsConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref during regex verification
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2798,7 +2858,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            List<SyncAssetsResult> result = await _application!.SyncAssetsAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2822,7 +2882,7 @@ public class SyncAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 }
