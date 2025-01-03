@@ -1,18 +1,19 @@
-﻿namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
+﻿namespace PhotoManager.Tests.Integration.Application.FindDuplicatedAssets;
 
 [TestFixture]
-public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
+public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
     private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+    private const string DATABASE_END_PATH = "v1.0";
 
+    private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
-    private StorageService? _storageService;
+    private UserConfigurationService? _userConfigurationService;
+    private Database? _database;
     private Mock<IStorageService>? _storageServiceMock;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -50,25 +51,12 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
-
-        _configurationRootMock = new Mock<IConfigurationRoot>();
-        _configurationRootMock.GetDefaultMockConfig();
-        _configurationRootMock.MockGetValue(UserConfigurationKeys.DETECT_THUMBNAILS, "true");
-        _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
-
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
+        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
     }
 
     [SetUp]
     public void SetUp()
     {
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new (userConfigurationService);
-
         _asset1 = new()
         {
             FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
@@ -196,24 +184,55 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         };
     }
 
+    private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, int pHashThreshold, bool detectThumbnails)
+    {
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH, thumbnailMaxWidth.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT, thumbnailMaxHeight.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_DHASH, usingDHash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMD5Hash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, pHashThreshold.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.DETECT_THUMBNAILS, detectThumbnails.ToString());
+
+        _userConfigurationService = new (configurationRootMock.Object);
+
+        _storageServiceMock = new Mock<IStorageService>();
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+
+        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new (_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
+        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        AssetsComparator assetsComparator = new();
+        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, _userConfigurationService);
+        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+    }
+
     // The hamming distance is about 120 between these hashes
     [Test]
     [Category("Thumbnail folder, basic hashing method")] // SHA-512 generates a 128-character long hash in hexadecimal representation
-    [TestCase("20", 0, new string[] { })]
-    [TestCase("40", 0, new string[] { })]
-    [TestCase("60", 0, new string[] { })]
-    [TestCase("80", 0, new string[] { })]
-    [TestCase("100", 0, new string[] { })]
-    [TestCase("110", 0, new string[] { })]
-    [TestCase("128", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailBasicHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase(20, 0, new string[] { })]
+    [TestCase(40, 0, new string[] { })]
+    [TestCase(60, 0, new string[] { })]
+    [TestCase(80, 0, new string[] { })]
+    [TestCase(100, 0, new string[] { })]
+    [TestCase(110, 0, new string[] { })]
+    [TestCase(128, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailBasicHashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName)
     {
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
+
         try
         {
-            _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-            UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
-
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
@@ -234,7 +253,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             _assetRepository.AddAsset(_asset4, assetData);
             _assetRepository.AddAsset(_asset5, assetData);
 
-            List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
 
@@ -253,20 +272,18 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
     // The hamming distance is about 30 between these hashes
     [Test]
     [Category("Thumbnail folder, MD5Hash")] // The MD5Hash is a 32-character hexadecimal string
-    [TestCase("5", 0, new string[] { })]
-    [TestCase("10", 0, new string[] { })]
-    [TestCase("15", 0, new string[] { })]
-    [TestCase("20", 0, new string[] { })]
-    [TestCase("25", 0, new string[] { })]
-    [TestCase("32", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailMD5HashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase(5, 0, new string[] { })]
+    [TestCase(10, 0, new string[] { })]
+    [TestCase(15, 0, new string[] { })]
+    [TestCase(20, 0, new string[] { })]
+    [TestCase(25, 0, new string[] { })]
+    [TestCase(32, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailMD5HashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName)
     {
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
+
         try
         {
-            _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-            UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
-
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
@@ -287,7 +304,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             _assetRepository.AddAsset(_asset4, assetData);
             _assetRepository.AddAsset(_asset5, assetData);
 
-            List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
 
@@ -306,20 +323,18 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
     // The hamming distance cannot be computed for this hashing method because it has not the same length
     [Test]
     [Category("Thumbnail folder, DHash")] // The DHash is a 17-character number
-    [TestCase("3")]
-    [TestCase("5")]
-    [TestCase("9")]
-    [TestCase("11")]
-    [TestCase("14")]
-    [TestCase("17")]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailDHashDifferentThresholdValues(string thresholdToMock)
+    [TestCase(3)]
+    [TestCase(5)]
+    [TestCase(9)]
+    [TestCase(11)]
+    [TestCase(14)]
+    [TestCase(17)]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailDHashDifferentThresholdValues(int thresholdToMock)
     {
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
+
         try
         {
-            _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-            UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
-
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
@@ -340,7 +355,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             _assetRepository.AddAsset(_asset4, assetData);
             _assetRepository.AddAsset(_asset5, assetData);
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => findDuplicatedAssetsService.GetDuplicatedAssets());
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _application!.GetDuplicatedAssets());
 
             Assert.That(exception?.Message, Is.EqualTo("Invalid arguments for hamming distance calculation."));
         }
@@ -353,28 +368,26 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
     // The hamming distance is about 36/74 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("Thumbnail folder, PHash")] // The PHash is a 210-character hexadecimal string
-    [TestCase("10", 0, new string[] { })]
-    [TestCase("20", 0, new string[] { })]
-    [TestCase("30", 0, new string[] { })]
-    [TestCase("40", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_ShitQuality.JPG" })]
-    [TestCase("50", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_ShitQuality.JPG" })]
-    [TestCase("60", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG" })]
-    [TestCase("80", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG" })]
-    [TestCase("90", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG" })]
-    [TestCase("100", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG" })]
-    [TestCase("120", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
-    [TestCase("140", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
-    [TestCase("160", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
-    [TestCase("180", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
-    [TestCase("210", 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailPHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
+    [TestCase(10, 0, new string[] { })]
+    [TestCase(20, 0, new string[] { })]
+    [TestCase(30, 0, new string[] { })]
+    [TestCase(40, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_ShitQuality.JPG" })]
+    [TestCase(50, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_ShitQuality.JPG" })]
+    [TestCase(60, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG" })]
+    [TestCase(80, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG" })]
+    [TestCase(90, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG" })]
+    [TestCase(100, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG" })]
+    [TestCase(120, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
+    [TestCase(140, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
+    [TestCase(160, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
+    [TestCase(180, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
+    [TestCase(210, 1, new[] { "Image_1336_Mini.JPG", "Image_1336_Original.JPG", "Image_1336_ShitQuality.JPG", "Image_1336_Small.JPG", "Image 1.jpg" })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailPHashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName)
     {
+        ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
+
         try
         {
-            _configurationRootMock!.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, thresholdToMock);
-            UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-            FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository!, _storageService!, userConfigurationService);
-
             string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
             string folderPath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
 
@@ -395,7 +408,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             _assetRepository.AddAsset(_asset4, assetData);
             _assetRepository.AddAsset(_asset5, assetData);
 
-            List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
+            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
             Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
 
