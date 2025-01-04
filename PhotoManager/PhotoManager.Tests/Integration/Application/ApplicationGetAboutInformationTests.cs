@@ -7,7 +7,6 @@ namespace PhotoManager.Tests.Integration.Application;
 [TestFixture]
 public class ApplicationGetAboutInformationTests
 {
-
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
