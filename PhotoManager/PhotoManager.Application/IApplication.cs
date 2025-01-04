@@ -19,7 +19,7 @@ public interface IApplication
     void DeleteAssets(Asset[] assets);
     AboutInformation GetAboutInformation(Assembly assembly);
     Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
-    string GetInitialFolder();
+    string GetInitialFolderPath();
     ushort GetCatalogCooldownMinutes();
     bool GetSyncAssetsEveryXMinutes();
     string GetExemptedFolderPath();

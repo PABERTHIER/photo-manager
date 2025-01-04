@@ -11,7 +11,7 @@
 //    public void ViewModelTest()
 //    {
 //        using var mock = AutoMock.GetLoose();
-//        mock.Mock<IApplication>().Setup(a => a.GetInitialFolder()).Returns(@"D:\Data");
+//        mock.Mock<IApplication>().Setup(a => a.GetInitialFolderPath()).Returns(@"D:\Data");
 
 //        Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = @"D:\Data\Folder1" };
 //        Folder selectedFolder = new() { Id = Guid.NewGuid(), Path = @"D:\Data\Folder2" };
@@ -37,7 +37,7 @@
 //    public void CanConfirmTest(string sourcePath, string selectedPath, bool expected)
 //    {
 //        using var mock = AutoMock.GetLoose();
-//        mock.Mock<IApplication>().Setup(a => a.GetInitialFolder()).Returns(@"D:\Data");
+//        mock.Mock<IApplication>().Setup(a => a.GetInitialFolderPath()).Returns(@"D:\Data");
 
 //        Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
@@ -54,7 +54,7 @@
 //    public void CanConfirmNullSourceFolderTest()
 //    {
 //        using var mock = AutoMock.GetLoose();
-//        mock.Mock<IApplication>().Setup(a => a.GetInitialFolder()).Returns(@"D:\Data");
+//        mock.Mock<IApplication>().Setup(a => a.GetInitialFolderPath()).Returns(@"D:\Data");
 
 //        Folder sourceFolder = null;
 
@@ -71,7 +71,7 @@
 //    public void CanConfirmNullTargetPathTest()
 //    {
 //        using var mock = AutoMock.GetLoose();
-//        mock.Mock<IApplication>().Setup(a => a.GetInitialFolder()).Returns(@"D:\Data");
+//        mock.Mock<IApplication>().Setup(a => a.GetInitialFolderPath()).Returns(@"D:\Data");
 
 //        Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = @"D:\Data\Folder1" };
 

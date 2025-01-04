@@ -30,7 +30,7 @@
 //         };
 
 //         Mock<IApplication> mock = new();
-//         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 
 //         SyncAssetsViewModel viewModel = new (mock.Object)
 //         {
@@ -69,7 +69,7 @@
 //         };
 
 //         Mock<IApplication> mock = new();
-//         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 
 //         SyncAssetsViewModel viewModel = new (mock.Object)
 //         {
@@ -100,7 +100,7 @@
 //         };
 
 //         Mock<IApplication> mock = new();
-//         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 //         SyncAssetsViewModel viewModel = new (mock.Object);
 
 //         viewModel.Step.Should().Be(ProcessStep.ViewDescription);
@@ -161,7 +161,7 @@
 //         };
 
 //         Mock<IApplication> mock = new();
-//         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 
 //         SyncAssetsViewModel viewModel = new (mock.Object)
 //         {
@@ -202,7 +202,7 @@
 //         };
 
 //         Mock<IApplication> mock = new();
-//         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 
 //         SyncAssetsViewModel viewModel = new (mock.Object)
 //         {
@@ -224,7 +224,7 @@
 //     public void NotifySyncImageTest()
 //     {
 //         Mock<IApplication> mock = new();
-//         mock.Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 
 //         SyncAssetsViewModel viewModel = new (mock.Object);
 

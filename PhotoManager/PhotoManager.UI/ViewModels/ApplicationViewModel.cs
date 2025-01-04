@@ -57,7 +57,7 @@ public class ApplicationViewModel : BaseViewModel
 
         SortCriteria = initialSortCriteria; // TODO: Should be FileName the default one -> delete this line and the parameter in the ctor
         // TODO: Rename to CurrentFolderPath
-        CurrentFolder = Application.GetInitialFolder();
+        CurrentFolder = Application.GetInitialFolderPath();
     }
 
     public AppMode AppMode

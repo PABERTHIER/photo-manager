@@ -91,8 +91,7 @@ public class Application : IApplication
 
     public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => _assetRepository.GetSubFolders(parentFolder, includeHidden);
 
-    // TODO: Rename to GetInitialFolderPath
-    public string GetInitialFolder() => _userConfigurationService.PathSettings.AssetsDirectory;
+    public string GetInitialFolderPath() => _userConfigurationService.PathSettings.AssetsDirectory;
 
     public ushort GetCatalogCooldownMinutes() => _userConfigurationService.AssetSettings.CatalogCooldownMinutes;
 
