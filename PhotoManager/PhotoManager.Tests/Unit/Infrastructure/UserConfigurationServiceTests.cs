@@ -1,4 +1,6 @@
 ﻿using PhotoManager.UI;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace PhotoManager.Tests.Unit.Infrastructure;
 
@@ -29,11 +31,24 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    public void GetAboutInformation_WithInvalidAssembly_ReturnsDefaultProduct()
+    public void GetAboutInformation_WithDifferentAssembly_ReturnsDifferentProduct()
     {
         AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(typeof(int).Assembly);
 
         Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
+        Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+    }
+
+    [Test]
+    public void GetAboutInformation_WithAssemblyWithoutProductAttribute_ReturnsDefaultProduct()
+    {
+        AssemblyName assemblyName = new ("TestAssemblyWithoutProductAttribute");
+        AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+
+        AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(assemblyBuilder);
+
+        Assert.That(aboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
         Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
