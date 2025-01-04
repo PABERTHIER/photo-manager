@@ -1454,6 +1454,81 @@ public class MoveAssetsServiceTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
+            const string asset1FileName = "Image 6.jpg";
+            const string asset2FileName = "Image 1.jpg";
+
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
+            string destinationFilePath1 = Path.Combine(destinationDirectory, asset1FileName);
+
+            bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath1, destinationFilePath1);
+
+            Assert.That(hasBeenCopied, Is.True);
+            Assert.That(File.Exists(sourceFilePath1), Is.True);
+            Assert.That(File.Exists(destinationFilePath1), Is.True);
+
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, asset2FileName);
+            string destinationFilePath2 = Path.Combine(destinationDirectory, asset2FileName);
+
+            hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath2, destinationFilePath2);
+
+            Assert.That(hasBeenCopied, Is.True);
+            Assert.That(File.Exists(sourceFilePath2), Is.True);
+            Assert.That(File.Exists(destinationFilePath2), Is.True);
+
+            Folder sourceFolder = _assetRepository!.AddFolder(destinationDirectory);
+
+            Asset? asset1 = _assetCreationService!.CreateAsset(destinationDirectory, asset1FileName);
+            Assert.That(asset1, Is.Not.Null);
+            Asset? asset2 = _assetCreationService!.CreateAsset(destinationDirectory, asset2FileName);
+            Assert.That(asset2, Is.Not.Null);
+
+            _assetRepository!.SaveCatalog(sourceFolder);
+
+            Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Assert.That(assetsInRepository, Is.Not.Empty);
+            Assert.That(assetsInRepository, Has.Length.EqualTo(2));
+            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(asset1.FileName));
+            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(asset2.FileName));
+
+            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName), Is.True);
+            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2.FileName), Is.True);
+
+            List<Asset> assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
+            Assert.That(assetsInDb, Is.Not.Empty);
+            Assert.That(assetsInDb, Has.Count.EqualTo(2));
+            Assert.That(assetsInDb[0].FileName, Is.EqualTo(asset1.FileName));
+            Assert.That(assetsInDb[1].FileName, Is.EqualTo(asset2.FileName));
+
+            _moveAssetsService!.DeleteAssets([asset1, asset2]);
+
+            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset1.FileName), Is.False);
+            Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset2.FileName), Is.False);
+
+            assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
+            Assert.That(assetsInRepository, Is.Empty);
+
+            Assert.That(File.Exists(destinationFilePath1), Is.False);
+            Assert.That(File.Exists(destinationFilePath2), Is.False);
+
+            assetsInDb = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
+            Assert.That(assetsInDb, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(destinationDirectory, true);
+            Directory.Delete(_databasePath!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAssets_AssetIsValid_DeletesAssetAndSavesCatalog()
+    {
+        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+
+        try
+        {
+            Directory.CreateDirectory(destinationDirectory);
+
             string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
             string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
 
@@ -1473,8 +1548,6 @@ public class MoveAssetsServiceTests
             Assert.That(File.Exists(destinationFilePath2), Is.True);
 
             Folder sourceFolder = _assetRepository!.AddFolder(destinationDirectory);
-
-            Assert.That(File.Exists(sourceFilePath1), Is.True);
 
             Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, "Image 6.jpg");
             Assert.That(asset, Is.Not.Null);
