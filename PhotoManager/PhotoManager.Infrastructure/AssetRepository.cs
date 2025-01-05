@@ -179,7 +179,7 @@ public class AssetRepository : IAssetRepository
         return folderPaths;
     }
 
-    public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) // TODO: Remove includeHidden when tests done in the caller class
+    public Folder[] GetSubFolders(Folder parentFolder)
     {
         return folders.Where(parentFolder.IsParentOf).ToArray();
     }

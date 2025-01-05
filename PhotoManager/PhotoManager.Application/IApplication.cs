@@ -18,7 +18,7 @@ public interface IApplication
     List<List<Asset>> GetDuplicatedAssets();
     void DeleteAssets(Asset[] assets);
     AboutInformation GetAboutInformation(Assembly assembly);
-    Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
+    Folder[] GetSubFolders(Folder parentFolder);
     string GetInitialFolderPath();
     ushort GetCatalogCooldownMinutes();
     bool GetSyncAssetsEveryXMinutes();

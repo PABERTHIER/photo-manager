@@ -11,7 +11,7 @@ public interface IAssetRepository
     bool FolderExists(string path);
     Folder[] GetFolders();
     HashSet<string> GetFoldersPath();
-    Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
+    Folder[] GetSubFolders(Folder parentFolder);
     Folder? GetFolderByPath(string path);
     void SaveCatalog(Folder? folder);
     bool BackupExists();

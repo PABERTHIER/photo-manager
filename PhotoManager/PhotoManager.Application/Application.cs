@@ -89,7 +89,7 @@ public class Application : IApplication
 
     public AboutInformation GetAboutInformation(Assembly assembly) => _userConfigurationService.GetAboutInformation(assembly);
 
-    public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => _assetRepository.GetSubFolders(parentFolder, includeHidden);
+    public Folder[] GetSubFolders(Folder parentFolder) => _assetRepository.GetSubFolders(parentFolder);
 
     public string GetInitialFolderPath() => _userConfigurationService.PathSettings.AssetsDirectory;
 

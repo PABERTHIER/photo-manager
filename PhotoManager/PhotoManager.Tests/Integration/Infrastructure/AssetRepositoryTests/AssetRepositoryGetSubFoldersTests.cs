@@ -56,12 +56,12 @@ public class AssetRepositoryGetSubFoldersTests
             Folder childFolder2 = _assetRepository!.AddFolder(childFolderPath2);
             Folder childFolder3 = _assetRepository!.AddFolder(childFolderPath3);
 
-            Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1, includeHidden: false);
-            Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2, includeHidden: false);
+            Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1);
+            Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2);
 
-            Folder[] childFolders1 = _assetRepository!.GetSubFolders(childFolder1, includeHidden: false);
-            Folder[] childFolders2 = _assetRepository!.GetSubFolders(childFolder2, includeHidden: false);
-            Folder[] childFolders3 = _assetRepository!.GetSubFolders(childFolder3, includeHidden: false);
+            Folder[] childFolders1 = _assetRepository!.GetSubFolders(childFolder1);
+            Folder[] childFolders2 = _assetRepository!.GetSubFolders(childFolder2);
+            Folder[] childFolders3 = _assetRepository!.GetSubFolders(childFolder3);
 
             Assert.That(parentFolders1, Is.Not.Empty);
             Assert.That(parentFolders1, Has.Length.EqualTo(1));
@@ -99,8 +99,8 @@ public class AssetRepositoryGetSubFoldersTests
             Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
 
-            Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1, includeHidden: false);
-            Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2, includeHidden: false);
+            Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1);
+            Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2);
 
             Assert.That(parentFolders1, Is.Empty);
             Assert.That(parentFolders2, Is.Empty);
@@ -128,8 +128,8 @@ public class AssetRepositoryGetSubFoldersTests
             Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
             Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
 
-            Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1, includeHidden: false);
-            Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2, includeHidden: false);
+            Folder[] parentFolders1 = _assetRepository!.GetSubFolders(parentFolder1);
+            Folder[] parentFolders2 = _assetRepository!.GetSubFolders(parentFolder2);
 
             Assert.That(parentFolders1, Is.Empty);
             Assert.That(parentFolders2, Is.Empty);
@@ -157,7 +157,7 @@ public class AssetRepositoryGetSubFoldersTests
 
             _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the Where on folders
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _assetRepository!.GetSubFolders(parentFolder1!, includeHidden: false));
+            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _assetRepository!.GetSubFolders(parentFolder1!));
 
             Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
 
