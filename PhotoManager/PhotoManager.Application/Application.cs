@@ -33,6 +33,17 @@ public class Application : IApplication
         _storageService = storageService;
     }
 
+    // Catalog
+    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null) => await _catalogAssetsService.CatalogAssetsAsync(callback, token);
+
+    /// <summary>
+    /// Detects duplicated assets in the catalog.
+    /// </summary>
+    /// <returns>A list of duplicated sets of assets (corresponding to the same image),
+    /// where each item is a list of duplicated assets.</returns>
+    public List<List<Asset>> GetDuplicatedAssets() => _findDuplicatedAssetsService.GetDuplicatedAssets();
+
+    // AssetRepository
     public Asset[] GetAssetsByPath(string directory)
     {
         if (string.IsNullOrWhiteSpace(directory))
@@ -47,67 +58,6 @@ public class Application : IApplication
 
         return _assetRepository.GetAssetsByPath(directory);
     }
-
-    public int GetAssetsCounter() => _assetRepository.GetAssetsCounter();
-
-    public int GetTotalFilesCount() => _storageService.GetTotalFilesCount();
-
-    public void LoadThumbnail(Asset asset)
-    {
-        asset.ImageData = _assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
-    }
-
-    public SyncAssetsConfiguration GetSyncAssetsConfiguration() => _assetRepository.GetSyncAssetsConfiguration();
-
-    public void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration)
-    {
-        syncConfiguration.Validate().Normalize();
-        _assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
-        _assetRepository.SaveCatalog(null);
-    }
-
-    public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) => await _syncAssetsService.ExecuteAsync(callback);
-
-    public async Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null) => await _catalogAssetsService.CatalogAssetsAsync(callback, token);
-
-    public void SetAsWallpaper(Asset asset, WallpaperStyle style)
-    {
-        if (asset != null)
-        {
-            _userConfigurationService.SetAsWallpaper(asset, style);
-        }
-    }
-
-    /// <summary>
-    /// Detects duplicated assets in the catalog.
-    /// </summary>
-    /// <returns>A list of duplicated sets of assets (corresponding to the same image),
-    /// where each item is a list of duplicated assets.</returns>
-    public List<List<Asset>> GetDuplicatedAssets() => _findDuplicatedAssetsService.GetDuplicatedAssets();
-
-    public void DeleteAssets(Asset[] assets) => _moveAssetsService.DeleteAssets(assets);
-
-    public AboutInformation GetAboutInformation(Assembly assembly) => _userConfigurationService.GetAboutInformation(assembly);
-
-    public Folder[] GetSubFolders(Folder parentFolder) => _assetRepository.GetSubFolders(parentFolder);
-
-    public string GetInitialFolderPath() => _userConfigurationService.PathSettings.AssetsDirectory;
-
-    public ushort GetCatalogCooldownMinutes() => _userConfigurationService.AssetSettings.CatalogCooldownMinutes;
-
-    public bool GetSyncAssetsEveryXMinutes() => _userConfigurationService.AssetSettings.SyncAssetsEveryXMinutes;
-
-    public string GetExemptedFolderPath() => _userConfigurationService.PathSettings.ExemptedFolderPath;
-
-    public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => _moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
-
-    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) => _storageService.LoadBitmapImageFromPath(imagePath, rotation);
-
-    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) => _storageService.LoadBitmapHeicImageFromPath(imagePath, rotation);
-
-    public bool FileExists(string fullPath) => _storageService.FileExists(fullPath);
-
-    public List<string> GetRecentTargetPaths() => _assetRepository.GetRecentTargetPaths();
 
     public Folder[] GetRootCatalogFolders()
     {
@@ -125,5 +75,56 @@ public class Application : IApplication
         }
 
         return folders;
+    }
+
+    public void LoadThumbnail(Asset asset)
+    {
+        asset.ImageData = _assetRepository.LoadThumbnail(asset.Folder.Path, asset.FileName, asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
+    }
+
+    public Folder[] GetSubFolders(Folder parentFolder) => _assetRepository.GetSubFolders(parentFolder);
+
+    public List<string> GetRecentTargetPaths() => _assetRepository.GetRecentTargetPaths();
+
+    public int GetAssetsCounter() => _assetRepository.GetAssetsCounter();
+
+    // UserConfigurationService
+    public string GetInitialFolderPath() => _userConfigurationService.PathSettings.AssetsDirectory;
+
+    public ushort GetCatalogCooldownMinutes() => _userConfigurationService.AssetSettings.CatalogCooldownMinutes;
+
+    public bool GetSyncAssetsEveryXMinutes() => _userConfigurationService.AssetSettings.SyncAssetsEveryXMinutes;
+
+    public string GetExemptedFolderPath() => _userConfigurationService.PathSettings.ExemptedFolderPath;
+
+    public AboutInformation GetAboutInformation(Assembly assembly) => _userConfigurationService.GetAboutInformation(assembly);
+
+    // StorageService
+    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) => _storageService.LoadBitmapImageFromPath(imagePath, rotation);
+    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) => _storageService.LoadBitmapHeicImageFromPath(imagePath, rotation);
+    public bool FileExists(string fullPath) => _storageService.FileExists(fullPath);
+    public int GetTotalFilesCount() => _storageService.GetTotalFilesCount();
+
+    // MoveAssetsService
+    public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => _moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
+    public void DeleteAssets(Asset[] assets) => _moveAssetsService.DeleteAssets(assets);
+
+    // Sync
+    public SyncAssetsConfiguration GetSyncAssetsConfiguration() => _assetRepository.GetSyncAssetsConfiguration();
+    public void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration)
+    {
+        syncConfiguration.Validate().Normalize();
+        _assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
+        _assetRepository.SaveCatalog(null);
+    }
+    public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) => await _syncAssetsService.ExecuteAsync(callback);
+
+    // Wallpaper
+    public void SetAsWallpaper(Asset asset, WallpaperStyle style)
+    {
+        if (asset != null)
+        {
+            _userConfigurationService.SetAsWallpaper(asset, style);
+        }
     }
 }
