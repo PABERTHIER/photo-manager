@@ -62,19 +62,14 @@ public class Application : IApplication
     public Folder[] GetRootCatalogFolders()
     {
         string[] paths = _userConfigurationService.GetRootCatalogFolderPaths();
-        Folder[] folders = new Folder[paths.Length];
+        Folder?[] folders = new Folder[paths.Length];
 
         for (int i = 0; i < paths.Length; i++)
         {
-            folders[i] = _assetRepository.GetFolderByPath(paths[i]);
-
-            if (folders[i] == null)
-            {
-                folders[i] = _assetRepository.AddFolder(paths[i]);
-            }
+            folders[i] = _assetRepository.GetFolderByPath(paths[i]) ?? _assetRepository.AddFolder(paths[i]);
         }
 
-        return folders;
+        return folders!;
     }
 
     public void LoadThumbnail(Asset asset)
