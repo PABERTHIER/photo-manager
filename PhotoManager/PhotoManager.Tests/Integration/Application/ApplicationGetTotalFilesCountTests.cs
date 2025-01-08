@@ -8,20 +8,7 @@ public class ApplicationGetTotalFilesCountTests
     private string? _databasePath;
     private const string DATABASE_END_PATH = "v1.0";
 
-    // TODO: Except for _application, declare each in SetUp directly, use this test file as example to make the other ones
     private PhotoManager.Application.Application? _application;
-    private TestableAssetRepository? _testableAssetRepository;
-    private SyncAssetsService? _syncAssetsService;
-    private AssetCreationService? _assetCreationService;
-    private CatalogAssetsService? _catalogAssetsService;
-    private MoveAssetsService? _moveAssetsService;
-    private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
-    private UserConfigurationService? _userConfigurationService;
-    private StorageService? _storageService;
-    private Database? _database;
-    private AssetsComparator? _assetsComparator;
-    private AssetHashCalculatorService? _assetHashCalculatorService;
-    private Mock<IStorageService>? _storageServiceMock;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -29,40 +16,42 @@ public class ApplicationGetTotalFilesCountTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
         _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
-
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
-
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
-    [SetUp]
-    public void SetUp()
+    private void ConfigureApplication(string assetsDirectory)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory!);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
 
-        _userConfigurationService = new (configurationRootMock.Object);
-        _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
-        _storageService = new (_userConfigurationService);
-        _assetHashCalculatorService = new (_userConfigurationService);
-        _assetsComparator = new();
-        _assetCreationService = new (_testableAssetRepository, _storageService, _assetHashCalculatorService, _userConfigurationService);
-        _catalogAssetsService = new (_testableAssetRepository, _storageService, _assetCreationService, _userConfigurationService, _assetsComparator);
-        _moveAssetsService = new (_testableAssetRepository, _storageService, _assetCreationService);
+        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
 
-        _syncAssetsService = new (_testableAssetRepository, _storageService, _assetsComparator, _moveAssetsService);
-        _findDuplicatedAssetsService = new (_testableAssetRepository, _storageService, _userConfigurationService);
-        _application = new (_testableAssetRepository, _syncAssetsService, _catalogAssetsService, _moveAssetsService, _findDuplicatedAssetsService, _userConfigurationService, _storageService);
+        Mock<IStorageService> storageServiceMock = new();
+        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+
+        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        AssetRepository assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
+        StorageService storageService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetCreationService assetCreationService = new (assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        AssetsComparator assetsComparator = new();
+        CatalogAssetsService catalogAssetsService = new (assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new (assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new (assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, storageService, userConfigurationService);
+        _application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
     }
 
     [Test]
     public void GetTotalFilesCount_RootDirectory_ReturnsTotalFilesCount()
     {
+        ConfigureApplication(_dataDirectory!);
+
         try
         {
             int totalFilesCount = _application!.GetTotalFilesCount();
+
             Assert.That(totalFilesCount, Is.EqualTo(67));
         }
         finally
@@ -76,20 +65,14 @@ public class ApplicationGetTotalFilesCountTests
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
 
+        ConfigureApplication(assetsDirectory);
+
         try
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            Mock<IConfigurationRoot> configurationRootMock = new();
-            configurationRootMock.GetDefaultMockConfig();
-            configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
+            int totalFilesCount = _application!.GetTotalFilesCount();
 
-            UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
-            StorageService storageService = new (userConfigurationService);
-
-            _application = new (_testableAssetRepository!, _syncAssetsService!, _catalogAssetsService!, _moveAssetsService!, _findDuplicatedAssetsService!, userConfigurationService, storageService);
-
-            int totalFilesCount = _application.GetTotalFilesCount();
             Assert.That(totalFilesCount, Is.EqualTo(0));
         }
         finally
