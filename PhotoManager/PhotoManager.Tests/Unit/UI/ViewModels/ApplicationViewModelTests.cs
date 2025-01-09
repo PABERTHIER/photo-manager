@@ -649,7 +649,7 @@ public class ApplicationViewModelTests
     [TestCase(false)]
     [TestCase(true)]
     // TODO: Update the name
-    public void NotifyCatalogChange_NullFolder_IgnoreNewAsset(bool analyseVideos)
+    public void NotifyCatalogChange_DefaultFolder_IgnoreNewAsset(bool analyseVideos)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
 

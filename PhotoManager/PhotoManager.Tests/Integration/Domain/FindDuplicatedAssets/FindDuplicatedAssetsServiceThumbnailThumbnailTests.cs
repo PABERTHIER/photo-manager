@@ -4,7 +4,8 @@
 public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
 {
     private string? _dataDirectory;
-    private string? _backupPath;
+    private string? _databaseDirectory;
+    private string? _databasePath;
     private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
 
@@ -48,7 +49,8 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
+        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
+        _databasePath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -56,7 +58,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
     }
 
     [SetUp]
@@ -224,13 +226,13 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_HASH);
             _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_HASH); // If this asset is in the set, then the threshold is not good
 
-            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1, assetData1);
-            _assetRepository.AddAsset(_asset2, assetData1);
-            _assetRepository.AddAsset(_asset3, assetData1);
-            _assetRepository.AddAsset(_asset4, assetData1);
-            _assetRepository.AddAsset(_asset5, assetData1);
+            _assetRepository!.AddAsset(_asset1, assetData);
+            _assetRepository.AddAsset(_asset2, assetData);
+            _assetRepository.AddAsset(_asset3, assetData);
+            _assetRepository.AddAsset(_asset4, assetData);
+            _assetRepository.AddAsset(_asset5, assetData);
 
             List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
@@ -238,13 +240,13 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = assetsName.ToList();
+                IList<string> assetsNameList = [..assetsName];
                 Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -277,13 +279,13 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_MD5_HASH);
             _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_MD5_HASH); // If this asset is in the set, then the threshold is not good
 
-            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1, assetData1);
-            _assetRepository.AddAsset(_asset2, assetData1);
-            _assetRepository.AddAsset(_asset3, assetData1);
-            _assetRepository.AddAsset(_asset4, assetData1);
-            _assetRepository.AddAsset(_asset5, assetData1);
+            _assetRepository!.AddAsset(_asset1, assetData);
+            _assetRepository.AddAsset(_asset2, assetData);
+            _assetRepository.AddAsset(_asset3, assetData);
+            _assetRepository.AddAsset(_asset4, assetData);
+            _assetRepository.AddAsset(_asset5, assetData);
 
             List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
@@ -291,13 +293,13 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = assetsName.ToList();
+                IList<string> assetsNameList = [..assetsName];
                 Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -330,13 +332,13 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_D_HASH);
             _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_D_HASH); // If this asset is in the set, then the threshold is not good
 
-            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1, assetData1);
-            _assetRepository.AddAsset(_asset2, assetData1);
-            _assetRepository.AddAsset(_asset3, assetData1);
-            _assetRepository.AddAsset(_asset4, assetData1);
-            _assetRepository.AddAsset(_asset5, assetData1);
+            _assetRepository!.AddAsset(_asset1, assetData);
+            _assetRepository.AddAsset(_asset2, assetData);
+            _assetRepository.AddAsset(_asset3, assetData);
+            _assetRepository.AddAsset(_asset4, assetData);
+            _assetRepository.AddAsset(_asset5, assetData);
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => findDuplicatedAssetsService.GetDuplicatedAssets());
 
@@ -344,7 +346,7 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -385,13 +387,13 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
             _asset4 = _asset4!.WithFolder(folder1).WithHash(SMALL_ASSET_P_HASH);
             _asset5 = _asset5!.WithFolder(folder2).WithHash(MISC_ASSET_P_HASH); // If this asset is in the set, then the threshold is not good
 
-            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData = [1, 2, 3];
 
-            _assetRepository!.AddAsset(_asset1, assetData1);
-            _assetRepository.AddAsset(_asset2, assetData1);
-            _assetRepository.AddAsset(_asset3, assetData1);
-            _assetRepository.AddAsset(_asset4, assetData1);
-            _assetRepository.AddAsset(_asset5, assetData1);
+            _assetRepository!.AddAsset(_asset1, assetData);
+            _assetRepository.AddAsset(_asset2, assetData);
+            _assetRepository.AddAsset(_asset3, assetData);
+            _assetRepository.AddAsset(_asset4, assetData);
+            _assetRepository.AddAsset(_asset5, assetData);
 
             List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
@@ -399,13 +401,13 @@ public class FindDuplicatedAssetsServiceThumbnailThumbnailTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = assetsName.ToList();
+                IList<string> assetsNameList = [..assetsName];
                 Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 }

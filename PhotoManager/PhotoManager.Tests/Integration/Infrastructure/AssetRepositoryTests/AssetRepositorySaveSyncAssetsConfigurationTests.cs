@@ -35,7 +35,7 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
     }
 
     [Test]
-    public void SaveSyncAssetsConfiguration_SyncAssetsConfiguration_SaveConfiguration()
+    public void SaveSyncAssetsConfiguration_SyncAssetsConfiguration_SavesConfiguration()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -74,7 +74,7 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
             _assetRepository!.SaveSyncAssetsConfiguration(new SyncAssetsConfiguration());
             syncAssetsConfiguration = _assetRepository.GetSyncAssetsConfiguration();
 
-            Assert.That(syncAssetsConfiguration.Definitions.Count, Is.EqualTo(0));
+            Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
 

@@ -44,7 +44,7 @@ public class BackupStorageTests
             string[] actualFiles = _backupStorage!.GetBackupFilesPaths(backupDirectory);
 
             Assert.That(actualFiles, Is.Not.Null);
-            Assert.That(actualFiles.Length, Is.EqualTo(0));
+            Assert.That(actualFiles, Is.Empty);
             Assert.That(actualFiles, Is.Empty);
         }
         finally

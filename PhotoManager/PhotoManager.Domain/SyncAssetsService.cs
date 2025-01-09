@@ -15,12 +15,7 @@ public class SyncAssetsService(
 
             foreach (SyncAssetsDirectoriesDefinition definition in configuration.Definitions)
             {
-                Execute(definition.SourceDirectory,
-                    definition.DestinationDirectory,
-                    definition.IncludeSubFolders,
-                    definition.DeleteAssetsNotInSource,
-                    callback,
-                    result);
+                Execute(definition, callback, result);
             }
 
             return result;
@@ -28,42 +23,39 @@ public class SyncAssetsService(
     }
 
     private void Execute(
-        string sourceDirectory,
-        string destinationDirectory,
-        bool includeSubFolders,
-        bool deleteAssetsNotInSource,
+        SyncAssetsDirectoriesDefinition definition,
         ProcessStatusChangedCallback callback,
         List<SyncAssetsResult> result)
     {
         SyncAssetsResult syncAssetsResult = new()
         {
-            SourceDirectory = sourceDirectory,
-            DestinationDirectory = destinationDirectory
+            SourceDirectory = definition.SourceDirectory,
+            DestinationDirectory = definition.DestinationDirectory
         };
 
-        if (!storageService.FolderExists(sourceDirectory))
+        if (!storageService.FolderExists(definition.SourceDirectory))
         {
-            syncAssetsResult.Message = $"Source directory '{sourceDirectory}' not found.";
+            syncAssetsResult.Message = $"Source directory '{definition.SourceDirectory}' not found.";
             result.Add(syncAssetsResult);
         }
         else
         {
             try
             {
-                if (!storageService.FolderExists(destinationDirectory))
+                if (!storageService.FolderExists(definition.DestinationDirectory))
                 {
-                    storageService.CreateDirectory(destinationDirectory);
+                    storageService.CreateDirectory(definition.DestinationDirectory);
                 }
 
-                string[] sourceFileNames = storageService.GetFileNames(sourceDirectory);
-                string[] destinationFileNames = storageService.GetFileNames(destinationDirectory);
+                string[] sourceFileNames = storageService.GetFileNames(definition.SourceDirectory);
+                string[] destinationFileNames = storageService.GetFileNames(definition.DestinationDirectory);
                 string[] newFileNames = assetsComparator.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
-                newFileNames = GetFilesNotAlreadyInDestinationSubDirectories(newFileNames, destinationDirectory);
+                newFileNames = GetFilesNotAlreadyInDestinationSubDirectories(newFileNames, definition.DestinationDirectory);
 
                 foreach (string newFileName in newFileNames)
                 {
-                    string sourceFilePath = Path.Combine(sourceDirectory, newFileName);
-                    string destinationFilePath = Path.Combine(destinationDirectory, newFileName);
+                    string sourceFilePath = Path.Combine(definition.SourceDirectory, newFileName);
+                    string destinationFilePath = Path.Combine(definition.DestinationDirectory, newFileName);
 
                     if (moveAssetsService.CopyAsset(sourceFilePath, destinationFilePath))
                     {
@@ -72,14 +64,14 @@ public class SyncAssetsService(
                     }
                 }
 
-                if (deleteAssetsNotInSource)
+                if (definition.DeleteAssetsNotInSource)
                 {
                     string[] deletedFileNames = assetsComparator.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
                     foreach (string deletedImage in deletedFileNames)
                     {
-                        string destinationPath = Path.Combine(destinationDirectory, deletedImage);
-                        storageService.DeleteFile(destinationDirectory, deletedImage);
+                        string destinationPath = Path.Combine(definition.DestinationDirectory, deletedImage);
+                        storageService.DeleteFile(definition.DestinationDirectory, deletedImage);
                         syncAssetsResult.SyncedImages++;
                         callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"Deleted '{destinationPath}'" });
                     }
@@ -87,25 +79,28 @@ public class SyncAssetsService(
 
                 syncAssetsResult.Message = syncAssetsResult.SyncedImages switch
                 {
-                    0 => $"No images synced from '{sourceDirectory}' to '{destinationDirectory}'.",
-                    1 => $"{syncAssetsResult.SyncedImages} image synced from '{sourceDirectory}' to '{destinationDirectory}'.",
-                    _ => $"{syncAssetsResult.SyncedImages} images synced from '{sourceDirectory}' to '{destinationDirectory}'.",
+                    0 => $"No images synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
+                    1 => $"{syncAssetsResult.SyncedImages} image synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
+                    _ => $"{syncAssetsResult.SyncedImages} images synced from '{definition.SourceDirectory}' to '{definition.DestinationDirectory}'.",
                 };
 
                 result.Add(syncAssetsResult);
 
-                if (includeSubFolders)
+                if (definition.IncludeSubFolders)
                 {
-                    List<DirectoryInfo> subdirectories = storageService.GetSubDirectories(sourceDirectory);
+                    List<DirectoryInfo> subdirectories = storageService.GetSubDirectories(definition.SourceDirectory);
 
                     for (int i = 0; i < subdirectories.Count; i++)
                     {
-                        Execute(subdirectories[i].FullName,
-                            Path.Combine(destinationDirectory, subdirectories[i].Name),
-                            includeSubFolders,
-                            deleteAssetsNotInSource,
-                            callback,
-                            result);
+                        SyncAssetsDirectoriesDefinition subDefinition = new()
+                        {
+                            SourceDirectory = subdirectories[i].FullName,
+                            DestinationDirectory = Path.Combine(definition.DestinationDirectory, subdirectories[i].Name),
+                            IncludeSubFolders = definition.IncludeSubFolders,
+                            DeleteAssetsNotInSource = definition.DeleteAssetsNotInSource
+                        };
+
+                        Execute(subDefinition, callback, result);
                     }
                 }
             }

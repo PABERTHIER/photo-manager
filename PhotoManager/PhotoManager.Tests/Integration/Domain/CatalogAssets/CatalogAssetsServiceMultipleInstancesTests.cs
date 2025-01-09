@@ -497,7 +497,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Assert.That(assetsInSubDirFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath.Count, Is.EqualTo(0));
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath, Is.Empty);
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(2));
@@ -627,7 +627,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             assetsInDirectory = Directory.GetFiles(assetsDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(2));
             assetsInDirectory = Directory.GetFiles(imageDeletedDirectory);
-            Assert.That(assetsInDirectory.Length, Is.EqualTo(0));
+            Assert.That(assetsInDirectory, Is.Empty);
             assetsInDirectory = Directory.GetFiles(imageUpdatedDirectory);
             Assert.That(assetsInDirectory, Has.Length.EqualTo(1));
             assetsInDirectory = Directory.GetFiles(subDirDirectory);
@@ -701,7 +701,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
             Assert.That(assetsInSubDirFolderFromRepositoryByPath, Has.Count.EqualTo(1));
 
             assetsInSubSubDirFolderFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(subSubDirDirectory);
-            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath.Count, Is.EqualTo(0));
+            Assert.That(assetsInSubSubDirFolderFromRepositoryByPath, Is.Empty);
 
             videoFirstFramesFromRepositoryByPath = _testableAssetRepository.GetCataloguedAssetsByPath(firstFrameVideosDirectory);
             Assert.That(videoFirstFramesFromRepositoryByPath, Has.Count.EqualTo(2));

@@ -59,15 +59,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -141,15 +137,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -272,15 +264,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -327,7 +315,7 @@ public class SyncAssetsServiceTests
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(0));
             Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
-            Assert.That(statusChanges.Count, Is.EqualTo(0));
+            Assert.That(statusChanges, Is.Empty);
         }
         finally
         {
@@ -391,15 +379,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -508,15 +492,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -666,22 +646,12 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = firstSourceDirectory,
-                    DestinationDirectory = firstDestinationDirectory
-                });
-
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = secondSourceDirectory,
-                    DestinationDirectory = secondDestinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = firstSourceDirectory, DestinationDirectory = firstDestinationDirectory });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = secondSourceDirectory, DestinationDirectory = secondDestinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -858,15 +828,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -1023,15 +989,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -1183,15 +1145,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -1351,7 +1309,7 @@ public class SyncAssetsServiceTests
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = sourceDirectory,
                     DestinationDirectory = destinationDirectory,
@@ -1360,6 +1318,7 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -1550,7 +1509,7 @@ public class SyncAssetsServiceTests
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = sourceDirectory,
                     DestinationDirectory = destinationDirectory,
@@ -1559,6 +1518,7 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -1734,15 +1694,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -1906,7 +1862,7 @@ public class SyncAssetsServiceTests
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = sourceDirectory,
                     DestinationDirectory = destinationDirectory,
@@ -1915,6 +1871,7 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -2086,7 +2043,7 @@ public class SyncAssetsServiceTests
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = sourceDirectory,
                     DestinationDirectory = destinationDirectory,
@@ -2095,6 +2052,7 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -2245,7 +2203,7 @@ public class SyncAssetsServiceTests
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = sourceDirectory,
                     DestinationDirectory = destinationDirectory,
@@ -2254,6 +2212,7 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -2451,6 +2410,7 @@ public class SyncAssetsServiceTests
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(1));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.EqualTo(null));
 
@@ -2622,15 +2582,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -2668,15 +2624,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory!,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory!, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -2741,15 +2693,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));
@@ -2837,15 +2785,11 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
-                {
-                    SourceDirectory = sourceDirectory,
-                    DestinationDirectory = destinationDirectory!
-                });
+            syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory! });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].DestinationDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].DestinationDirectory));

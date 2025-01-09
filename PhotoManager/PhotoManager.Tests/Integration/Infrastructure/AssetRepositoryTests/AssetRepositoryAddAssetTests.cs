@@ -130,8 +130,8 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -183,8 +183,8 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -227,7 +227,7 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
             Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
             Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -250,12 +250,14 @@ public class AssetRepositoryAddAssetTests
             string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
-            byte[] assetData = [1, 2, 3];
+
+            byte[] assetData1 = [1, 2, 3];
+            byte[] assetData2 = [];
 
             Dictionary<string, byte[]> blobToWrite = new()
             {
-                { _asset1!.FileName, [1, 2, 3]},
-                { _asset2!.FileName, [] }
+                { _asset1!.FileName, assetData1 },
+                { _asset2!.FileName, assetData2 }
             };
 
             _database!.WriteBlob(blobToWrite, folder.ThumbnailsFilename);
@@ -266,7 +268,7 @@ public class AssetRepositoryAddAssetTests
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Is.Empty);
 
-            _testableAssetRepository.AddAsset(_asset1!, assetData);
+            _testableAssetRepository.AddAsset(_asset1!, assetData1);
 
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
@@ -278,8 +280,8 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -362,7 +364,7 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
             Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
             Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
+            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -375,7 +377,7 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_AssetFolderIsNull_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
+    public void AddAsset_AssetFolderIsDefault_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -522,8 +524,8 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
             Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(new byte[] { 1, 2, 3 }));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(Array.Empty<byte>()));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

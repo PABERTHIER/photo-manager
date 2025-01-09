@@ -105,7 +105,7 @@ public class DatabaseDeleteOldBackupsTests
             _backupStorageMock.Verify(bs => bs.DeleteBackupFile(It.IsAny<string>()), Times.Never);
 
             Assert.That(database.Diagnostics.LastDeletedBackupFilePaths, Is.Not.Null);
-            Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!.Length, Is.EqualTo(0));
+            Assert.That(database.Diagnostics.LastDeletedBackupFilePaths!, Is.Empty);
         }
         finally
         {

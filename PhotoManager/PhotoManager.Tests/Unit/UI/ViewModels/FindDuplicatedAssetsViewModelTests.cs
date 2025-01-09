@@ -19,7 +19,7 @@
 //         };
 
 //         using var mock = AutoMock.GetLoose();
-//         mock.Mock<IApplication>().Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Mock<IApplication>().Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 //         mock.Mock<IApplication>().Setup(app => app.LoadThumbnail(It.IsAny<Asset>()))
 //             .Callback<Asset>(a => a.ImageData = new System.Windows.Media.Imaging.BitmapImage());
 
@@ -43,7 +43,7 @@
 //         List<List<Asset>> duplicatedAssetSets = new();
 
 //         using var mock = AutoMock.GetLoose();
-//         mock.Mock<IApplication>().Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Mock<IApplication>().Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 
 //         FindDuplicatedAssetsViewModel viewModel = mock.Create<FindDuplicatedAssetsViewModel>();
 //         viewModel.SetDuplicates(duplicatedAssetSets);
@@ -64,7 +64,7 @@
 //         List<List<Asset>> duplicatedAssetSets = null;
 
 //         using var mock = AutoMock.GetLoose();
-//         mock.Mock<IApplication>().Setup(app => app.GetInitialFolder()).Returns(@"C:\");
+//         mock.Mock<IApplication>().Setup(app => app.GetInitialFolderPath()).Returns(@"C:\");
 
 //         FindDuplicatedAssetsViewModel viewModel = mock.Create<FindDuplicatedAssetsViewModel>();
 

@@ -6,27 +6,27 @@ namespace PhotoManager.Application;
 
 public interface IApplication
 {
-    Asset[] GetAssets(string directory);
-    int GetAssetsCounter();
-    int GetTotalFilesCount();
-    void LoadThumbnail(Asset asset);
-    SyncAssetsConfiguration GetSyncAssetsConfiguration();
-    void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration);
-    Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback);
     Task CatalogAssetsAsync(CatalogChangeCallback callback, CancellationToken? token = null);
-    void SetAsWallpaper(Asset asset, WallpaperStyle style);
     List<List<Asset>> GetDuplicatedAssets();
-    void DeleteAssets(Asset[] assets);
-    AboutInformation GetAboutInformation(Assembly assembly);
-    Folder[] GetSubFolders(Folder parentFolder, bool includeHidden);
-    string GetInitialFolder();
+    Asset[] GetAssetsByPath(string directory);
+    Folder[] GetRootCatalogFolders();
+    void LoadThumbnail(Asset asset);
+    Folder[] GetSubFolders(Folder parentFolder);
+    List<string> GetRecentTargetPaths();
+    int GetAssetsCounter();
+    string GetInitialFolderPath();
     ushort GetCatalogCooldownMinutes();
     bool GetSyncAssetsEveryXMinutes();
     string GetExemptedFolderPath();
-    bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles);
+    AboutInformation GetAboutInformation(Assembly assembly);
     BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation);
     BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation);
     bool FileExists(string fullPath);
-    List<string> GetRecentTargetPaths();
-    Folder[] GetRootCatalogFolders();
+    int GetTotalFilesCount();
+    bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles);
+    void DeleteAssets(Asset[] assets);
+    SyncAssetsConfiguration GetSyncAssetsConfiguration();
+    void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration);
+    Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback);
+    void SetAsWallpaper(Asset asset, WallpaperStyle style);
 }
