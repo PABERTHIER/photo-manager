@@ -95,13 +95,4 @@ public class Application(
         assetRepository.SaveCatalog(null);
     }
     public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) => await syncAssetsService.ExecuteAsync(callback);
-
-    // Wallpaper
-    public void SetAsWallpaper(Asset? asset, WallpaperStyle style)
-    {
-        if (asset != null)
-        {
-            userConfigurationService.SetAsWallpaper(asset, style);
-        }
-    }
 }

@@ -21,7 +21,6 @@ PhotoManager is a desktop application that allows:
 - Import / export images from local folders / shared folders in the local network.
 - Delete images in local or shared folders that are not present in source folder.
 - Detect videos duplicates.
-- Change Windows wallpaper.
 
 **It is a local tool, that does not require an Internet connection to work.
 Your data stay on your computer and nothing is collected from you.

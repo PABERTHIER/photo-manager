@@ -23,43 +23,6 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
-    [Ignore("Tests ignored to prevent effects on the client computer")]
-    [TestCase(WallpaperStyle.Fit, "6", "0")]
-    [TestCase(WallpaperStyle.Stretch, "2", "0")]
-    [TestCase(WallpaperStyle.Tile, "0", "1")]
-    [TestCase(WallpaperStyle.Center, "0", "0")]
-    [TestCase(WallpaperStyle.Span, "22", "0")]
-    [TestCase(WallpaperStyle.Fill, "10", "0")]
-    public void SetAsWallpaper_ValidStyleAndTile_RegistersExpectedValues(WallpaperStyle style, string expectedStyleValue, string expectedTileValue)
-    {
-        Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
-        Asset asset = new()
-        {
-            FolderId = folder.Id,
-            Folder = folder,
-            FileName = "NonExistentFile.jpg",
-            Pixel = new()
-            {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
-            },
-            Hash = string.Empty
-        }; // Not giving an existing file to prevent the wallpaper to be changed
-
-        // Set up a StringWriter to capture console output
-        StringWriter stringWriter = new();
-        Console.SetOut(stringWriter);
-
-        _userConfigurationService!.SetAsWallpaper(asset, style);
-
-        // Get the captured console output
-        string consoleOutput = stringWriter.ToString();
-
-        // Assert that the expected error message was printed to the console
-        Assert.That(consoleOutput.Contains($"Wallpaper set for style {expectedStyleValue} and tile {expectedTileValue}"), Is.True);
-    }
-
-    [Test]
     public void GetAboutInformation_WithValidAssembly_ReturnsAboutInformation()
     {
         AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(typeof(App).Assembly);

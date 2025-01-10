@@ -11,14 +11,6 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="Set as _Wallpaper" Style="{StaticResource MenuItemStyle}">
-                    <MenuItem Header="_Center" Click="SetAsWallpaperCenter_Click" Style="{StaticResource MenuItemStyle}" />
-                    <MenuItem Header="_Fill" Click="SetAsWallpaperFill_Click" Style="{StaticResource MenuItemStyle}" />
-                    <MenuItem Header="_Fit" Click="SetAsWallpaperFit_Click" Style="{StaticResource MenuItemStyle}" />
-                    <MenuItem Header="S_pan" Click="SetAsWallpaperSpan_Click" Style="{StaticResource MenuItemStyle}" />
-                    <MenuItem Header="_Stretch" Click="SetAsWallpaperStretch_Click" Style="{StaticResource MenuItemStyle}" />
-                    <MenuItem Header="_Tile" Click="SetAsWallpaperTile_Click" Style="{StaticResource MenuItemStyle}" />
-                </MenuItem>
                 <MenuItem Header="Find _Duplicates..." Click="FindDuplicates_Click" Style="{StaticResource MenuItemStyle}" />
                 <MenuItem Header="Sync Assets..." Click="SyncAssets_Click" Style="{StaticResource MenuItemStyle}" />
                 <MenuItem Header="Copy Assets (Ctrl+C)..." Click="CopyAssets_Click" Style="{StaticResource MenuItemStyle}" />

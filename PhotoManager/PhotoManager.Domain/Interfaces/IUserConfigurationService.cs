@@ -10,7 +10,6 @@ public interface IUserConfigurationService
     public ProjectSettings ProjectSettings { get; }
     public StorageSettings StorageSettings { get; }
 
-    void SetAsWallpaper(Asset asset, WallpaperStyle style);
     AboutInformation GetAboutInformation(Assembly assembly);
     string[] GetRootCatalogFolderPaths();
 }
