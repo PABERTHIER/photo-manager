@@ -1,20 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Win32;
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace PhotoManager.Infrastructure;
 
 public class UserConfigurationService : IUserConfigurationService
 {
-    private const int SPI_SETDESKWALLPAPER = 20;
-    private const int SPIF_UPDATEINIFILE = 0x01;
-    private const int SPIF_SENDWININICHANGE = 0x02;
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
-
     public AssetSettings AssetSettings { get; private set; } = default!;
     public HashSettings HashSettings { get; private set; } = default!;
     public PathSettings PathSettings { get; private set; } = default!;
@@ -28,55 +19,6 @@ public class UserConfigurationService : IUserConfigurationService
         _configuration = configuration;
 
         InitializeConfigValues();
-    }
-
-    public void SetAsWallpaper(Asset asset, WallpaperStyle style)
-    {
-        RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
-
-        switch (style)
-        {
-            case WallpaperStyle.Fill:
-                key?.SetValue(@"WallpaperStyle", "10");
-                key?.SetValue(@"TileWallpaper", "0");
-                Console.WriteLine("Wallpaper set for style 10 and tile 0");
-                break;
-
-            case WallpaperStyle.Fit:
-                key?.SetValue(@"WallpaperStyle", "6");
-                key?.SetValue(@"TileWallpaper", "0");
-                Console.WriteLine("Wallpaper set for style 6 and tile 0");
-                break;
-
-            case WallpaperStyle.Stretch:
-                key?.SetValue(@"WallpaperStyle", "2");
-                key?.SetValue(@"TileWallpaper", "0");
-                Console.WriteLine("Wallpaper set for style 2 and tile 0");
-                break;
-
-            case WallpaperStyle.Tile:
-                key?.SetValue(@"WallpaperStyle", "0");
-                key?.SetValue(@"TileWallpaper", "1");
-                Console.WriteLine("Wallpaper set for style 0 and tile 1");
-                break;
-
-            case WallpaperStyle.Center:
-                key?.SetValue(@"WallpaperStyle", "0");
-                key?.SetValue(@"TileWallpaper", "0");
-                Console.WriteLine("Wallpaper set for style 0 and tile 0");
-                break;
-
-            case WallpaperStyle.Span:
-                key?.SetValue(@"WallpaperStyle", "22");
-                key?.SetValue(@"TileWallpaper", "0");
-                Console.WriteLine("Wallpaper set for style 22 and tile 0");
-                break;
-        }
-
-        if (File.Exists(asset.FullPath))
-        {
-            _ = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, asset.FullPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-        }
     }
 
     public AboutInformation GetAboutInformation(Assembly assembly)

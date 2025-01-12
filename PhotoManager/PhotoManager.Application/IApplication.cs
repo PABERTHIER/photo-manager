@@ -28,5 +28,4 @@ public interface IApplication
     SyncAssetsConfiguration GetSyncAssetsConfiguration();
     void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration);
     Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback);
-    void SetAsWallpaper(Asset asset, WallpaperStyle style);
 }
