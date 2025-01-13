@@ -7,7 +7,7 @@ public class FindDuplicatedAssetsServiceTests
     private string? _databaseDirectory;
     private string? _databasePath;
     private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+    private const string DATABASE_END_PATH = "v1.0";
 
     private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
     private AssetRepository? _assetRepository;
@@ -26,7 +26,7 @@ public class FindDuplicatedAssetsServiceTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
+        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();

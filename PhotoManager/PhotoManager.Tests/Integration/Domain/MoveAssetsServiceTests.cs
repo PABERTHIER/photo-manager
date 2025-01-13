@@ -4,9 +4,9 @@
 public class MoveAssetsServiceTests
 {
     private string? _dataDirectory;
+    private string? _databaseDirectory;
     private string? _databasePath;
-    private string? _backupPath;
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+    private const string DATABASE_END_PATH = "v1.0";
 
     private MoveAssetsService? _moveAssetsService;
     private UserConfigurationService? _userConfigurationService;
@@ -21,14 +21,14 @@ public class MoveAssetsServiceTests
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
-        _databasePath = Path.Combine(_dataDirectory, "DatabaseTests");
+        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
+        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
     }
 
@@ -163,7 +163,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -295,7 +295,7 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -420,7 +420,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -554,7 +554,7 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -659,7 +659,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
 
             // Allow to write access to the directory
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
@@ -801,7 +801,7 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -931,7 +931,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -979,7 +979,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
             loggingAssertsService.LoggingAssertTearDown();
         }
     }
@@ -1102,7 +1102,7 @@ public class MoveAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1203,7 +1203,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1225,7 +1225,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1247,7 +1247,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1298,7 +1298,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1361,7 +1361,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1398,7 +1398,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1441,7 +1441,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1516,7 +1516,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1581,7 +1581,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1599,7 +1599,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1617,7 +1617,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1664,7 +1664,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1723,7 +1723,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1755,7 +1755,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1780,7 +1780,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1814,7 +1814,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
 
             // Allow to write access to the directory
             DirectoryHelper.AllowWriteAccess(destinationDirectory);
@@ -1849,7 +1849,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
             loggingAssertsService.LoggingAssertTearDown();
         }
@@ -1870,7 +1870,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(destinationDirectory, true);
         }
     }
@@ -1907,7 +1907,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
             loggingAssertsService.LoggingAssertTearDown();
         }
     }
@@ -1933,7 +1933,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1967,7 +1967,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1991,7 +1991,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2016,7 +2016,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2039,7 +2039,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2066,7 +2066,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
             loggingAssertsService.LoggingAssertTearDown();
         }
     }
@@ -2089,7 +2089,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2114,7 +2114,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
             loggingAssertsService.LoggingAssertTearDown();
         }
     }
@@ -2137,7 +2137,7 @@ public class MoveAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2162,7 +2162,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
             loggingAssertsService.LoggingAssertTearDown();
         }
     }
@@ -2188,7 +2188,7 @@ public class MoveAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
             loggingAssertsService.LoggingAssertTearDown();
         }
     }

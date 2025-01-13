@@ -6,9 +6,10 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 public class AssetRepositoryGetAssetsByPathTests
 {
     private string? _dataDirectory;
-    private string? _backupPath;
+    private string? _databaseDirectory;
+    private string? _databasePath;
     private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+    private const string DATABASE_END_PATH = "v1.0";
 
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
@@ -24,7 +25,8 @@ public class AssetRepositoryGetAssetsByPathTests
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
+        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
+        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -34,7 +36,7 @@ public class AssetRepositoryGetAssetsByPathTests
     public void SetUp()
     {
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath!);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
@@ -194,7 +196,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -204,7 +206,7 @@ public class AssetRepositoryGetAssetsByPathTests
     {
         BitmapImage? bitmapImage = null;
         Mock<IStorageService> storageService = new();
-        storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath!);
+        storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
 
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
@@ -251,7 +253,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -324,7 +326,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -378,7 +380,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -416,7 +418,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -467,7 +469,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -505,7 +507,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -558,7 +560,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -591,7 +593,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -642,7 +644,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -651,7 +653,7 @@ public class AssetRepositoryGetAssetsByPathTests
     public void GetAssetsByPath_ExceptionThrown_ReturnsAssetsWithPartialData()
     {
         Mock<IStorageService> storageService = new();
-        storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath!);
+        storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
 
         UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
@@ -713,7 +715,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -800,7 +802,7 @@ public class AssetRepositoryGetAssetsByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
