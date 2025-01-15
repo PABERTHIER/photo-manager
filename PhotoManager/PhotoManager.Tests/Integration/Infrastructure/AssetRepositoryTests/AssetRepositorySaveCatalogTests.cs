@@ -6,9 +6,10 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 public class AssetRepositorySaveCatalogTests
 {
     private string? _dataDirectory;
-    private string? _backupPath;
+    private string? _databaseDirectory;
+    private string? _databasePath;
     private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+    private const string DATABASE_END_PATH = "v1.0";
 
     private AssetRepository? _assetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
@@ -22,13 +23,14 @@ public class AssetRepositorySaveCatalogTests
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
+        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
+        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
     }
 
     [SetUp]
@@ -84,11 +86,11 @@ public class AssetRepositorySaveCatalogTests
             _assetRepository!.AddAsset(_asset1!, []);
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
             // Just to fill the syncassetsdirectoriesdefinitions.db and the recenttargetpaths.db files
             SyncAssetsConfiguration syncAssetsConfiguration = new();
@@ -130,13 +132,13 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(_assetRepository.HasChanges(), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder2.ThumbnailsFilename)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder2.ThumbnailsFilename)), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
 
             List<Folder> folders = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
             List<Asset> assets = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
@@ -164,7 +166,7 @@ public class AssetRepositorySaveCatalogTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -188,11 +190,11 @@ public class AssetRepositorySaveCatalogTests
             _assetRepository!.AddAsset(_asset1!, []);
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
             // Just to fill the syncassetsdirectoriesdefinitions.db and the recenttargetpaths.db files
             SyncAssetsConfiguration syncAssetsConfiguration = new();
@@ -239,13 +241,13 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(assetRepository.HasChanges(), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder2.ThumbnailsFilename)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder2.ThumbnailsFilename)), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
 
             List<Folder> folders = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
             List<Asset> assets = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
@@ -279,7 +281,7 @@ public class AssetRepositorySaveCatalogTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -301,11 +303,11 @@ public class AssetRepositorySaveCatalogTests
             _assetRepository!.AddAsset(_asset1!, []);
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -314,18 +316,18 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(_assetRepository.HasChanges(), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -345,25 +347,25 @@ public class AssetRepositorySaveCatalogTests
             _assetRepository.DeleteFolder(addedFolder1);
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
             _assetRepository.SaveCatalog(null);
 
             Assert.That(_assetRepository.HasChanges(), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -377,25 +379,25 @@ public class AssetRepositorySaveCatalogTests
         try
         {
             Assert.That(_assetRepository!.HasChanges(), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
             _assetRepository.SaveCatalog(null);
 
             Assert.That(_assetRepository.HasChanges(), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -419,11 +421,11 @@ public class AssetRepositorySaveCatalogTests
             _assetRepository!.AddAsset(_asset1!, []);
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
 
             // Just to fill the syncassetsdirectoriesdefinitions.db and the recenttargetpaths.db files
             SyncAssetsConfiguration syncAssetsConfiguration = new();
@@ -465,13 +467,13 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(_assetRepository.HasChanges(), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder2.ThumbnailsFilename)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder2.ThumbnailsFilename)), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_backupPath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
 
             List<Folder> folders = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
             List<Asset> assets = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
@@ -497,7 +499,7 @@ public class AssetRepositorySaveCatalogTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

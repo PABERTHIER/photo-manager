@@ -6,8 +6,9 @@ namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 public class AssetRepositoryGetFolderByPathTests
 {
     private string? _dataDirectory;
-    private string? _backupPath;
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+    private string? _databaseDirectory;
+    private string? _databasePath;
+    private const string DATABASE_END_PATH = "v1.0";
 
     private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
@@ -17,13 +18,14 @@ public class AssetRepositoryGetFolderByPathTests
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
+        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
+        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
     }
 
     [SetUp]
@@ -64,7 +66,7 @@ public class AssetRepositoryGetFolderByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -98,7 +100,7 @@ public class AssetRepositoryGetFolderByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -122,7 +124,7 @@ public class AssetRepositoryGetFolderByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -147,7 +149,7 @@ public class AssetRepositoryGetFolderByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }
@@ -188,7 +190,7 @@ public class AssetRepositoryGetFolderByPathTests
         }
         finally
         {
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests"), true);
+            Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
         }
     }

@@ -4,9 +4,9 @@
 public class SyncAssetsServiceTests
 {
     private string? _dataDirectory;
+    private string? _databaseDirectory;
     private string? _databasePath;
-    private string? _backupPath;
-    private const string BACKUP_END_PATH = "DatabaseTests\\v1.0";
+    private const string DATABASE_END_PATH = "v1.0";
 
     private SyncAssetsService? _syncAssetsService;
     private UserConfigurationService? _userConfigurationService;
@@ -21,14 +21,14 @@ public class SyncAssetsServiceTests
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databasePath = Path.Combine(_dataDirectory, "DatabaseTests");
-        _backupPath = Path.Combine(_dataDirectory, BACKUP_END_PATH);
+        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
+        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
 
         _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_backupPath);
+        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
     }
 
@@ -86,7 +86,7 @@ public class SyncAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -191,7 +191,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -321,7 +321,7 @@ public class SyncAssetsServiceTests
         {
             Directory.Delete(sourceDirectory, true);
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -431,7 +431,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -543,7 +543,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -737,7 +737,7 @@ public class SyncAssetsServiceTests
         {
             Directory.Delete(firstDestinationDirectory, true);
             Directory.Delete(secondDestinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -895,7 +895,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1055,7 +1055,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1215,7 +1215,7 @@ public class SyncAssetsServiceTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory2, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1405,7 +1405,7 @@ public class SyncAssetsServiceTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory2, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1603,7 +1603,7 @@ public class SyncAssetsServiceTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory2, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1761,7 +1761,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -1970,7 +1970,7 @@ public class SyncAssetsServiceTests
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
             Directory.Delete(sourceSubDirectory3, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2119,7 +2119,7 @@ public class SyncAssetsServiceTests
         {
             Directory.Delete(destinationDirectory, true);
             Directory.Delete(sourceSubDirectory1, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2270,7 +2270,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2354,7 +2354,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2422,7 +2422,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2503,7 +2503,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2566,7 +2566,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2608,7 +2608,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2650,7 +2650,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2747,7 +2747,7 @@ public class SyncAssetsServiceTests
         finally
         {
             Directory.Delete(destinationDirectory, true);
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 
@@ -2822,7 +2822,7 @@ public class SyncAssetsServiceTests
         }
         finally
         {
-            Directory.Delete(_databasePath!, true);
+            Directory.Delete(_databaseDirectory!, true);
         }
     }
 }
