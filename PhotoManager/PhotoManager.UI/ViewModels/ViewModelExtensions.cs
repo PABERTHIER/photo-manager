@@ -20,7 +20,7 @@ public static class ViewModelExtensions
     {
         int currentIndex = collection.IndexOf(item);
 
-        if (currentIndex < (collection.Count - 1))
+        if (currentIndex >= 0 && currentIndex < (collection.Count - 1))
         {
             int newIndex = currentIndex + 1;
             collection.Remove(item);

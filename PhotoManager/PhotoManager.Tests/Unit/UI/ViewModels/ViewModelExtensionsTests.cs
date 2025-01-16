@@ -1,206 +1,383 @@
-﻿// using FluentAssertions;
-// using System.Collections.ObjectModel;
-// using Xunit;
+﻿using System.Collections.ObjectModel;
 
-// namespace PhotoManager.Tests.Unit.UI.ViewModels;
+namespace PhotoManager.Tests.Unit.UI.ViewModels;
 
-// public class ViewModelExtensionsTests
-// {
-//     [Test]
-//     public void MoveUpSecondDefinitionTest()
-//     {
-//         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
-//         {
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MyFirstGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MyFirstGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MySecondGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MySecondGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"\\MyServer\Images",
-//                 DestinationDirectory = @"C:\Images"
-//             }
-//         };
+[TestFixture]
+public class ViewModelExtensionsTests
+{
+    [Test]
+    public void MoveUp_FirstItem_DoesNotMoveUpItem()
+    {
+        ObservableCollection<string> items = ["toto", "tutu", "tata"];
 
-//         definitions.MoveUp(definitions[1]);
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
 
-//         definitions.Should().HaveCount(3);
-//         definitions[0].SourceDirectory.Should().Be(@"C:\MySecondGame\Screenshots");
-//         definitions[0].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
-//         definitions[1].SourceDirectory.Should().Be(@"C:\MyFirstGame\Screenshots");
-//         definitions[1].DestinationDirectory.Should().Be(@"C:\Images\MyFirstGame");
-//         definitions[2].SourceDirectory.Should().Be(@"\\MyServer\Images");
-//         definitions[2].DestinationDirectory.Should().Be(@"C:\Images");
-//     }
+        items.MoveUp(items[0]);
 
-//     [Test]
-//     public void MoveUpThirdDefinitionTest()
-//     {
-//         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
-//         {
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MyFirstGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MyFirstGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MySecondGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MySecondGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"\\MyServer\Images",
-//                 DestinationDirectory = @"C:\Images"
-//             }
-//         };
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+    }
 
-//         definitions.MoveUp(definitions[2]);
+    [Test]
+    public void MoveUp_NotFirstAndNotLastItem_MovesUpItem()
+    {
+        ObservableCollection<string> items = ["toto", "tutu", "tata"];
 
-//         definitions.Should().HaveCount(3);
-//         definitions[0].SourceDirectory.Should().Be(@"C:\MyFirstGame\Screenshots");
-//         definitions[0].DestinationDirectory.Should().Be(@"C:\Images\MyFirstGame");
-//         definitions[1].SourceDirectory.Should().Be(@"\\MyServer\Images");
-//         definitions[1].DestinationDirectory.Should().Be(@"C:\Images");
-//         definitions[2].SourceDirectory.Should().Be(@"C:\MySecondGame\Screenshots");
-//         definitions[2].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
-//     }
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
 
-//     [Test]
-//     public void MoveUpFirstDefinitionTest()
-//     {
-//         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
-//         {
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MyFirstGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MyFirstGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MySecondGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MySecondGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"\\MyServer\Images",
-//                 DestinationDirectory = @"C:\Images"
-//             }
-//         };
+        items.MoveUp(items[1]);
 
-//         definitions.MoveUp(definitions[0]);
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("tutu"));
+        Assert.That(items[1], Is.EqualTo("toto"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+    }
 
-//         definitions.Should().HaveCount(3);
-//         definitions[0].SourceDirectory.Should().Be(@"C:\MyFirstGame\Screenshots");
-//         definitions[0].DestinationDirectory.Should().Be(@"C:\Images\MyFirstGame");
-//         definitions[1].SourceDirectory.Should().Be(@"C:\MySecondGame\Screenshots");
-//         definitions[1].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
-//         definitions[2].SourceDirectory.Should().Be(@"\\MyServer\Images");
-//         definitions[2].DestinationDirectory.Should().Be(@"C:\Images");
-//     }
+    [Test]
+    public void MoveUp_LastAndNotFirstItem_MovesUpItem()
+    {
+        ObservableCollection<string> items = ["toto", "tutu", "tata"];
 
-//     [Test]
-//     public void MoveDownSecondDefinitionTest()
-//     {
-//         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
-//         {
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MyFirstGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MyFirstGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MySecondGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MySecondGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"\\MyServer\Images",
-//                 DestinationDirectory = @"C:\Images"
-//             }
-//         };
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
 
-//         definitions.MoveDown(definitions[1]);
+        items.MoveUp(items[2]);
 
-//         definitions.Should().HaveCount(3);
-//         definitions[0].SourceDirectory.Should().Be(@"C:\MyFirstGame\Screenshots");
-//         definitions[0].DestinationDirectory.Should().Be(@"C:\Images\MyFirstGame");
-//         definitions[1].SourceDirectory.Should().Be(@"\\MyServer\Images");
-//         definitions[1].DestinationDirectory.Should().Be(@"C:\Images");
-//         definitions[2].SourceDirectory.Should().Be(@"C:\MySecondGame\Screenshots");
-//         definitions[2].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
-//     }
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tata"));
+        Assert.That(items[2], Is.EqualTo("tutu"));
+    }
 
-//     [Test]
-//     public void MoveDownFirstDefinitionTest()
-//     {
-//         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
-//         {
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MyFirstGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MyFirstGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MySecondGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MySecondGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"\\MyServer\Images",
-//                 DestinationDirectory = @"C:\Images"
-//             }
-//         };
+    [Test]
+    [TestCase(new[] { "toto", "toto", "toto" }, new[] { "toto", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "tutu", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "toto", "tutu", "toto" })] // Unchanged
+    [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
+    public void MoveUp_FirstItemAndDuplicateItemsInTheCollection_DoesNotMoveUpItem(string[] collection, string[] expectedCollection)
+    {
+        ObservableCollection<string> items = [..collection];
 
-//         definitions.MoveDown(definitions[0]);
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(collection[0]));
+        Assert.That(items[1], Is.EqualTo(collection[1]));
+        Assert.That(items[2], Is.EqualTo(collection[2]));
 
-//         definitions.Should().HaveCount(3);
-//         definitions[0].SourceDirectory.Should().Be(@"C:\MySecondGame\Screenshots");
-//         definitions[0].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
-//         definitions[1].SourceDirectory.Should().Be(@"C:\MyFirstGame\Screenshots");
-//         definitions[1].DestinationDirectory.Should().Be(@"C:\Images\MyFirstGame");
-//         definitions[2].SourceDirectory.Should().Be(@"\\MyServer\Images");
-//         definitions[2].DestinationDirectory.Should().Be(@"C:\Images");
-//     }
+        items.MoveUp(items[0]);
 
-//     [Test]
-//     public void MoveDownLastDefinitionTest()
-//     {
-//         var definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>
-//         {
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MyFirstGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MyFirstGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"C:\MySecondGame\Screenshots",
-//                 DestinationDirectory = @"C:\Images\MySecondGame"
-//             },
-//             new SyncAssetsDirectoriesDefinition
-//             {
-//                 SourceDirectory = @"\\MyServer\Images",
-//                 DestinationDirectory = @"C:\Images"
-//             }
-//         };
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(expectedCollection[0]));
+        Assert.That(items[1], Is.EqualTo(expectedCollection[1]));
+        Assert.That(items[2], Is.EqualTo(expectedCollection[2]));
+    }
 
-//         definitions.MoveDown(definitions[2]);
+    [Test]
+    [TestCase(new[] { "toto", "toto", "toto" }, new[] { "toto", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "toto", "tutu", "toto" })]
+    [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "tutu", "toto", "toto" })]
+    [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
+    public void MoveUp_NotFirstAndNotLastItemAndDuplicateItemsInTheCollection_MovesUpFirstItemDuplicate(string[] collection, string[] expectedCollection)
+    {
+        ObservableCollection<string> items = [..collection];
 
-//         definitions.Should().HaveCount(3);
-//         definitions[0].SourceDirectory.Should().Be(@"C:\MyFirstGame\Screenshots");
-//         definitions[0].DestinationDirectory.Should().Be(@"C:\Images\MyFirstGame");
-//         definitions[1].SourceDirectory.Should().Be(@"C:\MySecondGame\Screenshots");
-//         definitions[1].DestinationDirectory.Should().Be(@"C:\Images\MySecondGame");
-//         definitions[2].SourceDirectory.Should().Be(@"\\MyServer\Images");
-//         definitions[2].DestinationDirectory.Should().Be(@"C:\Images");
-//     }
-// }
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(collection[0]));
+        Assert.That(items[1], Is.EqualTo(collection[1]));
+        Assert.That(items[2], Is.EqualTo(collection[2]));
+
+        items.MoveUp(items[1]);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(expectedCollection[0]));
+        Assert.That(items[1], Is.EqualTo(expectedCollection[1]));
+        Assert.That(items[2], Is.EqualTo(expectedCollection[2]));
+    }
+
+    [Test]
+    [TestCase(new[] { "toto", "toto", "toto" }, new[] { "toto", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "toto", "tutu", "toto" })]
+    [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "toto", "tutu", "toto" })] // Unchanged
+    [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "tutu", "toto" })]
+    public void MoveUp_LastItemAndDuplicateItemsInTheCollection_MovesUpFirstItemDuplicate(string[] collection, string[] expectedCollection)
+    {
+        ObservableCollection<string> items = [..collection];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(collection[0]));
+        Assert.That(items[1], Is.EqualTo(collection[1]));
+        Assert.That(items[2], Is.EqualTo(collection[2]));
+
+        items.MoveUp(items[2]);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(expectedCollection[0]));
+        Assert.That(items[1], Is.EqualTo(expectedCollection[1]));
+        Assert.That(items[2], Is.EqualTo(expectedCollection[2]));
+    }
+
+    [Test]
+    public void MoveUp_OnlyOneItem_DoesNothing()
+    {
+        ObservableCollection<string> items = ["toto"];
+
+        Assert.That(items, Has.Count.EqualTo(1));
+        Assert.That(items[0], Is.EqualTo("toto"));
+
+        items.MoveUp(items[0]);
+
+        Assert.That(items, Has.Count.EqualTo(1));
+        Assert.That(items[0], Is.EqualTo("toto"));
+    }
+
+    [Test]
+    public void MoveUp_ItemIsNotFound_DoesNothing()
+    {
+        ObservableCollection<string> items = ["toto"];
+
+        Assert.That(items, Has.Count.EqualTo(1));
+        Assert.That(items[0], Is.EqualTo("toto"));
+
+        items.MoveUp("tutu");
+
+        Assert.That(items, Has.Count.EqualTo(1));
+        Assert.That(items[0], Is.EqualTo("toto"));
+    }
+
+    [Test]
+    public void MoveUp_NoItem_DoesNothing()
+    {
+        ObservableCollection<string> items = [];
+
+        Assert.That(items, Is.Empty);
+
+        items.MoveUp("toto");
+
+        Assert.That(items, Is.Empty);
+    }
+
+    [Test]
+    public void MoveUp_CollectionIsNull_ThrowsNullReferenceException()
+    {
+        ObservableCollection<string> items = null!;
+
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => items.MoveUp("toto"));
+
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+    }
+
+    [Test]
+    public void MoveUp_ItemIsNull_DoesNothing()
+    {
+        ObservableCollection<string> items = ["toto", "tutu", "tata"];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+
+        items.MoveUp(null!);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+    }
+
+    [Test]
+    public void MoveDown_FirstAndNotLastItem_MovesDownItem()
+    {
+        ObservableCollection<string> items = ["toto", "tutu", "tata"];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+
+        items.MoveDown(items[0]);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("tutu"));
+        Assert.That(items[1], Is.EqualTo("toto"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+    }
+
+    [Test]
+    public void MoveDown_NotFirstAndNotLastItem_MovesDownItem()
+    {
+        ObservableCollection<string> items = ["toto", "tutu", "tata"];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+
+        items.MoveDown(items[1]);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tata"));
+        Assert.That(items[2], Is.EqualTo("tutu"));
+    }
+
+    [Test]
+    public void MoveDown_LastItem_DoesNotMoveDownItem()
+    {
+        ObservableCollection<string> items = ["toto", "tutu", "tata"];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+
+        items.MoveDown(items[2]);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+    }
+
+    [Test]
+    [TestCase(new[] { "toto", "toto", "toto" }, new[] { "toto", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "toto", "tutu", "toto" })]
+    [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "tutu", "toto", "toto" })]
+    [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
+    public void MoveDown_FirstItemAndDuplicateItemsInTheCollection_DoesNotMoveDownItem(string[] collection, string[] expectedCollection)
+    {
+        ObservableCollection<string> items = [..collection];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(collection[0]));
+        Assert.That(items[1], Is.EqualTo(collection[1]));
+        Assert.That(items[2], Is.EqualTo(collection[2]));
+
+        items.MoveDown(items[0]);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(expectedCollection[0]));
+        Assert.That(items[1], Is.EqualTo(expectedCollection[1]));
+        Assert.That(items[2], Is.EqualTo(expectedCollection[2]));
+    }
+
+    [Test]
+    [TestCase(new[] { "toto", "toto", "toto" }, new[] { "toto", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "tutu", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "toto", "toto", "tutu" })]
+    [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
+    public void MoveDown_NotFirstAndNotLastItemAndDuplicateItemsInTheCollection_MovesDownFirstItemDuplicate(string[] collection, string[] expectedCollection)
+    {
+        ObservableCollection<string> items = [..collection];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(collection[0]));
+        Assert.That(items[1], Is.EqualTo(collection[1]));
+        Assert.That(items[2], Is.EqualTo(collection[2]));
+
+        items.MoveDown(items[1]);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(expectedCollection[0]));
+        Assert.That(items[1], Is.EqualTo(expectedCollection[1]));
+        Assert.That(items[2], Is.EqualTo(expectedCollection[2]));
+    }
+
+    [Test]
+    [TestCase(new[] { "toto", "toto", "toto" }, new[] { "toto", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "tutu", "toto", "toto" }, new[] { "tutu", "toto", "toto" })] // Unchanged
+    [TestCase(new[] { "toto", "tutu", "toto" }, new[] { "tutu", "toto", "toto" })]
+    [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
+    public void MoveDown_LastItemAndDuplicateItemsInTheCollection_MovesDownFirstItemDuplicate(string[] collection, string[] expectedCollection)
+    {
+        ObservableCollection<string> items = [..collection];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(collection[0]));
+        Assert.That(items[1], Is.EqualTo(collection[1]));
+        Assert.That(items[2], Is.EqualTo(collection[2]));
+
+        items.MoveDown(items[2]);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo(expectedCollection[0]));
+        Assert.That(items[1], Is.EqualTo(expectedCollection[1]));
+        Assert.That(items[2], Is.EqualTo(expectedCollection[2]));
+    }
+
+    [Test]
+    public void MoveDown_OnlyOneItem_DoesNothing()
+    {
+        ObservableCollection<string> items = ["toto"];
+
+        Assert.That(items, Has.Count.EqualTo(1));
+        Assert.That(items[0], Is.EqualTo("toto"));
+
+        items.MoveDown(items[0]);
+
+        Assert.That(items, Has.Count.EqualTo(1));
+        Assert.That(items[0], Is.EqualTo("toto"));
+    }
+
+    [Test]
+    public void MoveDown_ItemIsNotFound_DoesNothing()
+    {
+        ObservableCollection<string> items = ["toto"];
+
+        Assert.That(items, Has.Count.EqualTo(1));
+        Assert.That(items[0], Is.EqualTo("toto"));
+
+        items.MoveDown("tutu");
+
+        Assert.That(items, Has.Count.EqualTo(1));
+        Assert.That(items[0], Is.EqualTo("toto"));
+    }
+
+    [Test]
+    public void MoveDown_NoItem_DoesNothing()
+    {
+        ObservableCollection<string> items = [];
+
+        Assert.That(items, Is.Empty);
+
+        items.MoveDown("toto");
+
+        Assert.That(items, Is.Empty);
+    }
+
+    [Test]
+    public void MoveDown_CollectionIsNull_ThrowsNullReferenceException()
+    {
+        ObservableCollection<string> items = null!;
+
+        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => items.MoveDown("toto"));
+
+        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+    }
+
+    [Test]
+    public void MoveDown_ItemIsNull_DoesNothing()
+    {
+        ObservableCollection<string> items = ["toto", "tutu", "tata"];
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+
+        items.MoveDown(null!);
+
+        Assert.That(items, Has.Count.EqualTo(3));
+        Assert.That(items[0], Is.EqualTo("toto"));
+        Assert.That(items[1], Is.EqualTo("tutu"));
+        Assert.That(items[2], Is.EqualTo("tata"));
+    }
+}
