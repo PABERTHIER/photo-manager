@@ -11,11 +11,12 @@ public abstract class BaseProcessViewModel<C, R> : BaseViewModel
 {
     private ProcessStep step = ProcessStep.ViewDescription;
     private ObservableCollection<string> processStatusMessages;
-    private ObservableCollection<R> results;
+    private ObservableCollection<R> _results;
 
     protected BaseProcessViewModel(IApplication application) : base(application)
     {
-        processStatusMessages = new ObservableCollection<string>();
+        processStatusMessages = [];
+        _results = [];
     }
 
     public ObservableCollection<string> ProcessStatusMessages
@@ -25,10 +26,10 @@ public abstract class BaseProcessViewModel<C, R> : BaseViewModel
 
     public ObservableCollection<R> Results
     {
-        get { return results; }
+        get => _results;
         set
         {
-            results = value;
+            _results = value;
             NotifyPropertyChanged(nameof(Results));
             NotifyPropertyChanged(nameof(CanViewResults));
         }
@@ -89,7 +90,7 @@ public abstract class BaseProcessViewModel<C, R> : BaseViewModel
 
     public bool CanViewResults
     {
-        get { return Step == ProcessStep.Run && Results != null && Results.Count > 0; }
+        get { return Step == ProcessStep.ViewResults && Results.Count > 0; }
     }
 
     public void AdvanceStep()
