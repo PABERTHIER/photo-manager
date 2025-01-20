@@ -1,21 +1,21 @@
-﻿namespace PhotoManager.Tests.Integration.Domain;
+﻿using PhotoManager.UI.ViewModels.Enums;
+using System.ComponentModel;
+using System.Windows;
+
+namespace PhotoManager.Tests.Integration.UI.ViewModels.SyncAssetsVM;
 
 [TestFixture]
-public class SyncAssetsServiceTests
+public class SyncAssetsViewModelRunProcessAsyncTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
     private const string DATABASE_END_PATH = "v1.0";
 
-    private SyncAssetsService? _syncAssetsService;
-    private UserConfigurationService? _userConfigurationService;
-    private AssetRepository? _assetRepository;
-    private Database? _database;
-    private StorageService? _storageService;
+    private SyncAssetsViewModel? _syncAssetsViewModel;
     private MoveAssetsService? _moveAssetsService;
-    private Mock<IStorageService>? _storageServiceMock;
-    private Mock<IConfigurationRoot>? _configurationRootMock;
+    private StorageService? _storageService;
+    private AssetRepository? _assetRepository;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -23,37 +23,55 @@ public class SyncAssetsServiceTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
         _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
-
-        _configurationRootMock = new Mock<IConfigurationRoot>();
-        _configurationRootMock.GetDefaultMockConfig();
-
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
-        _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
     }
 
-    [SetUp]
-    public void SetUp()
+    private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
-        _storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock.MockGetValue(UserConfigurationKeys.CATALOG_BATCH_SIZE, catalogBatchSize.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH, thumbnailMaxWidth.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT, thumbnailMaxHeight.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_DHASH, usingDHash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMD5Hash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
+
+        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+
+        Mock<IStorageService> storageServiceMock = new();
+        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+
+        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
+        _storageService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
+        CatalogAssetsService catalogAssetsService = new (_assetRepository, _storageService, assetCreationService, userConfigurationService, assetsComparator);
         _moveAssetsService = new (_assetRepository, _storageService, assetCreationService);
-        _syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        SyncAssetsService syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, _storageService, userConfigurationService);
+        PhotoManager.Application.Application application = new (_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, userConfigurationService, _storageService);
+        _syncAssetsViewModel = new (application);
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreEmpty_NoStatusChangesAndNoImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreEmpty_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToSync");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
@@ -61,8 +79,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -72,15 +90,28 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
-            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 0,
+                    Message = $"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -91,13 +122,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmpty_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmpty_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             const string assetName1 = "Image 1_duplicate.jpg";
@@ -139,8 +176,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -150,7 +187,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -176,17 +213,30 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(4));
-            Assert.That(result[0].Message, Is.EqualTo($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 4,
+                    Message = $"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -196,14 +246,20 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsEmptyAndDestinationIsNotEmpty_NoStatusChangesAndNoImagesAreAdded()
+    public async Task RunProcessAsync_SourceIsEmptyAndDestinationIsNotEmpty_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
         string sourceToCopyPath = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceDirectory = Path.Combine(sourceToCopyPath, "Source");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
@@ -266,8 +322,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -277,7 +333,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Is.Empty);
@@ -309,13 +365,26 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
-            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 0,
+                    Message = $"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -326,13 +395,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyMultipleNewImages_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptyMultipleNewImages_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             const string assetName1 = "Image 1_duplicate.jpg";
@@ -381,8 +456,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -392,7 +467,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -418,15 +493,28 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(2));
-            Assert.That(result[0].Message, Is.EqualTo($"2 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(2));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 2,
+                    Message = $"2 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -436,13 +524,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyOneNewImage_StatusChangesAndImageAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptyOneNewImage_NotifiesAndStatusChangesAndImageAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             const string assetName1 = "Image 1_duplicate.jpg";
@@ -494,8 +588,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -505,7 +599,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -531,14 +625,27 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(1));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -548,15 +655,21 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyMultipleNewImagesAndTwoDefinitions_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptyMultipleNewImagesAndTwoDefinitions_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string firstSourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string secondSourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
         string firstDestinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync1");
         string secondDestinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync2");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(firstDestinationDirectory);
             Directory.CreateDirectory(secondDestinationDirectory);
 
@@ -649,8 +762,8 @@ public class SyncAssetsServiceTests
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = firstSourceDirectory, DestinationDirectory = firstDestinationDirectory });
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = secondSourceDirectory, DestinationDirectory = secondDestinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -664,7 +777,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource1 = _storageService!.GetFileNames(firstSourceDirectory);
             Assert.That(fileNamesInSource1, Has.Length.EqualTo(4));
@@ -714,24 +827,37 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath7), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationPath7), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(2));
-
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(firstSourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(firstDestinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(2));
-            Assert.That(result[0].Message, Is.EqualTo($"2 images synced from '{firstSourceDirectory}' to '{firstDestinationDirectory}'."));
-
-            Assert.That(result[1].SourceDirectory, Is.EqualTo(secondSourceDirectory));
-            Assert.That(result[1].DestinationDirectory, Is.EqualTo(secondDestinationDirectory));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(2));
-            Assert.That(result[1].Message, Is.EqualTo($"2 images synced from '{secondSourceDirectory}' to '{secondDestinationDirectory}'."));
-
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath5}' => '{assetDestinationPath5}'"));
             Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetSourcePath7}' => '{assetDestinationPath7}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = firstSourceDirectory,
+                    DestinationDirectory = firstDestinationDirectory,
+                    SyncedImages = 2,
+                    Message = $"2 images synced from '{firstSourceDirectory}' to '{firstDestinationDirectory}'."
+                },
+                new()
+                {
+                    SourceDirectory = secondSourceDirectory,
+                    DestinationDirectory = secondDestinationDirectory,
+                    SyncedImages = 2,
+                    Message = $"2 images synced from '{secondSourceDirectory}' to '{secondDestinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -742,15 +868,21 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(destinationSubDirectory1);
             Directory.CreateDirectory(destinationSubDirectory2);
@@ -830,8 +962,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -841,7 +973,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -883,14 +1015,27 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.False);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(1));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -900,15 +1045,21 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyAllImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndNoImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptyAllImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_NotifiesAndStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(destinationSubDirectory1);
             Directory.CreateDirectory(destinationSubDirectory2);
@@ -991,8 +1142,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1002,7 +1153,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1044,13 +1195,26 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
-            Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 0,
+                    Message = $"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -1060,7 +1224,7 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsFalse_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsFalse_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
@@ -1070,8 +1234,14 @@ public class SyncAssetsServiceTests
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(sourceSubDirectory1);
             Directory.CreateDirectory(sourceSubDirectory2);
@@ -1147,8 +1317,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1158,7 +1328,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1199,16 +1369,29 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FolderExists(destinationSubDirectory1), Is.False);
             Assert.That(_storageService.FolderExists(destinationSubDirectory2), Is.False);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(3));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 3,
+                    Message = $"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -1220,7 +1403,7 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
@@ -1230,8 +1413,14 @@ public class SyncAssetsServiceTests
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(sourceSubDirectory1);
             Directory.CreateDirectory(sourceSubDirectory2);
@@ -1316,8 +1505,8 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1327,7 +1516,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1376,29 +1565,45 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(3));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
-
-            Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
-            Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[1].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
-
-            Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
-            Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
-            Assert.That(result[2].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
-
             Assert.That(statusChanges, Has.Count.EqualTo(5));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
             Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'"));
             Assert.That(statusChanges[4].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 3,
+                    Message = $"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                },
+                new()
+                {
+                    SourceDirectory = sourceSubDirectory1,
+                    DestinationDirectory = destinationSubDirectory1,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."
+                },
+                new()
+                {
+                    SourceDirectory = sourceSubDirectory2,
+                    DestinationDirectory = destinationSubDirectory2,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -1410,7 +1615,7 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceAndDestinationSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceAndDestinationSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
@@ -1420,8 +1625,14 @@ public class SyncAssetsServiceTests
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(sourceSubDirectory1);
             Directory.CreateDirectory(sourceSubDirectory2);
@@ -1516,8 +1727,8 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1527,7 +1738,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1575,28 +1786,44 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(3));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
-
-            Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
-            Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(0));
-            Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
-
-            Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
-            Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
-            Assert.That(result[2].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
-
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
             Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 3,
+                    Message = $"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                },
+                new()
+                {
+                    SourceDirectory = sourceSubDirectory1,
+                    DestinationDirectory = destinationSubDirectory1,
+                    SyncedImages = 0,
+                    Message = $"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."
+                },
+                new()
+                {
+                    SourceDirectory = sourceSubDirectory2,
+                    DestinationDirectory = destinationSubDirectory2,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -1608,15 +1835,21 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreMultipleLevel_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreMultipleLevel_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory2//SubDirectory2");
         string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory3//SubDirectory4//SubDirectory5");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(destinationSubDirectory1);
             Directory.CreateDirectory(destinationSubDirectory2);
@@ -1696,8 +1929,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1707,7 +1940,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1749,14 +1982,27 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path3), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path4), Is.False);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[0].Message, Is.EqualTo($"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(1));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -1766,7 +2012,7 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreMultipleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreMultipleLevelAndIncludeSubFoldersIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
@@ -1778,8 +2024,14 @@ public class SyncAssetsServiceTests
         string destinationSubDirectory2 = Path.Combine(destinationSubDirectory1, "SubDirectory2");
         string destinationSubDirectory3 = Path.Combine(destinationDirectory, "SubDirectory3");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(sourceSubDirectory1);
             Directory.CreateDirectory(sourceSubDirectory2);
@@ -1869,8 +2121,8 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -1880,7 +2132,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -1936,34 +2188,52 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory2Path), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory3Path), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(4));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
-
-            Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
-            Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(0));
-            Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
-
-            Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
-            Assert.That(result[2].DestinationDirectory, Is.EqualTo(destinationSubDirectory2));
-            Assert.That(result[2].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[2].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."));
-
-            Assert.That(result[3].SourceDirectory, Is.EqualTo(sourceSubDirectory3));
-            Assert.That(result[3].DestinationDirectory, Is.EqualTo(destinationSubDirectory3));
-            Assert.That(result[3].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[3].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory3}' to '{destinationSubDirectory3}'."));
-
             Assert.That(statusChanges, Has.Count.EqualTo(5));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
             Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory2Path}' => '{assetDestinationSubDirectory2Path}'"));
             Assert.That(statusChanges[4].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory3Path}' => '{assetDestinationSubDirectory3Path}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 3,
+                    Message = $"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                },
+                new()
+                {
+                    SourceDirectory = sourceSubDirectory1,
+                    DestinationDirectory = destinationSubDirectory1,
+                    SyncedImages = 0,
+                    Message = $"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."
+                },
+                new()
+                {
+                    SourceDirectory = sourceSubDirectory2,
+                    DestinationDirectory = destinationSubDirectory2,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceSubDirectory2}' to '{destinationSubDirectory2}'."
+                },
+                new()
+                {
+                    SourceDirectory = sourceSubDirectory3,
+                    DestinationDirectory = destinationSubDirectory3,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceSubDirectory3}' to '{destinationSubDirectory3}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -1975,15 +2245,21 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndDuplicatedAssetInSourceAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndDuplicatedAssetInSourceAndIncludeSubFoldersIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(sourceSubDirectory1);
 
@@ -2050,8 +2326,8 @@ public class SyncAssetsServiceTests
                     IncludeSubFolders = true
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2061,7 +2337,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2097,23 +2373,37 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationSubDirectory1Path), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(2));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(3));
-            Assert.That(result[0].Message, Is.EqualTo($"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
-
-            Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
-            Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(1));
-            Assert.That(result[1].Message, Is.EqualTo($"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
-
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
             Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetDestinationToCopySubDirectory1Path}' => '{assetDestinationSubDirectory1Path}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 3,
+                    Message = $"3 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                },
+                new()
+                {
+                    SourceDirectory = sourceSubDirectory1,
+                    DestinationDirectory = destinationSubDirectory1,
+                    SyncedImages = 1,
+                    Message = $"1 image synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -2124,14 +2414,20 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceAndDestinationAreNotEmptyBothContainDifferentImagesAndDeleteAssetsNotInSourceIsTrue_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceAndDestinationAreNotEmptyBothContainDifferentImagesAndDeleteAssetsNotInSourceIsTrue_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
         string destinationToCopy = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             const string assetName1 = "Image 1_duplicate.jpg";
@@ -2210,8 +2506,8 @@ public class SyncAssetsServiceTests
                     DeleteAssetsNotInSource = true,
                 });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2221,7 +2517,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2251,12 +2547,6 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath7), Is.False);
             Assert.That(_storageService.FileExists(assetDestinationPath8), Is.False);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(8));
-            Assert.That(result[0].Message, Is.EqualTo($"8 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(8));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
@@ -2266,6 +2556,25 @@ public class SyncAssetsServiceTests
             Assert.That(statusChanges[5].NewStatus, Is.EqualTo($"Deleted '{assetDestinationPath6}'"));
             Assert.That(statusChanges[6].NewStatus, Is.EqualTo($"Deleted '{assetDestinationPath7}'"));
             Assert.That(statusChanges[7].NewStatus, Is.EqualTo($"Deleted '{assetDestinationPath8}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 8,
+                    Message = $"8 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -2275,13 +2584,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsEmpty_NoStatusChangesAndNoImagesAreAdded()
+    public async Task RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsEmpty_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             const string assetName1 = "Image 1_duplicate.jpg";
@@ -2321,13 +2636,13 @@ public class SyncAssetsServiceTests
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Is.Empty);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2349,7 +2664,13 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.That(result, Is.Empty);
+            CheckAfterChanges(_syncAssetsViewModel, [], []);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], []);
         }
         finally
         {
@@ -2359,13 +2680,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public void ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsNull_ThrowsNullReferenceException()
+    public void RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsNull_ThrowsNullReferenceException()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             const string assetName1 = "Image 1_duplicate.jpg";
@@ -2409,15 +2736,22 @@ public class SyncAssetsServiceTests
             syncAssetsConfiguration.Definitions.Add(definition!);
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            // _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref in Validate and Normalize methods
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(1));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.EqualTo(null));
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _syncAssetsService!.ExecuteAsync(statusChanges.Add));
+            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add));
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+
+            CheckAfterChanges(_syncAssetsViewModel, [], []);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(syncAssetsViewModelInstances, [], []);
         }
         finally
         {
@@ -2427,13 +2761,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationNotSaved_NoStatusChangesAndNoImagesAreAdded()
+    public async Task RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationNotSaved_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             const string assetName1 = "Image 1_duplicate.jpg";
@@ -2471,12 +2811,12 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository!.GetSyncAssetsConfiguration();
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Is.Empty);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2498,7 +2838,13 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.False);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.False);
 
-            Assert.That(result, Is.Empty);
+            CheckAfterChanges(_syncAssetsViewModel, [], []);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], []);
         }
         finally
         {
@@ -2508,13 +2854,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public void ExecuteAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationIsNull_ThrowsNullReferenceException()
+    public void RunProcessAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationIsNull_ThrowsNullReferenceException()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             const string assetName1 = "Image 1_duplicate.jpg";
@@ -2555,13 +2907,20 @@ public class SyncAssetsServiceTests
             SyncAssetsConfiguration? syncAssetsConfiguration = null;
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration!);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            // _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref for Validate and Normalize methods
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
             Assert.That(syncAssetsConfigurationFromRepository, Is.Null);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _syncAssetsService!.ExecuteAsync(statusChanges.Add));
+            NullReferenceException? exception = Assert.ThrowsAsync<NullReferenceException>(async () => await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add));
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+
+            CheckAfterChanges(_syncAssetsViewModel, [], []);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(syncAssetsViewModelInstances, [], []);
         }
         finally
         {
@@ -2571,21 +2930,27 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceDirectoryDoesNotExist_NoStatusChangesAndNoImagesAreAdded()
+    public async Task RunProcessAsync_SourceDirectoryDoesNotExist_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToSync");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2595,15 +2960,28 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
-            Assert.That(result[0].Message, Is.EqualTo($"Source directory '{sourceDirectory}' not found."));
             Assert.That(statusChanges, Is.Empty);
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 0,
+                    Message = $"Source directory '{sourceDirectory}' not found."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -2613,13 +2991,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceDirectoryIsNull_NoStatusChangesAndNoImagesAreAdded()
+    public async Task RunProcessAsync_SourceDirectoryIsNull_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
         string? sourceDirectory = null;
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             Directory.CreateDirectory(destinationDirectory);
 
             SyncAssetsConfiguration syncAssetsConfiguration = new();
@@ -2627,7 +3011,8 @@ public class SyncAssetsServiceTests
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory!, DestinationDirectory = destinationDirectory });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            // _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref during regex verification
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2637,15 +3022,28 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
-            Assert.That(result[0].Message, Is.EqualTo($"Source directory '{sourceDirectory}' not found."));
             Assert.That(statusChanges, Is.Empty);
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory!,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 0,
+                    Message = $"Source directory '{sourceDirectory}' not found."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -2655,13 +3053,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationDirectoryDoesNotExist_StatusChangesAndImagesAreAdded()
+    public async Task RunProcessAsync_SourceIsNotEmptyAndDestinationDirectoryDoesNotExist_NotifiesAndStatusChangesAndImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             const string assetName1 = "Image 1_duplicate.jpg";
             const string assetName2 = "Image 9.png";
             const string assetName3 = "Image 9_duplicate.png";
@@ -2695,8 +3099,8 @@ public class SyncAssetsServiceTests
 
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory });
 
-            _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration);
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2706,7 +3110,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2732,17 +3136,30 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetDestinationPath3), Is.True);
             Assert.That(_storageService.FileExists(assetDestinationPath4), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(4));
-            Assert.That(result[0].Message, Is.EqualTo($"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Has.Count.EqualTo(4));
             Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
             Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath3}' => '{assetDestinationPath3}'"));
             Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetSourcePath4}' => '{assetDestinationPath4}'"));
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory,
+                    SyncedImages = 4,
+                    Message = $"4 images synced from '{sourceDirectory}' to '{destinationDirectory}'."
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
@@ -2752,13 +3169,19 @@ public class SyncAssetsServiceTests
     }
 
     [Test]
-    public async Task ExecuteAsync_SourceIsNotEmptyAndDestinationDirectoryIsNull_NoStatusChangesAndNoImagesAreAdded()
+    public async Task RunProcessAsync_SourceIsNotEmptyAndDestinationDirectoryIsNull_NotifiesAndNoStatusChangesAndNoImagesAreAdded()
     {
         string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string? destinationDirectory = null;
 
+        ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges();
+
             const string assetName1 = "Image 1_duplicate.jpg";
             const string assetName2 = "Image 9.png";
             const string assetName3 = "Image 9_duplicate.png";
@@ -2788,7 +3211,8 @@ public class SyncAssetsServiceTests
             syncAssetsConfiguration.Definitions.Add(new() { SourceDirectory = sourceDirectory, DestinationDirectory = destinationDirectory! });
 
             _assetRepository!.SaveSyncAssetsConfiguration(syncAssetsConfiguration);
-            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _assetRepository.GetSyncAssetsConfiguration();
+            // _syncAssetsViewModel!.SetProcessConfiguration(syncAssetsConfiguration); // Using instead _assetRepository to prevent null ref during regex verification
+            SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(syncAssetsConfiguration.Definitions.Count));
             Assert.That(syncAssetsConfigurationFromRepository.Definitions[0].SourceDirectory, Is.EqualTo(syncAssetsConfiguration.Definitions[0].SourceDirectory));
@@ -2798,7 +3222,7 @@ public class SyncAssetsServiceTests
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
-            List<SyncAssetsResult> result = await _syncAssetsService!.ExecuteAsync(statusChanges.Add);
+            await _syncAssetsViewModel!.RunProcessAsync(statusChanges.Add);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));
@@ -2812,17 +3236,123 @@ public class SyncAssetsServiceTests
             Assert.That(_storageService.FileExists(assetSourcePath3), Is.True);
             Assert.That(_storageService.FileExists(assetSourcePath4), Is.True);
 
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
-            Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
-            Assert.That(result[0].Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
             Assert.That(statusChanges, Is.Empty);
+
+            List<SyncAssetsResult> expectedResult =
+            [
+                new()
+                {
+                    SourceDirectory = sourceDirectory,
+                    DestinationDirectory = destinationDirectory!,
+                    SyncedImages = 0,
+                    Message = "Value cannot be null. (Parameter 'path')"
+                }
+            ];
+
+            CheckAfterChanges(_syncAssetsViewModel, [], expectedResult);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Results"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("CanViewResults"));
+
+            CheckInstance(syncAssetsViewModelInstances, [], expectedResult);
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    private (List<string> notifyPropertyChangedEvents, List<SyncAssetsViewModel> syncAssetsViewModelInstances) NotifyPropertyChangedEvents()
+    {
+        List<string> notifyPropertyChangedEvents = [];
+        List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
+
+        _syncAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        {
+            notifyPropertyChangedEvents.Add(e.PropertyName!);
+            syncAssetsViewModelInstances.Add((SyncAssetsViewModel)sender!);
+        };
+
+        return (notifyPropertyChangedEvents, syncAssetsViewModelInstances);
+    }
+
+    private void CheckBeforeChanges()
+    {
+        // From SyncAssetsViewModel
+        Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
+
+        // From BaseProcessViewModel
+        Assert.That(_syncAssetsViewModel!.ProcessStatusMessages, Is.Empty);
+        Assert.That(_syncAssetsViewModel!.Results, Is.Empty);
+        Assert.That(_syncAssetsViewModel!.Step, Is.EqualTo(ProcessStep.ViewDescription));
+        Assert.That(_syncAssetsViewModel!.DescriptionVisible, Is.EqualTo(Visibility.Visible));
+        Assert.That(_syncAssetsViewModel!.ConfigurationVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_syncAssetsViewModel!.RunVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_syncAssetsViewModel!.ResultsVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_syncAssetsViewModel!.CanViewDescription, Is.True);
+        Assert.That(_syncAssetsViewModel!.CanConfigure, Is.False);
+        Assert.That(_syncAssetsViewModel!.CanViewResults, Is.False);
+    }
+
+    private static void CheckAfterChanges(
+        SyncAssetsViewModel syncAssetsViewModelInstance,
+        List<SyncAssetsDirectoriesDefinition> definitions,
+        List<SyncAssetsResult> expectedResult)
+    {
+        // From SyncAssetsViewModel
+        Assert.That(syncAssetsViewModelInstance.Definitions, Has.Count.EqualTo(definitions.Count));
+
+        for (int i = 0; i < definitions.Count; i++)
+        {
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].SourceDirectory, Is.EqualTo(definitions[i].SourceDirectory));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].DestinationDirectory, Is.EqualTo(definitions[i].DestinationDirectory));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].IncludeSubFolders, Is.EqualTo(definitions[i].IncludeSubFolders));
+            Assert.That(syncAssetsViewModelInstance.Definitions[i].DeleteAssetsNotInSource, Is.EqualTo(definitions[i].DeleteAssetsNotInSource));
+        }
+
+        // From BaseProcessViewModel
+        Assert.That(syncAssetsViewModelInstance.ProcessStatusMessages, Is.Empty);
+
+        Assert.That(syncAssetsViewModelInstance.Results, Has.Count.EqualTo(expectedResult.Count));
+
+        for (int i = 0; i < expectedResult.Count; i++)
+        {
+            Assert.That(syncAssetsViewModelInstance.Results[i].SourceDirectory, Is.EqualTo(expectedResult[i].SourceDirectory));
+            Assert.That(syncAssetsViewModelInstance.Results[i].DestinationDirectory, Is.EqualTo(expectedResult[i].DestinationDirectory));
+            Assert.That(syncAssetsViewModelInstance.Results[i].SyncedImages, Is.EqualTo(expectedResult[i].SyncedImages));
+            Assert.That(syncAssetsViewModelInstance.Results[i].Message, Is.EqualTo(expectedResult[i].Message));
+        }
+
+        Assert.That(syncAssetsViewModelInstance.Step, Is.EqualTo(ProcessStep.ViewDescription));
+        Assert.That(syncAssetsViewModelInstance.DescriptionVisible, Is.EqualTo(Visibility.Visible));
+        Assert.That(syncAssetsViewModelInstance.ConfigurationVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(syncAssetsViewModelInstance.RunVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(syncAssetsViewModelInstance.ResultsVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(syncAssetsViewModelInstance.CanViewDescription, Is.True);
+        Assert.That(syncAssetsViewModelInstance.CanConfigure, Is.False);
+        Assert.That(syncAssetsViewModelInstance.CanViewResults, Is.False);
+    }
+
+    private static void CheckInstance(
+        List<SyncAssetsViewModel> syncAssetsViewModelInstances,
+        List<SyncAssetsDirectoriesDefinition> definitions,
+        List<SyncAssetsResult> expectedResult)
+    {
+        int syncAssetsViewModelInstancesCount = syncAssetsViewModelInstances.Count;
+
+        if (syncAssetsViewModelInstancesCount > 1)
+        {
+            Assert.That(syncAssetsViewModelInstances[syncAssetsViewModelInstancesCount - 2],
+                Is.EqualTo(syncAssetsViewModelInstances[0]));
+            // No need to go deeper, same instance because ref updated each time
+            Assert.That(syncAssetsViewModelInstances[syncAssetsViewModelInstancesCount - 1],
+                Is.EqualTo(syncAssetsViewModelInstances[syncAssetsViewModelInstancesCount - 2]));
+        }
+
+        if (syncAssetsViewModelInstancesCount > 0)
+        {
+            CheckAfterChanges(syncAssetsViewModelInstances[0], definitions, expectedResult);
         }
     }
 }
