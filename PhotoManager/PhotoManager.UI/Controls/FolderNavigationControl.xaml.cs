@@ -83,13 +83,14 @@ public partial class FolderNavigationControl : UserControl
         }
     }
 
+    // TODO: Remove includeHidden
     private void AddSubItems(TreeViewItem item, bool includeHidden)
     {
         try
         {
             item.Items.Clear();
 
-            Folder[] folders = ViewModel.GetSubFolders((Folder)item.Tag, includeHidden);
+            Folder[] folders = ViewModel.GetSubFolders((Folder)item.Tag);
             folders = folders.OrderBy(f => f.Name).ToArray();
 
             foreach (Folder folder in folders)
