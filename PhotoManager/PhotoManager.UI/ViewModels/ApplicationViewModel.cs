@@ -423,14 +423,6 @@ public class ApplicationViewModel : BaseViewModel
     {
         bool isCataloguedAssetsEmpty = cataloguedAssets.Length == 0;
 
-        // TODO: Temp fix waiting for rework about cataloguedAssets
-        if (isCataloguedAssetsEmpty && ObservableAssets.Count > 0)
-        {
-            cataloguedAssets = [..ObservableAssets];
-        }
-
-        isCataloguedAssetsEmpty = cataloguedAssets.Length == 0;
-
         if (!isCataloguedAssetsEmpty)
         {
             // AssetComparer comparer = new (SortAscending);
