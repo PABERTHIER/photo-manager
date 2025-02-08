@@ -529,7 +529,6 @@ public class ApplicationViewModel : BaseViewModel
     public BitmapImage LoadBitmapImageFromPath() => Application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
     public BitmapImage LoadBitmapHeicImageFromPath() => Application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
 
-    // ------------------
     public void CalculateGlobalAssetsCounter()
     {
         int globalAssetsCounter = Application.GetAssetsCounter();
