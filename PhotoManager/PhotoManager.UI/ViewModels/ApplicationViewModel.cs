@@ -479,6 +479,41 @@ public class ApplicationViewModel : BaseViewModel
         SortCriteria = sortCriteria;
         SortAscending = SortCriteria != previousSortCriteria || !SortAscending;
         SortAssets();
+    public BitmapImage LoadBitmapImageFromPath()
+    {
+        if (CurrentAsset == null)
+        {
+            throw new NullReferenceException("CurrentAsset is null");
+        }
+
+        return Application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+    }
+
+    public BitmapImage LoadBitmapHeicImageFromPath()
+    {
+        if (CurrentAsset == null)
+        {
+            throw new NullReferenceException("CurrentAsset is null");
+        }
+
+        return Application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+    }
+
+    public void CalculateGlobalAssetsCounter()
+    {
+        int globalAssetsCounter = Application.GetAssetsCounter();
+        GlobalAssetsCounterWording = $"Total number of assets: {globalAssetsCounter}";
+    }
+
+    public void SetExecutionTime(TimeSpan executionTime)
+    {
+        ExecutionTimeWording = $"Execution time: {executionTime}";
+    }
+
+    public void CalculateTotalFilesCount()
+    {
+        int totalFilesCount = Application.GetTotalFilesCount();
+        TotalFilesCountWording = $"{totalFilesCount} files found";
     }
 
     private string GetSortCriteriaDescription()
@@ -525,9 +560,6 @@ public class ApplicationViewModel : BaseViewModel
 
     // TODO: Remove includeHidden
     public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => Application.GetSubFolders(parentFolder);
-
-    public BitmapImage LoadBitmapImageFromPath() => Application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
-    public BitmapImage LoadBitmapHeicImageFromPath() => Application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
 
     public void CalculateGlobalAssetsCounter()
     {

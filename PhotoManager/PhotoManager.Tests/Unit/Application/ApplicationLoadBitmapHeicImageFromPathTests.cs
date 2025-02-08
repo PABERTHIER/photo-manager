@@ -161,7 +161,7 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    public void LoadBitmapHeicImageFromPath_InvalidRotation_ReturnsPartialBitmapImage()
+    public void LoadBitmapHeicImageFromPath_InvalidRotation_ThrowsArgumentException()
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -180,4 +180,3 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
         }
     }
 }
-
