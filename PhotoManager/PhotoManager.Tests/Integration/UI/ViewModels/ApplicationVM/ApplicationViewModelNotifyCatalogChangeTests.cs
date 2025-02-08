@@ -1,4 +1,5 @@
 ﻿using PhotoManager.UI.ViewModels.Enums;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 
@@ -1024,7 +1025,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory,
                 0,
                 [],
-                null!,
+                null,
                 videoFirstFrameFolder!,
                 false);
 
@@ -1538,7 +1539,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CheckAfterNotifyCatalogChanges(_applicationViewModel!, assetsDirectory, 0, [], null!, folder!, false);
+            CheckAfterNotifyCatalogChanges(_applicationViewModel!, assetsDirectory, 0, [], null, folder!, false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
@@ -1546,7 +1547,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, 0, [], null!, folder!, false);
+            CheckInstance(applicationViewModelInstances, assetsDirectory, 0, [], null, folder!, false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -1858,8 +1859,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 _applicationViewModel!,
                 assetsDirectory,
                 5,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
@@ -1905,8 +1906,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 applicationViewModelInstances,
                 assetsDirectory,
                 5,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
@@ -2667,7 +2668,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory,
                 0,
                 [],
-                null!,
+                null,
                 videoFirstFrameFolder!,
                 false);
 
@@ -3663,8 +3664,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 _applicationViewModel!,
                 assetsDirectory,
                 5,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
@@ -3710,8 +3711,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 applicationViewModelInstances,
                 assetsDirectory,
                 5,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
@@ -4826,7 +4827,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 firstFrameVideosDirectory,
                 0,
                 [],
-                null!,
+                null,
                 videoFirstFrameFolder!,
                 false);
 
@@ -6912,7 +6913,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -6931,7 +6932,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7030,7 +7031,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7057,7 +7058,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7143,7 +7144,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7177,7 +7178,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7261,7 +7262,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7303,7 +7304,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7963,7 +7964,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 imageDeletedDirectory,
                 0,
                 [],
-                null!,
+                null,
                 imageDeletedFolder!,
                 false);
 
@@ -8005,7 +8006,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 subSubDirDirectory,
                 0,
                 [],
-                null!,
+                null,
                 subSubDirFolder!,
                 false);
 
@@ -8694,7 +8695,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 imageDeletedDirectory,
                 0,
                 [],
-                null!,
+                null,
                 imageDeletedFolder!,
                 false);
 
@@ -8736,7 +8737,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 subSubDirDirectory,
                 0,
                 [],
-                null!,
+                null,
                 subSubDirFolder!,
                 false);
 
@@ -9440,7 +9441,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 imageDeletedDirectory,
                 0,
                 [],
-                null!,
+                null,
                 imageDeletedFolder!,
                 false);
 
@@ -9496,7 +9497,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 subSubDirDirectory,
                 0,
                 [],
-                null!,
+                null,
                 subSubDirFolder!,
                 false);
 
@@ -9646,7 +9647,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 _defaultAssetsDirectory!,
                 0,
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9662,7 +9663,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 _defaultAssetsDirectory!,
                 0,
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9764,7 +9765,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 _defaultAssetsDirectory!,
                 0,
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9780,7 +9781,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 _defaultAssetsDirectory!,
                 0,
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9885,7 +9886,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9901,7 +9902,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -10014,7 +10015,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 _defaultAssetsDirectory!,
                 0,
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -10029,7 +10030,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 _defaultAssetsDirectory!,
                 0,
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -11200,7 +11201,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 rootFolder!,
                 false);
 
@@ -11214,7 +11215,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 assetsDirectory,
                 0,
                 [],
-                null!,
+                null,
                 rootFolder!,
                 false);
 
@@ -11279,9 +11280,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolder, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.GlobaleAssetsCounter, Is.Null);
-        Assert.That(_applicationViewModel!.ExecutionTime, Is.Null);
-        Assert.That(_applicationViewModel!.TotalFilesNumber, Is.Null);
+        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
+        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
+        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
@@ -11294,8 +11295,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
         int expectedAppTitleAssetsCount,
-        IReadOnlyCollection<Asset> expectedObservableAssets,
-        Asset expectedCurrentAsset,
+        List<Asset> expectedAssets,
+        Asset? expectedCurrentAsset,
         Folder expectedFolder,
         bool expectedCanGoToNextAsset)
     {
@@ -11310,16 +11311,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolder, Is.EqualTo(expectedLastDirectoryInspected));
-        Assert.That(applicationViewModelInstance.ObservableAssets, Has.Count.EqualTo(expectedObservableAssets.Count));
-        Assert.That(applicationViewModelInstance.GlobaleAssetsCounter, Is.Null);
-        Assert.That(applicationViewModelInstance.ExecutionTime, Is.Null);
-        Assert.That(applicationViewModelInstance.TotalFilesNumber, Is.Null);
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
         Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo($"  - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo("The catalog process has ended."));
 
-        if (applicationViewModelInstance.CurrentAsset != null)
+        if (expectedCurrentAsset != null)
         {
-            AssertCurrentAssetPropertyValidity(applicationViewModelInstance.CurrentAsset, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
+            AssertCurrentAssetPropertyValidity(applicationViewModelInstance.CurrentAsset!, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
+        }
+        else
+        {
+            Assert.That(applicationViewModelInstance.CurrentAsset, Is.Null);
         }
 
         Assert.That(applicationViewModelInstance.LastSelectedFolder, Is.Null); // TODO: Should it be the root folder (add it in the ctor) ?
@@ -11327,7 +11332,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
     }
 
-    private void NotifyCatalogChangeFolderInspectionInProgress(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
+    private void NotifyCatalogChangeFolderInspectionInProgress(List<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11345,7 +11350,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeFolderInspectionCompleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string assetsDirectory, ref int increment)
+    private void NotifyCatalogChangeFolderInspectionCompleted(List<CatalogChangeCallbackEventArgs> catalogChanges, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11360,7 +11365,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeFolderCreated(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
+    private void NotifyCatalogChangeFolderCreated(List<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11378,7 +11383,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
+    private void NotifyCatalogChangeFolderDeleted(List<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11396,11 +11401,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     private void NotifyCatalogChangeAssetCreated(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        List<CatalogChangeCallbackEventArgs> catalogChanges,
         string assetsDirectory,
         string currentDirectory,
         int expectedAppTitleAssetsCount,
-        IReadOnlyList<Asset> expectedAssets,
+        List<Asset> expectedAssets,
         Asset expectedAsset,
         Folder folder,
         ref int increment)
@@ -11448,10 +11453,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     private void NotifyCatalogChangeAssetNotCreated(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        List<CatalogChangeCallbackEventArgs> catalogChanges,
         string currentDirectory,
         int expectedAppTitleAssetsCount,
-        IReadOnlyList<Asset> expectedAssets,
+        List<Asset> expectedAssets,
         string expectedAssetPath,
         ref int increment)
     {
@@ -11477,10 +11482,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     private void NotifyCatalogChangeAssetUpdated(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        List<CatalogChangeCallbackEventArgs> catalogChanges,
         string assetsDirectory,
         string currentDirectory,
-        IReadOnlyList<Asset> expectedAssets,
+        List<Asset> expectedAssets,
         Asset expectedAsset,
         Folder folder,
         ref int increment)
@@ -11528,11 +11533,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     private void NotifyCatalogChangeAssetDeleted(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        List<CatalogChangeCallbackEventArgs> catalogChanges,
         string assetsDirectory,
         string currentDirectory,
         int expectedAppTitleAssetsCount,
-        IReadOnlyList<Asset> expectedAssets,
+        List<Asset> expectedAssets,
         Asset expectedAsset,
         Folder folder,
         bool isCorrupted,
@@ -11572,7 +11577,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
+    private void NotifyCatalogChangeBackup(List<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
     {
         CatalogChangeReason catalogChangeReason = string.Equals(expectedMessage, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE) ? CatalogChangeReason.BackupCreationStarted : CatalogChangeReason.BackupUpdateStarted;
 
@@ -11601,7 +11606,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangesNoBackupChanges(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    private void NotifyCatalogChangesNoBackupChanges(List<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11616,7 +11621,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeEnd(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    private void NotifyCatalogChangeEnd(List<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11631,7 +11636,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeException(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
+    private void NotifyCatalogChangeException(List<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11648,7 +11653,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private static void AssertCataloguedAssetsByPathPropertyValidity(IReadOnlyList<Asset> expectedAssets, CatalogChangeCallbackEventArgs catalogChange, int cataloguedAssetsByPathCount)
+    private static void AssertCataloguedAssetsByPathPropertyValidity(List<Asset> expectedAssets, CatalogChangeCallbackEventArgs catalogChange, int cataloguedAssetsByPathCount)
     {
         for (int i = 0; i < cataloguedAssetsByPathCount; i++)
         {
@@ -11715,7 +11720,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(asset.ImageData, Is.Not.Null); // Unlike below (Application, CatalogAssetsService), it is set here
     }
 
-    private static void AssertObservableAssets(string currentDirectory, IReadOnlyList<Asset> expectedAssets, IReadOnlyList<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, List<Asset> expectedAssets, ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Count));
 
@@ -11738,24 +11743,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     private static void CheckInstance(
-        IReadOnlyList<ApplicationViewModel> applicationViewModelInstances,
+        List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
         int expectedAppTitleAssetsCount,
-        IReadOnlyCollection<Asset> expectedObservableAssets,
-        Asset expectedCurrentAsset,
+        List<Asset> expectedAssets,
+        Asset? expectedCurrentAsset,
         Folder expectedFolder,
         bool expectedCanGoToNextAsset)
     {
         int applicationViewModelInstancesCount = applicationViewModelInstances.Count;
+
         Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
-        // No need to go deeper same instance because ref updated each time
+        // No need to go deeper, same instance because ref updated each time
         Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
 
         CheckAfterNotifyCatalogChanges(
             applicationViewModelInstances[0],
             expectedLastDirectoryInspected,
             expectedAppTitleAssetsCount,
-            expectedObservableAssets,
+            expectedAssets,
             expectedCurrentAsset,
             expectedFolder,
             expectedCanGoToNextAsset);
