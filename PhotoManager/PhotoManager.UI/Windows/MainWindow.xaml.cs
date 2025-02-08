@@ -338,7 +338,7 @@ public partial class MainWindow : Window
 
     public void RefreshAssetsCounter()
     {
-        ViewModel.CalculateGlobaleAssetsCounter();
+        ViewModel.CalculateGlobalAssetsCounter();
     }
 
     public string GetExemptedFolderPath()
@@ -431,9 +431,9 @@ public partial class MainWindow : Window
         }
 
         await catalogTask.ConfigureAwait(true);
-        ViewModel?.CalculateGlobaleAssetsCounter();
+        ViewModel?.CalculateGlobalAssetsCounter();
         stopwatch.Stop();
         ViewModel?.SetExecutionTime(stopwatch.Elapsed);
-        ViewModel?.CalculateTotalFilesNumber();
+        ViewModel?.CalculateTotalFilesCount();
     }
 }

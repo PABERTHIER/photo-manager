@@ -32,9 +32,9 @@ public class ApplicationViewModel : BaseViewModel
     private string currentFolder;
     private Asset[] cataloguedAssets; // TODO: ByPath
     private ObservableCollection<Asset> observableAssets; // TODO: ByPath
-    private string globaleAssetsCounter;
-    private string executionTime;
-    private string totalFilesNumber;
+    private string _globalAssetsCounterWording;
+    private string _executionTimeWording;
+    private string _totalFilesCountWording;
     private Asset[] selectedAssets;
     private string appTitle;
     private string statusMessage;
@@ -157,36 +157,33 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    // TODO: Rename to GlobalAssetsCounterWording
-    public string GlobaleAssetsCounter
+    public string GlobalAssetsCounterWording
     {
-        get { return globaleAssetsCounter; }
+        get => _globalAssetsCounterWording;
         private set
         {
-            globaleAssetsCounter = value;
-            NotifyPropertyChanged(nameof(GlobaleAssetsCounter));
+            _globalAssetsCounterWording = value;
+            NotifyPropertyChanged(nameof(GlobalAssetsCounterWording));
         }
     }
 
-    // TODO: Rename to ExecutionTimeWording
-    public string ExecutionTime
+    public string ExecutionTimeWording
     {
-        get { return executionTime; }
+        get => _executionTimeWording;
         private set
         {
-            executionTime = value;
-            NotifyPropertyChanged(nameof(ExecutionTime));
+            _executionTimeWording = value;
+            NotifyPropertyChanged(nameof(ExecutionTimeWording));
         }
     }
 
-    // TODO: Rename to TotalFilesNumberWording
-    public string TotalFilesNumber
+    public string TotalFilesCountWording
     {
-        get { return totalFilesNumber; }
+        get => _totalFilesCountWording;
         private set
         {
-            totalFilesNumber = value;
-            NotifyPropertyChanged(nameof(TotalFilesNumber));
+            _totalFilesCountWording = value;
+            NotifyPropertyChanged(nameof(TotalFilesCountWording));
         }
     }
 
@@ -532,21 +529,21 @@ public class ApplicationViewModel : BaseViewModel
     public BitmapImage LoadBitmapImageFromPath() => Application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
     public BitmapImage LoadBitmapHeicImageFromPath() => Application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
 
-    public void CalculateGlobaleAssetsCounter()
+    // ------------------
+    public void CalculateGlobalAssetsCounter()
     {
-        var globaleAssetsCounter = Application.GetAssetsCounter();
-        GlobaleAssetsCounter = $"Total number of assets: {globaleAssetsCounter}";
+        int globalAssetsCounter = Application.GetAssetsCounter();
+        GlobalAssetsCounterWording = $"Total number of assets: {globalAssetsCounter}";
     }
 
     public void SetExecutionTime(TimeSpan executionTime)
     {
-        ExecutionTime = $"Execution time: {executionTime}";
+        ExecutionTimeWording = $"Execution time: {executionTime}";
     }
 
-    // TODO: Rename totalFilesNumber to totalFilesCount
-    public void CalculateTotalFilesNumber()
+    public void CalculateTotalFilesCount()
     {
-        var totalFilesNumber = Application.GetTotalFilesCount();
-        TotalFilesNumber = $"{totalFilesNumber} files found";
+        int totalFilesCount = Application.GetTotalFilesCount();
+        TotalFilesCountWording = $"{totalFilesCount} files found";
     }
 }
