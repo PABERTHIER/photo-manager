@@ -708,7 +708,7 @@ public class StorageServiceTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    public void LoadBitmapHeicImageFromPathViewerUserControl_InvalidRotation_ReturnsPartialBitmapImage()
+    public void LoadBitmapHeicImageFromPathViewerUserControl_InvalidRotation_ThrowsArgumentException()
     {
         string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         const Rotation rotation = (Rotation)999;

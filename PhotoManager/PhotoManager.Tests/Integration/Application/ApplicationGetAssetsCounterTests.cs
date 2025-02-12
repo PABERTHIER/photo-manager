@@ -186,6 +186,7 @@ public class ApplicationGetAssetsCounterTests
             await _application!.CatalogAssetsAsync(_ => {});
 
             assetsCounter = _application!.GetAssetsCounter();
+
             Assert.That(assetsCounter, analyseVideos ? Is.EqualTo(52) : Is.EqualTo(51));
 
             Assert.That(assetsUpdatedEvents, analyseVideos ? Has.Count.EqualTo(52) : Has.Count.EqualTo(51));
@@ -259,6 +260,7 @@ public class ApplicationGetAssetsCounterTests
             _assetRepository.DeleteAsset(assetsDirectory, _asset3.FileName);
 
             assetsCounter = _application!.GetAssetsCounter();
+
             Assert.That(assetsCounter, Is.EqualTo(2));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(4));

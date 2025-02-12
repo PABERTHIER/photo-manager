@@ -78,21 +78,27 @@ public class Application(
 
     // StorageService
     public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) => storageService.LoadBitmapImageFromPath(imagePath, rotation);
+
     public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) => storageService.LoadBitmapHeicImageFromPath(imagePath, rotation);
+
     public bool FileExists(string fullPath) => storageService.FileExists(fullPath);
+
     public int GetTotalFilesCount() => storageService.GetTotalFilesCount();
 
     // MoveAssetsService
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);
+
     public void DeleteAssets(Asset[] assets) => moveAssetsService.DeleteAssets(assets);
 
     // Sync
     public SyncAssetsConfiguration GetSyncAssetsConfiguration() => assetRepository.GetSyncAssetsConfiguration();
+
     public void SetSyncAssetsConfiguration(SyncAssetsConfiguration syncConfiguration)
     {
         syncConfiguration.Validate().Normalize();
         assetRepository.SaveSyncAssetsConfiguration(syncConfiguration);
         assetRepository.SaveCatalog(null);
     }
+
     public async Task<List<SyncAssetsResult>> SyncAssetsAsync(ProcessStatusChangedCallback callback) => await syncAssetsService.ExecuteAsync(callback);
 }
