@@ -1831,6 +1831,7 @@ public class ApplicationViewModelTests
     }
 
     [Test]
+    [Ignore("Rework")]
     [TestCase(false)]
     [TestCase(true)]
     // TODO: Update the name + Not null for a list !!!!

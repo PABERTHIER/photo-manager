@@ -32,7 +32,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         _asset1 = new()
         {
             FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 1_duplicate.jpg",
             Pixel = new()
             {
@@ -57,7 +57,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         _asset2 = new()
         {
             FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9.png",
             Pixel = new()
             {
@@ -82,7 +82,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         _asset3 = new()
         {
             FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image 9_duplicate.png",
             Pixel = new()
             {
@@ -107,7 +107,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         _asset4 = new()
         {
             FolderId = Guid.Empty,
-            Folder = new() { Id = Guid.Empty, Path = "" },
+            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = "Image_11.heic",
             Pixel = new()
             {
