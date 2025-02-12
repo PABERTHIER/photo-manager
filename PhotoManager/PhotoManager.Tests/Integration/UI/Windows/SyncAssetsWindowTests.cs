@@ -791,7 +791,7 @@ public class SyncAssetsWindowTests
             configuration.Definitions.AddRange(_syncAssetsViewModel!.Definitions);
             _syncAssetsViewModel!.SetProcessConfiguration(configuration);
 
-            await _syncAssetsViewModel!.RunProcessAsync(e => _syncAssetsViewModel.NotifyProcessStatusChanged(e));
+            await _syncAssetsViewModel!.RunProcessAsync(_syncAssetsViewModel.NotifyProcessStatusChanged);
 
             fileNamesInSource = _storageService!.GetFileNames(sourceDirectory);
             Assert.That(fileNamesInSource, Has.Length.EqualTo(4));

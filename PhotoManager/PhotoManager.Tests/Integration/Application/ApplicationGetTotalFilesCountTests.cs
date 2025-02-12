@@ -77,6 +77,7 @@ public class ApplicationGetTotalFilesCountTests
         }
         finally
         {
+            Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(assetsDirectory, true);
         }
     }
