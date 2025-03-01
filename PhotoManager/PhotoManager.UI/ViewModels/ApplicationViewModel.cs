@@ -203,6 +203,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
+    // TODO: When everything tested, rework this to have one method without param (like a toggle)
     public void ChangeAppMode()
     {
         AppMode = AppMode switch
@@ -213,9 +214,9 @@ public class ApplicationViewModel : BaseViewModel
         };
     }
 
-    public void ChangeAppMode(AppMode appMode)
+    public void ChangeAppMode(AppMode newAppMode)
     {
-        AppMode = appMode;
+        AppMode = newAppMode;
     }
 
     public void SetAssets(Asset[] assets)
