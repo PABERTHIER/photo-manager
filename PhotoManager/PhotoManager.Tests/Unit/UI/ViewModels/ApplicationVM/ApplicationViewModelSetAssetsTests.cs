@@ -134,7 +134,7 @@ public class ApplicationViewModelSetAssetsTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() {Id = folderId, Path = _dataDirectory!},
+            Folder = new() { Id = folderId, Path = _dataDirectory! },
             FileName = "Image 5.jpg",
             Pixel =
                 new()

@@ -273,13 +273,30 @@ public class ApplicationViewModel : BaseViewModel
 
     public void GoToAsset(Asset asset, AppMode newAppMode)
     {
-        Asset targetAsset = ObservableAssets.FirstOrDefault(f => f.FileName == asset.FileName);
+        Asset? observableAsset = null;
+        int newViewerPosition = -1;
 
-        if (targetAsset != null && Application.FileExists(targetAsset.FullPath))
+        for (int i = 0; i < ObservableAssets.Count; i++)
         {
-            int position = ObservableAssets.IndexOf(targetAsset);
-            ChangeAppMode(newAppMode);
-            ViewerPosition = position;
+            if (ObservableAssets[i].FileName.AsSpan() == asset.FileName.AsSpan())
+            {
+                observableAsset = ObservableAssets[i];
+                newViewerPosition = i;
+                break;
+            }
+        }
+
+        if (observableAsset != null && Application.FileExists(observableAsset.FullPath))
+        {
+            if (AppMode != newAppMode)
+            {
+                ChangeAppMode(newAppMode);
+            }
+
+            if (newViewerPosition > -1)
+            {
+                ViewerPosition = newViewerPosition;
+            }
         }
     }
 

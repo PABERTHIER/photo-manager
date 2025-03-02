@@ -6,7 +6,7 @@ using System.Windows;
 namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 
 [TestFixture]
-public class ApplicationViewModelRemoveAssetsTests
+public class ApplicationViewModelGoToAssetTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -20,6 +20,7 @@ public class ApplicationViewModelRemoveAssetsTests
     private Asset _asset3;
     private Asset _asset4;
     private Asset _asset5;
+    private Asset _asset6;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -156,6 +157,31 @@ public class ApplicationViewModelRemoveAssetsTests
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
+        _asset6 = new()
+        {
+            FolderId = folderId,
+            Folder = new() { Id = folderId, Path = Path.Combine(_dataDirectory!, "Folder1") },
+            FileName = "Image 6.jpg",
+            Pixel = new()
+            {
+                Asset = new() { Width = 1280, Height = 720 },
+                Thumbnail = new() { Width = 200, Height = 112 }
+            },
+            Hash = string.Empty,
+            ImageData = new(),
+            FileProperties = new()
+            {
+                Size = 2048,
+                Creation = new (2021, 6, 1),
+                Modification = new (2021, 7, 1)
+            },
+            ThumbnailCreationDateTime = new (2021, 6, 1),
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
     }
 
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -192,7 +218,210 @@ public class ApplicationViewModelRemoveAssetsTests
     }
 
     [Test]
-    public void RemoveAssets_ObservableAssetsIsNotEmptyAndAssetsIsNotEmptyAndRemoveTheCurrentAssetInFirstPosition_RemovesAsset()
+    public void GoToAsset_AssetIsInCurrentDirectory_GoesToAsset()
+    {
+        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(_dataDirectory!);
+
+            int expectedViewerPosition = 1;
+            string expectedAppTitle = $"  - {_dataDirectory!} - image 2 of 5 - sorted by file name ascending";
+
+            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
+
+            _applicationViewModel!.SetAssets(expectedAssets);
+
+            // First GoToAsset
+            _applicationViewModel!.GoToAsset(_asset2);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                true,
+                true);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+            // GoToAsset 1
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+
+            // Second GoToAsset
+            expectedViewerPosition = 4;
+            expectedAppTitle = $"  - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
+
+            _applicationViewModel!.GoToAsset(_asset5);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                true,
+                false);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(12));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+            // GoToAsset 1
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            // GoToAsset 2
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+
+            // Third GoToAsset
+            expectedViewerPosition = 4;
+            expectedAppTitle = $"  - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
+
+            _applicationViewModel!.GoToAsset(_asset5);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                true,
+                false);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+            // GoToAsset 1
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            // GoToAsset 2
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+            // GoToAsset 3
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+
+            // Fourth GoToAsset
+            expectedViewerPosition = 0;
+            expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+
+            _applicationViewModel!.GoToAsset(_asset1);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(22));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+            // GoToAsset 1
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            // GoToAsset 2
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
+            // GoToAsset 3
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
+            // GoToAsset 4
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
+
+            CheckInstance(
+                applicationViewModelInstances,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void GoToAsset_AssetIsNotInCurrentDirectory_DoesNothing()
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -207,18 +436,20 @@ public class ApplicationViewModelRemoveAssetsTests
             CheckBeforeChanges(_dataDirectory!);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 2 - sorted by file name ascending";
+            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
 
-            Asset[] assets = [_asset2, _asset4, _asset5];
-            Asset[] expectedAssets = [_asset4, _asset5];
+            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(expectedAssets);
 
-            _applicationViewModel!.RemoveAssets([_asset2]);
+            _applicationViewModel!.GoToAsset(_asset6);
 
             CheckAfterChanges(
                 _applicationViewModel!,
                 _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
                 expectedViewerPosition,
                 expectedAppTitle,
                 expectedAssets,
@@ -226,354 +457,6 @@ public class ApplicationViewModelRemoveAssetsTests
                 expectedAssets[expectedViewerPosition].Folder,
                 false,
                 true);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            // SetAssets
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            // RemoveAssets
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                expectedViewerPosition,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[expectedViewerPosition],
-                expectedAssets[expectedViewerPosition].Folder,
-                false,
-                true);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsIsNotEmptyAndAssetsIsNotEmptyAndRemoveTheCurrentAssetInMiddlePosition_RemovesAsset()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
-            const int expectedViewerPosition = 1;
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 2 of 2 - sorted by file name ascending";
-
-            Asset[] assets = [_asset2, _asset4, _asset5];
-            Asset[] expectedAssets = [_asset2, _asset5];
-
-            _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.GoToNextAsset();
-
-            _applicationViewModel!.RemoveAssets([_asset4]);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                expectedViewerPosition,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[expectedViewerPosition],
-                expectedAssets[expectedViewerPosition].Folder,
-                true,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
-            // SetAssets
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            // GoToNextAsset 1
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            // RemoveAssets
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                expectedViewerPosition,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[expectedViewerPosition],
-                expectedAssets[expectedViewerPosition].Folder,
-                true,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsIsNotEmptyAndAssetsIsNotEmptyAndRemoveTheCurrentAssetInLastPosition_RemovesAsset()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
-            const int expectedViewerPosition = 1;
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 2 of 2 - sorted by file name ascending";
-
-            Asset[] assets = [_asset2, _asset4, _asset5];
-            Asset[] expectedAssets = [_asset2, _asset4];
-
-            _applicationViewModel!.SetAssets(assets);
-            _applicationViewModel!.GoToNextAsset();
-            _applicationViewModel!.GoToNextAsset();
-
-            _applicationViewModel!.RemoveAssets([_asset5]);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                expectedViewerPosition,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[expectedViewerPosition],
-                expectedAssets[expectedViewerPosition].Folder,
-                true,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(19));
-            // SetAssets
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            // GoToNextAsset 1
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            // GoToNextAsset 2
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("AppTitle"));
-            // RemoveAssets
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                expectedViewerPosition,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[expectedViewerPosition],
-                expectedAssets[expectedViewerPosition].Folder,
-                true,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsHasAssetsAndAssetsHasTheSameAssets_RemovesAllAssets()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
-
-            Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
-            Asset[] expectedAssets = [];
-
-            _applicationViewModel!.SetAssets(assets);
-
-            _applicationViewModel!.RemoveAssets(assets);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                null,
-                null!,
-                false,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            // SetAssets
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            // RemoveAssets
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                null,
-                null!,
-                false,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsHasOneAssetAndAssetsHasTheSameAsset_RemovesAsset()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
-
-            Asset[] assets = [_asset1];
-            Asset[] expectedAssets = [];
-
-            _applicationViewModel!.SetAssets(assets);
-
-            _applicationViewModel!.RemoveAssets([assets[0]]);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                null,
-                null!,
-                false,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            // SetAssets
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            // RemoveAssets
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                null,
-                null!,
-                false,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsHasOneAssetAndAssetsHasNotTheSameAsset_DoesNothing()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 1 - sorted by file name ascending";
-
-            Asset[] assets = [_asset1];
-            Asset[] expectedAssets = [_asset1];
-
-            _applicationViewModel!.SetAssets(assets);
-
-            _applicationViewModel!.RemoveAssets([_asset2]);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                false,
-                false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
             // SetAssets
@@ -583,13 +466,16 @@ public class ApplicationViewModelRemoveAssetsTests
             CheckInstance(
                 applicationViewModelInstances,
                 _dataDirectory!,
-                0,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
                 expectedAppTitle,
                 expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
                 false,
-                false);
+                true);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -602,7 +488,7 @@ public class ApplicationViewModelRemoveAssetsTests
     }
 
     [Test]
-    public void RemoveAssets_ObservableAssetsHasTwoAssetsAndAssetsHasOneSameAndOneDifferentAsset_RemovesAsset()
+    public void GoToAsset_NoObservableAssets_DoesNothing()
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -616,78 +502,18 @@ public class ApplicationViewModelRemoveAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 1 - sorted by file name ascending";
-
-            Asset[] assets = [_asset1, _asset2];
-            Asset[] expectedAssets = [_asset2];
-
-            _applicationViewModel!.SetAssets(assets);
-
-            _applicationViewModel!.RemoveAssets([_asset4, _asset1]);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                false,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
-            // SetAssets
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-            // RemoveAssets
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                expectedAssets,
-                expectedAssets[0],
-                expectedAssets[0].Folder,
-                false,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsIsEmptyAndAssetsIsNotEmpty_DoesNothing()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
+            const int expectedViewerPosition = 0;
             string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
 
-            _applicationViewModel!.RemoveAssets([_asset1, _asset3]);
+            _applicationViewModel!.GoToAsset(_asset2);
 
             CheckAfterChanges(
                 _applicationViewModel!,
                 _dataDirectory!,
-                0,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
                 expectedAppTitle,
                 [],
                 null,
@@ -700,7 +526,10 @@ public class ApplicationViewModelRemoveAssetsTests
             CheckInstance(
                 applicationViewModelInstances,
                 _dataDirectory!,
-                0,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
                 expectedAppTitle,
                 [],
                 null,
@@ -719,7 +548,7 @@ public class ApplicationViewModelRemoveAssetsTests
     }
 
     [Test]
-    public void RemoveAssets_ObservableAssetsIsEmptyAndAssetsIsEmpty_DoesNothing()
+    public void GoToAsset_AssetIsNull_ThrowsNullReferenceException()
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -733,194 +562,30 @@ public class ApplicationViewModelRemoveAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            const int expectedViewerPosition = 0;
+            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
 
-            _applicationViewModel!.RemoveAssets([]);
+            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                [],
-                null,
-                null!,
-                false,
-                false);
+            _applicationViewModel!.SetAssets(expectedAssets);
 
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                [],
-                null,
-                null!,
-                false,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsIsEmptyAndAssetsIsNull_DoesNothing()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
-
-            _applicationViewModel!.RemoveAssets(null!);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                [],
-                null,
-                null!,
-                false,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Is.Empty);
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                [],
-                null,
-                null!,
-                false,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsIsNotEmptyAndAssetsIsEmpty_DoesNothing()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 1 - sorted by file name ascending";
-
-            Asset[] assetsToSet = [_asset1];
-            Asset[] assetsToRemove = [];
-
-            _applicationViewModel!.SetAssets(assetsToSet);
-
-            _applicationViewModel!.RemoveAssets(assetsToRemove);
-
-            CheckAfterChanges(
-                _applicationViewModel!,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                assetsToSet,
-                assetsToSet[0],
-                assetsToSet[0].Folder,
-                false,
-                false);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
-            // SetAssets
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
-
-            CheckInstance(
-                applicationViewModelInstances,
-                _dataDirectory!,
-                0,
-                expectedAppTitle,
-                assetsToSet,
-                assetsToSet[0],
-                assetsToSet[0].Folder,
-                false,
-                false);
-
-            // Because the root folder is already added
-            Assert.That(folderAddedEvents, Is.Empty);
-            Assert.That(folderRemovedEvents, Is.Empty);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void RemoveAssets_ObservableAssetsIsNotEmptyAssetsIsNull_ThrowsNullReferenceException()
-    {
-        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<ApplicationViewModel> applicationViewModelInstances,
-            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges(_dataDirectory!);
-
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 1 - sorted by file name ascending";
-
-            Asset[] assetsToSet = [_asset1];
-            Asset[] assetsToRemove = null!;
-
-            _applicationViewModel!.SetAssets(assetsToSet);
-
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _applicationViewModel!.RemoveAssets(assetsToRemove));
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _applicationViewModel!.GoToAsset(null!));
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
             CheckAfterChanges(
                 _applicationViewModel!,
                 _dataDirectory!,
-                0,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
                 expectedAppTitle,
-                assetsToSet,
-                assetsToSet[0],
-                assetsToSet[0].Folder,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
                 false,
-                false);
+                true);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
             // SetAssets
@@ -930,13 +595,445 @@ public class ApplicationViewModelRemoveAssetsTests
             CheckInstance(
                 applicationViewModelInstances,
                 _dataDirectory!,
-                0,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
                 expectedAppTitle,
-                assetsToSet,
-                assetsToSet[0],
-                assetsToSet[0].Folder,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void GoToAsset_AppModeAndAssetIsInCurrentDirectory_ChangesAppModeAndGoesToAsset()
+    {
+        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(_dataDirectory!);
+
+            int expectedViewerPosition = 1;
+            string expectedAppTitle = $"  - {_dataDirectory!} - {_asset2.FileName} - image 2 of 5 - sorted by file name ascending";
+
+            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
+
+            _applicationViewModel!.SetAssets(expectedAssets);
+
+            // First GoToAsset
+            _applicationViewModel!.GoToAsset(_asset2, AppMode.Viewer);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Viewer,
+                Visibility.Hidden,
+                Visibility.Visible,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                true,
+                true);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+            // GoToAsset 1
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppMode"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+
+            // Second GoToAsset
+            expectedViewerPosition = 4;
+            expectedAppTitle = $"  - {_dataDirectory!} - {_asset5.FileName} - image 5 of 5 - sorted by file name ascending";
+
+            _applicationViewModel!.GoToAsset(_asset5, AppMode.Viewer);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Viewer,
+                Visibility.Hidden,
+                Visibility.Visible,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                true,
+                false);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(16));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+            // GoToAsset 1
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppMode"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+            // GoToAsset 2
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+
+            // Third GoToAsset
+            expectedViewerPosition = 4;
+            expectedAppTitle = $"  - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
+
+            _applicationViewModel!.GoToAsset(_asset5, AppMode.Thumbnails);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                true,
+                false);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(25));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+            // GoToAsset 1
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppMode"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+            // GoToAsset 2
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            // GoToAsset 3
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppMode"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
+
+            // Fourth GoToAsset
+            expectedViewerPosition = 0;
+            expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+
+            _applicationViewModel!.GoToAsset(_asset1, AppMode.Thumbnails);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(30));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+            // GoToAsset 1
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("AppMode"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("ThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("AppTitle"));
+            // GoToAsset 2
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            // GoToAsset 3
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppMode"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ThumbnailsVisible"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ViewerVisible"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
+            // GoToAsset 4
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("ViewerPosition"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("CanGoToPreviousAsset"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("CanGoToNextAsset"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("CurrentAsset"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
+
+            CheckInstance(
+                applicationViewModelInstances,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    [TestCase(AppMode.Thumbnails)]
+    [TestCase(AppMode.Viewer)]
+    public void GoToAsset_AppModeAndAssetIsNotInCurrentDirectory_DoesNothing(AppMode appMode)
+    {
+        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(_dataDirectory!);
+
+            const int expectedViewerPosition = 0;
+            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+
+            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
+
+            _applicationViewModel!.SetAssets(expectedAssets);
+
+            _applicationViewModel!.GoToAsset(_asset6, appMode);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+
+            CheckInstance(
+                applicationViewModelInstances,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    [TestCase(AppMode.Thumbnails)]
+    [TestCase(AppMode.Viewer)]
+    public void GoToAsset_AppModeAndNoObservableAssets_DoesNothing(AppMode appMode)
+    {
+        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(_dataDirectory!);
+
+            const int expectedViewerPosition = 0;
+            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+
+            _applicationViewModel!.GoToAsset(_asset2, appMode);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                [],
+                null,
+                null!,
                 false,
                 false);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(
+                applicationViewModelInstances,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                [],
+                null,
+                null!,
+                false,
+                false);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    [TestCase(AppMode.Thumbnails)]
+    [TestCase(AppMode.Viewer)]
+    public void GoToAsset_AppModeAndAssetIsNull_ThrowsNullReferenceException(AppMode appMode)
+    {
+        ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(_dataDirectory!);
+
+            const int expectedViewerPosition = 0;
+            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 5 - sorted by file name ascending";
+
+            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
+
+            _applicationViewModel!.SetAssets(expectedAssets);
+
+            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _applicationViewModel!.GoToAsset(null!, appMode));
+
+            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("AppTitle"));
+
+            CheckInstance(
+                applicationViewModelInstances,
+                _dataDirectory!,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                expectedViewerPosition,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[expectedViewerPosition],
+                expectedAssets[expectedViewerPosition].Folder,
+                false,
+                true);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -1009,6 +1106,9 @@ public class ApplicationViewModelRemoveAssetsTests
     private static void CheckAfterChanges(
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
+        AppMode expectedAppMode,
+        Visibility expectedThumbnailsVisible,
+        Visibility expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -1021,10 +1121,10 @@ public class ApplicationViewModelRemoveAssetsTests
         Assert.That(applicationViewModelInstance.Product, Is.Null);
         Assert.That(applicationViewModelInstance.Version, Is.Null);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
-        Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
+        Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(expectedAppMode));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(expectedThumbnailsVisible));
+        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(expectedViewerVisible));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(expectedViewerPosition));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolder, Is.EqualTo(expectedLastDirectoryInspected));
@@ -1098,6 +1198,9 @@ public class ApplicationViewModelRemoveAssetsTests
     private static void CheckInstance(
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
+        AppMode expectedAppMode,
+        Visibility expectedThumbnailsVisible,
+        Visibility expectedViewerVisible,
         int expectedViewerPosition,
         string expectedAppTitle,
         Asset[] expectedAssets,
@@ -1120,6 +1223,9 @@ public class ApplicationViewModelRemoveAssetsTests
             CheckAfterChanges(
                 applicationViewModelInstances[0],
                 expectedLastDirectoryInspected,
+                expectedAppMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
                 expectedViewerPosition,
                 expectedAppTitle,
                 expectedAssets,
