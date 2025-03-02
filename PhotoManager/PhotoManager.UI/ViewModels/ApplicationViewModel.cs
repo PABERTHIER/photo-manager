@@ -245,24 +245,24 @@ public class ApplicationViewModel : BaseViewModel
 
     public void RemoveAssets(Asset[] assets)
     {
-        int observableAssetsCount = ObservableAssets.Count;
+        int initialObservableAssetsCount = ObservableAssets.Count;
 
-        if (observableAssetsCount > 0 && assets != null)
+        if (initialObservableAssetsCount > 0 && assets.Length > 0)
         {
-            foreach (var asset in assets)
+            for (int i = 0; i < assets.Length; i++)
             {
-                int position = ViewerPosition;
-                ObservableAssets.Remove(asset);
+                ObservableAssets.Remove(assets[i]);
 
-                if (position == observableAssetsCount)
+                if (ViewerPosition == ObservableAssets.Count)
                 {
-                    position--;
+                    GoToPreviousAsset();
                 }
-
-                ViewerPosition = position;
             }
 
-            NotifyPropertyChanged(nameof(ObservableAssets));
+            if (initialObservableAssetsCount != ObservableAssets.Count)
+            {
+                OnObservableAssetsUpdated();
+            }
         }
     }
 
