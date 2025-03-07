@@ -157,21 +157,9 @@ public class ApplicationViewModel : BaseViewModel
 
     public Folder LastSelectedFolder { get; set; }
 
-    public bool CanGoToPreviousAsset
-    {
-        get
-        {
-            return ViewerPosition > 0;
-        }
-    }
+    public bool CanGoToPreviousAsset => ViewerPosition > 0;
 
-    public bool CanGoToNextAsset
-    {
-        get
-        {
-            return ViewerPosition < (ObservableAssets?.Count - 1);
-        }
-    }
+    public bool CanGoToNextAsset => ViewerPosition < (ObservableAssets.Count - 1);
 
     public string GlobalAssetsCounterWording
     {
