@@ -16,44 +16,39 @@ namespace PhotoManager.UI.ViewModels;
 
 public class ApplicationViewModel : BaseViewModel
 {
-    private AppMode appMode;
-    private int viewerPosition;
-    private string currentFolder;
+    private AppMode _appMode;
+    private string _appTitle;
+    private string _currentFolder;
+    private int _viewerPosition;
     private SortableObservableCollection<Asset> _observableAssets;
+    private Asset[] _selectedAssets;
+    private string _statusMessage;
+    private SortCriteria _sortCriteria;
+    private SortCriteria _previousSortCriteria;
     private string _globalAssetsCounterWording;
     private string _executionTimeWording;
     private string _totalFilesCountWording;
-    private Asset[] selectedAssets;
-    private string appTitle;
-    private string statusMessage;
-    private SortCriteria sortCriteria;
-    private SortCriteria _previousSortCriteria;
-
-    public bool SortAscending { get; private set; } = true;
-    public string? Product { get; set; }
-    public string? Version { get; set; }
-    public bool IsRefreshingFolders { get; set; }
-
-    public event FolderAddedEventHandler? FolderAdded;
-    public event FolderRemovedEventHandler? FolderRemoved;
 
     public ApplicationViewModel(IApplication application) : base(application)
     {
         _observableAssets = [];
-        selectedAssets = [];
+        _selectedAssets = [];
 
         // TODO: Rename to CurrentFolderPath
         CurrentFolder = Application.GetInitialFolderPath();
     }
 
+    public event FolderAddedEventHandler? FolderAdded;
+    public event FolderRemovedEventHandler? FolderRemoved;
+
     public ObservableCollection<Asset> ObservableAssets => _observableAssets;
 
     public AppMode AppMode
     {
-        get { return appMode; }
+        get { return _appMode; }
         private set
         {
-            appMode = value;
+            _appMode = value;
             NotifyPropertyChanged(nameof(AppMode), nameof(ThumbnailsVisible), nameof(ViewerVisible));
             UpdateAppTitle();
         }
@@ -61,13 +56,15 @@ public class ApplicationViewModel : BaseViewModel
 
     public SortCriteria SortCriteria
     {
-        get { return sortCriteria; }
+        get { return _sortCriteria; }
         private set
         {
-            sortCriteria = value;
+            _sortCriteria = value;
             NotifyPropertyChanged(nameof(SortCriteria));
         }
     }
+
+    public bool SortAscending { get; private set; } = true;
 
     public Visibility ThumbnailsVisible
     {
@@ -81,10 +78,10 @@ public class ApplicationViewModel : BaseViewModel
 
     public int ViewerPosition
     {
-        get { return viewerPosition; }
+        get { return _viewerPosition; }
         set
         {
-            viewerPosition = value;
+            _viewerPosition = value;
             NotifyPropertyChanged(
                 nameof(ViewerPosition),
                 nameof(CanGoToPreviousAsset),
@@ -96,10 +93,10 @@ public class ApplicationViewModel : BaseViewModel
 
     public Asset[] SelectedAssets
     {
-        get { return selectedAssets; }
+        get { return _selectedAssets; }
         set
         {
-            selectedAssets = value;
+            _selectedAssets = value;
             NotifyPropertyChanged(nameof(SelectedAssets));
         }
     }
@@ -107,32 +104,34 @@ public class ApplicationViewModel : BaseViewModel
     // TODO: Rename to CurrentFolderPath
     public string CurrentFolder
     {
-        get { return currentFolder; }
+        get { return _currentFolder; }
         // TODO: Set the setter into private -> rework SetAssets to pass the path as parameter into it, to set the value of CurrentFolder
         set
         {
-            currentFolder = value;
+            _currentFolder = value;
             NotifyPropertyChanged(nameof(CurrentFolder));
             UpdateAppTitle();
         }
     }
 
+    public bool IsRefreshingFolders { get; set; }
+
     public string AppTitle
     {
-        get { return appTitle; }
+        get { return _appTitle; }
         set
         {
-            appTitle = value;
+            _appTitle = value;
             NotifyPropertyChanged(nameof(AppTitle));
         }
     }
 
     public string StatusMessage
     {
-        get { return statusMessage; }
+        get { return _statusMessage; }
         set
         {
-            statusMessage = value;
+            _statusMessage = value;
             NotifyPropertyChanged(nameof(StatusMessage));
         }
     }
@@ -177,6 +176,10 @@ public class ApplicationViewModel : BaseViewModel
             NotifyPropertyChanged(nameof(TotalFilesCountWording));
         }
     }
+
+    public string? Product { get; set; }
+
+    public string? Version { get; set; }
 
     // TODO: When everything tested, rework this to have one method without param (like a toggle)
     public void ChangeAppMode()
