@@ -1,4 +1,5 @@
-﻿using PhotoManager.UI.ViewModels.Enums;
+﻿using PhotoManager.UI.Models;
+using PhotoManager.UI.ViewModels.Enums;
 using System.ComponentModel;
 using System.Windows;
 

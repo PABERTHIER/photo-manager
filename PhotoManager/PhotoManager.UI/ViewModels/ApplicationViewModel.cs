@@ -1,6 +1,7 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.Domain.Comparers;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System;
 using System.Collections.Generic;
@@ -12,20 +13,6 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace PhotoManager.UI.ViewModels;
-
-// TODO: Move these 4 into separated file
-public class FolderAddedEventArgs
-{
-    public Folder Folder { get; set; }
-}
-
-public class FolderRemovedEventArgs
-{
-    public Folder Folder { get; set; }
-}
-
-public delegate void FolderAddedEventHandler(object sender, FolderAddedEventArgs e);
-public delegate void FolderRemovedEventHandler(object sender, FolderRemovedEventArgs e);
 
 public class ApplicationViewModel : BaseViewModel
 {
