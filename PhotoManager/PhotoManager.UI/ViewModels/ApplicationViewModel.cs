@@ -47,8 +47,8 @@ public class ApplicationViewModel : BaseViewModel
     public string? Version { get; set; }
     public bool IsRefreshingFolders { get; set; }
 
-    public event FolderAddedEventHandler FolderAdded;
-    public event FolderRemovedEventHandler FolderRemoved;
+    public event FolderAddedEventHandler? FolderAdded;
+    public event FolderRemovedEventHandler? FolderRemoved;
 
     public ApplicationViewModel(IApplication application) : base(application)
     {
@@ -314,12 +314,12 @@ public class ApplicationViewModel : BaseViewModel
 
     public void NotifyCatalogChange(CatalogChangeCallbackEventArgs e)
     {
-        StatusMessage = e?.Message;
+        StatusMessage = e.Message;
 
-        switch (e?.Reason)
+        switch (e.Reason)
         {
             case CatalogChangeReason.AssetCreated:
-                if (e?.Asset?.Folder?.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolder)
                 {
                     Application.LoadThumbnail(e.Asset);
                     AddAsset(e.Asset);
@@ -328,7 +328,7 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.AssetUpdated:
-                if (e?.Asset?.Folder?.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolder)
                 {
                     Application.LoadThumbnail(e.Asset);
                     UpdateAsset(e.Asset);
@@ -337,7 +337,7 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.AssetDeleted:
-                if (e?.Asset?.Folder?.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolder)
                 {
                     RemoveAssets([e.Asset]);
                 }
@@ -345,11 +345,22 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.FolderCreated:
-                AddFolder(e.Folder);
+                if (e.Folder != null)
+                {
+                    AddFolder(e.Folder);
+                }
+
                 break;
 
             case CatalogChangeReason.FolderDeleted:
-                RemoveFolder(e.Folder);
+                if (e.Folder != null)
+                {
+                    RemoveFolder(e.Folder);
+                }
+
+                break;
+
+            default:
                 break;
         }
     }
@@ -497,29 +508,19 @@ public class ApplicationViewModel : BaseViewModel
 
     private void AddAsset(Asset asset)
     {
-        if (ObservableAssets != null)
-        {
-            ObservableAssets.Add(asset);
-            NotifyPropertyChanged(nameof(ObservableAssets));
-            UpdateAppTitle();
-        }
+        ObservableAssets.Add(asset);
+        OnObservableAssetsUpdated();
     }
 
     private void UpdateAsset(Asset asset)
     {
-        if (ObservableAssets != null)
-        {
-            // TODO: Need to also check path and hash (even if the path is checked above)
-            var updatedAsset = ObservableAssets.FirstOrDefault(
-                a => string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
+        Asset? updatedAsset = ObservableAssets.FirstOrDefault(
+            a => string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
 
-            if (updatedAsset != null)
-            {
-                RemoveAssets(new Asset[] { updatedAsset });
-                AddAsset(asset);
-                NotifyPropertyChanged(nameof(ObservableAssets));
-                UpdateAppTitle();
-            }
+        if (updatedAsset != null)
+        {
+            RemoveAssets([updatedAsset]);
+            AddAsset(asset);
         }
     }
 

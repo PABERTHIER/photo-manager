@@ -11,7 +11,6 @@ public class ApplicationViewModelSetAssetsTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string DATABASE_END_PATH = "v1.0";
 
     private ApplicationViewModel? _applicationViewModel;
