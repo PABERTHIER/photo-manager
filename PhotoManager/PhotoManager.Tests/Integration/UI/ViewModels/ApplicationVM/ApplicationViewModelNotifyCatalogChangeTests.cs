@@ -11255,7 +11255,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
-        Assert.That(_applicationViewModel!.LastSelectedFolder, Is.Null); // TODO: Should it be the root folder (add it in the ctor) ?
+        Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
     }
@@ -11296,7 +11296,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(applicationViewModelInstance.CurrentAsset, Is.Null);
         }
 
-        Assert.That(applicationViewModelInstance.LastSelectedFolder, Is.Null); // TODO: Should it be the root folder (add it in the ctor) ?
+        Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
     }

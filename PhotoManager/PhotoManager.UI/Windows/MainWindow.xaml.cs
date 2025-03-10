@@ -259,7 +259,7 @@ public partial class MainWindow : Window
                     new FolderNavigationViewModel(
                         _application,
                         assets.First().Folder,
-                        ViewModel.LastSelectedFolder,
+                        ViewModel.MoveAssetsLastSelectedFolder,
                         _application.GetRecentTargetPaths()));
 
                 folderNavigationWindow.Closed += (sender, e) =>
@@ -274,7 +274,7 @@ public partial class MainWindow : Window
 
                         if (result)
                         {
-                            ViewModel.LastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
+                            ViewModel.MoveAssetsLastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
                             ViewModel.IsRefreshingFolders = true;
                             folderTreeView.Initialize();
                             ViewModel.IsRefreshingFolders = false;

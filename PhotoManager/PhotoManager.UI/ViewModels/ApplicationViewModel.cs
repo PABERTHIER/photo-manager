@@ -141,7 +141,7 @@ public class ApplicationViewModel : BaseViewModel
         get { return ObservableAssets?.Count > 0 && ViewerPosition >= 0 ? ObservableAssets?[ViewerPosition] : null; }
     }
 
-    public Folder LastSelectedFolder { get; set; }
+    public Folder? MoveAssetsLastSelectedFolder { get; set; }
 
     public bool CanGoToPreviousAsset => ViewerPosition > 0;
 
