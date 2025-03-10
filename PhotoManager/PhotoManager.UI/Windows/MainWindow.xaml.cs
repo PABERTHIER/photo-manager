@@ -66,8 +66,8 @@ public partial class MainWindow : Window
         try
         {
             ViewModel?.ChangeAppMode(AppMode.Thumbnails);
-            thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolder);
-            folderTreeView.SelectedPath = ViewModel?.CurrentFolder;
+            thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolderPath);
+            folderTreeView.SelectedPath = ViewModel?.CurrentFolderPath;
             await DoBackgroundWork();
         }
         catch (Exception ex)
@@ -398,7 +398,7 @@ public partial class MainWindow : Window
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
+        ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolderPath;
 
         if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perfs
         {

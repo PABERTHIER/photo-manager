@@ -776,11 +776,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(22));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
@@ -1033,11 +1033,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(19));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
@@ -2301,11 +2301,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
@@ -2670,11 +2670,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
@@ -4442,11 +4442,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
@@ -4815,11 +4815,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
@@ -8008,27 +8008,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(64));
-            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("AppTitle"));
@@ -8739,27 +8739,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(63));
-            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("AppTitle"));
@@ -9485,27 +9485,27 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(64));
-            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("AppTitle"));
@@ -11247,7 +11247,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.CurrentFolder, Is.EqualTo(expectedRootDirectory));
+        Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
         Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
@@ -11279,7 +11279,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
-        Assert.That(applicationViewModelInstance.CurrentFolder, Is.EqualTo(expectedLastDirectoryInspected));
+        Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
@@ -11738,7 +11738,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     private void GoToFolderEmulation(string assetsDirectory)
     {
-        _applicationViewModel!.CurrentFolder = assetsDirectory;
+        _applicationViewModel!.CurrentFolderPath = assetsDirectory;
         Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
         _applicationViewModel!.SetAssets(assets);
     }

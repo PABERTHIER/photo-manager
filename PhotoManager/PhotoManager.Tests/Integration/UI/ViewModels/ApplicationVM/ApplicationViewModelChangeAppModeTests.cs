@@ -706,7 +706,7 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.CurrentFolder, Is.EqualTo(expectedRootDirectory));
+        Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
         Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
@@ -744,7 +744,7 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(expectedViewerVisible));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
-        Assert.That(applicationViewModelInstance.CurrentFolder, Is.EqualTo(expectedLastDirectoryInspected));
+        Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);

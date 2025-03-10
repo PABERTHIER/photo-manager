@@ -18,7 +18,7 @@ public class ApplicationViewModel : BaseViewModel
 {
     private AppMode _appMode;
     private string _appTitle;
-    private string _currentFolder;
+    private string _currentFolderPath;
     private int _viewerPosition;
     private SortableObservableCollection<Asset> _observableAssets;
     private Asset[] _selectedAssets;
@@ -34,8 +34,7 @@ public class ApplicationViewModel : BaseViewModel
         _observableAssets = [];
         _selectedAssets = [];
 
-        // TODO: Rename to CurrentFolderPath
-        CurrentFolder = Application.GetInitialFolderPath();
+        CurrentFolderPath = Application.GetInitialFolderPath();
     }
 
     public event FolderAddedEventHandler? FolderAdded;
@@ -101,15 +100,14 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    // TODO: Rename to CurrentFolderPath
-    public string CurrentFolder
+    public string CurrentFolderPath
     {
-        get { return _currentFolder; }
+        get { return _currentFolderPath; }
         // TODO: Set the setter into private -> rework SetAssets to pass the path as parameter into it, to set the value of CurrentFolder
         set
         {
-            _currentFolder = value;
-            NotifyPropertyChanged(nameof(CurrentFolder));
+            _currentFolderPath = value;
+            NotifyPropertyChanged(nameof(CurrentFolderPath));
             UpdateAppTitle();
         }
     }
@@ -309,7 +307,7 @@ public class ApplicationViewModel : BaseViewModel
         switch (e.Reason)
         {
             case CatalogChangeReason.AssetCreated:
-                if (e.Asset?.Folder.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolderPath)
                 {
                     Application.LoadThumbnail(e.Asset);
                     AddAsset(e.Asset);
@@ -318,7 +316,7 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.AssetUpdated:
-                if (e.Asset?.Folder.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolderPath)
                 {
                     Application.LoadThumbnail(e.Asset);
                     UpdateAsset(e.Asset);
@@ -327,7 +325,7 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.AssetDeleted:
-                if (e.Asset?.Folder.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolderPath)
                 {
                     RemoveAssets([e.Asset]);
                 }
@@ -442,7 +440,7 @@ public class ApplicationViewModel : BaseViewModel
                 "{0} {1} - {2} - image {3} of {4} - sorted by {5}",
                 Product,
                 Version,
-                CurrentFolder,
+                CurrentFolderPath,
                 ViewerPosition + 1,
                 ObservableAssets?.Count,
                 sortCriteria);
@@ -454,7 +452,7 @@ public class ApplicationViewModel : BaseViewModel
                 "{0} {1} - {2} - {3} - image {4} of {5} - sorted by {6}",
                 Product,
                 Version,
-                CurrentFolder,
+                CurrentFolderPath,
                 CurrentAsset?.FileName,
                 ViewerPosition + 1,
                 ObservableAssets?.Count,
