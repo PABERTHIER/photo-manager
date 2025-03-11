@@ -30,7 +30,11 @@ public class ApplicationViewModelSetAssetsTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
         _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+    }
 
+    [SetUp]
+    public void SetUp()
+    {
         DateTime actualDate = DateTime.Now;
 
         _asset1 = new()
@@ -169,7 +173,7 @@ public class ApplicationViewModelSetAssetsTests
     }
 
     [Test]
-    public async Task SetAssets_CataloguedAssets_SetsAssets()
+    public async Task SetAssets_CataloguedAssetsAndRootDirectory_SetsAssets()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
@@ -202,7 +206,7 @@ public class ApplicationViewModelSetAssetsTests
 
             Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(assetsDirectory, assets);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -262,7 +266,106 @@ public class ApplicationViewModelSetAssetsTests
     }
 
     [Test]
-    public async Task SetAssets_NoCataloguedAssets_DoesNothing()
+    public async Task SetAssets_CataloguedAssetsAndOtherDirectory_UpdatesCurrentFolderPathAndSetsAssets()
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(assetsDirectory);
+
+            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+
+            // Mock to update the path of each asset
+            Folder folder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
+
+            _asset1 = _asset1.WithFolder(folder);
+            _asset2 = _asset2.WithFolder(folder);
+            _asset3 = _asset3.WithFolder(folder);
+            _asset4 = _asset4.WithFolder(folder);
+
+            _asset1.ImageData = new();
+            _asset2.ImageData = new();
+            _asset3.ImageData = new();
+            _asset4.ImageData = new();
+
+            const string expectedStatusMessage = "The catalog process has ended.";
+            const SortCriteria sortCriteria = SortCriteria.FileName;
+            string expectedAppTitle = $"  - {otherDirectory} - image 1 of 4 - sorted by file name ascending";
+            Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
+
+            _applicationViewModel!.SetAssets(otherDirectory, expectedAssets);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                otherDirectory,
+                true,
+                sortCriteria,
+                expectedAppTitle,
+                expectedStatusMessage,
+                expectedAssets,
+                expectedAssets[0],
+                folder,
+                true);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(21));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("CurrentFolderPath"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
+
+            CheckInstance(
+                applicationViewModelInstances,
+                otherDirectory,
+                true,
+                sortCriteria,
+                expectedAppTitle,
+                expectedStatusMessage,
+                expectedAssets,
+                expectedAssets[0],
+                folder,
+                true);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public async Task SetAssets_NoCataloguedAssetsAndRootDirectory_DoesNothing()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
 
@@ -288,7 +391,7 @@ public class ApplicationViewModelSetAssetsTests
 
             Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(assetsDirectory, assets);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -316,6 +419,84 @@ public class ApplicationViewModelSetAssetsTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
+                true,
+                sortCriteria,
+                expectedAppTitle,
+                expectedStatusMessage,
+                [],
+                null,
+                null!,
+                false);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(assetsDirectory, true);
+        }
+    }
+
+    [Test]
+    public async Task SetAssets_NoCataloguedAssetsAndOtherDirectory_UpdatesCurrentFolderPath()
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+        ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
+        try
+        {
+            CheckBeforeChanges(assetsDirectory);
+
+            Directory.CreateDirectory(assetsDirectory);
+
+            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+
+            const string expectedStatusMessage = "The catalog process has ended.";
+            const SortCriteria sortCriteria = SortCriteria.FileName;
+            string expectedAppTitle = $"  - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
+
+            Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
+
+            _applicationViewModel!.SetAssets(otherDirectory, assets);
+
+            CheckAfterChanges(
+                _applicationViewModel!,
+                otherDirectory,
+                true,
+                sortCriteria,
+                expectedAppTitle,
+                expectedStatusMessage,
+                [],
+                null,
+                null!,
+                false);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            // SetAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("CurrentFolderPath"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
+
+            CheckInstance(
+                applicationViewModelInstances,
+                otherDirectory,
                 true,
                 sortCriteria,
                 expectedAppTitle,

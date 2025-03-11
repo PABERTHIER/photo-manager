@@ -34,7 +34,8 @@ public class ApplicationViewModel : BaseViewModel
         _observableAssets = [];
         _selectedAssets = [];
 
-        CurrentFolderPath = Application.GetInitialFolderPath();
+        _currentFolderPath = Application.GetInitialFolderPath();
+        UpdateAppTitle(); // TODO: Temp fix waiting for the fix of UpdateAppTitle
     }
 
     public event FolderAddedEventHandler? FolderAdded;
@@ -103,8 +104,7 @@ public class ApplicationViewModel : BaseViewModel
     public string CurrentFolderPath
     {
         get { return _currentFolderPath; }
-        // TODO: Set the setter into private -> rework SetAssets to pass the path as parameter into it, to set the value of CurrentFolder
-        set
+        private set
         {
             _currentFolderPath = value;
             NotifyPropertyChanged(nameof(CurrentFolderPath));
@@ -195,8 +195,13 @@ public class ApplicationViewModel : BaseViewModel
         AppMode = newAppMode;
     }
 
-    public void SetAssets(Asset[] assets)
+    public void SetAssets(string newCurrentFolderPath, Asset[] assets)
     {
+        if (CurrentFolderPath.AsSpan() != newCurrentFolderPath.AsSpan())
+        {
+            CurrentFolderPath = newCurrentFolderPath;
+        }
+
         List<Asset> filteredAssets = [];
 
         for (int i = 0; i < assets.Length; i++)

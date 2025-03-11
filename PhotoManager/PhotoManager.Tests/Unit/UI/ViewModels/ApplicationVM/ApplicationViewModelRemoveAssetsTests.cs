@@ -213,7 +213,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assets = [_asset2, _asset4, _asset5];
             Asset[] expectedAssets = [_asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             _applicationViewModel!.RemoveAssets([_asset2]);
 
@@ -278,7 +278,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assets = [_asset2, _asset4, _asset5];
             Asset[] expectedAssets = [_asset2, _asset5];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.GoToNextAsset();
 
             _applicationViewModel!.RemoveAssets([_asset4]);
@@ -350,7 +350,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assets = [_asset2, _asset4, _asset5];
             Asset[] expectedAssets = [_asset2, _asset4];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.GoToNextAsset();
             _applicationViewModel!.GoToNextAsset();
 
@@ -433,7 +433,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
             Asset[] expectedAssets = [];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             _applicationViewModel!.RemoveAssets(assets);
 
@@ -497,7 +497,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assets = [_asset1];
             Asset[] expectedAssets = [];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             _applicationViewModel!.RemoveAssets([assets[0]]);
 
@@ -561,7 +561,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assets = [_asset1];
             Asset[] expectedAssets = [_asset1];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             _applicationViewModel!.RemoveAssets([_asset2]);
 
@@ -622,7 +622,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assets = [_asset1, _asset2];
             Asset[] expectedAssets = [_asset2];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             _applicationViewModel!.RemoveAssets([_asset4, _asset1]);
 
@@ -845,7 +845,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assetsToSet = [_asset1];
             Asset[] assetsToRemove = [];
 
-            _applicationViewModel!.SetAssets(assetsToSet);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assetsToSet);
 
             _applicationViewModel!.RemoveAssets(assetsToRemove);
 
@@ -906,7 +906,7 @@ public class ApplicationViewModelRemoveAssetsTests
             Asset[] assetsToSet = [_asset1];
             Asset[] assetsToRemove = null!;
 
-            _applicationViewModel!.SetAssets(assetsToSet);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assetsToSet);
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _applicationViewModel!.RemoveAssets(assetsToRemove));
 

@@ -212,7 +212,7 @@ public class ApplicationViewModelGoToNextAssetTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             // First GoToNextAsset
             _applicationViewModel!.GoToNextAsset();
@@ -415,7 +415,7 @@ public class ApplicationViewModelGoToNextAssetTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             _applicationViewModel!.GoToAsset(_asset5);
 

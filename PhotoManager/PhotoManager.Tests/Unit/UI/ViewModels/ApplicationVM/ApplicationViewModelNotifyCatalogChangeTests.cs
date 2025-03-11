@@ -241,7 +241,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {newAsset.Folder.Path} added to catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -335,7 +335,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {newAsset.Folder.Path} added to catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -431,7 +431,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {newAsset.Folder.Path} added to catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -863,7 +863,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {newAsset.Folder.Path} added to catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -933,7 +933,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = string.Empty;
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1011,7 +1011,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {_asset3.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1091,7 +1091,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {_asset3.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1173,7 +1173,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {_asset3.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1260,7 +1260,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _assetRepository.AddAsset(_asset4, assetData);
             _assetRepository.AddAsset(_asset5, assetData);
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             // First NotifyCatalogChange
             Asset[] expectedAssets = [_asset1, _asset2, _asset4, _asset5, _asset3];
@@ -1433,7 +1433,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {_asset1.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1610,7 +1610,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {updatedAsset.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1680,7 +1680,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = string.Empty;
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1758,7 +1758,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {_asset3.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1836,7 +1836,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {_asset3.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1916,7 +1916,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {_asset3.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -2001,7 +2001,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _assetRepository.AddAsset(_asset4, assetData);
             _assetRepository.AddAsset(_asset5, assetData);
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             // First NotifyCatalogChange
             Asset[] expectedAssets = [_asset1, _asset2, _asset4, _asset5];
@@ -2164,7 +2164,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {_asset1.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -2339,7 +2339,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = $"Image {deletedAsset.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -2409,7 +2409,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             string statusMessage = string.Empty;
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -2616,7 +2616,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -2994,7 +2994,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {

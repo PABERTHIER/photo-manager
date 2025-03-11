@@ -574,7 +574,7 @@ public class ApplicationViewModelChangeAppModeTests
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5 ];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.GoToNextAsset();
             _applicationViewModel!.GoToNextAsset();
             _applicationViewModel!.GoToNextAsset();

@@ -238,7 +238,7 @@ public class ApplicationViewModelGoToAssetTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             // First GoToAsset
             _applicationViewModel!.GoToAsset(_asset2);
@@ -441,7 +441,7 @@ public class ApplicationViewModelGoToAssetTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             _applicationViewModel!.GoToAsset(_asset6);
 
@@ -568,7 +568,7 @@ public class ApplicationViewModelGoToAssetTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _applicationViewModel!.GoToAsset(null!));
 
@@ -637,7 +637,7 @@ public class ApplicationViewModelGoToAssetTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             // First GoToAsset
             _applicationViewModel!.GoToAsset(_asset2, AppMode.Viewer);
@@ -866,7 +866,7 @@ public class ApplicationViewModelGoToAssetTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             _applicationViewModel!.GoToAsset(_asset6, appMode);
 
@@ -997,7 +997,7 @@ public class ApplicationViewModelGoToAssetTests
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            _applicationViewModel!.SetAssets(expectedAssets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _applicationViewModel!.GoToAsset(null!, appMode));
 

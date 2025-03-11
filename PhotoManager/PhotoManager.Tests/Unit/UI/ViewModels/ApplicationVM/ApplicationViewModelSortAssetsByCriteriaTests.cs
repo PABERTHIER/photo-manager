@@ -214,7 +214,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             Asset[] assets = [_asset1];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             string expectedAppTitle = sortCriteria switch
@@ -285,7 +285,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.FileName;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
             string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
@@ -379,7 +379,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.FileName;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
             string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
@@ -493,7 +493,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.FileSize;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             Asset[] expectedAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
@@ -557,7 +557,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.FileSize;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
             string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file size ascending";
@@ -671,7 +671,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.FileCreationDateTime;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             Asset[] expectedAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
@@ -735,7 +735,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.FileCreationDateTime;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
             string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file creation ascending";
@@ -849,7 +849,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.FileModificationDateTime;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             Asset[] expectedAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
@@ -913,7 +913,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.FileModificationDateTime;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
             string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file modification ascending";
@@ -1027,7 +1027,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.ThumbnailCreationDateTime;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             Asset[] expectedAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
@@ -1091,7 +1091,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const SortCriteria sortCriteria = SortCriteria.ThumbnailCreationDateTime;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
             string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
@@ -1208,7 +1208,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             Asset[] assets = [];
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             string expectedAppTitle = sortCriteria switch
@@ -1279,7 +1279,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             Asset[] assets = [_asset1];
             const SortCriteria invalidSortCriteria = (SortCriteria)999;
 
-            _applicationViewModel!.SetAssets(assets);
+            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             ArgumentOutOfRangeException? exception = Assert.Throws<ArgumentOutOfRangeException>(() => _applicationViewModel!.SortAssetsByCriteria(invalidSortCriteria));
 
