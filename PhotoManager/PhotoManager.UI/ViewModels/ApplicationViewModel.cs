@@ -45,7 +45,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public AppMode AppMode
     {
-        get { return _appMode; }
+        get => _appMode;
         private set
         {
             _appMode = value;
@@ -56,7 +56,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public SortCriteria SortCriteria
     {
-        get { return _sortCriteria; }
+        get => _sortCriteria;
         private set
         {
             _sortCriteria = value;
@@ -66,15 +66,9 @@ public class ApplicationViewModel : BaseViewModel
 
     public bool SortAscending { get; private set; } = true;
 
-    public Visibility ThumbnailsVisible
-    {
-        get { return AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden; }
-    }
+    public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden;
 
-    public Visibility ViewerVisible
-    {
-        get { return AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden; }
-    }
+    public Visibility ViewerVisible => AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden;
 
     public int ViewerPosition
     {
@@ -93,7 +87,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public Asset[] SelectedAssets
     {
-        get { return _selectedAssets; }
+        get => _selectedAssets;
         set
         {
             _selectedAssets = value;
@@ -103,7 +97,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public string CurrentFolderPath
     {
-        get { return _currentFolderPath; }
+        get => _currentFolderPath;
         private set
         {
             _currentFolderPath = value;
@@ -116,7 +110,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public string AppTitle
     {
-        get { return _appTitle; }
+        get => _appTitle;
         set
         {
             _appTitle = value;
@@ -126,7 +120,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public string StatusMessage
     {
-        get { return _statusMessage; }
+        get => _statusMessage;
         set
         {
             _statusMessage = value;
@@ -134,10 +128,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public Asset? CurrentAsset
-    {
-        get { return ObservableAssets?.Count > 0 && ViewerPosition >= 0 ? ObservableAssets?[ViewerPosition] : null; }
-    }
+    public Asset? CurrentAsset => ObservableAssets.Count > 0 && ViewerPosition >= 0 ? ObservableAssets[ViewerPosition] : null;
 
     public Folder? MoveAssetsLastSelectedFolder { get; set; }
 
@@ -447,7 +438,7 @@ public class ApplicationViewModel : BaseViewModel
                 Version,
                 CurrentFolderPath,
                 ViewerPosition + 1,
-                ObservableAssets?.Count,
+                ObservableAssets.Count,
                 sortCriteria);
         }
         else if (AppMode == AppMode.Viewer)
@@ -460,7 +451,7 @@ public class ApplicationViewModel : BaseViewModel
                 CurrentFolderPath,
                 CurrentAsset?.FileName,
                 ViewerPosition + 1,
-                ObservableAssets?.Count,
+                ObservableAssets.Count,
                 sortCriteria);
         }
 
