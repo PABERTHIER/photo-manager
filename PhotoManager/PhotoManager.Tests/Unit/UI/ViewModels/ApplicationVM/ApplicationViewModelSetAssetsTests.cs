@@ -1042,9 +1042,9 @@ public class ApplicationViewModelSetAssetsTests
         for (int i = 0; i < observableAssets.Count; i++)
         {
             Asset currentExpectedAsset = expectedAssets[i];
-            Asset currentObservableAssets = observableAssets[i];
+            Asset currentObservableAsset = observableAssets[i];
 
-            AssertAssetPropertyValidity(currentObservableAssets, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
         }
     }
 
