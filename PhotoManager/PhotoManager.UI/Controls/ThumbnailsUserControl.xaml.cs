@@ -46,11 +46,10 @@ public partial class ThumbnailsUserControl : UserControl
         {
             if (!ViewModel.IsRefreshingFolders)
             {
-                ViewModel.CurrentFolder = selectedImagePath;
                 // TODO: Each time the folder is switched, it will LoadBitmapThumbnailImage for each asset in the current dir
                 // (if switching between two folders multiple time, it will call each time LoadBitmapThumbnailImage) -> not good for perf
-                Asset[] assets = await GetAssets(application, ViewModel.CurrentFolder).ConfigureAwait(true);
-                ViewModel.SetAssets(assets);
+                Asset[] assets = await GetAssets(application, selectedImagePath).ConfigureAwait(true);
+                ViewModel.SetAssets(selectedImagePath, assets);
 
                 if (thumbnailsListView.Items.Count > 0)
                 {

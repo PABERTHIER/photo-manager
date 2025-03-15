@@ -66,8 +66,8 @@ public partial class MainWindow : Window
         try
         {
             ViewModel?.ChangeAppMode(AppMode.Thumbnails);
-            thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolder);
-            folderTreeView.SelectedPath = ViewModel?.CurrentFolder;
+            thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolderPath);
+            folderTreeView.SelectedPath = ViewModel?.CurrentFolderPath;
             await DoBackgroundWork();
         }
         catch (Exception ex)
@@ -259,7 +259,7 @@ public partial class MainWindow : Window
                     new FolderNavigationViewModel(
                         _application,
                         assets.First().Folder,
-                        ViewModel.LastSelectedFolder,
+                        ViewModel.MoveAssetsLastSelectedFolder,
                         _application.GetRecentTargetPaths()));
 
                 folderNavigationWindow.Closed += (sender, e) =>
@@ -274,7 +274,7 @@ public partial class MainWindow : Window
 
                         if (result)
                         {
-                            ViewModel.LastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
+                            ViewModel.MoveAssetsLastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
                             ViewModel.IsRefreshingFolders = true;
                             folderTreeView.Initialize();
                             ViewModel.IsRefreshingFolders = false;
@@ -338,7 +338,7 @@ public partial class MainWindow : Window
 
     public void RefreshAssetsCounter()
     {
-        ViewModel.CalculateGlobaleAssetsCounter();
+        ViewModel.CalculateGlobalAssetsCounter();
     }
 
     public string GetExemptedFolderPath()
@@ -398,7 +398,7 @@ public partial class MainWindow : Window
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
+        ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolderPath;
 
         if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perfs
         {
@@ -431,9 +431,9 @@ public partial class MainWindow : Window
         }
 
         await catalogTask.ConfigureAwait(true);
-        ViewModel?.CalculateGlobaleAssetsCounter();
+        ViewModel?.CalculateGlobalAssetsCounter();
         stopwatch.Stop();
         ViewModel?.SetExecutionTime(stopwatch.Elapsed);
-        ViewModel?.CalculateTotalFilesNumber();
+        ViewModel?.CalculateTotalFilesCount();
     }
 }

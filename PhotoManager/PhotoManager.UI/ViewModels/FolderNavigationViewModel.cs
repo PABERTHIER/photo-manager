@@ -10,10 +10,10 @@ public class FolderNavigationViewModel : ApplicationViewModel
 {
     private string targetPath;
 
-    public FolderNavigationViewModel(IApplication application, Folder sourceFolder, Folder lastSelectedFolder, List<string> recentTargetPaths) : base(application)
+    public FolderNavigationViewModel(IApplication application, Folder sourceFolder, Folder? lastSelectedFolder, List<string> recentTargetPaths) : base(application)
     {
         SourceFolder = sourceFolder;
-        LastSelectedFolder = lastSelectedFolder;
+        MoveAssetsLastSelectedFolder = lastSelectedFolder;
         RecentTargetPaths = new ObservableCollection<string>(recentTargetPaths);
     }
 
