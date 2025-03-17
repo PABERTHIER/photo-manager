@@ -29,6 +29,7 @@ public class ApplicationViewModel : BaseViewModel
     private string _executionTimeWording;
     private string _totalFilesCountWording;
 
+    // TODO: Private set for all props + Update UI to set mode OneWay
     public ApplicationViewModel(IApplication application) : base(application)
     {
         _observableAssets = [];
@@ -41,6 +42,7 @@ public class ApplicationViewModel : BaseViewModel
     public event FolderAddedEventHandler? FolderAdded;
     public event FolderRemovedEventHandler? FolderRemoved;
 
+    // TODO: Remove update on ObservableAssets and use _observableAssets instead ?
     public ObservableCollection<Asset> ObservableAssets => _observableAssets;
 
     public AppMode AppMode
@@ -70,9 +72,11 @@ public class ApplicationViewModel : BaseViewModel
 
     public Visibility ViewerVisible => AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden;
 
+    // TODO: Add check to prevent ViewerPosition having value -1
+    // TODO: Rework ViewerPosition to make the setter private (xaml binding issues)
     public int ViewerPosition
     {
-        get { return _viewerPosition; }
+        get => _viewerPosition;
         set
         {
             _viewerPosition = value;
@@ -108,6 +112,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public bool IsRefreshingFolders { get; set; }
 
+    // TODO: Private set + Update UI to set mode OneWay
     public string AppTitle
     {
         get => _appTitle;
@@ -238,11 +243,13 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
+    // TODO: Delete this method and tests
     public void GoToAsset(Asset asset)
     {
         GoToAsset(asset, AppMode);
     }
 
+    // TODO: Delete this method and tests
     public void GoToAsset(Asset asset, AppMode newAppMode)
     {
         Asset? observableAsset = null;
@@ -423,7 +430,7 @@ public class ApplicationViewModel : BaseViewModel
     }
 
     // TODO: Need to rework the content of the title + case where init getting -> image 1 of 0 -> not good
-    // TODO: Called to many times, need to rework this
+    // TODO: Called to many times, need to rework this (reduce event "AppTitle")
     private void UpdateAppTitle()
     {
         string title = null;

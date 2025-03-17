@@ -15,9 +15,10 @@ using System.Windows.Input;
 
 namespace PhotoManager.UI.Windows;
 
+// TODO: Move it into Models folder -> ThumbnailSelectedEventHandler
 public class ThumbnailSelectedEventArgs : EventArgs
 {
-    public Asset Asset { get; set; }
+    public Asset Asset { get; set; } // TODO: Remove this arg
 }
 
 public delegate void ThumbnailSelectedEventHandler(object sender, ThumbnailSelectedEventArgs e);
@@ -56,10 +57,7 @@ public partial class MainWindow : Window
         }
     }
 
-    public ApplicationViewModel ViewModel
-    {
-        get { return (ApplicationViewModel)DataContext; }
-    }
+    public ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
@@ -84,10 +82,10 @@ public partial class MainWindow : Window
     {
         try
         {
-            // TODO: Rework this code because there is no way to trigger MoveAssets by doing ctrl + C / M
-            // Window_KeyDown is instantly triggered after the ctrl click
             if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
             {
+                // TODO: Rework this code because there is no way to trigger MoveAssets by doing ctrl + C / M
+                // Window_KeyDown is instantly triggered after the ctrl click
                 switch (e.Key)
                 {
                     case Key.C:
@@ -383,7 +381,7 @@ public partial class MainWindow : Window
 
     private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        var taskCancellation = Task.Run(() =>
+        Task taskCancellation = Task.Run(() =>
         {
             _cts.Cancel();
         });

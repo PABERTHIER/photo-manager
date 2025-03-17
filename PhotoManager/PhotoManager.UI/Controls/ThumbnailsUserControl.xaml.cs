@@ -18,10 +18,9 @@ namespace PhotoManager.UI.Controls;
 /// Interaction logic for ThumbnailsUserControl.xaml
 /// </summary>
 [ExcludeFromCodeCoverage]
-public partial class ThumbnailsUserControl : UserControl
+public partial class ThumbnailsUserControl
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-    public event ThumbnailSelectedEventHandler ThumbnailSelected;
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
     public ThumbnailsUserControl()
     {
@@ -31,15 +30,16 @@ public partial class ThumbnailsUserControl : UserControl
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
-    private ApplicationViewModel ViewModel
-    {
-        get { return (ApplicationViewModel)DataContext; }
-    }
+    public event ThumbnailSelectedEventHandler? ThumbnailSelected;
 
+    private ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
+
+    // TODO: At Startup, the root is called twice (so calling twice GetAssets), need to handle this case to prevent perf issues
+    // TODO: No async void -> async Task
     public async void GoToFolder(IApplication application, string selectedImagePath)
     {
         try
@@ -49,18 +49,19 @@ public partial class ThumbnailsUserControl : UserControl
                 // TODO: Each time the folder is switched, it will LoadBitmapThumbnailImage for each asset in the current dir
                 // (if switching between two folders multiple time, it will call each time LoadBitmapThumbnailImage) -> not good for perf
                 Asset[] assets = await GetAssets(application, selectedImagePath).ConfigureAwait(true);
+
                 ViewModel.SetAssets(selectedImagePath, assets);
 
-                if (thumbnailsListView.Items.Count > 0)
+                if (ThumbnailsListView.Items.Count > 0 && ThumbnailsListView.Items[0] != null)
                 {
                     ViewModel.ViewerPosition = 0;
-                    thumbnailsListView.ScrollIntoView(thumbnailsListView.Items[0]);
+                    ThumbnailsListView.ScrollIntoView(ThumbnailsListView.Items[0]!);
                 }
             }
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -74,38 +75,39 @@ public partial class ThumbnailsUserControl : UserControl
         try
         {
             Asset asset = (Asset)((FrameworkElement)sender).DataContext;
-            ViewModel?.GoToAsset(asset);
+            ViewModel.GoToAsset(asset);
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
+    // TODO: Delete this method
     private void ContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         try
         {
             Asset asset = (Asset)((FrameworkElement)sender).DataContext;
-            ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs() { Asset = asset });
+            ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs { Asset = asset });
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
     // Triggered when double-clicked on the fullscreen image from ViewerUserControl to pass into thumbnail mode
-    public void ShowImage()
+    public void ShowImage() // TODO: Rename method to CloseImage
     {
-        if (thumbnailsListView.Items.Count > 0 && thumbnailsListView.SelectedItem != null)
+        if (ThumbnailsListView.Items.Count > 0 && ThumbnailsListView.SelectedItem != null)
         {
-            thumbnailsListView.ScrollIntoView(thumbnailsListView.SelectedItem);
+            ThumbnailsListView.ScrollIntoView(ThumbnailsListView.SelectedItem);
         }
     }
 
     private void ThumbnailsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        ViewModel.SelectedAssets = thumbnailsListView.SelectedItems.Cast<Asset>().ToArray();
+        ViewModel.SelectedAssets = ThumbnailsListView.SelectedItems.Cast<Asset>().ToArray();
     }
 }

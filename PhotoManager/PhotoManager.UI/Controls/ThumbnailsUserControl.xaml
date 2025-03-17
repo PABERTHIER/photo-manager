@@ -58,7 +58,7 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
-        <ListBox Name="thumbnailsListView"
+        <ListBox Name="ThumbnailsListView"
                  ItemsSource="{Binding ObservableAssets}"
                  ItemTemplate="{DynamicResource ThumbnailDataTemplate}"
                  Background="#FF3C3C3C"
