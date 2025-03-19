@@ -11,9 +11,9 @@ namespace PhotoManager.UI.Windows;
 /// Interaction logic for AboutWindow.xaml
 /// </summary>
 [ExcludeFromCodeCoverage]
-public partial class AboutWindow : Window
+public partial class AboutWindow
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
     public AboutWindow(AboutInformation aboutInformation)
     {
@@ -26,7 +26,7 @@ public partial class AboutWindow : Window
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 

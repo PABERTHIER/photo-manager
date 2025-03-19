@@ -2,10 +2,12 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace PhotoManager.Tests.Integration.Application;
+namespace PhotoManager.Tests.Integration.UI.Windows;
 
+// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
+// The goal is to test what does AboutWindow
 [TestFixture]
-public class ApplicationGetAboutInformationTests
+public class AboutWindowTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -52,7 +54,7 @@ public class ApplicationGetAboutInformationTests
     [Test]
     [TestCase("PhotoManager", "Toto", "PhotoManager", "Toto")]
     [TestCase("Photo Toto", "Tutu", "PhotoManager", "Tutu")]
-    public void GetAboutInformation_WithValidAssembly_ReturnsAboutInformation(
+    public void Constructor_WithValidAssembly_SetsTitle(
         string projectName,
         string projectOwner,
         string expectedProjectName,
@@ -69,6 +71,11 @@ public class ApplicationGetAboutInformationTests
             Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
             Assert.That(aboutInformation.Version, Does.StartWith("v"));
             Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+
+            string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+            string expectedTitle = $"About {expectedProjectName} v1.0.0";
+
+            Assert.That(title, Is.EqualTo(expectedTitle));
         }
         finally
         {
@@ -77,7 +84,7 @@ public class ApplicationGetAboutInformationTests
     }
 
     [Test]
-    public void GetAboutInformation_WithDifferentAssembly_ReturnsDifferentProduct()
+    public void Constructor_WithDifferentAssembly_SetsTitle()
     {
         ConfigureApplication(_dataDirectory!, "PhotoManager", "Toto");
 
@@ -89,6 +96,11 @@ public class ApplicationGetAboutInformationTests
             Assert.That(aboutInformation.Product, Is.EqualTo("Microsoft® .NET"));
             Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
             Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+
+            string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+            const string expectedTitle = "About Microsoft® .NET v1.0.0";
+
+            Assert.That(title, Is.EqualTo(expectedTitle));
         }
         finally
         {
@@ -99,7 +111,7 @@ public class ApplicationGetAboutInformationTests
     [Test]
     [TestCase("Manager Photo", "Toto")]
     [TestCase("Photo Toto", "Tutu")]
-    public void GetAboutInformation_WithAssemblyWithoutProductAttribute_ReturnsDefaultProduct(string expectedProjectName, string expectedProjectOwner)
+    public void Constructor_WithAssemblyWithoutProductAttribute_SetsTitle(string expectedProjectName, string expectedProjectOwner)
     {
         ConfigureApplication(_dataDirectory!, expectedProjectName, expectedProjectOwner);
 
@@ -113,6 +125,11 @@ public class ApplicationGetAboutInformationTests
             Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
             Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
             Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+
+            string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
+            string expectedTitle = $"About {expectedProjectName} v1.0.0";
+
+            Assert.That(title, Is.EqualTo(expectedTitle));
         }
         finally
         {
