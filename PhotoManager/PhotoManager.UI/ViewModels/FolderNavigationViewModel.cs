@@ -8,13 +8,13 @@ namespace PhotoManager.UI.ViewModels;
 
 public class FolderNavigationViewModel : ApplicationViewModel
 {
-    private string targetPath;
+    private string _targetPath;
 
     public FolderNavigationViewModel(IApplication application, Folder sourceFolder, Folder? lastSelectedFolder, List<string> recentTargetPaths) : base(application)
     {
         SourceFolder = sourceFolder;
         MoveAssetsLastSelectedFolder = lastSelectedFolder;
-        RecentTargetPaths = new ObservableCollection<string>(recentTargetPaths);
+        RecentTargetPaths = [..recentTargetPaths];
     }
 
     public Folder SourceFolder { get; private set; }
@@ -38,14 +38,15 @@ public class FolderNavigationViewModel : ApplicationViewModel
     }
 
     public bool HasConfirmed { get; set; }
+
     public ObservableCollection<string> RecentTargetPaths { get; private set; }
 
     public string TargetPath
     {
-        get { return targetPath; }
+        get => _targetPath;
         set
         {
-            targetPath = !string.IsNullOrEmpty(value) && value.EndsWith("\\") ? value[0..^1] : value;
+            _targetPath = !string.IsNullOrEmpty(value) && value.EndsWith("\\") ? value[0..^1] : value;
             NotifyPropertyChanged(nameof(TargetPath), nameof(SelectedFolder), nameof(CanConfirm));
         }
     }
