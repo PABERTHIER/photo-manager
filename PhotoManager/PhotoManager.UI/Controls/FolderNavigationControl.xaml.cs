@@ -15,22 +15,53 @@ namespace PhotoManager.UI.Controls;
 /// Interaction logic for FolderNavigationControl.xaml
 /// </summary>
 [ExcludeFromCodeCoverage]
-public partial class FolderNavigationControl : UserControl
+public partial class FolderNavigationControl
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-    private object placeholderNode = null;
-    public event EventHandler FolderSelected;
-    public string SelectedPath { get; set; }
-    private bool isInitializing = true;
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+
+    private readonly object? _placeholderNode = null;
+    private bool _isInitializing = true;
+
+    public event EventHandler? FolderSelected;
 
     public FolderNavigationControl()
     {
         InitializeComponent();
+
+        SelectedPath = string.Empty;
     }
 
-    public ApplicationViewModel ViewModel
+    public ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
+
+    public string SelectedPath { get; set; }
+
+    public void Initialize()
     {
-        get { return (ApplicationViewModel)DataContext; }
+        try
+        {
+            foldersTreeView.Items.Clear();
+            Folder[] rootFolders = ViewModel.GetRootCatalogFolders();
+
+            foreach (Folder folder in rootFolders)
+            {
+                TreeViewItem item = new()
+                {
+                    Header = folder.Name,
+                    Tag = folder
+                };
+
+                item.Items.Add(_placeholderNode);
+                item.Expanded += Item_Expanded;
+                foldersTreeView.Items.Add(item);
+            }
+
+            GoToFolder(SelectedPath);
+            _isInitializing = false;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+        }
     }
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -54,82 +85,19 @@ public partial class FolderNavigationControl : UserControl
         ViewModel.IsRefreshingFolders = false;
     }
 
-    // TODO: When a new folder is catalogued, this control should be notified so it can display it.
-    public void Initialize()
-    {
-        try
-        {
-            foldersTreeView.Items.Clear();
-            Folder[] rootFolders = ViewModel.GetRootCatalogFolders();
-
-            foreach (Folder folder in rootFolders)
-            {
-                TreeViewItem item = new()
-                {
-                    Header = folder.Name,
-                    Tag = folder
-                };
-
-                item.Items.Add(placeholderNode);
-                item.Expanded += new RoutedEventHandler(Item_Expanded);
-                foldersTreeView.Items.Add(item);
-            }
-
-            GoToFolder(SelectedPath);
-            isInitializing = false;
-        }
-        catch (Exception ex)
-        {
-            log.Error(ex);
-        }
-    }
-
-    // TODO: Remove includeHidden
-    private void AddSubItems(TreeViewItem item, bool includeHidden)
-    {
-        try
-        {
-            item.Items.Clear();
-
-            Folder[] folders = ViewModel.GetSubFolders((Folder)item.Tag);
-            folders = folders.OrderBy(f => f.Name).ToArray();
-
-            foreach (Folder folder in folders)
-            {
-                TreeViewItem subitem = new()
-                {
-                    Header = folder.Name,
-                    Tag = folder
-                };
-
-                subitem.Expanded += new RoutedEventHandler(Item_Expanded);
-                item.Items.Add(subitem);
-                AddSubItems(subitem, includeHidden);
-            }
-        }
-        catch (Exception ex)
-        {
-            log.Error(ex);
-        }
-    }
-
     private void Item_Expanded(object sender, RoutedEventArgs e)
     {
-        if (isInitializing)
+        if (_isInitializing)
+        {
             return;
+        }
 
         TreeViewItem item = (TreeViewItem)sender;
 
         if (LacksSubItems(item))
         {
-            // TODO: SHOULD ASK THE USER IF HE WANTS TO SEE HIDDEN FOLDERS. -> No // TODO: Remove includeHidden everywhere
-            AddSubItems(item, false);
+            AddSubItems(item);
         }
-    }
-
-    private bool LacksSubItems(TreeViewItem item)
-    {
-        return item.Items.Count == 1 && item.Items[0] == placeholderNode;
     }
 
     private void FoldersTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -137,34 +105,37 @@ public partial class FolderNavigationControl : UserControl
         try
         {
             TreeView tree = (TreeView)sender;
-            TreeViewItem selectedTreeViewItem = ((TreeViewItem)tree.SelectedItem);
+            TreeViewItem selectedTreeViewItem = (TreeViewItem)tree.SelectedItem;
 
             if (selectedTreeViewItem == null)
+            {
                 return;
+            }
 
+            // Even if SelectedPath == folder.Path -> source, need it to display assets at startup
             if (selectedTreeViewItem.Tag is Folder folder)
             {
                 SelectedPath = folder.Path;
-                FolderSelected?.Invoke(this, new EventArgs());
+                FolderSelected?.Invoke(this, EventArgs.Empty);
             }
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
-    public void GoToFolder(string folderFullPath)
+    private void GoToFolder(string folderFullPath)
     {
-        foreach (var item in foldersTreeView.Items)
+        foreach (object? item in foldersTreeView.Items)
         {
             TreeViewItem treeViewItem = (TreeViewItem)item;
-            // TODO: SHOULD ASK THE USER IF HE WANTS TO SEE HIDDEN FOLDERS.
-            GoToFolder(treeViewItem, folderFullPath, false);
+
+            GoToFolder(treeViewItem, folderFullPath);
         }
     }
 
-    private void GoToFolder(TreeViewItem item, string folderFullPath, bool includeHidden)
+    private void GoToFolder(TreeViewItem item, string folderFullPath)
     {
         if (item.Tag is Folder folder)
         {
@@ -172,7 +143,7 @@ public partial class FolderNavigationControl : UserControl
             {
                 if (LacksSubItems(item))
                 {
-                    AddSubItems(item, includeHidden);
+                    AddSubItems(item);
                 }
 
                 item.IsExpanded = true;
@@ -184,13 +155,46 @@ public partial class FolderNavigationControl : UserControl
                 }
                 else
                 {
-                    foreach (var subItem in item.Items)
+                    foreach (object? subItem in item.Items)
                     {
                         TreeViewItem treeViewItem = (TreeViewItem)subItem;
-                        GoToFolder(treeViewItem, folderFullPath, includeHidden);
+                        GoToFolder(treeViewItem, folderFullPath);
                     }
                 }
             }
         }
+    }
+
+    private void AddSubItems(TreeViewItem item)
+    {
+        try
+        {
+            item.Items.Clear();
+
+            Folder[] folders = ViewModel.GetSubFolders((Folder)item.Tag);
+            folders = [..folders.OrderBy(f => f.Name)];
+
+            foreach (Folder folder in folders)
+            {
+                TreeViewItem subItem = new()
+                {
+                    Header = folder.Name,
+                    Tag = folder
+                };
+
+                subItem.Expanded += Item_Expanded;
+                item.Items.Add(subItem);
+                AddSubItems(subItem);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+        }
+    }
+
+    private bool LacksSubItems(TreeViewItem item)
+    {
+        return item.Items.Count == 1 && item.Items[0] == _placeholderNode;
     }
 }
