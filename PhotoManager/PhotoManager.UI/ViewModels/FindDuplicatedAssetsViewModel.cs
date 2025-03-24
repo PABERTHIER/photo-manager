@@ -197,43 +197,12 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
     }
 }
 
-public class DuplicatedAssetViewModel : BaseViewModel
-{
-    private Asset asset;
-    private Visibility visible;
-
-    public DuplicatedAssetViewModel(IApplication application) : base(application)
-    {
-    }
-
-    public Asset Asset
-    {
-        get { return asset; }
-        set
-        {
-            asset = value;
-            NotifyPropertyChanged(nameof(Asset));
-        }
-    }
-
-    public Visibility Visible
-    {
-        get { return visible; }
-        set
-        {
-            visible = value;
-            NotifyPropertyChanged(nameof(Visible));
-            ParentViewModel?.NotifyAssetChanged(this);
-        }
-    }
-
-    public DuplicatedSetViewModel ParentViewModel { get; internal set; }
-}
-
+// TODO: Merge this VM into FindDuplicatedAssetsViewModel since it's just a List<DuplicatedAssetViewModel>
 public class DuplicatedSetViewModel : List<DuplicatedAssetViewModel>, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler PropertyChanged;
 
+    // TODO: Delete this code since it's the same in BaseViewModel ?
     protected void NotifyPropertyChanged(params string[] propertyNames)
     {
         foreach (string propertyName in propertyNames)
@@ -242,31 +211,19 @@ public class DuplicatedSetViewModel : List<DuplicatedAssetViewModel>, INotifyPro
         }
     }
 
-    private int GetVisibleDuplicates()
-    {
-        return this.Count(vm => vm.Visible == Visibility.Visible);
-    }
+    public string FileName => this[0].Asset.FileName;
 
-    public string FileName
-    {
-        get { return this[0].Asset.FileName; }
-    }
+    public int DuplicatesCount => GetVisibleDuplicates();
 
-    public int DuplicatesCount
-    {
-        get { return GetVisibleDuplicates(); }
-    }
-
-    public Visibility Visible
-    {
-        get
-        {
-            return GetVisibleDuplicates() > 1 ? Visibility.Visible : Visibility.Collapsed;
-        }
-    }
+    public Visibility Visible => GetVisibleDuplicates() > 1 ? Visibility.Visible : Visibility.Collapsed;
 
     public void NotifyAssetChanged(DuplicatedAssetViewModel asset)
     {
         NotifyPropertyChanged(nameof(DuplicatesCount), nameof(Visible));
+    }
+
+    private int GetVisibleDuplicates()
+    {
+        return this.Count(vm => vm.Visible == Visibility.Visible);
     }
 }
