@@ -3,7 +3,6 @@ using PhotoManager.Domain;
 using PhotoManager.UI.Windows;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 
@@ -194,36 +193,5 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
         {
             MessageBox.Show("All duplicates have been deleted. \nGood Job ;)", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-    }
-}
-
-// TODO: Merge this VM into FindDuplicatedAssetsViewModel since it's just a List<DuplicatedAssetViewModel>
-public class DuplicatedSetViewModel : List<DuplicatedAssetViewModel>, INotifyPropertyChanged
-{
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    // TODO: Delete this code since it's the same in BaseViewModel ?
-    protected void NotifyPropertyChanged(params string[] propertyNames)
-    {
-        foreach (string propertyName in propertyNames)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    public string FileName => this[0].Asset.FileName;
-
-    public int DuplicatesCount => GetVisibleDuplicates();
-
-    public Visibility Visible => GetVisibleDuplicates() > 1 ? Visibility.Visible : Visibility.Collapsed;
-
-    public void NotifyAssetChanged(DuplicatedAssetViewModel asset)
-    {
-        NotifyPropertyChanged(nameof(DuplicatesCount), nameof(Visible));
-    }
-
-    private int GetVisibleDuplicates()
-    {
-        return this.Count(vm => vm.Visible == Visibility.Visible);
     }
 }

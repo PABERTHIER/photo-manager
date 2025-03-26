@@ -17,7 +17,7 @@ public class DuplicatedAssetViewModel : BaseViewModel
     public Asset Asset
     {
         get => _asset;
-        set
+        set // TODO: Init
         {
             _asset = value;
             NotifyPropertyChanged(nameof(Asset));
@@ -31,9 +31,9 @@ public class DuplicatedAssetViewModel : BaseViewModel
         {
             _visible = value;
             NotifyPropertyChanged(nameof(Visible));
-            ParentViewModel.NotifyAssetChanged(this);
+            ParentViewModel.NotifyAssetChanged();
         }
     }
 
-    public DuplicatedSetViewModel ParentViewModel { get; internal set; }
+    public DuplicatedSetViewModel ParentViewModel { get; set; } // TODO: Init
 }

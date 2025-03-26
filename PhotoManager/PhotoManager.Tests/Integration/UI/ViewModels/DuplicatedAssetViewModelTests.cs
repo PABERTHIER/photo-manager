@@ -185,12 +185,13 @@ public class DuplicatedAssetViewModelTests
 
             _asset3 = _asset3.WithFolder(folder);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel = new (_application!) { Asset = _asset2 };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new (_application!) { Asset = _asset2 };
+            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new (_application!) { Asset = _asset3 };
 
             _duplicatedAssetViewModel = new (_application!)
             {
                 Asset = _asset3,
-                ParentViewModel = { duplicatedAssetViewModel }
+                ParentViewModel = [ duplicatedAssetViewModel1, duplicatedAssetViewModel2 ]
             };
 
             (
@@ -198,21 +199,44 @@ public class DuplicatedAssetViewModelTests
                 List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(_asset3, Visibility.Visible, [duplicatedAssetViewModel]);
+            CheckBeforeChanges(
+                _asset3,
+                Visibility.Visible,
+                [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+                _asset2.FileName,
+                2);
 
             _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset3, Visibility.Collapsed, [duplicatedAssetViewModel]);
+            CheckAfterChanges(
+                _duplicatedAssetViewModel!,
+                _asset3,
+                Visibility.Collapsed,
+                [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+                _asset2.FileName,
+                2);
 
             _duplicatedAssetViewModel!.Visible = Visibility.Hidden;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset3, Visibility.Hidden, [duplicatedAssetViewModel]);
+            CheckAfterChanges(
+                _duplicatedAssetViewModel!,
+                _asset3,
+                Visibility.Hidden,
+                [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+                _asset2.FileName,
+                2);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
 
-            CheckInstance(duplicatedAssetViewModelInstances, _asset3, Visibility.Hidden, [duplicatedAssetViewModel]);
+            CheckInstance(
+                duplicatedAssetViewModelInstances,
+                _asset3,
+                Visibility.Hidden,
+                [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
+                _asset2.FileName,
+                2);
         }
         finally
         {
@@ -240,21 +264,21 @@ public class DuplicatedAssetViewModelTests
                 List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(_asset1, Visibility.Hidden, []);
+            CheckBeforeChanges(_asset1, Visibility.Hidden, [], null, 0);
 
             _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset1, Visibility.Collapsed, []);
+            CheckAfterChanges(_duplicatedAssetViewModel!, _asset1, Visibility.Collapsed, [], null, 0);
 
             _duplicatedAssetViewModel!.Visible = Visibility.Visible;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset1, Visibility.Visible, []);
+            CheckAfterChanges(_duplicatedAssetViewModel!, _asset1, Visibility.Visible, [], null, 0);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
 
-            CheckInstance(duplicatedAssetViewModelInstances, _asset1, Visibility.Visible, []);
+            CheckInstance(duplicatedAssetViewModelInstances, _asset1, Visibility.Visible, [], null, 0);
         }
         finally
         {
@@ -282,21 +306,21 @@ public class DuplicatedAssetViewModelTests
                 List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            CheckBeforeChanges(_asset4, Visibility.Visible, []);
+            CheckBeforeChanges(_asset4, Visibility.Visible, [], null, 0);
 
             _duplicatedAssetViewModel!.Visible = Visibility.Collapsed;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset4, Visibility.Collapsed, []);
+            CheckAfterChanges(_duplicatedAssetViewModel!, _asset4, Visibility.Collapsed, [], null, 0);
 
             _duplicatedAssetViewModel!.Visible = Visibility.Hidden;
 
-            CheckAfterChanges(_duplicatedAssetViewModel!, _asset4, Visibility.Hidden, []);
+            CheckAfterChanges(_duplicatedAssetViewModel!, _asset4, Visibility.Hidden, [], null, 0);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(2));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("Visible"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("Visible"));
 
-            CheckInstance(duplicatedAssetViewModelInstances, _asset4, Visibility.Hidden, []);
+            CheckInstance(duplicatedAssetViewModelInstances, _asset4, Visibility.Hidden, [], null, 0);
         }
         finally
         {
@@ -318,7 +342,12 @@ public class DuplicatedAssetViewModelTests
         return (notifyPropertyChangedEvents, duplicatedAssetViewModelInstances);
     }
 
-    private void CheckBeforeChanges(Asset? expectedAsset, Visibility expectedVisible, DuplicatedSetViewModel expectedParentViewModel)
+    private void CheckBeforeChanges(
+        Asset? expectedAsset,
+        Visibility expectedVisible,
+        DuplicatedSetViewModel expectedParentViewModel,
+        string? expectedParentViewModelFileName,
+        int expectedParentViewModelDuplicatesCount)
     {
         if (expectedAsset != null)
         {
@@ -331,13 +360,27 @@ public class DuplicatedAssetViewModelTests
 
         Assert.That(_duplicatedAssetViewModel!.Visible, Is.EqualTo(expectedVisible));
 
-        Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.DuplicatesCount));
-        Assert.That(_duplicatedAssetViewModel!.ParentViewModel.Visible, Is.EqualTo(expectedParentViewModel.Visible));
-
-        for (int i = 0; i < expectedParentViewModel.Count; i++)
+        if (expectedParentViewModel.Count > 0)
         {
-            Assert.That(_duplicatedAssetViewModel!.ParentViewModel[i].Visible, Is.EqualTo(expectedParentViewModel[i].Visible));
-            AssertAssetPropertyValidity(_duplicatedAssetViewModel!.ParentViewModel[i].Asset, expectedParentViewModel[i].Asset);
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModel.FileName));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModel[0].Asset.FileName));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModelFileName));
+
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.DuplicatesCount));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.Count));
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModelDuplicatesCount));
+
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel.Visible, Is.EqualTo(expectedParentViewModel.Visible));
+
+            for (int i = 0; i < expectedParentViewModel.Count; i++)
+            {
+                Assert.That(_duplicatedAssetViewModel!.ParentViewModel[i].Visible, Is.EqualTo(expectedParentViewModel[i].Visible));
+                AssertAssetPropertyValidity(_duplicatedAssetViewModel!.ParentViewModel[i].Asset, expectedParentViewModel[i].Asset);
+            }
+        }
+        else
+        {
+            Assert.That(_duplicatedAssetViewModel!.ParentViewModel, Is.Empty);
         }
     }
 
@@ -345,7 +388,9 @@ public class DuplicatedAssetViewModelTests
         DuplicatedAssetViewModel duplicatedAssetViewModelInstance,
         Asset? expectedAsset,
         Visibility expectedVisible,
-        DuplicatedSetViewModel expectedParentViewModel)
+        DuplicatedSetViewModel expectedParentViewModel,
+        string? expectedParentViewModelFileName,
+        int expectedParentViewModelDuplicatesCount)
     {
         if (expectedAsset != null)
         {
@@ -358,13 +403,27 @@ public class DuplicatedAssetViewModelTests
 
         Assert.That(duplicatedAssetViewModelInstance.Visible, Is.EqualTo(expectedVisible));
 
-        Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.DuplicatesCount));
-        Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.Visible, Is.EqualTo(expectedParentViewModel.Visible));
-
-        for (int i = 0; i < expectedParentViewModel.Count; i++)
+        if (expectedParentViewModel.Count > 0)
         {
-            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel[i].Visible, Is.EqualTo(expectedParentViewModel[i].Visible));
-            AssertAssetPropertyValidity(duplicatedAssetViewModelInstance.ParentViewModel[i].Asset, expectedParentViewModel[i].Asset);
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModel.FileName));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModel[0].Asset.FileName));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.FileName, Is.EqualTo(expectedParentViewModelFileName));
+
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.DuplicatesCount));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModel.Count));
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.DuplicatesCount, Is.EqualTo(expectedParentViewModelDuplicatesCount));
+
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel.Visible, Is.EqualTo(expectedParentViewModel.Visible));
+
+            for (int i = 0; i < expectedParentViewModel.Count; i++)
+            {
+                Assert.That(duplicatedAssetViewModelInstance.ParentViewModel[i].Visible, Is.EqualTo(expectedParentViewModel[i].Visible));
+                AssertAssetPropertyValidity(duplicatedAssetViewModelInstance.ParentViewModel[i].Asset, expectedParentViewModel[i].Asset);
+            }
+        }
+        else
+        {
+            Assert.That(duplicatedAssetViewModelInstance.ParentViewModel, Is.Empty);
         }
     }
 
@@ -383,7 +442,9 @@ public class DuplicatedAssetViewModelTests
         List<DuplicatedAssetViewModel> duplicatedAssetViewModelInstances,
         Asset? expectedAsset,
         Visibility expectedVisible,
-        DuplicatedSetViewModel expectedDuplicatedSetViewModel)
+        DuplicatedSetViewModel expectedDuplicatedSetViewModel,
+        string? expectedParentViewModelFileName,
+        int expectedParentViewModelDuplicatesCount)
     {
         int duplicatedAssetViewModelInstancesCount = duplicatedAssetViewModelInstances.Count;
 
@@ -396,7 +457,13 @@ public class DuplicatedAssetViewModelTests
 
         if (duplicatedAssetViewModelInstancesCount > 0)
         {
-            CheckAfterChanges(duplicatedAssetViewModelInstances[0], expectedAsset, expectedVisible, expectedDuplicatedSetViewModel);
+            CheckAfterChanges(
+                duplicatedAssetViewModelInstances[0],
+                expectedAsset,
+                expectedVisible,
+                expectedDuplicatedSetViewModel,
+                expectedParentViewModelFileName,
+                expectedParentViewModelDuplicatesCount);
         }
     }
 }
