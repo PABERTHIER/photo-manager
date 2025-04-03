@@ -417,8 +417,8 @@ public class DuplicatedAssetViewModelTests
 
             for (int i = 0; i < expectedParentViewModel.Count; i++)
             {
-                Assert.That(duplicatedAssetViewModelInstance.ParentViewModel[i].Visible, Is.EqualTo(expectedParentViewModel[i].Visible));
                 AssertAssetPropertyValidity(duplicatedAssetViewModelInstance.ParentViewModel[i].Asset, expectedParentViewModel[i].Asset);
+                Assert.That(duplicatedAssetViewModelInstance.ParentViewModel[i].Visible, Is.EqualTo(expectedParentViewModel[i].Visible));
             }
         }
         else

@@ -13,6 +13,7 @@ public class ApplicationGetAssetsCounterTests
 
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
+    private UserConfigurationService? _userConfigurationService;
     private Database? _database;
     private Mock<IStorageService>? _storageServiceMock;
 
@@ -147,23 +148,23 @@ public class ApplicationGetAssetsCounterTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new (configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new (_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
+        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
         MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, _userConfigurationService);
+        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
     }
 
     [Test]
@@ -171,9 +172,9 @@ public class ApplicationGetAssetsCounterTests
     [TestCase(true)]
     public async Task GetAssetsCounter_CataloguedAssets_ReturnsNumberOfAssets(bool analyseVideos)
     {
-        string outputVideoFirstFrameDirectory = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
-
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, analyseVideos);
+
+        string outputVideoFirstFrameDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);

@@ -28,13 +28,13 @@
             <ColumnDefinition Width="500"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" Foreground="#FFFFFFFF" Content="{Binding DuplicatedAssetSetsCollection.Count}" ContentStringFormat="Duplicated sets: {0}"/>
+        <Label Grid.Row="0" Grid.Column="0" Foreground="#FFFFFFFF" Content="{Binding DuplicatedAssetSets.Count}" ContentStringFormat="Duplicated sets: {0}"/>
         <Label Grid.Row="0" Grid.Column="1" x:Name="refreshLabel" Padding="5" MouseLeftButtonDown="RefreshLabel_MouseLeftButtonDown" Content="Refresh" Style="{StaticResource ButtonStyle}" />
         <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
             <Label x:Name="deleteEveryLabel" Padding="5" MouseLeftButtonDown="DeleteEveryDuplicatesLabel_MouseLeftButtonDown" Content="Delete Every Duplicates Linked To Exempt Folder" Style="{StaticResource ButtonStyle}" />
             <Label x:Name="copyToClipboardAndOpenInFileExploerer" Padding="5" MouseLeftButtonDown="CopyToClipboard_OpenInFileExplorer_MouseLeftButtonDown" Content="Open in File Explorer" Style="{StaticResource ButtonStyle}" />
         </StackPanel>
-        <DataGrid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" ItemsSource="{Binding DuplicatedAssetSetsCollection}" SelectedIndex="{Binding DuplicatedAssetSetsPosition}" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserAddRows="False" SelectionMode="Single" SelectionUnit="FullRow" Margin="10 0 10 0" Background="#FF3C3C3C">
+        <DataGrid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" ItemsSource="{Binding DuplicatedAssetSets}" SelectedIndex="{Binding DuplicatedAssetSetsPosition}" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserAddRows="False" SelectionMode="Single" SelectionUnit="FullRow" Margin="10 0 10 0" Background="#FF3C3C3C">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="Background" Value="#FF3C3C3C"/>

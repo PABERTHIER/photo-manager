@@ -19,7 +19,7 @@ namespace PhotoManager.UI.Windows;
 public partial class DuplicatedAssetsWindow : Window
 {
     private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-    // TODO: Rename this file
+    // TODO: Rename this class
     public DuplicatedAssetsWindow(FindDuplicatedAssetsViewModel viewModel)
     {
         try
@@ -41,10 +41,7 @@ public partial class DuplicatedAssetsWindow : Window
 
     public MainWindow MainWindowInstance { get; set; }
 
-    private List<DuplicatedSetViewModel> DuplicatedAssets
-    {
-        get { return ViewModel.GetAllDuplicatedAssets(); }
-    }
+    private List<DuplicatedSetViewModel> DuplicatedAssets => ViewModel.DuplicatedAssetSets; // TODO: Rename to DuplicatedAssetSets
 
     private void DeleteLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
