@@ -1,6 +1,7 @@
 ﻿using log4net;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,10 @@ namespace PhotoManager.UI.Windows;
 /// Interaction logic for DuplicatedAssetsWindow.xaml
 /// </summary>
 [ExcludeFromCodeCoverage]
-public partial class DuplicatedAssetsWindow : Window
+public partial class DuplicatedAssetsWindow
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+
     // TODO: Rename this class
     public DuplicatedAssetsWindow(FindDuplicatedAssetsViewModel viewModel)
     {
@@ -27,19 +29,20 @@ public partial class DuplicatedAssetsWindow : Window
             InitializeComponent();
 
             DataContext = viewModel;
+
+            viewModel.MessageBoxInformationSent += DisplayMessageBox;
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
-    public FindDuplicatedAssetsViewModel ViewModel
-    {
-        get { return (FindDuplicatedAssetsViewModel)DataContext; }
-    }
+    public event RefreshAssetsCounterEventHandler? RefreshAssetsCounter;
+    public event GetExemptedFolderPathEventHandler? GetExemptedFolderPath;
+    public event DeleteDuplicateAssetsEventHandler? DeleteDuplicateAssets;
 
-    public MainWindow MainWindowInstance { get; set; }
+    public FindDuplicatedAssetsViewModel ViewModel => (FindDuplicatedAssetsViewModel)DataContext;
 
     private List<DuplicatedSetViewModel> DuplicatedAssets => ViewModel.DuplicatedAssetSets; // TODO: Rename to DuplicatedAssetSets
 
@@ -47,16 +50,14 @@ public partial class DuplicatedAssetsWindow : Window
     {
         try
         {
-            DuplicatedAssetViewModel viewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
-            Asset asset = viewModel.Asset;
-            ViewModel.DeleteAsset(viewModel, MainWindowInstance);
-            ViewModel.Refresh();
+            DuplicatedAssetViewModel duplicatedAssetViewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
+            DeleteDuplicateAssets?.Invoke(this, [duplicatedAssetViewModel.Asset]);
 
-            Console.WriteLine("Delete " + asset.FullPath);
+            ViewModel.CollapseAssets([duplicatedAssetViewModel]);
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -64,13 +65,12 @@ public partial class DuplicatedAssetsWindow : Window
     {
         try
         {
-            DuplicatedAssetViewModel viewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
-            DeleteAllDuplicatedAssetsByHash(DuplicatedAssets, viewModel.Asset);
-            ViewModel.Refresh();
+            DuplicatedAssetViewModel duplicatedAssetViewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
+            DeleteAllDuplicatedAssetsByHash(DuplicatedAssets, duplicatedAssetViewModel.Asset);
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -82,7 +82,7 @@ public partial class DuplicatedAssetsWindow : Window
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -91,11 +91,10 @@ public partial class DuplicatedAssetsWindow : Window
         try
         {
             DeleteEveryDuplicatedAssets(DuplicatedAssets);
-            ViewModel.Refresh();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -107,17 +106,17 @@ public partial class DuplicatedAssetsWindow : Window
             Clipboard.SetText(assetPath);
 
             string args = $"/select, \"{assetPath}\"";
-            Process.Start("explorer.exe", args);
+            Process.Start("explorer.exe", args); // TODO: Only for Windows
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
     private void FindDuplicatesAssetsWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        MainWindowInstance.RefreshAssetsCounter();
+        RefreshAssetsCounter?.Invoke(this);
     }
 
     // TODO: Move the logic to services for both methods (no logic here !)
@@ -125,7 +124,7 @@ public partial class DuplicatedAssetsWindow : Window
     {
         if (duplicatedAssets == null || currentAsset == null)
         {
-            log.Error("duplicatedAssets or currentAsset is null");
+            Log.Error("duplicatedAssets or currentAsset is null");
             return;
         }
 
@@ -137,26 +136,37 @@ public partial class DuplicatedAssetsWindow : Window
 
         if (assetSelected == null)
         {
-            log.Error("firstAsset is null");
+            Log.Error("firstAsset is null");
             return;
         }
 
-        var assetsToDelete = duplicatedAssetByHash?.Where(x => x != null && x != assetSelected).ToList() ?? new List<DuplicatedAssetViewModel>();
+        var assetsToDelete = duplicatedAssetByHash?
+            .Where(x => x != null && x != assetSelected)
+            .ToList() 
+            ?? new List<DuplicatedAssetViewModel>();
 
-        ViewModel.DeleteAssets(assetsToDelete, MainWindowInstance);
+        DeleteDuplicateAssets?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
+
+        ViewModel.CollapseAssets(assetsToDelete);
     }
 
     private void DeleteEveryDuplicatedAssets(List<DuplicatedSetViewModel> duplicatedAssets)
     {
         if (duplicatedAssets == null)
         {
-            log.Error("duplicatedAssets is null");
+            Log.Error("duplicatedAssets is null");
             return;
         }
 
-        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == MainWindowInstance.GetExemptedFolderPath()).ToList();
+        string exemptedFolderPath = GetExemptedFolderPath?.Invoke(this) ?? string.Empty;
 
-        var duplicatedAssetsFiltered = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path != MainWindowInstance.GetExemptedFolderPath()).ToList();
+        var exemptedAssets = DuplicatedAssets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == exemptedFolderPath).ToList();
+
+        var duplicatedAssetsFiltered = DuplicatedAssets
+            .Where(x => x != null)
+            .SelectMany(x => x)
+            .Where(y => y != null && y.Asset.Folder.Path != exemptedFolderPath)
+            .ToList();
 
         var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
             x => x.Asset.Hash,
@@ -164,6 +174,13 @@ public partial class DuplicatedAssetsWindow : Window
             (x, y) => x)
             .ToList();
 
-        ViewModel.DeleteAssets(assetsToDelete, MainWindowInstance);
+        DeleteDuplicateAssets?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
+
+        ViewModel.CollapseAssets(assetsToDelete);
+    }
+
+    private static void DisplayMessageBox(object sender, MessageBoxInformationSentEventArgs e)
+    {
+        MessageBox.Show(e.Message, e.Caption, MessageBoxButton.OK, MessageBoxImage.Information);
     }
 }

@@ -4,25 +4,11 @@ using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class DuplicatedAssetViewModel : BaseViewModel
+public class DuplicatedAssetViewModel(IApplication application) : BaseViewModel(application)
 {
-    private Asset _asset;
     private Visibility _visible;
 
-    public DuplicatedAssetViewModel(IApplication application) : base(application)
-    {
-        ParentViewModel = [];
-    }
-
-    public Asset Asset
-    {
-        get => _asset;
-        set // TODO: Init
-        {
-            _asset = value;
-            NotifyPropertyChanged(nameof(Asset));
-        }
-    }
+    public required Asset Asset { get; init; }
 
     public Visibility Visible
     {
@@ -35,5 +21,5 @@ public class DuplicatedAssetViewModel : BaseViewModel
         }
     }
 
-    public DuplicatedSetViewModel ParentViewModel { get; set; } // TODO: Init
+    public DuplicatedSetViewModel ParentViewModel { get; init; } = [];
 }

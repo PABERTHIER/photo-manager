@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using PhotoManager.UI.Models;
+using System.ComponentModel;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.FindDuplicatedAssetsVM;
 
@@ -1058,6 +1059,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
         (
             List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents,
             List<string> notifyApplicationVmPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
@@ -1637,6 +1639,8 @@ public class FindDuplicatedAssetsViewModelDHashTests
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
+            Assert.That(messagesInformationSent, Is.Empty);
+
             CheckInstance(
                 findDuplicatedAssetsViewModelInstances,
                 expectedDuplicatedAssetsSets,
@@ -1657,10 +1661,14 @@ public class FindDuplicatedAssetsViewModelDHashTests
         }
     }
 
-    private (
+    private
+        (
         List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents,
         List<string> notifyApplicationVmPropertyChangedEvents,
-        List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances) NotifyPropertyChangedEvents()
+        List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+        List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        )
+        NotifyPropertyChangedEvents()
     {
         List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents = [];
         List<string> notifyApplicationVmPropertyChangedEvents = [];
@@ -1677,7 +1685,20 @@ public class FindDuplicatedAssetsViewModelDHashTests
             notifyApplicationVmPropertyChangedEvents.Add(e.PropertyName!);
         };
 
-        return (notifyFindDuplicatedAssetsVmPropertyChangedEvents, notifyApplicationVmPropertyChangedEvents, findDuplicatedAssetsViewModelInstances);
+        List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
+
+        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate(object _, MessageBoxInformationSentEventArgs e)
+        {
+            messagesInformationSent.Add(e);
+        };
+
+        return
+        (
+            notifyFindDuplicatedAssetsVmPropertyChangedEvents,
+            notifyApplicationVmPropertyChangedEvents,
+            messagesInformationSent,
+            findDuplicatedAssetsViewModelInstances
+        );
     }
 
     private void CheckBeforeChanges()

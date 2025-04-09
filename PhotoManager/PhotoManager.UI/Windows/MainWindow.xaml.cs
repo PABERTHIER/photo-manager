@@ -29,33 +29,33 @@ public delegate void ThumbnailSelectedEventHandler(object sender, ThumbnailSelec
 [ExcludeFromCodeCoverage]
 public partial class MainWindow : Window
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+
     private readonly IApplication _application;
-    private readonly CancellationTokenSource _cts;
-    Task catalogTask;
+    private readonly CancellationTokenSource _cancellationTokenSource;
+    private Task _catalogTask;
 
-    public static MainWindow Current { get; private set; }
-
-    // TODO: Refacto about to get it only once
+    // TODO: Rework aboutInformation to get it only once (need to Add Author into the VM)
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
     {
         try
         {
             InitializeComponent();
             Current = this;
-            _cts = new CancellationTokenSource();
+            _cancellationTokenSource = new();
 
             _application = application;
-            var aboutInformation = application.GetAboutInformation(GetType().Assembly);
-            viewModel.Product = aboutInformation.Product; // TODO: Add Author here and above
-            viewModel.Version = aboutInformation.Version;
             DataContext = viewModel;
+
+            SetAboutInformation();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
+
+    public static MainWindow Current { get; private set; }
 
     public ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
 
@@ -70,7 +70,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
         finally
         {
@@ -78,14 +78,14 @@ public partial class MainWindow : Window
         }
     }
 
+    // TODO: Add a help page to describe all shortcuts available
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
         try
         {
             if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
             {
-                // TODO: Rework this code because there is no way to trigger MoveAssets by doing ctrl + C / M
-                // Window_KeyDown is instantly triggered after the ctrl click
+                // To trigger these events below, need to hold the Ctrl key and press C or M in the meantime
                 switch (e.Key)
                 {
                     case Key.C:
@@ -94,6 +94,9 @@ public partial class MainWindow : Window
 
                     case Key.M:
                         MoveAssets(preserveOriginalFiles: false);
+                        break;
+                    // ReSharper disable once RedundantEmptySwitchSection
+                    default:
                         break;
                 }
             }
@@ -107,38 +110,29 @@ public partial class MainWindow : Window
 
                     case Key.PageUp:
                     case Key.Left:
-                        ViewModel?.GoToPreviousAsset();
+                        ViewModel.GoToPreviousAsset();
                         ShowImage();
                         break;
 
                     case Key.PageDown:
                     case Key.Right:
-                        ViewModel?.GoToNextAsset();
+                        ViewModel.GoToNextAsset();
                         ShowImage();
                         break;
 
                     case Key.F1:
-                        ViewModel?.ChangeAppMode();
+                        ViewModel.ChangeAppMode();
                         ShowImage();
+                        break;
+                    // ReSharper disable once RedundantEmptySwitchSection
+                    default:
                         break;
                 }
             }
         }
         catch (Exception ex)
         {
-            log.Error(ex);
-        }
-    }
-
-    private void ShowImage()
-    {
-        if (ViewModel.AppMode == AppMode.Viewer)
-        {
-            viewerUserControl.ShowImage();
-        }
-        else
-        {
-            thumbnailsUserControl.ShowImage();
+            Log.Error(ex);
         }
     }
 
@@ -146,12 +140,12 @@ public partial class MainWindow : Window
     {
         try
         {
-            ViewModel?.GoToAsset(e.Asset, AppMode.Viewer);
+            ViewModel.GoToAsset(e.Asset, AppMode.Viewer);
             ShowImage();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -159,12 +153,12 @@ public partial class MainWindow : Window
     {
         try
         {
-            ViewModel?.GoToAsset(e.Asset, AppMode.Thumbnails);
+            ViewModel.GoToAsset(e.Asset, AppMode.Thumbnails);
             ShowImage();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -176,7 +170,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -190,10 +184,12 @@ public partial class MainWindow : Window
             {
                 FindDuplicatedAssetsViewModel viewModel = new (_application);
                 viewModel.SetDuplicates(duplicates);
-                DuplicatedAssetsWindow duplicatedAssetsWindow = new (viewModel) // DuplicatedAssetsWindow is FindDuplicatedAssetsWindow.xaml
-                {
-                    MainWindowInstance = Current
-                };
+                DuplicatedAssetsWindow duplicatedAssetsWindow = new (viewModel); // DuplicatedAssetsWindow is FindDuplicatedAssetsWindow.xaml
+
+                duplicatedAssetsWindow.GetExemptedFolderPath += GetExemptedFolderPath;
+                duplicatedAssetsWindow.RefreshAssetsCounter += RefreshAssetsCounter;
+                duplicatedAssetsWindow.DeleteDuplicateAssets += DeleteDuplicateAssets;
+
                 duplicatedAssetsWindow.ShowDialog();
             }
             else
@@ -203,7 +199,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -211,13 +207,13 @@ public partial class MainWindow : Window
     {
         try
         {
-            SyncAssetsViewModel viewModel = new (_application);
-            SyncAssetsWindow syncAssetsWindow = new (viewModel);
+            SyncAssetsViewModel syncAssetsViewModel = new (_application);
+            SyncAssetsWindow syncAssetsWindow = new (syncAssetsViewModel);
             syncAssetsWindow.ShowDialog();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -225,13 +221,14 @@ public partial class MainWindow : Window
     {
         try
         {
-            var about = _application.GetAboutInformation(GetType().Assembly);
-            AboutWindow duplicatedAssetsWindow = new (about);  // TODO: Add Author above
-            duplicatedAssetsWindow.ShowDialog();
+            // TODO: Why doing it twice ? Already done in the ctor, use instead VM
+            AboutInformation aboutInformation = _application.GetAboutInformation(GetType().Assembly);
+            AboutWindow aboutWindow = new (aboutInformation);  // TODO: Add Author above
+            aboutWindow.ShowDialog();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -295,7 +292,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -303,46 +300,43 @@ public partial class MainWindow : Window
     {
         try
         {
-            var assets = ViewModel.SelectedAssets;
+            Asset[] selectedAssets = ViewModel.SelectedAssets;
 
-            if (assets != null)
+            if (selectedAssets.Length > 0)
             {
-                _application.DeleteAssets(assets);
-                ViewModel.RemoveAssets(assets);
+                _application.DeleteAssets(selectedAssets); // TODO: Need to rework how the deletion is handled
+                ViewModel.RemoveAssets(selectedAssets);
                 ShowImage();
             }
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
-    public void DeleteDuplicateAssets(Asset[] assets )
+    private void DeleteDuplicateAssets(object sender, Asset[] assets)
     {
         try
         {
-            if (assets != null)
+            if (assets.Length > 0)
             {
-                _application.DeleteAssets(assets);
+                _application.DeleteAssets(assets); // TODO: Can make one method with above
                 ViewModel.RemoveAssets(assets);
             }
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
-    public void RefreshAssetsCounter()
+    private void RefreshAssetsCounter(object sender)
     {
         ViewModel.CalculateGlobalAssetsCounter();
     }
 
-    public string GetExemptedFolderPath()
-    {
-        return ViewModel.GetExemptedFolderPath();
-    }
+    private string GetExemptedFolderPath(object sender) => ViewModel.GetExemptedFolderPath();
 
     private void DeleteAssets_Click(object sender, RoutedEventArgs e)
     {
@@ -383,11 +377,11 @@ public partial class MainWindow : Window
     {
         Task taskCancellation = Task.Run(() =>
         {
-            _cts.Cancel();
+            _cancellationTokenSource.Cancel();
         });
 
         await taskCancellation.ConfigureAwait(true);
-        await catalogTask.ConfigureAwait(true);
+        await _catalogTask.ConfigureAwait(true);
         //e.Cancel = catalogTask != null && !catalogTask.IsCompleted; // Now that all tasks are canceled, the window can be closed properly
     }
 
@@ -398,7 +392,7 @@ public partial class MainWindow : Window
 
         ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolderPath;
 
-        if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perfs
+        if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perf
         {
             ushort minutes = ViewModel.GetCatalogCooldownMinutes();
 
@@ -416,22 +410,41 @@ public partial class MainWindow : Window
     {
         try
         {
-            catalogTask = ViewModel.CatalogAssets(
+            _catalogTask = ViewModel.CatalogAssets(
             async (e) =>
             {
                 // The InvokeAsync method is used to avoid freezing the application when the task is cancelled.
                 await Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e));
-            }, _cts.Token);
+            }, _cancellationTokenSource.Token);
         }
         catch (OperationCanceledException ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
 
-        await catalogTask.ConfigureAwait(true);
-        ViewModel?.CalculateGlobalAssetsCounter();
+        await _catalogTask.ConfigureAwait(true);
+        ViewModel.CalculateGlobalAssetsCounter();
         stopwatch.Stop();
-        ViewModel?.SetExecutionTime(stopwatch.Elapsed);
-        ViewModel?.CalculateTotalFilesCount();
+        ViewModel.SetExecutionTime(stopwatch.Elapsed);
+        ViewModel.CalculateTotalFilesCount();
+    }
+
+    private void SetAboutInformation()
+    {
+        AboutInformation aboutInformation = _application.GetAboutInformation(GetType().Assembly);
+        ViewModel.Product = aboutInformation.Product; // TODO: Add Author here and above
+        ViewModel.Version = aboutInformation.Version;
+    }
+
+    private void ShowImage()
+    {
+        if (ViewModel.AppMode == AppMode.Viewer)
+        {
+            viewerUserControl.ShowImage();
+        }
+        else
+        {
+            thumbnailsUserControl.ShowImage();
+        }
     }
 }
