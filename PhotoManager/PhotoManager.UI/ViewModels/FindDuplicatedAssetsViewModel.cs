@@ -190,10 +190,12 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     private void NavigateToPreviousVisibleSet(int currentIndex)
     {
+        int duplicatedAssetSetsCount = DuplicatedAssetSets.Count;
+
         // If currentIndex is out of range, adjust it to the last valid index
-        if (currentIndex >= DuplicatedAssetSets.Count)
+        if (currentIndex >= duplicatedAssetSetsCount)
         {
-            currentIndex = DuplicatedAssetSets.Count - 1;
+            currentIndex = duplicatedAssetSetsCount - 1;
         }
 
         for (int i = currentIndex; i >= 0; i--)
