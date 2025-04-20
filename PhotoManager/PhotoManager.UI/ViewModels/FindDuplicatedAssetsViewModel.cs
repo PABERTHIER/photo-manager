@@ -121,6 +121,29 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         SetDuplicates(duplicatedAssetsSets);
     }
 
+    public List<DuplicatedAssetViewModel> GetDuplicatedAssets(Asset currentAsset)
+    {
+        if (DuplicatedAssetSets.Count == 0)
+        {
+            return [];
+        }
+
+        string currentRootFolderPath = currentAsset.Folder.Path;
+        IEnumerable<DuplicatedSetViewModel> duplicatedAssetByHashList = DuplicatedAssetSets.Where(x => x.Any(y => y.Asset.Hash == currentAsset.Hash));
+        DuplicatedSetViewModel? duplicatedAssetByHash = duplicatedAssetByHashList.FirstOrDefault();
+
+        DuplicatedAssetViewModel? duplicatedAsset = duplicatedAssetByHash?.FirstOrDefault(x =>
+            x.Asset.Folder.Path == currentRootFolderPath && x.Asset.FileName == currentAsset.FileName);
+
+        if (duplicatedAsset == null)
+        {
+            return [];
+        }
+
+        List<DuplicatedAssetViewModel> assetsToDelete = duplicatedAssetByHash?.Where(x => x != duplicatedAsset).ToList() ?? [];
+
+        return assetsToDelete;
+    }
     public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
     {
         if (duplicatedAssets.Count == 1)
