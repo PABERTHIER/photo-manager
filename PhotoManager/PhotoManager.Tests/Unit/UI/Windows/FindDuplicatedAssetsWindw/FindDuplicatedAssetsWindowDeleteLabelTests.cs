@@ -567,7 +567,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel2);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -578,8 +578,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -604,7 +602,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
         }
     }
 
-    // TODO: Too many notify from the VM, need to rework a bit the reset position method
     [Test]
     public void DeleteLabel_DuplicatesAndMiddleAssetOfTheSetAndDuplicateIsInCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
@@ -696,7 +693,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -704,8 +701,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition")); // TODO: Should not have it, need to rework a bit the reset position method
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -821,7 +816,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -829,8 +824,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -946,7 +939,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -954,8 +947,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1071,7 +1062,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1079,8 +1070,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1196,7 +1185,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1204,8 +1193,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1391,7 +1378,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet,
                 expectedDuplicatedAssetViewModel2);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1402,8 +1389,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1469,7 +1454,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet,
                 expectedDuplicatedAssetViewModel4);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1480,11 +1465,9 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 2
+            // CollapseAssets 3
             Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 3
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -1553,7 +1536,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet,
                 expectedDuplicatedAssetViewModel4);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1564,11 +1547,9 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 2
+            // CollapseAssets 3
             Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 3
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 4
 
             Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
@@ -1644,7 +1625,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet,
                 expectedDuplicatedAssetViewModel4);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1655,11 +1636,9 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 2
+            // CollapseAssets 3
             Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 3
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 4
             // CollapseAssets 5
 
@@ -2868,6 +2847,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel unknownDuplicatedAssetSet = [];
 
+            // Only one duplicate in the set, then set is not visible
             DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new (_application!)
             {
                 Asset = _asset1,
@@ -2914,11 +2894,11 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 _findDuplicatedAssetsViewModel!,
                 expectedDuplicatedAssetsSets,
                 1,
-                0,
+                1,
                 expectedDuplicatedAssetSet2,
-                expectedDuplicatedAssetViewModel3);
+                expectedDuplicatedAssetViewModel4);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(15));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -2933,11 +2913,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // DuplicatedAssetPosition updated
             Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets (because even if the set does not exist, it reset props based on the given set)
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -2952,9 +2928,9 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 findDuplicatedAssetsViewModelInstances,
                 expectedDuplicatedAssetsSets,
                 1,
-                0,
+                1,
                 expectedDuplicatedAssetSet2,
-                expectedDuplicatedAssetViewModel3);
+                expectedDuplicatedAssetViewModel4);
         }
         finally
         {
@@ -2999,6 +2975,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel unknownDuplicatedAssetSet = [];
 
+            // Only one duplicate in the set, then set is not visible
             DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new (_application!)
             {
                 Asset = _asset1,
@@ -3037,11 +3014,11 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 _findDuplicatedAssetsViewModel!,
                 expectedDuplicatedAssetsSets,
                 0,
-                0,
+                1,
                 expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
+                expectedDuplicatedAssetViewModel2);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -3051,11 +3028,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             // DuplicatedAssetPosition updated
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets (because even if the set does not exist, it reset props based on the given set)
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -3070,9 +3043,9 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 findDuplicatedAssetsViewModelInstances,
                 expectedDuplicatedAssetsSets,
                 0,
-                0,
+                1,
                 expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
+                expectedDuplicatedAssetViewModel2);
         }
         finally
         {
@@ -3163,16 +3136,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets (because even if the set does not exist, it reset props based on the given set)
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
@@ -3232,6 +3203,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel unknownDuplicatedAssetSet = [];
 
+            // Only one duplicate in the set, then set is not visible
             DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new (_application!)
             {
                 Asset = _asset1,
@@ -3274,18 +3246,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
                 expectedDuplicatedAssetSet,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets (because even if the set does not exist, it reset props based on the given set)
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
 
             Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);

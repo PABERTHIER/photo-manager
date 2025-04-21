@@ -151,13 +151,16 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
             duplicatedAssets[0].Visible = Visibility.Collapsed;
 
             // We want to navigate to another set only when we are collapsing the last duplicate of the current set
-            if (duplicatedAssets[0].ParentViewModel.Count(x => x.Visible == Visibility.Visible) <= 1)
+            if (CurrentDuplicatedAssetSet.Visible == Visibility.Visible)
             {
-                NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
+                if (CurrentDuplicatedAsset?.Visible == Visibility.Collapsed)
+                {
+                    ResetDuplicatedAssetPosition();
+                }
             }
             else
             {
-                ResetDuplicatedAssetPosition();
+                NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
             }
 
             return;

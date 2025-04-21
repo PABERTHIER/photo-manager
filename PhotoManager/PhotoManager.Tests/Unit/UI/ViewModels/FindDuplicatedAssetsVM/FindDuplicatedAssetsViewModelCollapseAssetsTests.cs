@@ -1834,7 +1834,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1842,8 +1842,6 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
 
@@ -1968,7 +1966,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel2);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1979,8 +1977,6 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
 
@@ -2198,7 +2194,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -2206,8 +2202,6 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
 
@@ -2450,7 +2444,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -2458,8 +2452,6 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
             // Second Collapse
             _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]]);
@@ -2472,7 +2464,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -2480,11 +2472,7 @@ public class FindDuplicatedAssetsViewModelCollapseAssetsTests
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
 
