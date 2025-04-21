@@ -140,7 +140,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
             return [];
         }
 
-        List<DuplicatedAssetViewModel> assetsToDelete = duplicatedAssetByHash?.Where(x => x != duplicatedAsset).ToList() ?? [];
+        List<DuplicatedAssetViewModel> assetsToDelete = duplicatedAssetByHash?.Where(x => x != duplicatedAsset && x.Visible == Visibility.Visible).ToList() ?? [];
 
         return assetsToDelete;
     }
