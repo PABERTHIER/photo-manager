@@ -1,10 +1,10 @@
 ﻿using log4net;
-using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -112,7 +112,7 @@ public partial class FindDuplicatedAssetsWindow
         }
     }
 
-    private void FindDuplicatedAssetsWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void FindDuplicatedAssetsWindow_Closing(object sender, CancelEventArgs e)
     {
         RefreshAssetsCounter?.Invoke(this);
     }
