@@ -121,29 +121,62 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         SetDuplicates(duplicatedAssetsSets);
     }
 
-    public List<DuplicatedAssetViewModel> GetDuplicatedAssets(Asset currentAsset)
+    public List<DuplicatedAssetViewModel> GetDuplicatedAssets(Asset asset)
     {
         if (DuplicatedAssetSets.Count == 0)
         {
             return [];
         }
 
-        string currentRootFolderPath = currentAsset.Folder.Path;
-        IEnumerable<DuplicatedSetViewModel> duplicatedAssetByHashList = DuplicatedAssetSets.Where(x => x.Any(y => y.Asset.Hash == currentAsset.Hash));
-        DuplicatedSetViewModel? duplicatedAssetByHash = duplicatedAssetByHashList.FirstOrDefault();
+        string assetHash = asset.Hash;
+        string assetFolderPath = asset.Folder.Path;
+        string assetFileName = asset.FileName;
 
-        DuplicatedAssetViewModel? duplicatedAsset = duplicatedAssetByHash?.FirstOrDefault(x =>
-            x.Asset.Folder.Path == currentRootFolderPath && x.Asset.FileName == currentAsset.FileName);
+        DuplicatedSetViewModel duplicatedSetViewModel = [];
 
-        if (duplicatedAsset == null)
+        for (int i = 0; i < DuplicatedAssetSets.Count; i++)
+        {
+            DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
+
+            for (int j = 0; j < duplicatedAssetSet.Count;)
+            {
+                if (duplicatedAssetSet[j].Asset.Hash != assetHash)
+                {
+                    break;
+                }
+
+                duplicatedSetViewModel = duplicatedAssetSet;
+                break;
+            }
+
+            if (duplicatedSetViewModel.Count != 0)
+            {
+                break;
+            }
+        }
+
+        if (duplicatedSetViewModel.Count == 0)
         {
             return [];
         }
 
-        List<DuplicatedAssetViewModel> assetsToDelete = duplicatedAssetByHash?.Where(x => x != duplicatedAsset && x.Visible == Visibility.Visible).ToList() ?? [];
+        List<DuplicatedAssetViewModel> assetsToDelete = [];
+
+        for (int i = 0; i < duplicatedSetViewModel.Count; i++)
+        {
+            if ((duplicatedSetViewModel[i].Asset.Folder.Path == assetFolderPath
+                 && duplicatedSetViewModel[i].Asset.FileName == assetFileName)
+                || duplicatedSetViewModel[i].Visible == Visibility.Collapsed)
+            {
+                continue;
+            }
+
+            assetsToDelete.Add(duplicatedSetViewModel[i]);
+        }
 
         return assetsToDelete;
     }
+
     public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
     {
         if (duplicatedAssets.Count == 1)

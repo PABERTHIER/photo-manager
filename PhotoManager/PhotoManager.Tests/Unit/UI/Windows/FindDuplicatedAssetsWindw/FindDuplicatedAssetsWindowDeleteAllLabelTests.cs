@@ -3091,8 +3091,9 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         }
     }
 
+    // This case cannot happen (having same file in same folder) and shows that those assets cannot be picked up
     [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetAndCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_SendsDeleteDuplicatedAssetsEventAndCollapsesNotCurrentDuplicatedAsset()
+    public void DeleteAllLabel_DuplicatesAndOneSetAndCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
@@ -3137,7 +3138,6 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
             {
                 Asset = _asset6,
-                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
@@ -3161,15 +3161,11 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
 
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
+            Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
 
             Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
 
             Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
@@ -3187,9 +3183,9 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         }
     }
 
-    // This case cannot happen (having same file in same folder) and shows that the first asset is always picked up (not the one sent)
+    // This case cannot happen (having same file in same folder) and shows that those assets cannot be picked up
     [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetAndNotCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_SendsDeleteDuplicatedAssetsEventAndCollapsesFirstDuplicatedAsset()
+    public void DeleteAllLabel_DuplicatesAndOneSetAndNotCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
@@ -3234,7 +3230,6 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
             {
                 Asset = _asset6,
-                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
@@ -3258,15 +3253,11 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
             // CollapseAssets
 
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
+            Assert.That(messagesInformationSent, Is.Empty);
             Assert.That(getExemptedFolderPathEvents, Is.Empty);
 
             Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
 
             Assert.That(refreshAssetsCounterEvents, Is.Empty);
 

@@ -2232,8 +2232,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         }
     }
 
+    // This case cannot happen (having same file in same folder) and shows that those assets cannot be picked up
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetAndCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_ReturnsNotCurrentDuplicatedAsset()
+    public void GetDuplicatedAssets_DuplicatesAndOneSetAndCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_ReturnsEmptyList()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2279,9 +2280,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedAssetViewModel> duplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset6);
+            Assert.That(duplicatedAssets, Is.Empty);
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2315,9 +2314,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         }
     }
 
-    // This case cannot happen (having same file in same folder) and shows that the first asset is always picked up (not the one sent)
+    // This case cannot happen (having same file in same folder) and shows that those assets cannot be picked up
     [Test]
-    public void GetDuplicatedAssets_DuplicatesAndOneSetAndNotCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_ReturnsFirstDuplicatedAsset()
+    public void GetDuplicatedAssets_DuplicatesAndOneSetAndNotCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_ReturnsEmptyList()
     {
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2363,9 +2362,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             List<DuplicatedAssetViewModel> duplicatedAssets =
                 _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1].Asset);
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset6);
+            Assert.That(duplicatedAssets, Is.Empty);
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
