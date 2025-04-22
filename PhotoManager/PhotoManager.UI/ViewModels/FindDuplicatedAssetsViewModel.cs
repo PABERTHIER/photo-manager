@@ -177,6 +177,30 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         return assetsToDelete;
     }
 
+    public List<DuplicatedAssetViewModel> GetNotExemptedDuplicatedAssets(string exemptedFolderPath)
+    {
+        if (DuplicatedAssetSets.Count == 0)
+        {
+            return [];
+        }
+
+        List<DuplicatedAssetViewModel> exemptedAssets = DuplicatedAssetSets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == exemptedFolderPath).ToList();
+
+        List<DuplicatedAssetViewModel> duplicatedAssetsFiltered = DuplicatedAssetSets
+            .Where(x => x != null)
+            .SelectMany(x => x)
+            .Where(y => y != null && y.Asset.Folder.Path != exemptedFolderPath)
+            .ToList();
+
+        List<DuplicatedAssetViewModel> assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
+                x => x.Asset.Hash,
+                y => y.Asset.Hash,
+                (x, _) => x)
+            .ToList();
+
+        return assetsToDelete;
+    }
+
     public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
     {
         for (int i = 0; i < duplicatedAssets.Count; i++)
