@@ -179,32 +179,20 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
     {
-        if (duplicatedAssets.Count == 1)
-        {
-            duplicatedAssets[0].Visible = Visibility.Collapsed;
-
-            // We want to navigate to another set only when we are collapsing the last duplicate of the current set
-            if (CurrentDuplicatedAssetSet.Visible == Visibility.Visible)
-            {
-                if (CurrentDuplicatedAsset?.Visible == Visibility.Collapsed)
-                {
-                    ResetDuplicatedAssetPosition();
-                }
-            }
-            else
-            {
-                NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
-            }
-
-            return;
-        }
-
         for (int i = 0; i < duplicatedAssets.Count; i++)
         {
             duplicatedAssets[i].Visible = Visibility.Collapsed;
         }
 
-        if (CurrentDuplicatedAssetSet.Visible != Visibility.Visible)
+        // We want to navigate to another set only when we are collapsing the last duplicate of the current set
+        if (CurrentDuplicatedAssetSet.Visible == Visibility.Visible)
+        {
+            if (CurrentDuplicatedAsset!.Visible == Visibility.Collapsed)
+            {
+                ResetDuplicatedAssetPosition();
+            }
+        }
+        else
         {
             NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
         }
