@@ -3,7 +3,6 @@ using PhotoManager.Domain;
 using PhotoManager.UI.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
@@ -184,19 +183,47 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
             return [];
         }
 
-        List<DuplicatedAssetViewModel> exemptedAssets = DuplicatedAssetSets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == exemptedFolderPath).ToList();
+        List<DuplicatedAssetViewModel> exemptedAssets = [];
+        List<DuplicatedAssetViewModel> duplicatedAssetsFiltered = [];
 
-        List<DuplicatedAssetViewModel> duplicatedAssetsFiltered = DuplicatedAssetSets
-            .Where(x => x != null)
-            .SelectMany(x => x)
-            .Where(y => y != null && y.Asset.Folder.Path != exemptedFolderPath)
-            .ToList();
+        for (int i = 0; i < DuplicatedAssetSets.Count; i++)
+        {
+            DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
 
-        List<DuplicatedAssetViewModel> assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
-                x => x.Asset.Hash,
-                y => y.Asset.Hash,
-                (x, _) => x)
-            .ToList();
+            for (int j = 0; j < duplicatedAssetSet.Count; j++)
+            {
+                DuplicatedAssetViewModel duplicatedAsset = duplicatedAssetSet[j];
+
+                if (duplicatedAsset.Asset.Folder.Path == exemptedFolderPath)
+                {
+                    exemptedAssets.Add(duplicatedAsset);
+                }
+                else if (duplicatedAsset.Visible != Visibility.Collapsed)
+                {
+                    duplicatedAssetsFiltered.Add(duplicatedAsset);
+                }
+            }
+        }
+
+        List<DuplicatedAssetViewModel> assetsToDelete = [];
+
+        for (int i = 0; i < duplicatedAssetsFiltered.Count; i++)
+        {
+            DuplicatedAssetViewModel filteredAsset = duplicatedAssetsFiltered[i];
+
+            for (int j = 0; j < exemptedAssets.Count; j++)
+            {
+                DuplicatedAssetViewModel exemptedAsset = exemptedAssets[j];
+
+                if (filteredAsset.Asset.Hash != exemptedAsset.Asset.Hash)
+                {
+                    continue;
+                }
+
+                assetsToDelete.Add(filteredAsset);
+                break;
+            }
+        }
 
         return assetsToDelete;
     }
