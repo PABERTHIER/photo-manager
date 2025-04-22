@@ -3379,7 +3379,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
         GetExemptedFolderPath += delegate
         {
-            getExemptedFolderPathEvents.Add(string.Empty);
+            getExemptedFolderPathEvents.Add(exemptedFolderPathToReturn);
 
             return exemptedFolderPathToReturn;
         };

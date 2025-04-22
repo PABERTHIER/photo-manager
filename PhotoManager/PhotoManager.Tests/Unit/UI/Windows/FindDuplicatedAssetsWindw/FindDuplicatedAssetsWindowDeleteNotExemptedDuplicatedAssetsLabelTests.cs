@@ -7,7 +7,7 @@ namespace PhotoManager.Tests.Unit.UI.Windows.FindDuplicatedAssetsWindw;
 // For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
 // The goal is to test what does FindDuplicatedAssetsWindow
 [TestFixture]
-public class FindDuplicatedAssetsWindowDeleteAllLabelTests
+public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -21,8 +21,8 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
 
 #pragma warning disable CS0067 // Event is never used
     private event RefreshAssetsCounterEventHandler? RefreshAssetsCounter;
-    private event GetExemptedFolderPathEventHandler? GetExemptedFolderPath;
 #pragma warning restore CS0067 // Event is never used
+    private event GetExemptedFolderPathEventHandler? GetExemptedFolderPath;
     private event DeleteDuplicatedAssetsEventHandler? DeleteDuplicatedAssets;
 
     private Asset _asset1;
@@ -241,7 +241,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
     }
 
     [Test]
-    public void DeleteAllLabel_DuplicatesAndThreeSetsAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssetsInTheSet()
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAllOtherMatchingDuplicates()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
@@ -261,32 +261,32 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
-            Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
             const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
             const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
             const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
 
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash2);
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
 
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash3);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash3);
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
 
-            List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
 
-            // First DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
+            DeleteNotExemptedDuplicatedAssets();
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -294,22 +294,23 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
             {
-                Asset = _asset1,
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
             {
-                Asset = _asset2,
-                Visible = Visibility.Collapsed,
+                Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
             {
-                Asset = _asset6,
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
@@ -323,14 +324,324 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
             {
-                Asset = _asset4,
+                Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
             {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndNewPositions_SendsDeleteDuplicatedAssetsEventAndCollapsesAllOtherMatchingDuplicates()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel.DuplicatedAssetSetsPosition = 1;
+            _findDuplicatedAssetsViewModel.DuplicatedAssetPosition = 1;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
                 Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(15));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // DuplicatedAssetSetsPosition update
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+            // DuplicatedAssetPosition update
+            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesMatchingDuplicate()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
@@ -357,229 +668,30 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
+            // CollapseAssets
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
 
             Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
             Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            // Second DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            expectedDuplicatedAssetSet1 = [];
-            expectedDuplicatedAssetSet2 = [];
-            expectedDuplicatedAssetSet3 = [];
-
-            expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
-
-            expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
-
-            expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                2,
-                0,
-                expectedDuplicatedAssetSet3,
-                expectedDuplicatedAssetViewModel5);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(2));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
-            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset3);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            // Third DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            expectedDuplicatedAssetSet1 = [];
-            expectedDuplicatedAssetSet2 = [];
-            expectedDuplicatedAssetSet3 = [];
-
-            expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
-
-            expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
-
-            expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 3
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(3));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
-            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset3);
-            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset5);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
 
             Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
             CheckInstance(
                 findDuplicatedAssetsViewModelInstances,
                 expectedDuplicatedAssetsSets,
+                1,
                 0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetViewModel3);
         }
         finally
         {
@@ -588,7 +700,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
     }
 
     [Test]
-    public void DeleteAllLabel_DuplicatesAndThreeSetsAndCurrentDuplicatedAssetFromSecondSet_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssetsInTheSet()
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSetsAndCurrentSet_SendsDeleteDuplicatedAssetsEventAndCollapsesMatchingDuplicate()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
@@ -608,34 +720,32 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
-            Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
             const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
             const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
             const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
 
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash2);
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash2);
 
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash3);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash3);
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
 
-            List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
+            List<List<Asset>> assetsSets = [[_asset1, _asset4], [_asset2, _asset3], [_asset5, _asset6]];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
 
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
-
-            // First DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
+            DeleteNotExemptedDuplicatedAssets();
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -650,14 +760,15 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
             {
-                Asset = _asset2,
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
             {
-                Asset = _asset6,
+                Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
@@ -665,21 +776,170 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
             {
                 Asset = _asset3,
-                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
             {
-                Asset = _asset4,
+                Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
             {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                1,
+                0,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetViewModel3);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                1,
+                0,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetViewModel3);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetThatHasOneDuplicateAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesMatchingDuplicate()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 2;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
                 Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
@@ -699,7 +959,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
                 expectedDuplicatedAssetSet3,
                 expectedDuplicatedAssetViewModel5);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
             // SetDuplicates
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -711,570 +971,26 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
 
             Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
 
             Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
             Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset3);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            // Second DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            expectedDuplicatedAssetSet1 = [];
-            expectedDuplicatedAssetSet2 = [];
-            expectedDuplicatedAssetSet3 = [];
-
-            expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
-
-            expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
-
-            expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(2));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset3);
-            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset5);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            // Third DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            expectedDuplicatedAssetSet1 = [];
-            expectedDuplicatedAssetSet2 = [];
-            expectedDuplicatedAssetSet3 = [];
-
-            expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
-
-            expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
-
-            expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(17));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 3
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(3));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset3);
-            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset5);
-            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset2);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
 
             Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
             CheckInstance(
                 findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndThreeSetsAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssetsInTheSet()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
-            Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
-
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
-            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
-
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash2);
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
-
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash3);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash3);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            // First DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
-            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
-            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-
-            Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            // Second DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
-
-            expectedDuplicatedAssetSet1 = [];
-            expectedDuplicatedAssetSet2 = [];
-            expectedDuplicatedAssetSet3 = [];
-
-            expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
-
-            expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
-
-            expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
                 expectedDuplicatedAssetsSets,
                 2,
                 0,
                 expectedDuplicatedAssetSet3,
                 expectedDuplicatedAssetViewModel5);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(2));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
-            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset1);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            // Third DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
-
-            expectedDuplicatedAssetSet1 = [];
-            expectedDuplicatedAssetSet2 = [];
-            expectedDuplicatedAssetSet3 = [];
-
-            expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
-
-            expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
-
-            expectedDuplicatedAssetsSets =
-                [
-                    expectedDuplicatedAssetSet1,
-                    expectedDuplicatedAssetSet2,
-                    expectedDuplicatedAssetSet3
-                ];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 3
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(3));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
-            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset1);
-            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset4);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
         }
         finally
         {
@@ -1283,7 +999,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
     }
 
     [Test]
-    public void DeleteAllLabel_DuplicatesAndTwoSetsAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssetsInTheSet()
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetThatHasDuplicates_SendsDeleteDuplicatedAssetsEventAndCollapsesAllOtherDuplicates()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
@@ -1303,498 +1019,28 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
-            Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
-
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash1);
-
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash2);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset6], [_asset3, _asset4, _asset5]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            // First DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
-            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel6);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                1,
-                0,
-                expectedDuplicatedAssetSet2,
-                expectedDuplicatedAssetViewModel4);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset6);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            // Second DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            expectedDuplicatedAssetSet1 = [];
-            expectedDuplicatedAssetSet2 = [];
-
-            expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
-
-            expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel6);
-
-            expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(2));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset6);
-            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset4);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][1], _asset5);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndTwoSetsAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssetsInTheSet()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
-            Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
-
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash1);
-
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash2);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset6], [_asset3, _asset4, _asset5]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            // First DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[2]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
-            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel6);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                1,
-                0,
-                expectedDuplicatedAssetSet2,
-                expectedDuplicatedAssetViewModel4);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            // Second DeleteAll
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
-
-            expectedDuplicatedAssetSet1 = [];
-            expectedDuplicatedAssetSet2 = [];
-
-            expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset2,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
-
-            expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
-
-            expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel6);
-
-            expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 1
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets 2
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(2));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
-            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset3);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][1], _asset5);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithMultipleAssetsAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesNotCurrentDuplicatedAssets()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
-            Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
             const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash);
+            _asset3 = _asset3.WithFolder(folder1).WithHash(hash);
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash);
 
-            List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5]];
+            List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5, _asset6]];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
 
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
+            DeleteNotExemptedDuplicatedAssets();
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
@@ -1837,6 +1083,14 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel5);
 
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel6);
+
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             CheckAfterChanges(
@@ -1860,14 +1114,16 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
 
             Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(4));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(5));
             AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
             AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset3);
             AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][2], _asset4);
             AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][3], _asset5);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][4], _asset6);
 
             Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
@@ -1886,7 +1142,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
     }
 
     [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithMultipleAssetsAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssets()
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsDifferentFolders_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
@@ -1906,32 +1162,33 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
-            Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
             const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash);
 
-            List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5]];
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
+            _asset2 = _asset2.WithFolder(folder2).WithHash(hash);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset2, _asset1, _asset3]];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
 
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
+            DeleteNotExemptedDuplicatedAssets();
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
             {
-                Asset = _asset1,
+                Asset = _asset4,
                 Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
@@ -1940,593 +1197,25 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
             {
                 Asset = _asset2,
+                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
             {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
+                Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
             {
-                Asset = _asset4,
-                Visible = Visibility.Collapsed,
+                Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel5);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(4));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset3);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][2], _asset4);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][3], _asset5);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndFirstAssetIsTheCurrent_SendsDeleteDuplicatedAssetsEventAndCollapsesNotCurrentDuplicatedAssets()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset5);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset6);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndFirstAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssets()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[0]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel2);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset5);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset6);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel2);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndSecondAssetIsTheCurrent_SendsDeleteDuplicatedAssetsEventAndCollapsesNotCurrentAssets()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel2);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset6);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel2);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndSecondAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssets()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset6);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndThirdAssetIsTheCurrent_SendsDeleteDuplicatedAssetsEventAndCollapsesNotCurrentAssets()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 2;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
             CheckAfterChanges(
@@ -2544,21 +1233,19 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update
+            // CollapseAssets
             Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
 
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+            Assert.That(messagesInformationSent, Is.Empty);
 
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
 
             Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
             Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset5);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
 
             Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
@@ -2577,7 +1264,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
     }
 
     [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithSomeAssetsWithSameNameAndThirdAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicatedAssets()
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatchingOfTwoAssetsSameFolder_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
@@ -2597,1169 +1284,1830 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[2]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset5,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset5);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithTwoAssetsAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesNotCurrentDuplicatedAsset()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset3]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset3);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithTwoAssetsAndCurrentDuplicatedAssetAndNewAssetPosition_SendsDeleteDuplicatedAssetsEventAndCollapsesNotCurrentDuplicatedAsset()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset3]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel2);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel2);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithTwoAssetsAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesCurrentDuplicatedAsset()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset3]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetWithTwoAssetsAndNotCurrentDuplicatedAssetAndNewAssetPosition_SendsDeleteDuplicatedAssetsEventAndCollapsesCurrentDuplicatedAsset()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset3]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[0]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel2);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset3);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel2);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    // This case cannot happen (having same file in same folder) and shows that those assets cannot be picked up
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetAndCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
             const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
 
-            _asset5 = _asset5.WithFolder(folder).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder).WithHash(hash);
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash);
 
-            List<List<Asset>> assetsSets = [[_asset5, _asset6]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    // This case cannot happen (having same file in same folder) and shows that those assets cannot be picked up
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetAndNotCurrentDuplicatedAssetAndTwoAssetsWithSameNameInSameFolder_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset5 = _asset5.WithFolder(folder).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset5, _asset6]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetNotVisibleAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAssetSet[1].Visible = Visibility.Collapsed;
-            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAssetSet[2].Visible = Visibility.Collapsed;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset4,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetNotVisibleAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAssetSet[1].Visible = Visibility.Collapsed;
-            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAssetSet[2].Visible = Visibility.Collapsed;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset4,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetContainsOneAssetNotVisibleAndCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndAndCollapsesVisibleDuplicatedAssets()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAssetSet[2].Visible = Visibility.Collapsed;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset3,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset4,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset3);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndOneSetContainsOneAssetNotVisibleAndNotCurrentDuplicatedAsset_SendsDeleteDuplicatedAssetsEventAndCollapsesVisibleDuplicatedAssets()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
-
-            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
-            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
-
-            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
-
-            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAssetSet[2].Visible = Visibility.Collapsed;
-
-            DeleteAll(_findDuplicatedAssetsViewModel.CurrentDuplicatedAssetSet[1]);
-
-            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset4,
-                Visible = Visibility.Collapsed,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // CollapseAssets
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-
-            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
-            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
-            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
-
-            Assert.That(refreshAssetsCounterEvents, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-        }
-    }
-
-    [Test]
-    public void DeleteAllLabel_DuplicatesAndDuplicatedAssetViewModelIsUnknown_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
-    {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
-
-        (
-            List<string> notifyPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
-        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
-        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
-
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-
-            _asset2 = _asset2.WithFolder(folder).WithHash(hash);
             _asset4 = _asset4.WithFolder(folder).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder).WithHash(hash);
+            _asset2 = _asset2.WithFolder(folder).WithHash(hash);
 
-            List<List<Asset>> assetsSets = [[_asset2, _asset4, _asset5]];
+            List<List<Asset>> assetsSets = [[_asset4, _asset2, _asset1, _asset3]];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
 
-            DuplicatedSetViewModel unknownDuplicatedAssetSet = [];
+            DeleteNotExemptedDuplicatedAssets();
 
-            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new (_application!)
+            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
             {
                 Asset = _asset1,
-                ParentViewModel = unknownDuplicatedAssetSet
+                ParentViewModel = expectedDuplicatedAssetSet
             };
-            unknownDuplicatedAssetSet.Add(unknownDuplicatedAssetViewModel);
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
 
-            DeleteAll(unknownDuplicatedAssetViewModel);
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel4);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                2,
+                expectedDuplicatedAssetSet,
+                expectedDuplicatedAssetViewModel3);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                2,
+                expectedDuplicatedAssetSet,
+                expectedDuplicatedAssetViewModel3);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+    
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsTwoSameDuplicatesAndTwoSets_SendsDeleteDuplicatedAssetsEventAndCollapsesMatchingAssets()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash1);
+
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1, _asset3], [_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                1,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel2);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                1,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel2);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsTwoSameDuplicatesAndOneSetMatching_SendsDeleteDuplicatedAssetsEventAndCollapsesAssetsInTheRootDirectory()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+
+            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash);
+
+            _asset4 = _asset4.WithFolder(folder).WithHash(hash);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1, _asset3]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                1,
+                expectedDuplicatedAssetSet,
+                expectedDuplicatedAssetViewModel2);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                1,
+                expectedDuplicatedAssetSet,
+                expectedDuplicatedAssetViewModel2);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    // This case cannot happen (having same file in same folder)
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsWithSameNameAndTwoSetsOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset5 = _asset5.WithFolder(exemptedFolder).WithHash(hash2);
+            _asset6 = _asset6.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash1);
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    // This case cannot happen (having same file in same folder)
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetMatchingAndTwoSetsOfDuplicatesWithTwoAssetsWithSameName_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset4 = _asset4.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash2);
+            _asset6 = _asset6.WithFolder(folder1).WithHash(hash2);
+
+            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash1);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3], [_asset4, _asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset5,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset6,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset5);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset6);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    // Visibility start ------------------------------------------------------------------------------------------------
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsAssetsThatHasOneCollapsedDuplicatesAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAsset!.Visible = Visibility.Collapsed;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsOneAssetCollapsedThatHasOneDuplicatesAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAssetSet[1].Visible = Visibility.Collapsed;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsOneCollapsedAssetAndOneDuplicateIsCollapsedAndTwoSets_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset5, _asset3]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[0][0].Visible = Visibility.Collapsed;
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[1][2].Visible = Visibility.Collapsed;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset5,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset3,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset5);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsOneCollapsedAssetThatHasOneCollapsedDuplicateAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAsset!.Visible = Visibility.Collapsed;
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[0][1].Visible = Visibility.Collapsed;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsThatHaveDuplicatesAndThreeSetsAndAllOtherAssetsAreCollapsed_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAsset!.Visible = Visibility.Collapsed;
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[1][0].Visible = Visibility.Collapsed;
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[2][0].Visible = Visibility.Collapsed;
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[2][1].Visible = Visibility.Collapsed;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasTwoAssetsCollapsedThatHaveDuplicatesAndThreeSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAllOtherMatchingDuplicates()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel!.CurrentDuplicatedAssetSet[1].Visible = Visibility.Collapsed;
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[1][1].Visible = Visibility.Collapsed;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                2,
+                0,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetViewModel5);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderContainsAssetsAndThreeSetsWithOneCollapsed_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicates()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash2);
+
+            _asset4 = _asset4.WithFolder(folder2).WithHash(hash1);
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+
+            _asset5 = _asset5.WithFolder(folder1).WithHash(hash3);
+            _asset6 = _asset6.WithFolder(folder2).WithHash(hash3);
+
+            List<List<Asset>> assetsSets = [[_asset4, _asset1], [_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[2][0].Visible = Visibility.Collapsed;
+            _findDuplicatedAssetsViewModel!.DuplicatedAssetSets[2][1].Visible = Visibility.Collapsed;
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel5);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset6,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+                [
+                    expectedDuplicatedAssetSet1,
+                    expectedDuplicatedAssetSet2,
+                    expectedDuplicatedAssetSet3
+                ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset4);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+    // Visibility end --------------------------------------------------------------------------------------------------
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasAssetsWithSomeDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "1cc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash3);
+            _asset4 = _asset4.WithFolder(exemptedFolder).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset2, _asset5], [_asset1, _asset4]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasAssetsWithNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash3 = "1cc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash4 = "2cc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(exemptedFolder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(exemptedFolder).WithHash(hash3);
+            _asset4 = _asset4.WithFolder(exemptedFolder).WithHash(hash4);
+
+            _asset2 = _asset2.WithFolder(folder1).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
@@ -3772,17 +3120,10 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
 
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
             {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet
-            };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
-            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
 
@@ -3801,9 +3142,12 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
 
             Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
 
             Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
             Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
@@ -3825,7 +3169,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
     }
 
     [Test]
-    public void DeleteAllLabel_NoDuplicatesAndDuplicatedAssetViewModel_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameAndHash_SendsDeleteDuplicatedAssetsEventAndCollapsesOtherDuplicate()
     {
         string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
@@ -3845,16 +3189,723 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         {
             CheckBeforeChanges();
 
-            DuplicatedSetViewModel duplicatedAssetSet = [];
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel = new (_application!)
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset6 = _asset6.WithFolder(exemptedFolder).WithHash(hash1);
+
+            _asset5 = _asset5.WithFolder(folder).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder).WithHash(hash2);
+            _asset3 = _asset3.WithFolder(folder).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset2, _asset3], [_asset5, _asset6]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset5,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset6,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset5);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderHasOneAssetAndOneSetsContainsOneAssetWithSameNameButDifferentHash_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            Folder exemptedFolder = _assetRepository!.AddFolder(exemptedFolderPath);
+            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset6 = _asset6.WithFolder(exemptedFolder).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet
+            };
+            expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndTwoSetsOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!);
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder1).WithHash(hash1);
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
             {
                 Asset = _asset1,
-                ParentViewModel = duplicatedAssetSet
+                ParentViewModel = expectedDuplicatedAssetSet1
             };
-            duplicatedAssetSet.Add(duplicatedAssetViewModel);
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DeleteAll(duplicatedAssetViewModel);
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsTheSameAsTheOtherDirectoryAndTwoSetsOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+        string exemptedFolderPath = Path.Combine(otherDirectory);
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.False);
+
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder1).WithHash(hash1);
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndOneSetOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!);
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(folder).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder).WithHash(hash1);
+            _asset4 = _asset4.WithFolder(folder).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderDoesNotContainAssetsAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash1);
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderDoesNotContainAssetsAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            DeleteNotExemptedDuplicatedAssets();
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -3870,7 +3921,8 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
             Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
 
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
 
             Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
             Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
@@ -3892,11 +3944,387 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
     }
 
     [Test]
-    public void DeleteAllLabel_DuplicatesAndDuplicatedAssetViewModelIsNull_ThrowNullReferenceException()
+    public void DeleteAllNotExemptedLabel_ExemptedFolderIsEmptyAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "Folder2");
 
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Directory.CreateDirectory(exemptedFolderPath);
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash1);
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(exemptedFolderPath, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderIsEmptyAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "Folder2");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Directory.CreateDirectory(exemptedFolderPath);
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.True);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                [],
+                0,
+                0,
+                [],
+                null);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                [],
+                0,
+                0,
+                [],
+                null);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(exemptedFolderPath, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathDoesNotExistAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "Toto");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.False);
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash1);
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
+            Assert.That(messagesInformationSent, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathDoesNotExistAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "Toto");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Assert.That(Directory.Exists(exemptedFolderPath), Is.False);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                [],
+                0,
+                0,
+                [],
+                null);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                [],
+                0,
+                0,
+                [],
+                null);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsEmptyAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, string.Empty, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -3931,9 +4359,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => DeleteAll(null!));
-
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+            DeleteNotExemptedDuplicatedAssets();
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -3990,10 +4416,16 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
 
             Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-            Assert.That(deleteDuplicatedAssetsEvents, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(string.Empty));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
             Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
             CheckInstance(
@@ -4011,11 +4443,9 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
     }
 
     [Test]
-    public void DeleteAllLabel_NoDuplicatesAndDuplicatedAssetViewModelIsNull_ThrowNullReferenceException()
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsEmptyAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, string.Empty, 200, 150, false, false, false, false);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -4031,9 +4461,7 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         {
             CheckBeforeChanges();
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => DeleteAll(null!));
-
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+            DeleteNotExemptedDuplicatedAssets();
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -4044,9 +4472,195 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
                 null);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(string.Empty));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                [],
+                0,
+                0,
+                [],
+                null);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsNullAndDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, null!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+
+            Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
+
+            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+
+            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3.WithFolder(folder2).WithHash(hash1);
+            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+
+            _asset2 = _asset2.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+
+            List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(assetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset5,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets = [expectedDuplicatedAssetSet1, expectedDuplicatedAssetSet2];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
+            // SetDuplicates
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // CollapseAssets
+
             Assert.That(messagesInformationSent, Is.Empty);
-            Assert.That(getExemptedFolderPathEvents, Is.Empty);
-            Assert.That(deleteDuplicatedAssetsEvents, Is.Empty);
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.Null);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+        }
+    }
+
+    [Test]
+    public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsNullAndNoDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, null!, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                [],
+                0,
+                0,
+                [],
+                null);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.Null);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
             Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
             CheckInstance(
@@ -4287,9 +4901,11 @@ public class FindDuplicatedAssetsWindowDeleteAllLabelTests
         }
     }
 
-    private void DeleteAll(DuplicatedAssetViewModel duplicatedAssetViewModel)
+    private void DeleteNotExemptedDuplicatedAssets()
     {
-        List<DuplicatedAssetViewModel> assetsToDelete = _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(duplicatedAssetViewModel.Asset);
+        string exemptedFolderPath = GetExemptedFolderPath?.Invoke(this) ?? string.Empty;
+
+        List<DuplicatedAssetViewModel> assetsToDelete = _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
         DeleteDuplicatedAssets?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
 

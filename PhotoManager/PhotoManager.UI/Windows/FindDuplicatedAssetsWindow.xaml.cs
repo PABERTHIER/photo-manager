@@ -72,11 +72,15 @@ public partial class FindDuplicatedAssetsWindow
         }
     }
 
-    private void DeleteEveryDuplicatesLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void DeleteAllNotExemptedLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         try
         {
-            DeleteEveryDuplicatedAssets(ViewModel.DuplicatedAssetSets);
+            string exemptedFolderPath = GetExemptedFolderPath?.Invoke(this) ?? string.Empty;
+
+            List<DuplicatedAssetViewModel> assetsToDelete = ViewModel.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
+
+            DeleteAssets(assetsToDelete);
         }
         catch (Exception ex)
         {
@@ -115,35 +119,6 @@ public partial class FindDuplicatedAssetsWindow
     private void FindDuplicatedAssetsWindow_Closing(object sender, CancelEventArgs e)
     {
         RefreshAssetsCounter?.Invoke(this);
-    }
-
-    // TODO: Move the logic to services for both methods (no logic here !)
-    private void DeleteEveryDuplicatedAssets(List<DuplicatedSetViewModel> duplicatedAssets)
-    {
-        if (duplicatedAssets == null)
-        {
-            Log.Error("duplicatedAssets is null");
-            return;
-        }
-
-        string exemptedFolderPath = GetExemptedFolderPath?.Invoke(this) ?? string.Empty;
-
-        // TODO: Put it into the VM + add UT and IT tests about it
-        var exemptedAssets = ViewModel.DuplicatedAssetSets.Where(x => x != null).SelectMany(x => x).Where(y => y != null && y.Asset.Folder.Path == exemptedFolderPath).ToList();
-
-        var duplicatedAssetsFiltered = ViewModel.DuplicatedAssetSets
-            .Where(x => x != null)
-            .SelectMany(x => x)
-            .Where(y => y != null && y.Asset.Folder.Path != exemptedFolderPath)
-            .ToList();
-
-        var assetsToDelete = duplicatedAssetsFiltered.Join(exemptedAssets,
-            x => x.Asset.Hash,
-            y => y.Asset.Hash,
-            (x, y) => x)
-            .ToList();
-
-        DeleteAssets(assetsToDelete);
     }
 
     private void DeleteAssets(List<DuplicatedAssetViewModel> assetsToDelete)
