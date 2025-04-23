@@ -104,6 +104,12 @@ public partial class FindDuplicatedAssetsWindow
     {
         try
         {
+            if (ViewModel.CurrentDuplicatedAsset == null)
+            {
+                Log.Error("No duplicated asset selected");
+                return;
+            }
+
             string assetPath = ViewModel.CurrentDuplicatedAsset.Asset.FullPath;
             Clipboard.SetText(assetPath);
 
