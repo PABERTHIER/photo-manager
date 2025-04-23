@@ -184,13 +184,14 @@ public partial class MainWindow : Window
             {
                 FindDuplicatedAssetsViewModel viewModel = new (_application);
                 viewModel.SetDuplicates(duplicates);
-                DuplicatedAssetsWindow duplicatedAssetsWindow = new (viewModel); // DuplicatedAssetsWindow is FindDuplicatedAssetsWindow.xaml
+                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new (viewModel);
 
-                duplicatedAssetsWindow.GetExemptedFolderPath += GetExemptedFolderPath;
-                duplicatedAssetsWindow.RefreshAssetsCounter += RefreshAssetsCounter;
-                duplicatedAssetsWindow.DeleteDuplicateAssets += DeleteDuplicateAssets;
+                // TODO: For each event, test to define the event with the method and check if the method is well triggered
+                findDuplicatedAssetsWindow.GetExemptedFolderPath += GetExemptedFolderPath;
+                findDuplicatedAssetsWindow.DeleteDuplicatedAssets += DeleteDuplicatedAssets;
+                findDuplicatedAssetsWindow.RefreshAssetsCounter += RefreshAssetsCounter;
 
-                duplicatedAssetsWindow.ShowDialog();
+                findDuplicatedAssetsWindow.ShowDialog();
             }
             else
             {
@@ -315,7 +316,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void DeleteDuplicateAssets(object sender, Asset[] assets)
+    private void DeleteDuplicatedAssets(object sender, Asset[] assets)
     {
         try
         {

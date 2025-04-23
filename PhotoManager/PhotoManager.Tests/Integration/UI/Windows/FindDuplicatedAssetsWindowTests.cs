@@ -2,10 +2,12 @@
 using System.ComponentModel;
 using System.Windows;
 
-namespace PhotoManager.Tests.Integration.UI.ViewModels.FindDuplicatedAssetsVM;
+namespace PhotoManager.Tests.Integration.UI.Windows;
 
+// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
+// The goal is to test what does FindDuplicatedAssetsWindow
 [TestFixture]
-public class FindDuplicatedAssetsViewModelAllDuplicatesTests
+public class FindDuplicatedAssetsWindowTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -18,6 +20,10 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
     private UserConfigurationService? _userConfigurationService;
+
+    private event RefreshAssetsCounterEventHandler? RefreshAssetsCounter;
+    private event GetExemptedFolderPathEventHandler? GetExemptedFolderPath;
+    private event DeleteDuplicatedAssetsEventHandler? DeleteDuplicatedAssets;
 
     private Asset _asset1;
     private Asset _asset2;
@@ -458,7 +464,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
     }
 
     [Test]
-    public async Task SetDuplicates_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_SetsDuplicates()
+    public async Task DeleteLabel_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAsset()
     {
         string rootDirectory = Path.Combine(_dataDirectory!);
         string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
@@ -468,7 +474,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
         string directoryPart = Path.Combine(duplicatesDirectory, "Part");
         string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
         string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
-        string exemptedFolderPath = Path.Combine(rootDirectory, "Folder2");
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
 
@@ -481,407 +487,9 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
 
-        try
-        {
-            CheckBeforeChanges();
-
-            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
-
-            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
-
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
-            Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(3));
-            Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[2], Has.Count.EqualTo(3));
-            Assert.That(duplicatedAssetsSets[3], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[4], Has.Count.EqualTo(4));
-
-            // Image 1
-            Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset6.FileName));
-            Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset7.FileName));
-
-            // Image 2
-            Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset2.FileName));
-            Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset3.FileName));
-
-            // Image 9
-            Assert.That(duplicatedAssetsSets[2][0].FileName, Is.EqualTo(_asset4.FileName));
-            Assert.That(duplicatedAssetsSets[2][1].FileName, Is.EqualTo(_asset8.FileName));
-            Assert.That(duplicatedAssetsSets[2][2].FileName, Is.EqualTo(_asset9.FileName));
-
-            // Image 11
-            Assert.That(duplicatedAssetsSets[3][0].FileName, Is.EqualTo(_asset5.FileName));
-            Assert.That(duplicatedAssetsSets[3][1].FileName, Is.EqualTo(_asset10.FileName));
-
-            // Image 1336
-            Assert.That(duplicatedAssetsSets[4][0].FileName, Is.EqualTo(_asset11.FileName));
-            Assert.That(duplicatedAssetsSets[4][1].FileName, Is.EqualTo(_asset12.FileName));
-            Assert.That(duplicatedAssetsSets[4][2].FileName, Is.EqualTo(_asset13.FileName));
-            Assert.That(duplicatedAssetsSets[4][3].FileName, Is.EqualTo(_asset14.FileName));
-
-            Folder? folder1 = _assetRepository!.GetFolderByPath(rootDirectory);
-            Folder? folder2 = _assetRepository!.GetFolderByPath(directoryNewFolder1);
-            Folder? folder3 = _assetRepository!.GetFolderByPath(directoryNewFolder2);
-            Folder? folder4 = _assetRepository!.GetFolderByPath(directorySample1);
-            Folder? folder5 = _assetRepository!.GetFolderByPath(directoryPart);
-            Folder? folder6 = _assetRepository!.GetFolderByPath(directoryResolution);
-            Folder? folder7 = _assetRepository!.GetFolderByPath(directoryThumbnail);
-
-            Assert.That(folder1, Is.Not.Null);
-            Assert.That(folder2, Is.Not.Null);
-            Assert.That(folder3, Is.Not.Null);
-            Assert.That(folder4, Is.Not.Null);
-            Assert.That(folder5, Is.Not.Null);
-            Assert.That(folder6, Is.Not.Null);
-            Assert.That(folder7, Is.Not.Null);
-
-            _asset1 = _asset1.WithFolder(folder1!);
-            _asset2 = _asset2.WithFolder(folder1!);
-            _asset3 = _asset3.WithFolder(folder1!);
-            _asset4 = _asset4.WithFolder(folder1!);
-            _asset5 = _asset5.WithFolder(folder1!);
-
-            _asset6 = _asset6.WithFolder(folder2!);
-
-            _asset7 = _asset7.WithFolder(folder3!);
-            _asset8 = _asset8.WithFolder(folder3!);
-            _asset9 = _asset9.WithFolder(folder3!);
-            _asset10 = _asset10.WithFolder(folder3!);
-
-            _asset11 = _asset11.WithFolder(folder4!);
-            _asset12 = _asset12.WithFolder(folder5!);
-            _asset13 = _asset13.WithFolder(folder6!);
-            _asset14 = _asset14.WithFolder(folder7!);
-
-            DuplicatedSetViewModel duplicatedAssetSet1 = [];
-            DuplicatedSetViewModel duplicatedAssetSet2 = [];
-            DuplicatedSetViewModel duplicatedAssetSet3 = [];
-            DuplicatedSetViewModel duplicatedAssetSet4 = [];
-            DuplicatedSetViewModel duplicatedAssetSet5 = [];
-
-            // Image 1
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset7,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel3);
-
-            // Image 2
-            DuplicatedAssetViewModel duplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset2,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
-
-            // Image 9
-            DuplicatedAssetViewModel duplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel6);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel7 = new (_application!)
-            {
-                Asset = _asset8,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel7);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel8 = new (_application!)
-            {
-                Asset = _asset9,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel8);
-
-            // Image 11
-            DuplicatedAssetViewModel duplicatedAssetViewModel9 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = duplicatedAssetSet4
-            };
-            duplicatedAssetSet4.Add(duplicatedAssetViewModel9);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel10 = new (_application!)
-            {
-                Asset = _asset10,
-                ParentViewModel = duplicatedAssetSet4
-            };
-            duplicatedAssetSet4.Add(duplicatedAssetViewModel10);
-
-            // Image 1336
-            DuplicatedAssetViewModel duplicatedAssetViewModel11 = new (_application!)
-            {
-                Asset = _asset11,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel11);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel12 = new (_application!)
-            {
-                Asset = _asset12,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel12);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel13 = new (_application!)
-            {
-                Asset = _asset13,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel13);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel14 = new (_application!)
-            {
-                Asset = _asset14,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel14);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-            [
-                duplicatedAssetSet1,
-                duplicatedAssetSet2,
-                duplicatedAssetSet3,
-                duplicatedAssetSet4,
-                duplicatedAssetSet5
-            ];
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-
-            Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(149));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[23], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[29], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[30], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[32], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[35], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[36], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[38], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[39], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[43], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[44], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[46], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[47], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[49], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[52], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[55], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[56], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[58], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[59], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[61], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[62], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[63], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[64], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[65], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[66], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[67], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[68], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[69], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[70], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[71], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[72], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[73], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[74], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[75], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[76], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[77], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[78], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[79], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[80], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[81], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[82], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[83], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[84], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[85], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[86], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[87], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[88], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[89], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[90], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[91], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[92], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[93], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[94], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[95], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[96], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[97], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[98], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[99], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[100], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[101], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[102], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[103], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[104], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[105], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[106], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[107], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[108], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[109], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[110], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[111], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[112], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[113], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[114], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[115], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[116], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[117], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[118], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[119], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[120], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[121], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[122], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[123], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[124], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[125], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[126], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[127], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[128], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[129], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[130], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[131], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[132], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[133], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[134], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[135], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[136], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[137], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[138], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[139], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[140], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[141], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[142], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[143], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[144], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[145], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[146], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[147], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[148], Is.EqualTo("StatusMessage"));
-
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(messagesInformationSent, Is.Empty);
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-            Directory.Delete(directoryOutputVideoFirstFrame, true);
-        }
-    }
-
-    [Test]
-    public async Task CollapseAssets_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_CollapsesAssets()
-    {
-        string rootDirectory = Path.Combine(_dataDirectory!);
-        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
-        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, "NewFolder1");
-        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, "NewFolder2");
-        string directorySample1 = Path.Combine(duplicatesDirectory, "NotDuplicate", "Sample1");
-        string directoryPart = Path.Combine(duplicatesDirectory, "Part");
-        string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
-        string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
-        string exemptedFolderPath = Path.Combine(rootDirectory, "Folder2");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
-
-        string directoryOutputVideoFirstFrame = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-
-        (
-            List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents,
-            List<string> notifyApplicationVmPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
         try
         {
@@ -958,8 +566,8 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
-            // First Collapse
-            _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0]]);
+            // First Delete
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0]);
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
@@ -1102,20 +710,18 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
 
-            // Second Collapse
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 4;
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
 
-            // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new();
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
 
-            // Because _asset12 will become the CurrentAsset so the ImageData will be loaded (was null because not in the current directory)
-            _asset12.ImageData = new();
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
-            _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[4][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[4][3]
-                ]);
+            // Second Delete
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[4][1]);
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[4][3]);
 
             expectedDuplicatedAssetSet5 = [];
 
@@ -1123,7 +729,6 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetViewModel11 = new (_application!)
             {
                 Asset = _asset11,
-                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
@@ -1131,6 +736,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetViewModel12 = new (_application!)
             {
                 Asset = _asset12,
+                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
@@ -1162,12 +768,12 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
                 expectedDuplicatedAssetsSets,
-                4,
+                0,
                 1,
-                expectedDuplicatedAssetSet5,
-                expectedDuplicatedAssetViewModel12);
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel2);
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(13));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(7));
             // SetDuplicates
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1177,24 +783,25 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Collapse 1
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
 
-            // Third Collapse
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 0;
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
 
-            _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][0],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][1],
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][2]
-                ]);
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(3));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset12);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset14);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Third Delete
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][0]);
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][1]);
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][2]);
 
             expectedDuplicatedAssetSet3 = [];
 
@@ -1240,7 +847,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel2);
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(17));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(7));
             // SetDuplicates
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1250,23 +857,30 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Collapse 1
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 3
 
-            // Fourth Collapse
-            _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1]]);
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(6));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset12);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset14);
+            Assert.That(deleteDuplicatedAssetsEvents[3], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[3][0], _asset4);
+            Assert.That(deleteDuplicatedAssetsEvents[4], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[4][0], _asset8);
+            Assert.That(deleteDuplicatedAssetsEvents[5], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[5][0], _asset9);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Fourth Delete
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][1]);
 
             expectedDuplicatedAssetSet1 = [];
 
@@ -1311,7 +925,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedDuplicatedAssetSet2,
                 expectedDuplicatedAssetViewModel4);
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(21));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(11));
             // SetDuplicates
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1321,28 +935,37 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Collapse 1
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
+            // Collapse 2
+            // Collapse 3
+            // Collapse 4
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Collapse 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Collapse 3
-            // Collapse 4
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[17], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[18], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[19], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[20], Is.EqualTo("CurrentDuplicatedAsset"));
 
-            // Fifth Collapse
-            _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]]);
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(7));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset12);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset14);
+            Assert.That(deleteDuplicatedAssetsEvents[3], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[3][0], _asset4);
+            Assert.That(deleteDuplicatedAssetsEvents[4], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[4][0], _asset8);
+            Assert.That(deleteDuplicatedAssetsEvents[5], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[5][0], _asset9);
+            Assert.That(deleteDuplicatedAssetsEvents[6], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[6][0], _asset6);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Fifth Delete
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]);
 
             expectedDuplicatedAssetSet2 = [];
 
@@ -1379,7 +1002,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedDuplicatedAssetSet4,
                 expectedDuplicatedAssetViewModel9);
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(25));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(15));
             // SetDuplicates
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1389,35 +1012,49 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Collapse 1
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
+            // Collapse 2
+            // Collapse 3
+            // Collapse 4
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Collapse 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Collapse 3
-            // Collapse 4
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[17], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[18], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[19], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[20], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 5
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[21], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[22], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[23], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[24], Is.EqualTo("CurrentDuplicatedAsset"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
 
-            // Sixth Collapse
-            _findDuplicatedAssetsViewModel!.CollapseAssets([_findDuplicatedAssetsViewModel.DuplicatedAssetSets[3][0]]);
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(8));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset12);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset14);
+            Assert.That(deleteDuplicatedAssetsEvents[3], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[3][0], _asset4);
+            Assert.That(deleteDuplicatedAssetsEvents[4], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[4][0], _asset8);
+            Assert.That(deleteDuplicatedAssetsEvents[5], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[5][0], _asset9);
+            Assert.That(deleteDuplicatedAssetsEvents[6], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[6][0], _asset6);
+            Assert.That(deleteDuplicatedAssetsEvents[7], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[7][0], _asset3);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Sixth Delete
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[3][0]);
 
             expectedDuplicatedAssetSet4 = [];
+
+            // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
+            _asset11.ImageData = new();
 
             // Image 11
             expectedDuplicatedAssetViewModel9 = new (_application!)
@@ -1448,11 +1085,11 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 _findDuplicatedAssetsViewModel!,
                 expectedDuplicatedAssetsSets,
                 4,
-                1,
+                0,
                 expectedDuplicatedAssetSet5,
-                expectedDuplicatedAssetViewModel12);
+                expectedDuplicatedAssetViewModel11);
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(29));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(19));
             // SetDuplicates
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1462,41 +1099,51 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Collapse 1
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
+            // Collapse 2
+            // Collapse 3
+            // Collapse 4
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Collapse 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
-            // Collapse 3
-            // Collapse 4
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[17], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[18], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[19], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[20], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 5
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[21], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[22], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[23], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[24], Is.EqualTo("CurrentDuplicatedAsset"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 6
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[25], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[26], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[27], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[28], Is.EqualTo("CurrentDuplicatedAsset"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[17], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[18], Is.EqualTo("CurrentDuplicatedAsset"));
 
-            // Seventh Collapse
-            _findDuplicatedAssetsViewModel!.CollapseAssets(
-                [
-                    _findDuplicatedAssetsViewModel.DuplicatedAssetSets[4][1]
-                ]);
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(9));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset12);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset14);
+            Assert.That(deleteDuplicatedAssetsEvents[3], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[3][0], _asset4);
+            Assert.That(deleteDuplicatedAssetsEvents[4], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[4][0], _asset8);
+            Assert.That(deleteDuplicatedAssetsEvents[5], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[5][0], _asset9);
+            Assert.That(deleteDuplicatedAssetsEvents[6], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[6][0], _asset6);
+            Assert.That(deleteDuplicatedAssetsEvents[7], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[7][0], _asset3);
+            Assert.That(deleteDuplicatedAssetsEvents[8], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[8][0], _asset5);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Seventh Delete
+            Delete(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[4][0]);
 
             expectedDuplicatedAssetSet5 = [];
 
@@ -1549,7 +1196,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(33));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(23));
             // SetDuplicates
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
@@ -1559,694 +1206,24 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             // Collapse 1
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 3
             // Collapse 4
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[17], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[18], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[19], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[20], Is.EqualTo("CurrentDuplicatedAsset"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 5
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[21], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[22], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[23], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[24], Is.EqualTo("CurrentDuplicatedAsset"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 6
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[25], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[26], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[27], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[28], Is.EqualTo("CurrentDuplicatedAsset"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[17], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[18], Is.EqualTo("CurrentDuplicatedAsset"));
             // Collapse 7
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[29], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[30], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[31], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[32], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(149));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[23], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[29], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[30], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[32], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[35], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[36], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[38], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[39], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[43], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[44], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[46], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[47], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[49], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[52], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[55], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[56], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[58], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[59], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[61], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[62], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[63], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[64], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[65], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[66], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[67], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[68], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[69], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[70], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[71], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[72], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[73], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[74], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[75], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[76], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[77], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[78], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[79], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[80], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[81], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[82], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[83], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[84], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[85], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[86], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[87], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[88], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[89], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[90], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[91], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[92], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[93], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[94], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[95], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[96], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[97], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[98], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[99], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[100], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[101], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[102], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[103], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[104], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[105], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[106], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[107], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[108], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[109], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[110], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[111], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[112], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[113], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[114], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[115], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[116], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[117], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[118], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[119], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[120], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[121], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[122], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[123], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[124], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[125], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[126], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[127], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[128], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[129], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[130], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[131], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[132], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[133], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[134], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[135], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[136], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[137], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[138], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[139], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[140], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[141], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[142], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[143], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[144], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[145], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[146], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[147], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[148], Is.EqualTo("StatusMessage"));
-
-            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
-            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
-            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
-
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-        }
-        finally
-        {
-            Directory.Delete(_databaseDirectory!, true);
-            Directory.Delete(directoryOutputVideoFirstFrame, true);
-        }
-    }
-
-    [Test]
-    public async Task GetDuplicatedAssets_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_ReturnsOtherDuplicatedAssetsInTheSet()
-    {
-        string rootDirectory = Path.Combine(_dataDirectory!);
-        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
-        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, "NewFolder1");
-        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, "NewFolder2");
-        string directorySample1 = Path.Combine(duplicatesDirectory, "NotDuplicate", "Sample1");
-        string directoryPart = Path.Combine(duplicatesDirectory, "Part");
-        string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
-        string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
-        string exemptedFolderPath = Path.Combine(rootDirectory, "Folder2");
-
-        ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
-
-        string directoryOutputVideoFirstFrame = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-
-        (
-            List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents,
-            List<string> notifyApplicationVmPropertyChangedEvents,
-            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
-            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
-        ) = NotifyPropertyChangedEvents();
-
-        try
-        {
-            CheckBeforeChanges();
-
-            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
-
-            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
-
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
-            Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(3));
-            Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[2], Has.Count.EqualTo(3));
-            Assert.That(duplicatedAssetsSets[3], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[4], Has.Count.EqualTo(4));
-
-            // Image 1
-            Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset6.FileName));
-            Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset7.FileName));
-
-            // Image 2
-            Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset2.FileName));
-            Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset3.FileName));
-
-            // Image 9
-            Assert.That(duplicatedAssetsSets[2][0].FileName, Is.EqualTo(_asset4.FileName));
-            Assert.That(duplicatedAssetsSets[2][1].FileName, Is.EqualTo(_asset8.FileName));
-            Assert.That(duplicatedAssetsSets[2][2].FileName, Is.EqualTo(_asset9.FileName));
-
-            // Image 11
-            Assert.That(duplicatedAssetsSets[3][0].FileName, Is.EqualTo(_asset5.FileName));
-            Assert.That(duplicatedAssetsSets[3][1].FileName, Is.EqualTo(_asset10.FileName));
-
-            // Image 1336
-            Assert.That(duplicatedAssetsSets[4][0].FileName, Is.EqualTo(_asset11.FileName));
-            Assert.That(duplicatedAssetsSets[4][1].FileName, Is.EqualTo(_asset12.FileName));
-            Assert.That(duplicatedAssetsSets[4][2].FileName, Is.EqualTo(_asset13.FileName));
-            Assert.That(duplicatedAssetsSets[4][3].FileName, Is.EqualTo(_asset14.FileName));
-
-            Folder? folder1 = _assetRepository!.GetFolderByPath(rootDirectory);
-            Folder? folder2 = _assetRepository!.GetFolderByPath(directoryNewFolder1);
-            Folder? folder3 = _assetRepository!.GetFolderByPath(directoryNewFolder2);
-            Folder? folder4 = _assetRepository!.GetFolderByPath(directorySample1);
-            Folder? folder5 = _assetRepository!.GetFolderByPath(directoryPart);
-            Folder? folder6 = _assetRepository!.GetFolderByPath(directoryResolution);
-            Folder? folder7 = _assetRepository!.GetFolderByPath(directoryThumbnail);
-
-            Assert.That(folder1, Is.Not.Null);
-            Assert.That(folder2, Is.Not.Null);
-            Assert.That(folder3, Is.Not.Null);
-            Assert.That(folder4, Is.Not.Null);
-            Assert.That(folder5, Is.Not.Null);
-            Assert.That(folder6, Is.Not.Null);
-            Assert.That(folder7, Is.Not.Null);
-
-            _asset1 = _asset1.WithFolder(folder1!);
-            _asset2 = _asset2.WithFolder(folder1!);
-            _asset3 = _asset3.WithFolder(folder1!);
-            _asset4 = _asset4.WithFolder(folder1!);
-            _asset5 = _asset5.WithFolder(folder1!);
-
-            _asset6 = _asset6.WithFolder(folder2!);
-
-            _asset7 = _asset7.WithFolder(folder3!);
-            _asset8 = _asset8.WithFolder(folder3!);
-            _asset9 = _asset9.WithFolder(folder3!);
-            _asset10 = _asset10.WithFolder(folder3!);
-
-            _asset11 = _asset11.WithFolder(folder4!);
-            _asset12 = _asset12.WithFolder(folder5!);
-            _asset13 = _asset13.WithFolder(folder6!);
-            _asset14 = _asset14.WithFolder(folder7!);
-
-            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
-
-            // First GetDuplicatedAssets
-            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
-            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
-            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
-            DuplicatedSetViewModel expectedDuplicatedAssetSet4 = [];
-            DuplicatedSetViewModel expectedDuplicatedAssetSet5 = [];
-
-            // Image 1
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
-            {
-                Asset = _asset1,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
-            {
-                Asset = _asset6,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
-            {
-                Asset = _asset7,
-                ParentViewModel = expectedDuplicatedAssetSet1
-            };
-            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
-
-            // Image 2
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
-            {
-                Asset = _asset2,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
-            {
-                Asset = _asset3,
-                ParentViewModel = expectedDuplicatedAssetSet2
-            };
-            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
-
-            // Image 9
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
-            {
-                Asset = _asset4,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel7 = new (_application!)
-            {
-                Asset = _asset8,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel7);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel8 = new (_application!)
-            {
-                Asset = _asset9,
-                ParentViewModel = expectedDuplicatedAssetSet3
-            };
-            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel8);
-
-            // Image 11
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel9 = new (_application!)
-            {
-                Asset = _asset5,
-                ParentViewModel = expectedDuplicatedAssetSet4
-            };
-            expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel9);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel10 = new (_application!)
-            {
-                Asset = _asset10,
-                ParentViewModel = expectedDuplicatedAssetSet4
-            };
-            expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel10);
-
-            // Image 1336
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel11 = new (_application!)
-            {
-                Asset = _asset11,
-                ParentViewModel = expectedDuplicatedAssetSet5
-            };
-            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel12 = new (_application!)
-            {
-                Asset = _asset12,
-                ParentViewModel = expectedDuplicatedAssetSet5
-            };
-            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel13 = new (_application!)
-            {
-                Asset = _asset13,
-                ParentViewModel = expectedDuplicatedAssetSet5
-            };
-            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel13);
-
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel14 = new (_application!)
-            {
-                Asset = _asset14,
-                ParentViewModel = expectedDuplicatedAssetSet5
-            };
-            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel14);
-
-            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
-            [
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetSet2,
-                expectedDuplicatedAssetSet3,
-                expectedDuplicatedAssetSet4,
-                expectedDuplicatedAssetSet5
-            ];
-
-            List<DuplicatedAssetViewModel> duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel2);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset6);
-            AssertDuplicatedAsset(duplicatedAssets[1], expectedDuplicatedAssetViewModel3);
-            AssertAssetPropertyValidity(duplicatedAssets[1].Asset, _asset7);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetPosition = 1;
-
-            // Because _asset6 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset6.ImageData = new();
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel2);
-
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(7));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Second GetDuplicatedAssets
-            duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[4][1].Asset);
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel11);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset11);
-            AssertDuplicatedAsset(duplicatedAssets[1], expectedDuplicatedAssetViewModel13);
-            AssertAssetPropertyValidity(duplicatedAssets[1].Asset, _asset13);
-            AssertDuplicatedAsset(duplicatedAssets[2], expectedDuplicatedAssetViewModel14);
-            AssertAssetPropertyValidity(duplicatedAssets[2].Asset, _asset14);
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel2);
-
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(7));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Third GetDuplicatedAssets
-            duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][2].Asset);
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel6);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset4);
-            AssertDuplicatedAsset(duplicatedAssets[1], expectedDuplicatedAssetViewModel7);
-            AssertAssetPropertyValidity(duplicatedAssets[1].Asset, _asset8);
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                1,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel2);
-
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(7));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Fourth GetDuplicatedAssets
-            duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(2));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel1);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset1);
-            AssertDuplicatedAsset(duplicatedAssets[1], expectedDuplicatedAssetViewModel3);
-            AssertAssetPropertyValidity(duplicatedAssets[1].Asset, _asset7);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 1;
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                1,
-                0,
-                expectedDuplicatedAssetSet2,
-                expectedDuplicatedAssetViewModel4);
-
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(11));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Fifth GetDuplicatedAssets
-            duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1].Asset);
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel4);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset2);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 3;
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                3,
-                0,
-                expectedDuplicatedAssetSet4,
-                expectedDuplicatedAssetViewModel9);
-
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(15));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Sixth GetDuplicatedAssets
-
-            // Because _asset11 became the CurrentAsset so the ImageData has been loaded (was null because not in the current directory)
-            _asset11.ImageData = new();
-
-            duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(1));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel10);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset10);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 4;
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                4,
-                0,
-                expectedDuplicatedAssetSet5,
-                expectedDuplicatedAssetViewModel11);
-
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(19));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 3
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[17], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[18], Is.EqualTo("CurrentDuplicatedAsset"));
-
-            // Seventh GetDuplicatedAssets
-            duplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(_findDuplicatedAssetsViewModel.CurrentDuplicatedAsset!.Asset);
-
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(3));
-            AssertDuplicatedAsset(duplicatedAssets[0], expectedDuplicatedAssetViewModel12);
-            AssertAssetPropertyValidity(duplicatedAssets[0].Asset, _asset12);
-            AssertDuplicatedAsset(duplicatedAssets[1], expectedDuplicatedAssetViewModel13);
-            AssertAssetPropertyValidity(duplicatedAssets[1].Asset, _asset13);
-            AssertDuplicatedAsset(duplicatedAssets[2], expectedDuplicatedAssetViewModel14);
-            AssertAssetPropertyValidity(duplicatedAssets[2].Asset, _asset14);
-
-            _findDuplicatedAssetsViewModel!.DuplicatedAssetSetsPosition = 0;
-
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
-
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(23));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 1
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 2
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 3
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[17], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[18], Is.EqualTo("CurrentDuplicatedAsset"));
-            // DuplicatedAssetSetsPosition update 4
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[19], Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[20], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[21], Is.EqualTo("DuplicatedAssetPosition"));
@@ -2404,7 +1381,35 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             Assert.That(notifyApplicationVmPropertyChangedEvents[147], Is.EqualTo("StatusMessage"));
             Assert.That(notifyApplicationVmPropertyChangedEvents[148], Is.EqualTo("StatusMessage"));
 
-            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(10));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset12);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset14);
+            Assert.That(deleteDuplicatedAssetsEvents[3], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[3][0], _asset4);
+            Assert.That(deleteDuplicatedAssetsEvents[4], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[4][0], _asset8);
+            Assert.That(deleteDuplicatedAssetsEvents[5], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[5][0], _asset9);
+            Assert.That(deleteDuplicatedAssetsEvents[6], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[6][0], _asset6);
+            Assert.That(deleteDuplicatedAssetsEvents[7], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[7][0], _asset3);
+            Assert.That(deleteDuplicatedAssetsEvents[8], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[8][0], _asset5);
+            Assert.That(deleteDuplicatedAssetsEvents[9], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[9][0], _asset11);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
 
             CheckInstance(
                 findDuplicatedAssetsViewModelInstances,
@@ -2422,7 +1427,94 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
     }
 
     [Test]
-    public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_ReturnsOtherDuplicatedAssets()
+    public async Task DeleteLabel_NoCataloguedAssets_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents,
+            List<string> notifyApplicationVmPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Directory.CreateDirectory(assetsDirectory);
+
+            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+
+            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+
+            Assert.That(duplicatedAssetsSets, Is.Empty);
+
+            DuplicatedSetViewModel duplicatedAssetSet = [];
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = duplicatedAssetSet
+            };
+            duplicatedAssetSet.Add(duplicatedAssetViewModel);
+
+            Delete(duplicatedAssetViewModel);
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                [],
+                0,
+                0,
+                [],
+                null);
+
+            Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(5));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Is.Empty);
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                [],
+                0,
+                0,
+                [],
+                null);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(assetsDirectory, true);
+        }
+    }
+
+    [Test]
+    public async Task DeleteAllLabel_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAssets()
     {
         string rootDirectory = Path.Combine(_dataDirectory!);
         string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
@@ -2432,7 +1524,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
         string directoryPart = Path.Combine(duplicatesDirectory, "Part");
         string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
         string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
-        string exemptedFolderPath = Path.Combine(directoryNewFolder2);
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
 
@@ -2444,6 +1536,10 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             List<MessageBoxInformationSentEventArgs> messagesInformationSent,
             List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
         ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
 
         try
         {
@@ -2520,6 +1616,9 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
+            // First DeleteAll
+            DeleteAll(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[0][0]);
+
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
@@ -2537,6 +1636,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
             {
                 Asset = _asset6,
+                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
@@ -2544,6 +1644,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
             {
                 Asset = _asset7,
+                Visible = Visibility.Collapsed,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
@@ -2638,18 +1739,303 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedDuplicatedAssetSet5
             ];
 
-            List<DuplicatedAssetViewModel> notExemptedDuplicatedAssets =
-                _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                1,
+                0,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetViewModel4);
 
-            Assert.That(notExemptedDuplicatedAssets, Has.Count.EqualTo(4));
-            AssertDuplicatedAsset(notExemptedDuplicatedAssets[0], expectedDuplicatedAssetViewModel1);
-            AssertAssetPropertyValidity(notExemptedDuplicatedAssets[0].Asset, _asset1);
-            AssertDuplicatedAsset(notExemptedDuplicatedAssets[1], expectedDuplicatedAssetViewModel2);
-            AssertAssetPropertyValidity(notExemptedDuplicatedAssets[1].Asset, _asset6);
-            AssertDuplicatedAsset(notExemptedDuplicatedAssets[2], expectedDuplicatedAssetViewModel6);
-            AssertAssetPropertyValidity(notExemptedDuplicatedAssets[2].Asset, _asset4);
-            AssertDuplicatedAsset(notExemptedDuplicatedAssets[3], expectedDuplicatedAssetViewModel9);
-            AssertAssetPropertyValidity(notExemptedDuplicatedAssets[3].Asset, _asset5);
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 1
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset7);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Second DeleteAll
+            DeleteAll(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[4][2]);
+
+            expectedDuplicatedAssetSet5 = [];
+
+            // Image 1336
+            expectedDuplicatedAssetViewModel11 = new (_application!)
+            {
+                Asset = _asset11,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet5
+            };
+            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
+
+            expectedDuplicatedAssetViewModel12 = new (_application!)
+            {
+                Asset = _asset12,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet5
+            };
+            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
+
+            expectedDuplicatedAssetViewModel13 = new (_application!)
+            {
+                Asset = _asset13,
+                ParentViewModel = expectedDuplicatedAssetSet5
+            };
+            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel13);
+
+            expectedDuplicatedAssetViewModel14 = new (_application!)
+            {
+                Asset = _asset14,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet5
+            };
+            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel14);
+
+            expectedDuplicatedAssetsSets =
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetSet4,
+                expectedDuplicatedAssetSet5
+            ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                1,
+                0,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetViewModel4);
+
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 1
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 2
+
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(2));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset7);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(3));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset11);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][1], _asset12);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][2], _asset14);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Third DeleteAll
+            DeleteAll(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[2][0]);
+
+            expectedDuplicatedAssetSet3 = [];
+
+            // Image 9
+            expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset4,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            expectedDuplicatedAssetViewModel7 = new (_application!)
+            {
+                Asset = _asset8,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel7);
+
+            expectedDuplicatedAssetViewModel8 = new (_application!)
+            {
+                Asset = _asset9,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel8);
+
+            expectedDuplicatedAssetsSets =
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetSet4,
+                expectedDuplicatedAssetSet5
+            ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                1,
+                0,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetViewModel4);
+
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 1
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 2
+            // Collapse 3
+
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(3));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset7);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(3));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset11);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][1], _asset12);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][2], _asset14);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset8);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][1], _asset9);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Fourth DeleteAll
+            DeleteAll(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[1][1]);
+
+            expectedDuplicatedAssetSet2 = [];
+
+            // Image 2
+            expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            expectedDuplicatedAssetsSets =
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetSet4,
+                expectedDuplicatedAssetSet5
+            ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                3,
+                0,
+                expectedDuplicatedAssetSet4,
+                expectedDuplicatedAssetViewModel9);
+
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(13));
+            // SetDuplicates
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 1
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 2
+            // Collapse 3
+            // Collapse 4
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(messagesInformationSent, Is.Empty);
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(4));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset7);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(3));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset11);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][1], _asset12);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][2], _asset14);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset8);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][1], _asset9);
+            Assert.That(deleteDuplicatedAssetsEvents[3], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[3][0], _asset2);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            // Fifth DeleteAll
+            DeleteAll(_findDuplicatedAssetsViewModel.DuplicatedAssetSets[3][1]);
+
+            expectedDuplicatedAssetSet4 = [];
+
+            // Image 11
+            expectedDuplicatedAssetViewModel9 = new (_application!)
+            {
+                Asset = _asset5,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet4
+            };
+            expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel9);
+
+            expectedDuplicatedAssetViewModel10 = new (_application!)
+            {
+                Asset = _asset10,
+                ParentViewModel = expectedDuplicatedAssetSet4
+            };
+            expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel10);
+
+            expectedDuplicatedAssetsSets =
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetSet4,
+                expectedDuplicatedAssetSet5
+            ];
 
             CheckAfterChanges(
                 _findDuplicatedAssetsViewModel!,
@@ -2659,13 +2045,555 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedDuplicatedAssetSet1,
                 expectedDuplicatedAssetViewModel1);
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(5));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(17));
             // SetDuplicates
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
             Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 1
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 2
+            // Collapse 3
+            // Collapse 4
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[9], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[10], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[11], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[12], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse 6
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[13], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[14], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[15], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[16], Is.EqualTo("CurrentDuplicatedAsset"));
+
+            Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(149));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[23], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[29], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[30], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[32], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[35], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[36], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[38], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[39], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[43], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[44], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[46], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[47], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[49], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[52], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[55], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[56], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[58], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[59], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[61], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[62], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[63], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[64], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[65], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[66], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[67], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[68], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[69], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[70], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[71], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[72], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[73], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[74], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[75], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[76], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[77], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[78], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[79], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[80], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[81], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[82], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[83], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[84], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[85], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[86], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[87], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[88], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[89], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[90], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[91], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[92], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[93], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[94], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[95], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[96], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[97], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[98], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[99], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[100], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[101], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[102], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[103], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[104], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[105], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[106], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[107], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[108], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[109], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[110], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[111], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[112], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[113], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[114], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[115], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[116], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[117], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[118], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[119], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[120], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[121], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[122], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[123], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[124], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[125], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[126], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[127], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[128], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[129], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[130], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[131], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[132], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[133], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[134], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[135], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[136], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[137], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[138], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[139], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[140], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[141], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[142], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[143], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[144], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[145], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[146], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[147], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[148], Is.EqualTo("StatusMessage"));
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(5));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset6);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset7);
+            Assert.That(deleteDuplicatedAssetsEvents[1], Has.Length.EqualTo(3));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][0], _asset11);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][1], _asset12);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[1][2], _asset14);
+            Assert.That(deleteDuplicatedAssetsEvents[2], Has.Length.EqualTo(2));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][0], _asset8);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[2][1], _asset9);
+            Assert.That(deleteDuplicatedAssetsEvents[3], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[3][0], _asset2);
+            Assert.That(deleteDuplicatedAssetsEvents[4], Has.Length.EqualTo(1));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[4][0], _asset5);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                expectedDuplicatedAssetsSets,
+                0,
+                0,
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetViewModel1);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(directoryOutputVideoFirstFrame, true);
+        }
+    }
+
+    [Test]
+    public async Task DeleteAllLabel_NoCataloguedAssets_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents,
+            List<string> notifyApplicationVmPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Directory.CreateDirectory(assetsDirectory);
+
+            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+
+            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+
+            Assert.That(duplicatedAssetsSets, Is.Empty);
+
+            DuplicatedSetViewModel duplicatedAssetSet = [];
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = duplicatedAssetSet
+            };
+            duplicatedAssetSet.Add(duplicatedAssetViewModel);
+
+            DeleteAll(duplicatedAssetViewModel);
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                [],
+                0,
+                0,
+                [],
+                null);
+
+            Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(5));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Is.Empty);
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Is.Empty);
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                [],
+                0,
+                0,
+                [],
+                null);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(assetsDirectory, true);
+        }
+    }
+
+    [Test]
+    public async Task DeleteAllNotExemptedLabel_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_SendsDeleteDuplicatedAssetsEventAndCollapsesAssets()
+    {
+        string rootDirectory = Path.Combine(_dataDirectory!);
+        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
+        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, "NewFolder1");
+        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, "NewFolder2");
+        string directorySample1 = Path.Combine(duplicatesDirectory, "NotDuplicate", "Sample1");
+        string directoryPart = Path.Combine(duplicatesDirectory, "Part");
+        string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
+        string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
+        string exemptedFolderPath = Path.Combine(directoryNewFolder2);
+
+        ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, exemptedFolderPath, 200, 150, false, false, false, true);
+
+        string directoryOutputVideoFirstFrame = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
+
+        (
+            List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents,
+            List<string> notifyApplicationVmPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+
+            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+
+            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(5));
+            Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(3));
+            Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(2));
+            Assert.That(duplicatedAssetsSets[2], Has.Count.EqualTo(3));
+            Assert.That(duplicatedAssetsSets[3], Has.Count.EqualTo(2));
+            Assert.That(duplicatedAssetsSets[4], Has.Count.EqualTo(4));
+
+            // Image 1
+            Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset6.FileName));
+            Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset7.FileName));
+
+            // Image 2
+            Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset2.FileName));
+            Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset3.FileName));
+
+            // Image 9
+            Assert.That(duplicatedAssetsSets[2][0].FileName, Is.EqualTo(_asset4.FileName));
+            Assert.That(duplicatedAssetsSets[2][1].FileName, Is.EqualTo(_asset8.FileName));
+            Assert.That(duplicatedAssetsSets[2][2].FileName, Is.EqualTo(_asset9.FileName));
+
+            // Image 11
+            Assert.That(duplicatedAssetsSets[3][0].FileName, Is.EqualTo(_asset5.FileName));
+            Assert.That(duplicatedAssetsSets[3][1].FileName, Is.EqualTo(_asset10.FileName));
+
+            // Image 1336
+            Assert.That(duplicatedAssetsSets[4][0].FileName, Is.EqualTo(_asset11.FileName));
+            Assert.That(duplicatedAssetsSets[4][1].FileName, Is.EqualTo(_asset12.FileName));
+            Assert.That(duplicatedAssetsSets[4][2].FileName, Is.EqualTo(_asset13.FileName));
+            Assert.That(duplicatedAssetsSets[4][3].FileName, Is.EqualTo(_asset14.FileName));
+
+            Folder? folder1 = _assetRepository!.GetFolderByPath(rootDirectory);
+            Folder? folder2 = _assetRepository!.GetFolderByPath(directoryNewFolder1);
+            Folder? folder3 = _assetRepository!.GetFolderByPath(directoryNewFolder2);
+            Folder? folder4 = _assetRepository!.GetFolderByPath(directorySample1);
+            Folder? folder5 = _assetRepository!.GetFolderByPath(directoryPart);
+            Folder? folder6 = _assetRepository!.GetFolderByPath(directoryResolution);
+            Folder? folder7 = _assetRepository!.GetFolderByPath(directoryThumbnail);
+
+            Assert.That(folder1, Is.Not.Null);
+            Assert.That(folder2, Is.Not.Null);
+            Assert.That(folder3, Is.Not.Null);
+            Assert.That(folder4, Is.Not.Null);
+            Assert.That(folder5, Is.Not.Null);
+            Assert.That(folder6, Is.Not.Null);
+            Assert.That(folder7, Is.Not.Null);
+
+            _asset1 = _asset1.WithFolder(folder1!);
+            _asset2 = _asset2.WithFolder(folder1!);
+            _asset3 = _asset3.WithFolder(folder1!);
+            _asset4 = _asset4.WithFolder(folder1!);
+            _asset5 = _asset5.WithFolder(folder1!);
+
+            _asset6 = _asset6.WithFolder(folder2!);
+
+            _asset7 = _asset7.WithFolder(folder3!);
+            _asset8 = _asset8.WithFolder(folder3!);
+            _asset9 = _asset9.WithFolder(folder3!);
+            _asset10 = _asset10.WithFolder(folder3!);
+
+            _asset11 = _asset11.WithFolder(folder4!);
+            _asset12 = _asset12.WithFolder(folder5!);
+            _asset13 = _asset13.WithFolder(folder6!);
+            _asset14 = _asset14.WithFolder(folder7!);
+
+            _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet3 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet4 = [];
+            DuplicatedSetViewModel expectedDuplicatedAssetSet5 = [];
+
+            // Image 1
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            {
+                Asset = _asset1,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            {
+                Asset = _asset6,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            {
+                Asset = _asset7,
+                ParentViewModel = expectedDuplicatedAssetSet1
+            };
+            expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
+
+            // Image 2
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            {
+                Asset = _asset2,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            {
+                Asset = _asset3,
+                ParentViewModel = expectedDuplicatedAssetSet2
+            };
+            expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
+
+            // Image 9
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            {
+                Asset = _asset4,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel7 = new (_application!)
+            {
+                Asset = _asset8,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel7);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel8 = new (_application!)
+            {
+                Asset = _asset9,
+                ParentViewModel = expectedDuplicatedAssetSet3
+            };
+            expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel8);
+
+            // Image 11
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel9 = new (_application!)
+            {
+                Asset = _asset5,
+                Visible = Visibility.Collapsed,
+                ParentViewModel = expectedDuplicatedAssetSet4
+            };
+            expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel9);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel10 = new (_application!)
+            {
+                Asset = _asset10,
+                ParentViewModel = expectedDuplicatedAssetSet4
+            };
+            expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel10);
+
+            // Image 1336
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel11 = new (_application!)
+            {
+                Asset = _asset11,
+                ParentViewModel = expectedDuplicatedAssetSet5
+            };
+            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel12 = new (_application!)
+            {
+                Asset = _asset12,
+                ParentViewModel = expectedDuplicatedAssetSet5
+            };
+            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel13 = new (_application!)
+            {
+                Asset = _asset13,
+                ParentViewModel = expectedDuplicatedAssetSet5
+            };
+            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel13);
+
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel14 = new (_application!)
+            {
+                Asset = _asset14,
+                ParentViewModel = expectedDuplicatedAssetSet5
+            };
+            expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel14);
+
+            List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
+            [
+                expectedDuplicatedAssetSet1,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetSet3,
+                expectedDuplicatedAssetSet4,
+                expectedDuplicatedAssetSet5
+            ];
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                expectedDuplicatedAssetsSets,
+                1,
+                0,
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetViewModel4);
+
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(9));
+            // SetDuplicates
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+            // Collapse
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[5], Is.EqualTo("DuplicatedAssetSetsPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[6], Is.EqualTo("CurrentDuplicatedAssetSet"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[7], Is.EqualTo("DuplicatedAssetPosition"));
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[8], Is.EqualTo("CurrentDuplicatedAsset"));
 
             Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(149));
             // CatalogAssets + NotifyCatalogChange
@@ -2821,19 +2749,129 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
 
             Assert.That(messagesInformationSent, Is.Empty);
 
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Has.Length.EqualTo(4));
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][0], _asset1);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][1], _asset6);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][2], _asset4);
+            AssertAssetPropertyValidity(deleteDuplicatedAssetsEvents[0][3], _asset5);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
             CheckInstance(
                 findDuplicatedAssetsViewModelInstances,
                 expectedDuplicatedAssetsSets,
+                1,
                 0,
-                0,
-                expectedDuplicatedAssetSet1,
-                expectedDuplicatedAssetViewModel1);
+                expectedDuplicatedAssetSet2,
+                expectedDuplicatedAssetViewModel4);
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             Directory.Delete(directoryOutputVideoFirstFrame, true);
         }
+    }
+
+    [Test]
+    public async Task DeleteAllNotExemptedLabel_NoCataloguedAssets_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
+    {
+        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string exemptedFolderPath = Path.Combine(_dataDirectory!, "TestFolder");
+
+        ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
+
+        (
+            List<string> notifyFindDuplicatedAssetsVmPropertyChangedEvents,
+            List<string> notifyApplicationVmPropertyChangedEvents,
+            List<MessageBoxInformationSentEventArgs> messagesInformationSent,
+            List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances
+        ) = NotifyPropertyChangedEvents();
+
+        List<string> getExemptedFolderPathEvents = NotifyGetExemptedFolderPath(_userConfigurationService!.PathSettings.ExemptedFolderPath);
+        List<Asset[]> deleteDuplicatedAssetsEvents = NotifyDeleteDuplicatedAssets();
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        try
+        {
+            CheckBeforeChanges();
+
+            Directory.CreateDirectory(assetsDirectory);
+
+            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
+
+            List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
+
+            Assert.That(duplicatedAssetsSets, Is.Empty);
+
+            DuplicatedSetViewModel duplicatedAssetSet = [];
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel = new (_application!)
+            {
+                Asset = _asset1,
+                ParentViewModel = duplicatedAssetSet
+            };
+            duplicatedAssetSet.Add(duplicatedAssetViewModel);
+
+            DeleteNotExemptedDuplicatedAssets();
+
+            CheckAfterChanges(
+                _findDuplicatedAssetsViewModel!,
+                [],
+                0,
+                0,
+                [],
+                null);
+
+            Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(5));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+
+            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Is.Empty);
+
+            Assert.That(messagesInformationSent, Has.Count.EqualTo(1));
+            Assert.That(messagesInformationSent[0].Message, Is.EqualTo("All duplicates have been deleted. \nGood Job ;)"));
+            Assert.That(messagesInformationSent[0].Caption, Is.EqualTo("Information"));
+
+            Assert.That(getExemptedFolderPathEvents, Has.Count.EqualTo(1));
+            Assert.That(getExemptedFolderPathEvents[0], Is.EqualTo(exemptedFolderPath));
+
+            Assert.That(deleteDuplicatedAssetsEvents, Has.Count.EqualTo(1));
+            Assert.That(deleteDuplicatedAssetsEvents[0], Is.Empty);
+
+            Assert.That(refreshAssetsCounterEvents, Is.Empty);
+
+            CheckInstance(
+                findDuplicatedAssetsViewModelInstances,
+                [],
+                0,
+                0,
+                [],
+                null);
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            Directory.Delete(assetsDirectory, true);
+        }
+    }
+
+    [Test]
+    public void FindDuplicatedAssetsWindowClosing_RefreshAssetsCounter_InvokesRefreshAssetsCounterEvent()
+    {
+        List<string> refreshAssetsCounterEvents = NotifyRefreshAssetsCounter();
+
+        RefreshAssetsCounter?.Invoke(this);
+
+        Assert.That(refreshAssetsCounterEvents, Has.Count.EqualTo(1));
+        Assert.That(refreshAssetsCounterEvents[0], Is.EqualTo(string.Empty));
     }
 
     private
@@ -2874,6 +2912,44 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             messagesInformationSent,
             findDuplicatedAssetsViewModelInstances
         );
+    }
+
+    private List<string> NotifyGetExemptedFolderPath(string exemptedFolderPathToReturn)
+    {
+        List<string> getExemptedFolderPathEvents = [];
+
+        GetExemptedFolderPath += delegate
+        {
+            getExemptedFolderPathEvents.Add(exemptedFolderPathToReturn);
+
+            return exemptedFolderPathToReturn;
+        };
+
+        return getExemptedFolderPathEvents;
+    }
+
+    private List<Asset[]> NotifyDeleteDuplicatedAssets()
+    {
+        List<Asset[]> deleteDuplicatedAssetsEvents = [];
+
+        DeleteDuplicatedAssets += delegate(object _, Asset[] asset)
+        {
+            deleteDuplicatedAssetsEvents.Add(asset);
+        };
+
+        return deleteDuplicatedAssetsEvents;
+    }
+
+    private List<string> NotifyRefreshAssetsCounter()
+    {
+        List<string> refreshAssetsCounterEvents = [];
+
+        RefreshAssetsCounter += delegate
+        {
+            refreshAssetsCounterEvents.Add(string.Empty);
+        };
+
+        return refreshAssetsCounterEvents;
     }
 
     private void CheckBeforeChanges()
@@ -3021,5 +3097,32 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
                 expectedCurrentDuplicatedAssetSet,
                 expectedCurrentDuplicatedAsset);
         }
+    }
+
+    private void Delete(DuplicatedAssetViewModel duplicatedAssetViewModel)
+    {
+        DeleteDuplicatedAssets?.Invoke(this, [duplicatedAssetViewModel.Asset]);
+
+        _findDuplicatedAssetsViewModel!.CollapseAssets([duplicatedAssetViewModel]);
+    }
+
+    private void DeleteAll(DuplicatedAssetViewModel duplicatedAssetViewModel)
+    {
+        List<DuplicatedAssetViewModel> assetsToDelete = _findDuplicatedAssetsViewModel!.GetDuplicatedAssets(duplicatedAssetViewModel.Asset);
+
+        DeleteDuplicatedAssets?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
+
+        _findDuplicatedAssetsViewModel!.CollapseAssets(assetsToDelete);
+    }
+
+    private void DeleteNotExemptedDuplicatedAssets()
+    {
+        string exemptedFolderPath = GetExemptedFolderPath?.Invoke(this) ?? string.Empty;
+
+        List<DuplicatedAssetViewModel> assetsToDelete = _findDuplicatedAssetsViewModel!.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
+
+        DeleteDuplicatedAssets?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
+
+        _findDuplicatedAssetsViewModel!.CollapseAssets(assetsToDelete);
     }
 }

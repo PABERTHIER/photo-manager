@@ -3,7 +3,6 @@ using PhotoManager.Domain;
 using PhotoManager.UI.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
@@ -121,31 +120,130 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
         SetDuplicates(duplicatedAssetsSets);
     }
 
-    public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
+    public List<DuplicatedAssetViewModel> GetDuplicatedAssets(Asset asset)
     {
-        if (duplicatedAssets.Count == 1)
+        if (DuplicatedAssetSets.Count == 0)
         {
-            duplicatedAssets[0].Visible = Visibility.Collapsed;
-
-            // We want to navigate to another set only when we are collapsing the last duplicate of the current set
-            if (duplicatedAssets[0].ParentViewModel.Count(x => x.Visible == Visibility.Visible) <= 1)
-            {
-                NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
-            }
-            else
-            {
-                ResetDuplicatedAssetPosition();
-            }
-
-            return;
+            return [];
         }
 
+        string assetHash = asset.Hash;
+        string assetFolderPath = asset.Folder.Path;
+        string assetFileName = asset.FileName;
+
+        DuplicatedSetViewModel duplicatedSetViewModel = [];
+
+        for (int i = 0; i < DuplicatedAssetSets.Count; i++)
+        {
+            DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
+
+            for (int j = 0; j < duplicatedAssetSet.Count;)
+            {
+                if (duplicatedAssetSet[j].Asset.Hash != assetHash)
+                {
+                    break;
+                }
+
+                duplicatedSetViewModel = duplicatedAssetSet;
+                break;
+            }
+
+            if (duplicatedSetViewModel.Count != 0)
+            {
+                break;
+            }
+        }
+
+        if (duplicatedSetViewModel.Count == 0)
+        {
+            return [];
+        }
+
+        List<DuplicatedAssetViewModel> assetsToDelete = [];
+
+        for (int i = 0; i < duplicatedSetViewModel.Count; i++)
+        {
+            if ((duplicatedSetViewModel[i].Asset.Folder.Path == assetFolderPath
+                 && duplicatedSetViewModel[i].Asset.FileName == assetFileName)
+                || duplicatedSetViewModel[i].Visible == Visibility.Collapsed)
+            {
+                continue;
+            }
+
+            assetsToDelete.Add(duplicatedSetViewModel[i]);
+        }
+
+        return assetsToDelete;
+    }
+
+    public List<DuplicatedAssetViewModel> GetNotExemptedDuplicatedAssets(string exemptedFolderPath)
+    {
+        if (DuplicatedAssetSets.Count == 0)
+        {
+            return [];
+        }
+
+        List<DuplicatedAssetViewModel> exemptedAssets = [];
+        List<DuplicatedAssetViewModel> duplicatedAssetsFiltered = [];
+
+        for (int i = 0; i < DuplicatedAssetSets.Count; i++)
+        {
+            DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
+
+            for (int j = 0; j < duplicatedAssetSet.Count; j++)
+            {
+                DuplicatedAssetViewModel duplicatedAsset = duplicatedAssetSet[j];
+
+                if (duplicatedAsset.Asset.Folder.Path == exemptedFolderPath)
+                {
+                    exemptedAssets.Add(duplicatedAsset);
+                }
+                else if (duplicatedAsset.Visible != Visibility.Collapsed)
+                {
+                    duplicatedAssetsFiltered.Add(duplicatedAsset);
+                }
+            }
+        }
+
+        List<DuplicatedAssetViewModel> assetsToDelete = [];
+
+        for (int i = 0; i < duplicatedAssetsFiltered.Count; i++)
+        {
+            DuplicatedAssetViewModel filteredAsset = duplicatedAssetsFiltered[i];
+
+            for (int j = 0; j < exemptedAssets.Count; j++)
+            {
+                DuplicatedAssetViewModel exemptedAsset = exemptedAssets[j];
+
+                if (filteredAsset.Asset.Hash != exemptedAsset.Asset.Hash)
+                {
+                    continue;
+                }
+
+                assetsToDelete.Add(filteredAsset);
+                break;
+            }
+        }
+
+        return assetsToDelete;
+    }
+
+    public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
+    {
         for (int i = 0; i < duplicatedAssets.Count; i++)
         {
             duplicatedAssets[i].Visible = Visibility.Collapsed;
         }
 
-        if (CurrentDuplicatedAssetSet.Visible != Visibility.Visible)
+        // We want to navigate to another set only when we are collapsing the last duplicate of the current set
+        if (CurrentDuplicatedAssetSet.Visible == Visibility.Visible)
+        {
+            if (CurrentDuplicatedAsset!.Visible == Visibility.Collapsed)
+            {
+                ResetDuplicatedAssetPosition();
+            }
+        }
+        else
         {
             NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
         }
@@ -190,10 +288,12 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     private void NavigateToPreviousVisibleSet(int currentIndex)
     {
+        int duplicatedAssetSetsCount = DuplicatedAssetSets.Count;
+
         // If currentIndex is out of range, adjust it to the last valid index
-        if (currentIndex >= DuplicatedAssetSets.Count)
+        if (currentIndex >= duplicatedAssetSetsCount)
         {
-            currentIndex = DuplicatedAssetSets.Count - 1;
+            currentIndex = duplicatedAssetSetsCount - 1;
         }
 
         for (int i = currentIndex; i >= 0; i--)

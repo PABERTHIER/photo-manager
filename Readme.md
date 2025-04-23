@@ -107,7 +107,7 @@ The lower the value of `PHashThreshold`, the more precise it is.
 
 - `AssetsDirectory = "the_directory\\to_your_pictures"`: The directory where your assets are, to analyse them.
 - `BackupPath = "the_directory\\to_your_local_database"`:  The directory where the database will be stored (The backup must be upper than the location to prevent bugs like "Process is already used" **WIP**).
-- `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the asset in this exempted path.
+- `ExemptedFolderPath = "the_directory\\to_your_protected_assets"`: The path where PhotoManager will protect your assets and if there are duplicates in others paths, you will be able to delete all of them except the assets in this exempted path.
 - `FirstFrameVideosFolderName = "OutputVideoFirstFrame"`: The folder to save the first frame for each video file (Used if you set `AnalyseVideos` to true), the path will be "`AssetsDirectory` + `\\FirstFrameVideosFolderName`".
 
 **The `Project` part is about settings of project (there is no need to update it):** :building_construction:
@@ -165,6 +165,7 @@ There are three ways to delete duplicates:
 The button `Delete` :arrow_right: This will delete the selected duplicate.
 The button `DeleteAllButThis` :arrow_right: This will delete all duplicates associated to this asset and keep the selected duplicate.
 The button `Delete Every Duplicates Linked To Exempt Folder` :arrow_right: This will delete all duplicates found everywhere that has a duplicate linked in the `ExemptedFolderPath`, but all duplicates in the `ExemptedFolderPath` will be protected.
+:memo: Note: The `ExemptedFolder` should not contain any folder inside, all assets must be in the root (otherwise, they will not be exempted).
 
 ## How to use it for videos ? :clapper:
 
