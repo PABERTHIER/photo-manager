@@ -5,6 +5,7 @@ using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.ViewModels.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -177,15 +178,14 @@ public partial class MainWindow : Window
     {
         try
         {
-            var duplicates = _application.GetDuplicatedAssets();
+            List<List<Asset>> assetsSets = _application.GetDuplicatedAssets();
 
-            if (duplicates.Count > 0)
+            if (assetsSets.Count > 0)
             {
-                FindDuplicatedAssetsViewModel viewModel = new (_application);
-                viewModel.SetDuplicates(duplicates);
-                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new (viewModel);
+                FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModel = new (_application);
+                findDuplicatedAssetsViewModel.SetDuplicates(assetsSets);
+                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new (findDuplicatedAssetsViewModel);
 
-                // TODO: For each event, test to define the event with the method and check if the method is well triggered
                 findDuplicatedAssetsWindow.GetExemptedFolderPath += GetExemptedFolderPath;
                 findDuplicatedAssetsWindow.DeleteDuplicatedAssets += DeleteDuplicatedAssets;
                 findDuplicatedAssetsWindow.RefreshAssetsCounter += RefreshAssetsCounter;
