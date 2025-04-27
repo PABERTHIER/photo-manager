@@ -215,7 +215,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3];
 
             CheckAfterChanges(
@@ -280,7 +280,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
-            string expectedAppTitle = $"  - {otherDirectory} - image 1 of 3 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 3 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3];
 
             CheckAfterChanges(
@@ -340,7 +340,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3];
 
             CheckAfterChanges(
@@ -407,7 +407,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
-            string expectedAppTitle = $"  - {otherDirectory} - image 1 of 3 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 3 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3];
 
             CheckAfterChanges(
@@ -469,7 +469,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
-            string expectedAppTitle = $"  - {otherDirectory} - image 1 of 3 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 3 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3];
 
             CheckAfterChangesOtherDirectory(
@@ -531,7 +531,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -590,7 +590,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
-            string expectedAppTitle = $"  - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -649,7 +649,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -708,7 +708,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
-            string expectedAppTitle = $"  - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -769,7 +769,7 @@ public class ApplicationViewModelSetAssetsTests
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -828,7 +828,7 @@ public class ApplicationViewModelSetAssetsTests
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            string expectedAppTitle = $"  - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -902,8 +902,6 @@ public class ApplicationViewModelSetAssetsTests
     private void CheckBeforeChanges(string expectedRootDirectory)
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
-        Assert.That(_applicationViewModel!.Product, Is.Null);
-        Assert.That(_applicationViewModel!.Version, Is.Null);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -916,12 +914,16 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void CheckAfterChanges(
@@ -936,8 +938,6 @@ public class ApplicationViewModelSetAssetsTests
         bool expectedCanGoToNextAsset)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.EqualTo(expectedSortAscending));
-        Assert.That(applicationViewModelInstance.Product, Is.Null);
-        Assert.That(applicationViewModelInstance.Version, Is.Null);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(expectedSortCriteria));
@@ -965,6 +965,9 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void CheckAfterChangesOtherDirectory(
@@ -980,8 +983,6 @@ public class ApplicationViewModelSetAssetsTests
         bool expectedCanGoToNextAsset)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.EqualTo(expectedSortAscending));
-        Assert.That(applicationViewModelInstance.Product, Is.Null);
-        Assert.That(applicationViewModelInstance.Version, Is.Null);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(expectedSortCriteria));
@@ -1009,6 +1010,9 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)

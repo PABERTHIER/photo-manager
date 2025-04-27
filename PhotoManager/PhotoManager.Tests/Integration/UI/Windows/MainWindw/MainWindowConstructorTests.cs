@@ -3,10 +3,12 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.ComponentModel;
 using System.Windows;
 
-namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
+namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
+// For STA concern and WPF resources initialization issues, the best choice has been to "mock" the Window
+// The goal is to test what does MainWindow
 [TestFixture]
-public class ApplicationViewModelGetExemptedFolderPathTests
+public class MainWindowConstructorTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -14,6 +16,7 @@ public class ApplicationViewModelGetExemptedFolderPathTests
     private const string DATABASE_END_PATH = "v1.0";
 
     private ApplicationViewModel? _applicationViewModel;
+    private PhotoManager.Application.Application? _application;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -23,12 +26,13 @@ public class ApplicationViewModelGetExemptedFolderPathTests
         _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
     }
 
-    private void ConfigureApplicationViewModel(string assetsDirectory, string exemptedFolderPath)
+    private void ConfigureApplicationViewModel(string assetsDirectory, string projectName, string projectOwner)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
-        configurationRootMock.MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, exemptedFolderPath);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.PROJECT_NAME, projectName);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.PROJECT_OWNER, projectOwner);
 
         UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
 
@@ -46,16 +50,20 @@ public class ApplicationViewModelGetExemptedFolderPathTests
         MoveAssetsService moveAssetsService = new (assetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (assetRepository, storageService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _applicationViewModel = new (application);
+        _application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new (_application);
     }
 
     [Test]
-    [TestCase("E:\\Workspace\\PhotoManager\\Test\\test1")]
-    [TestCase("E:\\Workspace\\PhotoManager\\Test\\test2")]
-    public void GetExemptedFolderPath_CorrectValue_ReturnsExemptedFolderPathValue(string expectedExemptedFolderPath)
+    [TestCase("PhotoManager", "Toto", "PhotoManager", "Toto")]
+    [TestCase("Photo Toto", "Tutu", "PhotoManager", "Tutu")]
+    public void Constructor_WithValidAssembly_SetsCancellationTokenSourceAndAboutInformation(
+        string projectName,
+        string projectOwner,
+        string expectedProjectName,
+        string expectedProjectOwner)
     {
-        ConfigureApplicationViewModel(_dataDirectory!, expectedExemptedFolderPath);
+        ConfigureApplicationViewModel(_dataDirectory!, projectName, projectOwner);
 
         (
             List<string> notifyPropertyChangedEvents,
@@ -65,18 +73,27 @@ public class ApplicationViewModelGetExemptedFolderPathTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            CheckBeforeChanges(_dataDirectory!, expectedProjectName, expectedProjectOwner);
 
-            string exemptedFolderPath = _applicationViewModel!.GetExemptedFolderPath();
+            CancellationTokenSource cancellationTokenSource = new();
 
-            Assert.That(exemptedFolderPath, Is.Not.Null);
-            Assert.That(exemptedFolderPath, Is.EqualTo(expectedExemptedFolderPath));
+            Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);
+            Assert.That(cancellationTokenSource.Token.CanBeCanceled, Is.True);
+            Assert.That(cancellationTokenSource.Token.IsCancellationRequested, Is.False);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!);
+            CheckAfterChanges(
+                _applicationViewModel!,
+                _dataDirectory!,
+                expectedProjectName,
+                expectedProjectOwner);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!);
+            CheckInstance(
+                applicationViewModelInstances,
+                _dataDirectory!,
+                expectedProjectName,
+                expectedProjectOwner);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -121,7 +138,7 @@ public class ApplicationViewModelGetExemptedFolderPathTests
         return (notifyPropertyChangedEvents, applicationViewModelInstances, folderAddedEvents, folderRemovedEvents);
     }
 
-    private void CheckBeforeChanges(string expectedRootDirectory)
+    private void CheckBeforeChanges(string expectedRootDirectory, string expectedProduct, string expectedAuthor)
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
@@ -143,12 +160,16 @@ public class ApplicationViewModelGetExemptedFolderPathTests
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
-        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
-        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo(expectedProduct));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo(expectedAuthor));
         Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
-    private static void CheckAfterChanges(ApplicationViewModel applicationViewModelInstance, string expectedLastDirectoryInspected)
+    private static void CheckAfterChanges(
+        ApplicationViewModel applicationViewModelInstance,
+        string expectedLastDirectoryInspected,
+        string expectedProduct,
+        string expectedAuthor)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
@@ -170,12 +191,16 @@ public class ApplicationViewModelGetExemptedFolderPathTests
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.False);
-        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
-        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo(expectedProduct));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo(expectedAuthor));
         Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
-    private static void CheckInstance(List<ApplicationViewModel> applicationViewModelInstances, string expectedLastDirectoryInspected)
+    private static void CheckInstance(
+        List<ApplicationViewModel> applicationViewModelInstances,
+        string expectedLastDirectoryInspected,
+        string expectedProduct,
+        string expectedAuthor)
     {
         int applicationViewModelInstancesCount = applicationViewModelInstances.Count;
 
@@ -183,13 +208,16 @@ public class ApplicationViewModelGetExemptedFolderPathTests
         {
             Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
             // No need to go deeper, same instance because ref updated each time
-            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1],
-                Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
         }
 
         if (applicationViewModelInstancesCount > 0)
         {
-            CheckAfterChanges(applicationViewModelInstances[0], expectedLastDirectoryInspected);
+            CheckAfterChanges(
+                applicationViewModelInstances[0],
+                expectedLastDirectoryInspected,
+                expectedProduct,
+                expectedAuthor);
         }
     }
 }

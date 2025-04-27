@@ -1,5 +1,4 @@
-﻿using PhotoManager.UI;
-using PhotoManager.UI.Models;
+﻿using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -200,17 +199,6 @@ public class ApplicationViewModelChangeAppModeTests
             _asset3 = _asset3.WithFolder(folder!);
             _asset4 = _asset4.WithFolder(folder!);
 
-            AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(App).Assembly);
-
-            Assert.That(aboutInformation.Product, Is.EqualTo("PhotoManager"));
-            Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
-            Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
-            Assert.That(aboutInformation.Version, Does.StartWith("v"));
-            Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
-
-            _applicationViewModel!.Product = aboutInformation.Product;
-            _applicationViewModel!.Version = aboutInformation.Version;
-
             const string expectedStatusMessage = "The catalog process has ended.";
             string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - {_asset1.FileName} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
@@ -220,8 +208,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Viewer,
                 Visibility.Hidden,
                 Visibility.Visible,
@@ -264,8 +250,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Viewer,
                 Visibility.Hidden,
                 Visibility.Visible,
@@ -313,8 +297,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Thumbnails,
                 Visibility.Visible,
                 Visibility.Hidden,
@@ -367,8 +349,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Viewer,
                 Visibility.Hidden,
                 Visibility.Visible,
@@ -422,8 +402,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Viewer,
                 Visibility.Hidden,
                 Visibility.Visible,
@@ -465,17 +443,6 @@ public class ApplicationViewModelChangeAppModeTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            AboutInformation aboutInformation = _application!.GetAboutInformation(typeof(App).Assembly);
-
-            Assert.That(aboutInformation.Product, Is.EqualTo("PhotoManager"));
-            Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
-            Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
-            Assert.That(aboutInformation.Version, Does.StartWith("v"));
-            Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
-
-            _applicationViewModel!.Product = aboutInformation.Product;
-            _applicationViewModel!.Version = aboutInformation.Version;
-
             const string expectedStatusMessage = "The catalog process has ended.";
             string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 1 of 0 - sorted by file name ascending";
 
@@ -484,8 +451,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Viewer,
                 Visibility.Hidden,
                 Visibility.Visible,
@@ -516,8 +481,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Viewer,
                 Visibility.Hidden,
                 Visibility.Visible,
@@ -553,8 +516,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Thumbnails,
                 Visibility.Visible,
                 Visibility.Hidden,
@@ -595,8 +556,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Viewer,
                 Visibility.Hidden,
                 Visibility.Visible,
@@ -638,8 +597,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                "PhotoManager",
-                "v1.0.0",
                 AppMode.Viewer,
                 Visibility.Hidden,
                 Visibility.Visible,
@@ -697,8 +654,6 @@ public class ApplicationViewModelChangeAppModeTests
     private void CheckBeforeChanges(string expectedRootDirectory)
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
-        Assert.That(_applicationViewModel!.Product, Is.Null);
-        Assert.That(_applicationViewModel!.Version, Is.Null);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -711,19 +666,21 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void CheckAfterChanges(
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
-        string? expectedProduct,
-        string? expectedVersion,
         AppMode expectedAppMode,
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible,
@@ -735,8 +692,6 @@ public class ApplicationViewModelChangeAppModeTests
         bool expectedCanGoToNextAsset)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
-        Assert.That(applicationViewModelInstance.Product, Is.EqualTo(expectedProduct));
-        Assert.That(applicationViewModelInstance.Version, Is.EqualTo(expectedVersion));
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(expectedAppMode));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -764,6 +719,9 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void AssertCurrentAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
@@ -797,8 +755,6 @@ public class ApplicationViewModelChangeAppModeTests
     private static void CheckInstance(
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
-        string? expectedProduct,
-        string? expectedVersion,
         AppMode expectedAppMode,
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible,
@@ -823,8 +779,6 @@ public class ApplicationViewModelChangeAppModeTests
             CheckAfterChanges(
                 applicationViewModelInstances[0],
                 expectedLastDirectoryInspected,
-                expectedProduct,
-                expectedVersion,
                 expectedAppMode,
                 expectedThumbnailsVisible,
                 expectedViewerVisible,

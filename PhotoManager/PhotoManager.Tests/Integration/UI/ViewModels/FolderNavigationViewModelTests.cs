@@ -202,7 +202,7 @@ public class FolderNavigationViewModelTests
             _asset4 = _asset4!.WithFolder(folder!);
 
             const string expectedStatusMessage = "The catalog process has ended.";
-            string expectedAppTitle = $"  - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
             CheckAfterChanges(
@@ -480,8 +480,6 @@ public class FolderNavigationViewModelTests
     {
         // From ApplicationViewModel
         Assert.That(_folderNavigationViewModel!.SortAscending, Is.True);
-        Assert.That(_folderNavigationViewModel!.Product, Is.Null);
-        Assert.That(_folderNavigationViewModel!.Version, Is.Null);
         Assert.That(_folderNavigationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_folderNavigationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_folderNavigationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -494,7 +492,8 @@ public class FolderNavigationViewModelTests
         Assert.That(_folderNavigationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_folderNavigationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_folderNavigationViewModel!.TotalFilesCountWording, Is.Null);
-        Assert.That(_folderNavigationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_folderNavigationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_folderNavigationViewModel!.StatusMessage, Is.Null);
         Assert.That(_folderNavigationViewModel!.CurrentAsset, Is.Null);
 
@@ -510,6 +509,9 @@ public class FolderNavigationViewModelTests
 
         Assert.That(_folderNavigationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_folderNavigationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_folderNavigationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_folderNavigationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_folderNavigationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
 
         // From FolderNavigationViewModel
         if (expectedSourceFolder != null)
@@ -550,8 +552,6 @@ public class FolderNavigationViewModelTests
     {
         // From ApplicationViewModel
         Assert.That(folderNavigationViewModelInstance.SortAscending, Is.True);
-        Assert.That(folderNavigationViewModelInstance.Product, Is.Null);
-        Assert.That(folderNavigationViewModelInstance.Version, Is.Null);
         Assert.That(folderNavigationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(folderNavigationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(folderNavigationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -588,6 +588,9 @@ public class FolderNavigationViewModelTests
 
         Assert.That(folderNavigationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(folderNavigationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(folderNavigationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(folderNavigationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(folderNavigationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
 
         // From FolderNavigationViewModel
         if (expectedSourceFolder != null)
@@ -603,7 +606,7 @@ public class FolderNavigationViewModelTests
         
         if (expectedSelectedFolder != null)
         {
-            Assert.That(folderNavigationViewModelInstance.SelectedFolder.Id, Is.EqualTo(expectedSelectedFolder.Id));
+            Assert.That(folderNavigationViewModelInstance.SelectedFolder!.Id, Is.EqualTo(expectedSelectedFolder.Id));
             Assert.That(folderNavigationViewModelInstance.SelectedFolder.Path, Is.EqualTo(expectedSelectedFolder.Path));
         }
         else

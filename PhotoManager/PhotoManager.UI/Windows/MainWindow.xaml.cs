@@ -5,6 +5,7 @@ using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.ViewModels.Enums;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -33,26 +34,24 @@ public partial class MainWindow : Window
 
     private readonly IApplication _application;
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private Task _catalogTask;
+    private Task _catalogTask = new(() => {});
 
-    // TODO: Rework aboutInformation to get it only once (need to Add Author into the VM)
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
     {
         try
         {
             InitializeComponent();
             Current = this;
-            _cancellationTokenSource = new();
-
-            _application = application;
             DataContext = viewModel;
-
-            SetAboutInformation();
         }
         catch (Exception ex)
         {
             Log.Error(ex);
+            throw;
         }
+
+        _application = application;
+        _cancellationTokenSource = new();
     }
 
     public static MainWindow Current { get; private set; }
@@ -222,9 +221,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            // TODO: Why doing it twice ? Already done in the ctor, use instead VM
-            AboutInformation aboutInformation = _application.GetAboutInformation(GetType().Assembly);
-            AboutWindow aboutWindow = new (aboutInformation);  // TODO: Add Author above
+            AboutWindow aboutWindow = new (ViewModel.AboutInformation);
             aboutWindow.ShowDialog();
         }
         catch (Exception ex)
@@ -374,7 +371,7 @@ public partial class MainWindow : Window
         ViewModel.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
     }
 
-    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Window_Closing(object sender, CancelEventArgs e)
     {
         Task taskCancellation = Task.Run(() =>
         {
@@ -428,13 +425,6 @@ public partial class MainWindow : Window
         stopwatch.Stop();
         ViewModel.SetExecutionTime(stopwatch.Elapsed);
         ViewModel.CalculateTotalFilesCount();
-    }
-
-    private void SetAboutInformation()
-    {
-        AboutInformation aboutInformation = _application.GetAboutInformation(GetType().Assembly);
-        ViewModel.Product = aboutInformation.Product; // TODO: Add Author here and above
-        ViewModel.Version = aboutInformation.Version;
     }
 
     private void ShowImage()

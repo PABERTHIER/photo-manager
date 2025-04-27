@@ -219,12 +219,12 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             string expectedAppTitle = sortCriteria switch
             {
-                SortCriteria.FileName => $"  - {_dataDirectory} - image 1 of 1 - sorted by file name descending",
-                SortCriteria.FileSize => $"  - {_dataDirectory} - image 1 of 1 - sorted by file size ascending",
-                SortCriteria.FileCreationDateTime => $"  - {_dataDirectory} - image 1 of 1 - sorted by file creation ascending",
-                SortCriteria.FileModificationDateTime => $"  - {_dataDirectory} - image 1 of 1 - sorted by file modification ascending",
-                SortCriteria.ThumbnailCreationDateTime => $"  - {_dataDirectory} - image 1 of 1 - sorted by thumbnail creation ascending",
-                _ => $"  - {_dataDirectory} - image 1 of 1 - sorted by  ascending"
+                SortCriteria.FileName => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by file name descending",
+                SortCriteria.FileSize => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by file size ascending",
+                SortCriteria.FileCreationDateTime => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by file creation ascending",
+                SortCriteria.FileModificationDateTime => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by file modification ascending",
+                SortCriteria.ThumbnailCreationDateTime => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by thumbnail creation ascending",
+                _ => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by  ascending"
             };
 
             CheckAfterChanges(
@@ -288,7 +288,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -317,7 +317,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
                 true);
 
             Asset[] expectedAssetsUpdated = [_asset5, _asset4, _asset3, _asset2, _asset1];
-            string expectedAppTitleUpdated = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name descending";
+            string expectedAppTitleUpdated = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name descending";
 
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
@@ -382,10 +382,10 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
-            string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAscendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] expectedDescendingAssets = [_asset5, _asset4, _asset3, _asset2, _asset1];
-            string expectedDescendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name descending";
+            string expectedDescendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name descending";
 
             for (int i = 0; i < 10; i++)
             {
@@ -497,7 +497,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             Asset[] expectedAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file size ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file size ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -560,10 +560,10 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
-            string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file size ascending";
+            string expectedAscendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file size ascending";
 
             Asset[] expectedDescendingAssets = [_asset5, _asset2, _asset4, _asset1, _asset3];
-            string expectedDescendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file size descending";
+            string expectedDescendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file size descending";
 
             for (int i = 0; i < 10; i++)
             {
@@ -675,7 +675,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             Asset[] expectedAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file creation ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file creation ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -738,10 +738,10 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
-            string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file creation ascending";
+            string expectedAscendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file creation ascending";
 
             Asset[] expectedDescendingAssets = [_asset5, _asset2, _asset4, _asset1, _asset3];
-            string expectedDescendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file creation descending";
+            string expectedDescendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file creation descending";
 
             for (int i = 0; i < 10; i++)
             {
@@ -853,7 +853,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             Asset[] expectedAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file modification ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file modification ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -916,10 +916,10 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
-            string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file modification ascending";
+            string expectedAscendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file modification ascending";
 
             Asset[] expectedDescendingAssets = [_asset5, _asset2, _asset4, _asset1, _asset3];
-            string expectedDescendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file modification descending";
+            string expectedDescendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file modification descending";
 
             for (int i = 0; i < 10; i++)
             {
@@ -1031,7 +1031,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
             Asset[] expectedAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -1094,10 +1094,10 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             Asset[] expectedAscendingAssets = [_asset3, _asset1, _asset4, _asset2, _asset5];
-            string expectedAscendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
+            string expectedAscendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation ascending";
 
             Asset[] expectedDescendingAssets = [_asset5, _asset2, _asset4, _asset1, _asset3];
-            string expectedDescendingAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation descending";
+            string expectedDescendingAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by thumbnail creation descending";
 
             for (int i = 0; i < 10; i++)
             {
@@ -1213,12 +1213,12 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             string expectedAppTitle = sortCriteria switch
             {
-                SortCriteria.FileName => $"  - {_dataDirectory} - image 1 of 0 - sorted by file name descending",
-                SortCriteria.FileSize => $"  - {_dataDirectory} - image 1 of 0 - sorted by file size ascending",
-                SortCriteria.FileCreationDateTime => $"  - {_dataDirectory} - image 1 of 0 - sorted by file creation ascending",
-                SortCriteria.FileModificationDateTime => $"  - {_dataDirectory} - image 1 of 0 - sorted by file modification ascending",
-                SortCriteria.ThumbnailCreationDateTime => $"  - {_dataDirectory} - image 1 of 0 - sorted by thumbnail creation ascending",
-                _ => $"  - {_dataDirectory} - image 1 of 0 - sorted by  ascending"
+                SortCriteria.FileName => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name descending",
+                SortCriteria.FileSize => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file size ascending",
+                SortCriteria.FileCreationDateTime => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file creation ascending",
+                SortCriteria.FileModificationDateTime => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file modification ascending",
+                SortCriteria.ThumbnailCreationDateTime => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by thumbnail creation ascending",
+                _ => $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by  ascending"
             };
 
             CheckAfterChanges(
@@ -1285,7 +1285,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             Assert.That(exception?.Message, Is.EqualTo($"Unknown sort criteria (Parameter '{nameof(SortCriteria)}')"));
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -1360,8 +1360,6 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
     private void CheckBeforeChanges(string expectedRootDirectory)
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
-        Assert.That(_applicationViewModel!.Product, Is.Null);
-        Assert.That(_applicationViewModel!.Version, Is.Null);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -1374,12 +1372,16 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void CheckAfterChanges(
@@ -1394,8 +1396,6 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         bool expectedCanGoToNextAsset)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.EqualTo(expectedSortAscending));
-        Assert.That(applicationViewModelInstance.Product, Is.Null);
-        Assert.That(applicationViewModelInstance.Version, Is.Null);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(expectedSortCriteria));
@@ -1423,6 +1423,9 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)

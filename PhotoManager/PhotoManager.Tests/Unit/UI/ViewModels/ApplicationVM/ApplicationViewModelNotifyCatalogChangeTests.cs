@@ -213,7 +213,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -307,7 +307,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -403,7 +403,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -496,7 +496,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -550,7 +550,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Second NotifyCatalogChange
             expectedAssets = [_asset1, _asset2];
 
-            expectedAppTitle = $"  - {_dataDirectory} - image 1 of 2 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 2 - sorted by file name ascending";
             statusMessage = $"Image {_asset2.Folder.Path} added to catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -586,7 +586,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Third NotifyCatalogChange
             expectedAssets = [_asset1, _asset2, _asset3];
 
-            expectedAppTitle = $"  - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
             statusMessage = $"Image {_asset3.Folder.Path} added to catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -626,7 +626,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Fourth NotifyCatalogChange
             expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-            expectedAppTitle = $"  - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
             statusMessage = $"Image {_asset4.Folder.Path} added to catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -670,7 +670,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Fifth NotifyCatalogChange
             expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
-            expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
             statusMessage = $"Image {_asset5.Folder.Path} added to catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -750,7 +750,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -839,7 +839,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
@@ -927,7 +927,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -999,7 +999,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -1079,7 +1079,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -1161,7 +1161,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -1240,7 +1240,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -1423,7 +1423,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
 
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
             byte[] assetData = [1, 2, 3];
@@ -1501,7 +1501,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -1586,7 +1586,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
@@ -1674,7 +1674,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -1746,7 +1746,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -1824,7 +1824,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -1904,7 +1904,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -1981,7 +1981,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -2040,7 +2040,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Second NotifyCatalogChange
             expectedAssets = [_asset2, _asset4, _asset5];
 
-            expectedAppTitle = $"  - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
             statusMessage = $"Image {_asset1.Folder.Path} deleted from catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -2079,7 +2079,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             // Third NotifyCatalogChange
             expectedAssets = [_asset2, _asset4];
 
-            expectedAppTitle = $"  - {_dataDirectory} - image 1 of 2 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 2 - sorted by file name ascending";
             statusMessage = $"Image {_asset5.Folder.Path} deleted from catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -2154,7 +2154,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
 
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
             byte[] assetData = [1, 2, 3];
@@ -2230,7 +2230,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -2315,7 +2315,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
@@ -2403,7 +2403,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -2479,7 +2479,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = $"Folder {otherDirectory} added to catalog.";
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2544,7 +2544,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = $"Folder {_dataDirectory} added to catalog.";
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2611,7 +2611,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
             string statusMessage = $"Folder {otherDirectory} added to catalog.";
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
@@ -2685,7 +2685,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = $"Folder {otherDirectory} added to catalog.";
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2751,7 +2751,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = string.Empty;
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2808,7 +2808,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = $"Folder {_dataDirectory} added to catalog.";
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2857,7 +2857,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = $"Folder {otherDirectory} deleted from catalog.";
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2922,7 +2922,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = $"Folder {_dataDirectory} deleted from catalog.";
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -2989,7 +2989,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
             string statusMessage = $"Folder {otherDirectory} deleted from catalog.";
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
@@ -3063,7 +3063,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(otherDirectory);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = $"Folder {otherDirectory} deleted from catalog.";
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -3129,7 +3129,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = string.Empty;
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -3186,7 +3186,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = $"Folder {_dataDirectory} deleted from catalog.";
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -3240,7 +3240,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
             string statusMessage = string.Empty;
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
@@ -3300,7 +3300,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"  - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _applicationViewModel!.NotifyCatalogChange(null!));
 
@@ -3374,8 +3374,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private void CheckBeforeChanges(string expectedRootDirectory)
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
-        Assert.That(_applicationViewModel!.Product, Is.Null);
-        Assert.That(_applicationViewModel!.Version, Is.Null);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -3388,12 +3386,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void CheckAfterChanges(
@@ -3407,8 +3409,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         bool expectedCanGoToNextAsset)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
-        Assert.That(applicationViewModelInstance.Product, Is.Null);
-        Assert.That(applicationViewModelInstance.Version, Is.Null);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -3436,6 +3436,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)

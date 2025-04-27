@@ -34,8 +34,9 @@ public class ApplicationViewModel : BaseViewModel
     {
         _observableAssets = [];
         _selectedAssets = [];
-
         _currentFolderPath = Application.GetInitialFolderPath();
+
+        AboutInformation = Application.GetAboutInformation(GetType().Assembly);
         UpdateAppTitle(); // TODO: Temp fix waiting for the fix of UpdateAppTitle
     }
 
@@ -171,9 +172,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public string? Product { get; set; }
-
-    public string? Version { get; set; }
+    public AboutInformation AboutInformation { get; }
 
     // TODO: When everything tested, rework this to have one method without param (like a toggle)
     public void ChangeAppMode()
@@ -351,6 +350,7 @@ public class ApplicationViewModel : BaseViewModel
 
                 break;
 
+            // ReSharper disable once RedundantEmptySwitchSection
             default:
                 break;
         }
@@ -441,8 +441,8 @@ public class ApplicationViewModel : BaseViewModel
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
                 "{0} {1} - {2} - image {3} of {4} - sorted by {5}",
-                Product,
-                Version,
+                AboutInformation.Product,
+                AboutInformation.Version,
                 CurrentFolderPath,
                 ViewerPosition + 1,
                 ObservableAssets.Count,
@@ -453,8 +453,8 @@ public class ApplicationViewModel : BaseViewModel
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
                 "{0} {1} - {2} - {3} - image {4} of {5} - sorted by {6}",
-                Product,
-                Version,
+                AboutInformation.Product,
+                AboutInformation.Version,
                 CurrentFolderPath,
                 CurrentAsset?.FileName,
                 ViewerPosition + 1,
