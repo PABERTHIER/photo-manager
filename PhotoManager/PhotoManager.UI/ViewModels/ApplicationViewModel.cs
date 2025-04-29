@@ -174,20 +174,9 @@ public class ApplicationViewModel : BaseViewModel
 
     public AboutInformation AboutInformation { get; }
 
-    // TODO: When everything tested, rework this to have one method without param (like a toggle)
     public void ChangeAppMode()
     {
-        AppMode = AppMode switch
-        {
-            AppMode.Viewer => AppMode.Thumbnails,
-            AppMode.Thumbnails => AppMode.Viewer,
-            _ => AppMode
-        };
-    }
-
-    public void ChangeAppMode(AppMode newAppMode)
-    {
-        AppMode = newAppMode;
+        AppMode = AppMode == AppMode.Thumbnails ? AppMode.Viewer : AppMode.Thumbnails;
     }
 
     public void SetAssets(string newCurrentFolderPath, Asset[] assets)
@@ -242,13 +231,13 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    // TODO: Delete this method and tests
+    // TODO: Dead code: Delete this method and tests
     public void GoToAsset(Asset asset)
     {
         GoToAsset(asset, AppMode);
     }
 
-    // TODO: Delete this method and tests
+    // TODO: Dead code: Delete this method and tests
     public void GoToAsset(Asset asset, AppMode newAppMode)
     {
         Asset? observableAsset = null;
@@ -268,7 +257,7 @@ public class ApplicationViewModel : BaseViewModel
         {
             if (AppMode != newAppMode)
             {
-                ChangeAppMode(newAppMode);
+                ChangeAppMode();
             }
 
             if (newViewerPosition > -1)

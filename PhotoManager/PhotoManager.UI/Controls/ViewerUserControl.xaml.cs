@@ -1,8 +1,6 @@
 ﻿using log4net;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
-using PhotoManager.UI.ViewModels.Enums;
-using PhotoManager.UI.Windows;
 using System;
 using System.Reflection;
 using System.Windows;
@@ -31,7 +29,7 @@ public partial class ViewerUserControl
         }
     }
 
-    public event ThumbnailSelectedEventHandler? ThumbnailSelected;
+    public event EventHandler? ThumbnailSelected;
 
     private ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
 
@@ -67,7 +65,7 @@ public partial class ViewerUserControl
         {
             if (ViewModel.CurrentAsset != null)
             {
-                ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs { Asset = ViewModel.CurrentAsset });
+                ThumbnailSelected?.Invoke(this, EventArgs.Empty);
             }
         }
         catch (Exception ex)
@@ -78,7 +76,7 @@ public partial class ViewerUserControl
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.ChangeAppMode(AppMode.Thumbnails);
+        ViewModel.ChangeAppMode();
     }
 
     // Triggered when double-clicked on the thumbnail image from ThumbnailsUserControl to pass into fullscreen mode
