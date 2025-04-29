@@ -105,7 +105,7 @@ public partial class MainWindow : Window
                 switch (e.Key)
                 {
                     case Key.Delete:
-                        DeleteAssets();
+                        DeleteSelectedAssets();
                         break;
 
                     case Key.PageUp:
@@ -294,33 +294,13 @@ public partial class MainWindow : Window
         }
     }
 
-    private void DeleteAssets()
-    {
-        try
-        {
-            Asset[] selectedAssets = ViewModel.SelectedAssets;
-
-            if (selectedAssets.Length > 0)
-            {
-                _application.DeleteAssets(selectedAssets); // TODO: Need to rework how the deletion is handled
-                ViewModel.RemoveAssets(selectedAssets);
-                ShowImage();
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex);
-        }
-    }
-
     private void DeleteDuplicatedAssets(object sender, Asset[] assets)
     {
         try
         {
             if (assets.Length > 0)
             {
-                _application.DeleteAssets(assets); // TODO: Can make one method with above
-                ViewModel.RemoveAssets(assets);
+                DeleteAssets(assets);
             }
         }
         catch (Exception ex)
@@ -338,7 +318,7 @@ public partial class MainWindow : Window
 
     private void DeleteAssets_Click(object sender, RoutedEventArgs e)
     {
-        DeleteAssets();
+        DeleteSelectedAssets();
     }
 
     private void Exit_Click(object sender, RoutedEventArgs e)
@@ -437,5 +417,29 @@ public partial class MainWindow : Window
         {
             thumbnailsUserControl.ShowImage();
         }
+    }
+
+    private void DeleteSelectedAssets()
+    {
+        try
+        {
+            Asset[] selectedAssets = ViewModel.SelectedAssets;
+
+            if (selectedAssets.Length > 0)
+            {
+                DeleteAssets(selectedAssets);
+                ShowImage();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+        }
+    }
+
+    private void DeleteAssets(Asset[] assets)
+    {
+        _application.DeleteAssets(assets); // TODO: Need to rework how the deletion is handled
+        ViewModel.RemoveAssets(assets);
     }
 }
