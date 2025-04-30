@@ -17,19 +17,11 @@ using System.Windows.Input;
 
 namespace PhotoManager.UI.Windows;
 
-// TODO: Move it into Models folder -> ThumbnailSelectedEventHandler
-public class ThumbnailSelectedEventArgs : EventArgs
-{
-    public Asset Asset { get; set; } // TODO: Remove this arg
-}
-
-public delegate void ThumbnailSelectedEventHandler(object sender, ThumbnailSelectedEventArgs e);
-
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 [ExcludeFromCodeCoverage]
-public partial class MainWindow : Window
+public partial class MainWindow
 {
     private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
@@ -63,7 +55,6 @@ public partial class MainWindow : Window
     {
         try
         {
-            ViewModel?.ChangeAppMode(AppMode.Thumbnails);
             thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolderPath);
             folderTreeView.SelectedPath = ViewModel?.CurrentFolderPath;
             await DoBackgroundWork();
@@ -136,24 +127,11 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ThumbnailsUserControl_ThumbnailSelected(object sender, ThumbnailSelectedEventArgs e)
+    private void ToggleImageView(object sender, EventArgs e)
     {
         try
         {
-            ViewModel.GoToAsset(e.Asset, AppMode.Viewer);
-            ShowImage();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex);
-        }
-    }
-
-    private void ViewerUserControl_ThumbnailSelected(object sender, ThumbnailSelectedEventArgs e)
-    {
-        try
-        {
-            ViewModel.GoToAsset(e.Asset, AppMode.Thumbnails);
+            ViewModel.ChangeAppMode();
             ShowImage();
         }
         catch (Exception ex)

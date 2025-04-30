@@ -1,6 +1,5 @@
 ﻿using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
-using PhotoManager.UI.Windows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
@@ -22,7 +21,7 @@ public class ThumbnailsUserControlTests
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
 
-    private event ThumbnailSelectedEventHandler? ThumbnailSelected;
+    private event EventHandler? ThumbnailSelected;
 
     private Asset _asset1;
     private Asset _asset2;
@@ -1156,25 +1155,13 @@ public class ThumbnailsUserControlTests
     }
 
     [Test]
-    public void ContentControlMouseDoubleClick_Asset_SendsThumbnailSelectedEventWithAsset()
+    public void ContentControlMouseDoubleClick_Event_SendsEvent()
     {
-        List<Asset> thumbnailSelectedEvents = NotifyThumbnailSelected();
+        List<string> thumbnailSelectedEvents = NotifyThumbnailSelected();
 
-        ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs { Asset = _asset1 });
+        ThumbnailSelected?.Invoke(this, EventArgs.Empty);
 
         Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(1));
-        Assert.That(thumbnailSelectedEvents[0], Is.EqualTo(_asset1));
-    }
-
-    [Test]
-    public void ContentControlMouseDoubleClick_NoAsset_SendsThumbnailSelectedEventWithoutAsset()
-    {
-        List<Asset> thumbnailSelectedEvents = NotifyThumbnailSelected();
-
-        ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs());
-
-        Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(1));
-        Assert.That(thumbnailSelectedEvents[0], Is.Null);
     }
 
     [Test]
@@ -1397,13 +1384,13 @@ public class ThumbnailsUserControlTests
         return (notifyPropertyChangedEvents, applicationViewModelInstances, folderAddedEvents, folderRemovedEvents);
     }
 
-    private List<Asset> NotifyThumbnailSelected()
+    private List<string> NotifyThumbnailSelected()
     {
-        List<Asset> thumbnailSelectedEvents = [];
+        List<string> thumbnailSelectedEvents = [];
 
-        ThumbnailSelected += delegate(object _, ThumbnailSelectedEventArgs e)
+        ThumbnailSelected += delegate
         {
-            thumbnailSelectedEvents.Add(e.Asset);
+            thumbnailSelectedEvents.Add(string.Empty);
         };
 
         return thumbnailSelectedEvents;
