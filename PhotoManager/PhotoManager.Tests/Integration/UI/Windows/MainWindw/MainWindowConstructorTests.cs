@@ -15,6 +15,7 @@ public class MainWindowConstructorTests
     private string? _databasePath;
     private const string DATABASE_END_PATH = "v1.0";
 
+    private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
 
@@ -24,6 +25,12 @@ public class MainWindowConstructorTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
         _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
         _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        _folderNavigationViewModel = null;
     }
 
     private void ConfigureApplicationViewModel(string assetsDirectory, string projectName, string projectOwner)
@@ -75,6 +82,14 @@ public class MainWindowConstructorTests
         {
             CheckBeforeChanges(_dataDirectory!, expectedProjectName, expectedProjectOwner);
 
+            Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
+
+            _folderNavigationViewModel = new (
+                _applicationViewModel!,
+                _application!,
+                sourceFolder,
+                []);
+
             CancellationTokenSource cancellationTokenSource = new();
 
             Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);
@@ -86,6 +101,13 @@ public class MainWindowConstructorTests
                 _dataDirectory!,
                 expectedProjectName,
                 expectedProjectOwner);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                _dataDirectory!,
+                expectedProjectName,
+                expectedProjectOwner,
+                sourceFolder);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
@@ -194,6 +216,29 @@ public class MainWindowConstructorTests
         Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo(expectedProduct));
         Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo(expectedAuthor));
         Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+    }
+
+    private static void CheckFolderNavigationViewModel(
+        FolderNavigationViewModel folderNavigationViewModelInstance,
+        string expectedLastDirectoryInspected,
+        string expectedProduct,
+        string expectedAuthor,
+        Folder expectedSourceFolder)
+    {
+        CheckAfterChanges(
+            folderNavigationViewModelInstance.ApplicationViewModel,
+            expectedLastDirectoryInspected,
+            expectedProduct,
+            expectedAuthor);
+
+        Assert.That(folderNavigationViewModelInstance.SourceFolder.Id, Is.EqualTo(expectedSourceFolder.Id));
+        Assert.That(folderNavigationViewModelInstance.SourceFolder.Path, Is.EqualTo(expectedSourceFolder.Path));
+        Assert.That(folderNavigationViewModelInstance.SelectedFolder, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.LastSelectedFolder, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.CanConfirm, Is.False);
+        Assert.That(folderNavigationViewModelInstance.HasConfirmed, Is.False);
+        Assert.That(folderNavigationViewModelInstance.RecentTargetPaths, Is.Empty);
+        Assert.That(folderNavigationViewModelInstance.TargetPath, Is.Null);
     }
 
     private static void CheckInstance(

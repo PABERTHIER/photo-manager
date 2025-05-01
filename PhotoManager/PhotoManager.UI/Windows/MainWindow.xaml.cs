@@ -36,6 +36,12 @@ public partial class MainWindow
             InitializeComponent();
             Current = this;
             DataContext = viewModel;
+
+            folderTreeView.DataContext = new FolderNavigationViewModel(
+                ViewModel,
+                application,
+                new() { Id = Guid.NewGuid(), Path = ViewModel.CurrentFolderPath },
+                application.GetRecentTargetPaths());
         }
         catch (Exception ex)
         {
@@ -218,60 +224,6 @@ public partial class MainWindow
         MoveAssets(preserveOriginalFiles: false);
     }
 
-    private void MoveAssets(bool preserveOriginalFiles)
-    {
-        try
-        {
-            var assets = ViewModel.SelectedAssets;
-
-            if (assets != null && assets.Length > 0)
-            {
-                FolderNavigationWindow folderNavigationWindow = new(
-                    new FolderNavigationViewModel(
-                        _application,
-                        assets.First().Folder,
-                        ViewModel.MoveAssetsLastSelectedFolder,
-                        _application.GetRecentTargetPaths()));
-
-                folderNavigationWindow.Closed += (sender, e) =>
-                {
-                    if (folderNavigationWindow.ViewModel.HasConfirmed)
-                    {
-                        bool result = true;
-
-                        result = _application.MoveAssets(assets,
-                            folderNavigationWindow.ViewModel.SelectedFolder,
-                            preserveOriginalFiles);
-
-                        if (result)
-                        {
-                            ViewModel.MoveAssetsLastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
-                            ViewModel.IsRefreshingFolders = true;
-                            folderTreeView.Initialize();
-                            ViewModel.IsRefreshingFolders = false;
-
-                            if (!preserveOriginalFiles)
-                            {
-                                ViewModel.RemoveAssets(assets);
-
-                                if (ViewModel.AppMode == AppMode.Viewer)
-                                {
-                                    viewerUserControl.ShowImage();
-                                }
-                            }
-                        }
-                    }
-                };
-
-                folderNavigationWindow.Show();
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex);
-        }
-    }
-
     private void DeleteDuplicatedAssets(object sender, Asset[] assets)
     {
         try
@@ -419,5 +371,59 @@ public partial class MainWindow
     {
         _application.DeleteAssets(assets); // TODO: Need to rework how the deletion is handled
         ViewModel.RemoveAssets(assets);
+    }
+
+    private void MoveAssets(bool preserveOriginalFiles)
+    {
+        try
+        {
+            Asset[] assets = ViewModel.SelectedAssets;
+
+            if (assets.Length > 0)
+            {
+                FolderNavigationWindow folderNavigationWindow = new(
+                    new FolderNavigationViewModel(
+                        ViewModel,
+                        _application,
+                        assets.First().Folder, // TODO: assets[0]
+                        _application.GetRecentTargetPaths()));
+
+                folderNavigationWindow.Closed += (_, _) =>
+                {
+                    if (folderNavigationWindow.ViewModel.SelectedFolder != null && folderNavigationWindow.ViewModel.HasConfirmed)
+                    {
+                        bool result = true;
+
+                        result = _application.MoveAssets(assets,
+                            folderNavigationWindow.ViewModel.SelectedFolder,
+                            preserveOriginalFiles);
+
+                        if (result)
+                        {
+                            ViewModel.MoveAssetsLastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
+                            ViewModel.IsRefreshingFolders = true;
+                            folderTreeView.Initialize();
+                            ViewModel.IsRefreshingFolders = false;
+
+                            if (!preserveOriginalFiles)
+                            {
+                                ViewModel.RemoveAssets(assets);
+
+                                if (ViewModel.AppMode == AppMode.Viewer)
+                                {
+                                    viewerUserControl.ShowImage();
+                                }
+                            }
+                        }
+                    }
+                };
+
+                folderNavigationWindow.Show();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+        }
     }
 }
