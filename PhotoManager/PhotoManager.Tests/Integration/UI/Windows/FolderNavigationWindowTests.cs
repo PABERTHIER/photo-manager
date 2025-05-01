@@ -18,6 +18,7 @@ public class FolderNavigationWindowTests
     private const string DATABASE_END_PATH = "v1.0";
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
+    private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
 
@@ -139,6 +140,12 @@ public class FolderNavigationWindowTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _folderNavigationViewModel = null;
+    }
+
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
     {
         Mock<IConfigurationRoot> configurationRootMock = new();
@@ -169,6 +176,7 @@ public class FolderNavigationWindowTests
         SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
         _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new (_application);
     }
 
     [Test]
@@ -185,10 +193,13 @@ public class FolderNavigationWindowTests
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
             List<string> recentTargetPaths = [otherDirectory];
 
-            _folderNavigationViewModel = new (_application!, folder1, folder2, recentTargetPaths);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder1, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -197,7 +208,7 @@ public class FolderNavigationWindowTests
 
             Directory.CreateDirectory(otherDirectory);
 
-            await _folderNavigationViewModel!.CatalogAssets(_folderNavigationViewModel.NotifyCatalogChange);
+            await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
@@ -237,32 +248,34 @@ public class FolderNavigationWindowTests
                 [..recentTargetPaths],
                 selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
             // FolderSelected
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CanConfirm"));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Has.Count.EqualTo(20));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             // Confirm
             Confirm();
@@ -284,32 +297,34 @@ public class FolderNavigationWindowTests
                 [..recentTargetPaths],
                 selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
             // FolderSelected
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CanConfirm"));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Has.Count.EqualTo(20));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
 
             // Cancel
             Cancel();
@@ -331,32 +346,51 @@ public class FolderNavigationWindowTests
                 [..recentTargetPaths],
                 selectedPath);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(3));
             // FolderSelected
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("TargetPath"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("SelectedFolder"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("CanConfirm"));
+            Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
+            Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
+            Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Has.Count.EqualTo(20));
+            // CatalogAssets + NotifyCatalogChange
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[14], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+
+            CheckInstance(
+                folderNavigationViewModelInstances,
+                assetsDirectory,
+                expectedAppTitle,
+                expectedStatusMessage,
+                expectedAssets,
+                expectedAssets[0],
+                folder,
+                folder2,
+                true,
+                folder1,
+                expectedSelectedFolder,
+                true,
+                false,
+                [..recentTargetPaths],
+                selectedPath);
 
             CheckInstance(
                 folderNavigationViewModelInstances,
@@ -398,10 +432,13 @@ public class FolderNavigationWindowTests
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
-            _folderNavigationViewModel = new (_application!, folder, folder, recentTargetPaths);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -433,8 +470,8 @@ public class FolderNavigationWindowTests
                 null);
 
             Assert.That(folderNavigationViewModelInstances, Is.Empty);
-
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -457,10 +494,13 @@ public class FolderNavigationWindowTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _folderNavigationViewModel = new (_application!, folder, folder, []);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -492,8 +532,8 @@ public class FolderNavigationWindowTests
                 null);
 
             Assert.That(folderNavigationViewModelInstances, Is.Empty);
-
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -518,10 +558,13 @@ public class FolderNavigationWindowTests
             Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            _folderNavigationViewModel = new (_application!, folder1, folder2, []);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder1, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -553,8 +596,8 @@ public class FolderNavigationWindowTests
                 null);
 
             Assert.That(folderNavigationViewModelInstances, Is.Empty);
-
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -577,10 +620,11 @@ public class FolderNavigationWindowTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _folderNavigationViewModel = new (_application!, folder, null, []);
+            _folderNavigationViewModel = new (_applicationViewModel!, _application!, folder, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -612,8 +656,8 @@ public class FolderNavigationWindowTests
                 null);
 
             Assert.That(folderNavigationViewModelInstances, Is.Empty);
-
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -634,10 +678,11 @@ public class FolderNavigationWindowTests
 
         try
         {
-            _folderNavigationViewModel = new (_application!, null!, null, []);
+            _folderNavigationViewModel = new (_applicationViewModel!, _application!, null!, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -668,8 +713,8 @@ public class FolderNavigationWindowTests
                 null);
 
             Assert.That(folderNavigationViewModelInstances, Is.Empty);
-
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -693,10 +738,13 @@ public class FolderNavigationWindowTests
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
-            _folderNavigationViewModel = new (_application!, folder, folder, recentTargetPaths);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -734,6 +782,8 @@ public class FolderNavigationWindowTests
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             CheckInstance(
                 folderNavigationViewModelInstances,
@@ -773,10 +823,13 @@ public class FolderNavigationWindowTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _folderNavigationViewModel = new (_application!, folder, folder, []);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -814,6 +867,8 @@ public class FolderNavigationWindowTests
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             CheckInstance(
                 folderNavigationViewModelInstances,
@@ -855,10 +910,13 @@ public class FolderNavigationWindowTests
             Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            _folderNavigationViewModel = new (_application!, folder1, folder2, []);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder1, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -896,6 +954,8 @@ public class FolderNavigationWindowTests
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             CheckInstance(
                 folderNavigationViewModelInstances,
@@ -935,10 +995,11 @@ public class FolderNavigationWindowTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _folderNavigationViewModel = new (_application!, folder, null, []);
+            _folderNavigationViewModel = new (_applicationViewModel!, _application!, folder, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -976,6 +1037,8 @@ public class FolderNavigationWindowTests
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             CheckInstance(
                 folderNavigationViewModelInstances,
@@ -1017,10 +1080,13 @@ public class FolderNavigationWindowTests
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
-            _folderNavigationViewModel = new (_application!, folder, folder, recentTargetPaths);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -1058,6 +1124,8 @@ public class FolderNavigationWindowTests
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             CheckInstance(
                 folderNavigationViewModelInstances,
@@ -1102,10 +1170,13 @@ public class FolderNavigationWindowTests
             Folder folder = new() { Id = Guid.NewGuid(), Path = sourceFolderPath };
             List<string> recentTargetPaths = [assetsDirectory];
 
-            _folderNavigationViewModel = new (_application!, folder, folder, recentTargetPaths);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -1143,6 +1214,8 @@ public class FolderNavigationWindowTests
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("TargetPath"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
+
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             CheckInstance(
                 folderNavigationViewModelInstances,
@@ -1185,10 +1258,13 @@ public class FolderNavigationWindowTests
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
-            _folderNavigationViewModel = new (_application!, folder1, folder2, recentTargetPaths);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder1, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -1248,6 +1324,8 @@ public class FolderNavigationWindowTests
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("SelectedFolder"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("CanConfirm"));
 
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
+
             CheckInstance(
                 folderNavigationViewModelInstances,
                 assetsDirectory,
@@ -1287,10 +1365,13 @@ public class FolderNavigationWindowTests
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
             List<string> recentTargetPaths = [assetsDirectory];
 
-            _folderNavigationViewModel = new (_application!, folder, folder, recentTargetPaths);
+            _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
+
+            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
+                List<string> notifyApplicationViewModelPropertyChangedEvents,
                 List<FolderNavigationViewModel> folderNavigationViewModelInstances,
                 List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
             ) = NotifyPropertyChangedEvents();
@@ -1343,8 +1424,8 @@ public class FolderNavigationWindowTests
                 null);
 
             Assert.That(folderNavigationViewModelInstances, Is.Empty);
-
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
+            Assert.That(notifyApplicationViewModelPropertyChangedEvents, Is.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -1358,6 +1439,7 @@ public class FolderNavigationWindowTests
 
     private
         (List<string> notifyPropertyChangedEvents,
+        List<string> notifyApplicationViewModelPropertyChangedEvents,
         List<FolderNavigationViewModel> folderNavigationViewModelInstances,
         List<Folder> folderAddedEvents,
         List<Folder> folderRemovedEvents)
@@ -1372,21 +1454,32 @@ public class FolderNavigationWindowTests
             folderNavigationViewModelInstances.Add((FolderNavigationViewModel)sender!);
         };
 
+        List<string> notifyApplicationViewModelPropertyChangedEvents = [];
+        _applicationViewModel!.PropertyChanged += delegate(object? _, PropertyChangedEventArgs e)
+        {
+            notifyApplicationViewModelPropertyChangedEvents.Add(e.PropertyName!);
+        };
+
         List<Folder> folderAddedEvents = [];
 
-        _folderNavigationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        _folderNavigationViewModel!.ApplicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
         List<Folder> folderRemovedEvents = [];
 
-        _folderNavigationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        _folderNavigationViewModel!.ApplicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
         {
             folderRemovedEvents.Add(e.Folder);
         };
 
-        return (notifyPropertyChangedEvents, folderNavigationViewModelInstances, folderAddedEvents, folderRemovedEvents);
+        return (
+            notifyPropertyChangedEvents,
+            notifyApplicationViewModelPropertyChangedEvents,
+            folderNavigationViewModelInstances,
+            folderAddedEvents,
+            folderRemovedEvents);
     }
 
     private void CheckBeforeChanges(
@@ -1397,39 +1490,41 @@ public class FolderNavigationWindowTests
         ObservableCollection<string> expectedRecentTargetPaths)
     {
         // From ApplicationViewModel
-        Assert.That(_folderNavigationViewModel!.SortAscending, Is.True);
-        Assert.That(_folderNavigationViewModel!.IsRefreshingFolders, Is.False);
-        Assert.That(_folderNavigationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
-        Assert.That(_folderNavigationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(_folderNavigationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(_folderNavigationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_folderNavigationViewModel!.ViewerPosition, Is.EqualTo(0));
-        Assert.That(_folderNavigationViewModel!.SelectedAssets, Is.Empty);
-        Assert.That(_folderNavigationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
-        Assert.That(_folderNavigationViewModel!.ObservableAssets, Is.Empty);
-        Assert.That(_folderNavigationViewModel!.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(_folderNavigationViewModel!.ExecutionTimeWording, Is.Null);
-        Assert.That(_folderNavigationViewModel!.TotalFilesCountWording, Is.Null);
-        Assert.That(_folderNavigationViewModel!.AppTitle,
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SortAscending, Is.True);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.IsRefreshingFolders, Is.False);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppMode, Is.EqualTo(AppMode.Thumbnails));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SortCriteria, Is.EqualTo(SortCriteria.FileName));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerPosition, Is.EqualTo(0));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SelectedAssets, Is.Empty);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ObservableAssets, Is.Empty);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.GlobalAssetsCounterWording, Is.Null);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ExecutionTimeWording, Is.Null);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.TotalFilesCountWording, Is.Null);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppTitle,
             Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
-        Assert.That(_folderNavigationViewModel!.StatusMessage, Is.Null);
-        Assert.That(_folderNavigationViewModel!.CurrentAsset, Is.Null);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.StatusMessage, Is.Null);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentAsset, Is.Null);
 
         if (expectedMoveAssetsLastSelectedFolder != null)
         {
-            Assert.That(_folderNavigationViewModel!.MoveAssetsLastSelectedFolder!.Id, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
-            Assert.That(_folderNavigationViewModel!.MoveAssetsLastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+            Assert.That(_folderNavigationViewModel!.ApplicationViewModel.MoveAssetsLastSelectedFolder!.Id,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
+            Assert.That(_folderNavigationViewModel!.ApplicationViewModel.MoveAssetsLastSelectedFolder!.Path,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
         }
         else
         {
-            Assert.That(_folderNavigationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
+            Assert.That(_folderNavigationViewModel!.ApplicationViewModel.MoveAssetsLastSelectedFolder, Is.Null);
         }
 
-        Assert.That(_folderNavigationViewModel!.CanGoToPreviousAsset, Is.False);
-        Assert.That(_folderNavigationViewModel!.CanGoToNextAsset, Is.False);
-        Assert.That(_folderNavigationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
-        Assert.That(_folderNavigationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(_folderNavigationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CanGoToPreviousAsset, Is.False);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CanGoToNextAsset, Is.False);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Version, Is.EqualTo("v1.0.0"));
 
         // From FolderNavigationViewModel
         if (expectedSourceFolder != null)
@@ -1443,6 +1538,17 @@ public class FolderNavigationWindowTests
         }
 
         Assert.That(_folderNavigationViewModel!.SelectedFolder, Is.Null);
+
+        if (expectedMoveAssetsLastSelectedFolder != null)
+        {
+            Assert.That(_folderNavigationViewModel!.LastSelectedFolder!.Id, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
+            Assert.That(_folderNavigationViewModel!.LastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+        }
+        else
+        {
+            Assert.That(_folderNavigationViewModel!.LastSelectedFolder, Is.Null);
+        }
+
         Assert.That(_folderNavigationViewModel!.CanConfirm, Is.EqualTo(expectedCanConfirm));
         Assert.That(_folderNavigationViewModel!.HasConfirmed, Is.False);
 
@@ -1472,46 +1578,53 @@ public class FolderNavigationWindowTests
         string? expectedTargetPath)
     {
         // From ApplicationViewModel
-        Assert.That(folderNavigationViewModelInstance.SortAscending, Is.True);
-        Assert.That(folderNavigationViewModelInstance.IsRefreshingFolders, Is.False);
-        Assert.That(folderNavigationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
-        Assert.That(folderNavigationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
-        Assert.That(folderNavigationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
-        Assert.That(folderNavigationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(folderNavigationViewModelInstance.ViewerPosition, Is.EqualTo(0));
-        Assert.That(folderNavigationViewModelInstance.SelectedAssets, Is.Empty);
-        Assert.That(folderNavigationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
-        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, folderNavigationViewModelInstance.ObservableAssets);
-        Assert.That(folderNavigationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(folderNavigationViewModelInstance.ExecutionTimeWording, Is.Null);
-        Assert.That(folderNavigationViewModelInstance.TotalFilesCountWording, Is.Null);
-        Assert.That(folderNavigationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
-        Assert.That(folderNavigationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortAscending, Is.True);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.IsRefreshingFolders, Is.False);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AppMode, Is.EqualTo(AppMode.Thumbnails));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortCriteria, Is.EqualTo(SortCriteria.FileName));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerPosition, Is.EqualTo(0));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SelectedAssets, Is.Empty);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, folderNavigationViewModelInstance.ApplicationViewModel.ObservableAssets);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.GlobalAssetsCounterWording, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ExecutionTimeWording, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.TotalFilesCountWording, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AppTitle, Is.EqualTo(expectedAppTitle));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.StatusMessage, Is.EqualTo(expectedStatusMessage));
 
         if (expectedCurrentAsset != null)
         {
-            AssertCurrentAssetPropertyValidity(folderNavigationViewModelInstance.CurrentAsset!, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
+            AssertCurrentAssetPropertyValidity(
+                folderNavigationViewModelInstance.ApplicationViewModel.CurrentAsset!,
+                expectedCurrentAsset,
+                expectedCurrentAsset.FullPath,
+                expectedLastDirectoryInspected,
+                expectedFolder);
         }
         else
         {
-            Assert.That(folderNavigationViewModelInstance.CurrentAsset, Is.Null);
+            Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CurrentAsset, Is.Null);
         }
 
         if (expectedMoveAssetsLastSelectedFolder != null)
         {
-            Assert.That(folderNavigationViewModelInstance.MoveAssetsLastSelectedFolder!.Id, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
-            Assert.That(folderNavigationViewModelInstance.MoveAssetsLastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+            Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.MoveAssetsLastSelectedFolder!.Id,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
+            Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.MoveAssetsLastSelectedFolder!.Path,
+                Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
         }
         else
         {
-            Assert.That(folderNavigationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
+            Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.MoveAssetsLastSelectedFolder, Is.Null);
         }
 
-        Assert.That(folderNavigationViewModelInstance.CanGoToPreviousAsset, Is.False);
-        Assert.That(folderNavigationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
-        Assert.That(folderNavigationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
-        Assert.That(folderNavigationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(folderNavigationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CanGoToPreviousAsset, Is.False);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Version, Is.EqualTo("v1.0.0"));
 
         // From FolderNavigationViewModel
         if (expectedSourceFolder != null)
@@ -1533,6 +1646,16 @@ public class FolderNavigationWindowTests
         else
         {
             Assert.That(folderNavigationViewModelInstance.SelectedFolder, Is.Null);
+        }
+
+        if (expectedMoveAssetsLastSelectedFolder != null)
+        {
+            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Id, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Id));
+            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder!.Path, Is.EqualTo(expectedMoveAssetsLastSelectedFolder.Path));
+        }
+        else
+        {
+            Assert.That(folderNavigationViewModelInstance.LastSelectedFolder, Is.Null);
         }
 
         Assert.That(folderNavigationViewModelInstance.CanConfirm, Is.EqualTo(expectedCanConfirm));
@@ -1634,8 +1757,8 @@ public class FolderNavigationWindowTests
 
     private string Init()
     {
-        return _folderNavigationViewModel!.MoveAssetsLastSelectedFolder != null
-            ? _folderNavigationViewModel!.MoveAssetsLastSelectedFolder.Path
+        return _folderNavigationViewModel!.LastSelectedFolder != null
+            ? _folderNavigationViewModel!.LastSelectedFolder.Path
             : _folderNavigationViewModel!.SourceFolder.Path;
     }
 

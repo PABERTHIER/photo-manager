@@ -17,12 +17,15 @@ public class MainWindowDeleteAssetsTests
     private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string DATABASE_END_PATH = "v1.0";
 
+    private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
 
     private Asset _asset1Temp;
     private Asset _asset2Temp;
+
+    private Folder? _sourceFolder;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -89,6 +92,13 @@ public class MainWindowDeleteAssetsTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _sourceFolder = null;
+        _folderNavigationViewModel = null;
+    }
+
     private void ConfigureApplicationViewModel(
         int catalogBatchSize,
         string assetsDirectory,
@@ -128,6 +138,8 @@ public class MainWindowDeleteAssetsTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
         _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
         _applicationViewModel = new (_application);
+
+        _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
     }
 
     // DeleteDuplicatedAssets
@@ -211,6 +223,19 @@ public class MainWindowDeleteAssetsTests
                 expectedAssets,
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                null,
+                false,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
             // CatalogAssets + NotifyCatalogChange
@@ -333,6 +358,19 @@ public class MainWindowDeleteAssetsTests
                 expectedAssets,
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                null,
+                false,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(15));
             // CatalogAssets + NotifyCatalogChange
@@ -457,6 +495,19 @@ public class MainWindowDeleteAssetsTests
                 _asset2Temp,
                 false);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                _asset2Temp,
+                false,
+                _sourceFolder!);
+
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
@@ -579,6 +630,19 @@ public class MainWindowDeleteAssetsTests
                 _asset1Temp,
                 false);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                _asset1Temp,
+                false,
+                _sourceFolder!);
+
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
@@ -700,6 +764,19 @@ public class MainWindowDeleteAssetsTests
                 _asset1Temp,
                 true);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                _asset1Temp,
+                true,
+                _sourceFolder!);
+
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
@@ -816,6 +893,19 @@ public class MainWindowDeleteAssetsTests
                 expectedAssets,
                 _asset1Temp,
                 true);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                _asset1Temp,
+                true,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
             // CatalogAssets + NotifyCatalogChange
@@ -943,6 +1033,19 @@ public class MainWindowDeleteAssetsTests
                 _asset1Temp,
                 true);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                _asset1Temp,
+                true,
+                _sourceFolder!);
+
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
@@ -1028,6 +1131,19 @@ public class MainWindowDeleteAssetsTests
                 expectedAssets,
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                AppMode.Thumbnails,
+                Visibility.Visible,
+                Visibility.Hidden,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                null,
+                false,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(5));
             // CatalogAssets + NotifyCatalogChange
@@ -1160,6 +1276,19 @@ public class MainWindowDeleteAssetsTests
                 expectedAssets,
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                appMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
+                expectedSelectedAssets,
+                expectedAppTitle,
+                expectedAssets,
+                null,
+                false,
+                _sourceFolder!);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -1337,6 +1466,19 @@ public class MainWindowDeleteAssetsTests
                 expectedAssets,
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                appMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
+                expectedSelectedAssets,
+                expectedAppTitle,
+                expectedAssets,
+                null,
+                false,
+                _sourceFolder!);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -1518,6 +1660,19 @@ public class MainWindowDeleteAssetsTests
                 _asset2Temp,
                 false);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                appMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
+                expectedSelectedAssets,
+                expectedAppTitle,
+                expectedAssets,
+                _asset2Temp,
+                false,
+                _sourceFolder!);
+
             if (appMode == AppMode.Thumbnails)
             {
                 Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(14));
@@ -1690,6 +1845,19 @@ public class MainWindowDeleteAssetsTests
                 _asset1Temp,
                 false);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                appMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
+                expectedSelectedAssets,
+                expectedAppTitle,
+                expectedAssets,
+                _asset1Temp,
+                false,
+                _sourceFolder!);
+
             if (appMode == AppMode.Thumbnails)
             {
                 Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(14));
@@ -1857,6 +2025,19 @@ public class MainWindowDeleteAssetsTests
                 _asset1Temp,
                 true);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                appMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                _asset1Temp,
+                true,
+                _sourceFolder!);
+
             if (appMode == AppMode.Thumbnails)
             {
                 Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
@@ -2015,6 +2196,19 @@ public class MainWindowDeleteAssetsTests
                 expectedAssets,
                 _asset1Temp,
                 true);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                appMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
+                expectedSelectedAssets,
+                expectedAppTitle,
+                expectedAssets,
+                _asset1Temp,
+                true,
+                _sourceFolder!);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -2187,6 +2381,19 @@ public class MainWindowDeleteAssetsTests
                 _asset1Temp,
                 true);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                destinationDirectory,
+                appMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
+                expectedSelectedAssets,
+                expectedAppTitle,
+                expectedAssets,
+                _asset1Temp,
+                true,
+                _sourceFolder!);
+
             if (appMode == AppMode.Thumbnails)
             {
                 Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(12));
@@ -2315,6 +2522,19 @@ public class MainWindowDeleteAssetsTests
                 expectedAssets,
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                appMode,
+                expectedThumbnailsVisible,
+                expectedViewerVisible,
+                [],
+                expectedAppTitle,
+                expectedAssets,
+                null,
+                false,
+                _sourceFolder!);
 
             if (appMode == AppMode.Thumbnails)
             {
@@ -2470,6 +2690,41 @@ public class MainWindowDeleteAssetsTests
         Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
+    private static void CheckFolderNavigationViewModel(
+        FolderNavigationViewModel folderNavigationViewModelInstance,
+        string expectedLastDirectoryInspected,
+        AppMode expectedAppMode,
+        Visibility expectedThumbnailsVisible,
+        Visibility expectedViewerVisible,
+        Asset[] expectedSelectedAssets,
+        string expectedAppTitle,
+        Asset[] expectedAssets,
+        Asset? expectedCurrentAsset,
+        bool expectedCanGoToNextAsset,
+        Folder expectedSourceFolder)
+    {
+        CheckAfterChanges(
+            folderNavigationViewModelInstance.ApplicationViewModel,
+            expectedLastDirectoryInspected,
+            expectedAppMode,
+            expectedThumbnailsVisible,
+            expectedViewerVisible,
+            expectedSelectedAssets,
+            expectedAppTitle,
+            expectedAssets,
+            expectedCurrentAsset,
+            expectedCanGoToNextAsset);
+
+        Assert.That(folderNavigationViewModelInstance.SourceFolder.Id, Is.EqualTo(expectedSourceFolder.Id));
+        Assert.That(folderNavigationViewModelInstance.SourceFolder.Path, Is.EqualTo(expectedSourceFolder.Path));
+        Assert.That(folderNavigationViewModelInstance.SelectedFolder, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.LastSelectedFolder, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.CanConfirm, Is.False);
+        Assert.That(folderNavigationViewModelInstance.HasConfirmed, Is.False);
+        Assert.That(folderNavigationViewModelInstance.RecentTargetPaths, Is.Empty);
+        Assert.That(folderNavigationViewModelInstance.TargetPath, Is.Null);
+    }
+
     private static void CheckInstance(
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
@@ -2556,8 +2811,14 @@ public class MainWindowDeleteAssetsTests
         Assert.That(asset.ImageData, expectedAsset.ImageData == null ? Is.Null : Is.Not.Null); 
     }
 
-    private static void MainWindowsInit()
+    private void MainWindowsInit()
     {
+        _folderNavigationViewModel = new (
+            _applicationViewModel!,
+            _application!,
+            _sourceFolder!,
+            []);
+
         CancellationTokenSource cancellationTokenSource = new();
 
         Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);

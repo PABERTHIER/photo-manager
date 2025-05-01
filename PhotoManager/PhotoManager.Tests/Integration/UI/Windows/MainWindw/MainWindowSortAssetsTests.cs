@@ -17,6 +17,7 @@ public class MainWindowSortAssetsTests
     private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
     private const string DATABASE_END_PATH = "v1.0";
 
+    private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
@@ -26,6 +27,8 @@ public class MainWindowSortAssetsTests
     private Asset _asset2;
     private Asset _asset3;
     private Asset _asset4;
+
+    private Folder? _sourceFolder;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -146,6 +149,13 @@ public class MainWindowSortAssetsTests
         };
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _sourceFolder = null;
+        _folderNavigationViewModel = null;
+    }
+
     private void ConfigureApplicationViewModel(
         int catalogBatchSize,
         string assetsDirectory,
@@ -185,6 +195,8 @@ public class MainWindowSortAssetsTests
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, _userConfigurationService);
         _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
         _applicationViewModel = new (_application);
+
+        _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
     }
 
     [Test]
@@ -232,6 +244,16 @@ public class MainWindowSortAssetsTests
                 expectedAssets[0],
                 true);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[0],
+                true,
+                _sourceFolder!);
+
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(20));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
@@ -271,6 +293,16 @@ public class MainWindowSortAssetsTests
                 expectedAssets,
                 expectedAssets[0],
                 true);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[0],
+                true,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
             // CatalogAssets + NotifyCatalogChange
@@ -315,6 +347,16 @@ public class MainWindowSortAssetsTests
                 expectedAssets,
                 expectedAssets[0],
                 true);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[0],
+                true,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(26));
             // CatalogAssets + NotifyCatalogChange
@@ -363,6 +405,16 @@ public class MainWindowSortAssetsTests
                 expectedAssets,
                 expectedAssets[0],
                 true);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[0],
+                true,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(29));
             // CatalogAssets + NotifyCatalogChange
@@ -415,6 +467,16 @@ public class MainWindowSortAssetsTests
                 expectedAssets,
                 expectedAssets[0],
                 true);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                expectedAssets,
+                expectedAssets[0],
+                true,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
             // CatalogAssets + NotifyCatalogChange
@@ -513,6 +575,16 @@ public class MainWindowSortAssetsTests
                 null,
                 false);
 
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                [],
+                null,
+                false,
+                _sourceFolder!);
+
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(7));
             // CatalogAssets + NotifyCatalogChange
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
@@ -538,6 +610,16 @@ public class MainWindowSortAssetsTests
                 [],
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                [],
+                null,
+                false,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(9));
             // CatalogAssets + NotifyCatalogChange
@@ -567,6 +649,16 @@ public class MainWindowSortAssetsTests
                 [],
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                [],
+                null,
+                false,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(11));
             // CatalogAssets + NotifyCatalogChange
@@ -599,6 +691,16 @@ public class MainWindowSortAssetsTests
                 [],
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                [],
+                null,
+                false,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(13));
             // CatalogAssets + NotifyCatalogChange
@@ -634,6 +736,16 @@ public class MainWindowSortAssetsTests
                 [],
                 null,
                 false);
+
+            CheckFolderNavigationViewModel(
+                _folderNavigationViewModel!,
+                assetsDirectory,
+                expectedSortCriteria,
+                expectedAppTitle,
+                [],
+                null,
+                false,
+                _sourceFolder!);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(15));
             // CatalogAssets + NotifyCatalogChange
@@ -780,6 +892,35 @@ public class MainWindowSortAssetsTests
         Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
+    private static void CheckFolderNavigationViewModel(
+        FolderNavigationViewModel folderNavigationViewModelInstance,
+        string expectedLastDirectoryInspected,
+        SortCriteria expectedSortCriteria,
+        string expectedAppTitle,
+        Asset[] expectedAssets,
+        Asset? expectedCurrentAsset,
+        bool expectedCanGoToNextAsset,
+        Folder expectedSourceFolder)
+    {
+        CheckAfterChanges(
+            folderNavigationViewModelInstance.ApplicationViewModel,
+            expectedLastDirectoryInspected,
+            expectedSortCriteria,
+            expectedAppTitle,
+            expectedAssets,
+            expectedCurrentAsset,
+            expectedCanGoToNextAsset);
+
+        Assert.That(folderNavigationViewModelInstance.SourceFolder.Id, Is.EqualTo(expectedSourceFolder.Id));
+        Assert.That(folderNavigationViewModelInstance.SourceFolder.Path, Is.EqualTo(expectedSourceFolder.Path));
+        Assert.That(folderNavigationViewModelInstance.SelectedFolder, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.LastSelectedFolder, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.CanConfirm, Is.False);
+        Assert.That(folderNavigationViewModelInstance.HasConfirmed, Is.False);
+        Assert.That(folderNavigationViewModelInstance.RecentTargetPaths, Is.Empty);
+        Assert.That(folderNavigationViewModelInstance.TargetPath, Is.Null);
+    }
+
     private static void CheckInstance(
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
@@ -845,8 +986,14 @@ public class MainWindowSortAssetsTests
         Assert.That(asset.ImageData, expectedAsset.ImageData == null ? Is.Null : Is.Not.Null); 
     }
 
-    private static void MainWindowsInit()
+    private void MainWindowsInit()
     {
+        _folderNavigationViewModel = new (
+            _applicationViewModel!,
+            _application!,
+            _sourceFolder!,
+            []);
+
         CancellationTokenSource cancellationTokenSource = new();
 
         Assert.That(cancellationTokenSource.IsCancellationRequested, Is.False);
