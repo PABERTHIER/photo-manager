@@ -19,6 +19,7 @@ public class FolderNavigationViewModel(
 
     public Folder SourceFolder { get; } = sourceFolder;
 
+    // TODO: Not great having a new guid each time
     public Folder? SelectedFolder => !string.IsNullOrWhiteSpace(TargetPath) ? new() { Id = Guid.NewGuid(), Path = TargetPath } : null;
 
     public Folder? LastSelectedFolder => ApplicationViewModel.MoveAssetsLastSelectedFolder;

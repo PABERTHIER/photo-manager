@@ -385,16 +385,15 @@ public partial class MainWindow
                     new FolderNavigationViewModel(
                         ViewModel,
                         _application,
-                        assets.First().Folder, // TODO: assets[0]
+                        assets[0].Folder,
                         _application.GetRecentTargetPaths()));
 
                 folderNavigationWindow.Closed += (_, _) =>
                 {
-                    if (folderNavigationWindow.ViewModel.SelectedFolder != null && folderNavigationWindow.ViewModel.HasConfirmed)
+                    if (folderNavigationWindow.ViewModel is { SelectedFolder: not null, HasConfirmed: true })
                     {
-                        bool result = true;
-
-                        result = _application.MoveAssets(assets,
+                        bool result = _application.MoveAssets(
+                            assets,
                             folderNavigationWindow.ViewModel.SelectedFolder,
                             preserveOriginalFiles);
 
