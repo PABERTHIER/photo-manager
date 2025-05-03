@@ -23,8 +23,8 @@ public partial class FolderNavigationWindow
             InitializeComponent();
 
             DataContext = viewModel;
-            folderTreeView.SelectedPath = viewModel.MoveAssetsLastSelectedFolder != null
-                ? viewModel.MoveAssetsLastSelectedFolder.Path
+            folderTreeView.SelectedPath = viewModel.LastSelectedFolder != null
+                ? viewModel.LastSelectedFolder.Path
                 : viewModel.SourceFolder.Path;
         }
         catch (Exception ex)

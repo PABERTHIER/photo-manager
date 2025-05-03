@@ -208,7 +208,7 @@ public class ApplicationViewModelGoToNextAssetTests
             CheckBeforeChanges(_dataDirectory!);
 
             int expectedViewerPosition = 1;
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 2 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 2 of 5 - sorted by file name ascending";
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -244,7 +244,7 @@ public class ApplicationViewModelGoToNextAssetTests
 
             // Second GoToNextAsset
             expectedViewerPosition = 2;
-            expectedAppTitle = $"  - {_dataDirectory!} - image 3 of 5 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 3 of 5 - sorted by file name ascending";
 
             _applicationViewModel!.GoToNextAsset();
 
@@ -281,7 +281,7 @@ public class ApplicationViewModelGoToNextAssetTests
 
             // Third GoToNextAsset
             expectedViewerPosition = 3;
-            expectedAppTitle = $"  - {_dataDirectory!} - image 4 of 5 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 4 of 5 - sorted by file name ascending";
 
             _applicationViewModel!.GoToNextAsset();
 
@@ -324,7 +324,7 @@ public class ApplicationViewModelGoToNextAssetTests
 
             // Fourth GoToNextAsset
             expectedViewerPosition = 4;
-            expectedAppTitle = $"  - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
 
             _applicationViewModel!.GoToNextAsset();
 
@@ -411,7 +411,7 @@ public class ApplicationViewModelGoToNextAssetTests
             CheckBeforeChanges(_dataDirectory!);
 
             const int expectedViewerPosition = 4;
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 5 of 5 - sorted by file name ascending";
 
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -486,7 +486,7 @@ public class ApplicationViewModelGoToNextAssetTests
             CheckBeforeChanges(_dataDirectory!);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"  - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.GoToNextAsset();
 
@@ -566,8 +566,6 @@ public class ApplicationViewModelGoToNextAssetTests
     private void CheckBeforeChanges(string expectedRootDirectory)
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
-        Assert.That(_applicationViewModel!.Product, Is.Null);
-        Assert.That(_applicationViewModel!.Version, Is.Null);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -580,12 +578,16 @@ public class ApplicationViewModelGoToNextAssetTests
         Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void CheckAfterChanges(
@@ -603,8 +605,6 @@ public class ApplicationViewModelGoToNextAssetTests
         bool expectedCanGoToNextAsset)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
-        Assert.That(applicationViewModelInstance.Product, Is.Null);
-        Assert.That(applicationViewModelInstance.Version, Is.Null);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(expectedAppMode));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -632,6 +632,9 @@ public class ApplicationViewModelGoToNextAssetTests
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.EqualTo(expectedCanGoToPreviousAsset));
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)

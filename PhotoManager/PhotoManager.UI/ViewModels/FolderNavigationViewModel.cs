@@ -6,24 +6,23 @@ using System.Collections.ObjectModel;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class FolderNavigationViewModel : ApplicationViewModel
+public class FolderNavigationViewModel(
+    ApplicationViewModel applicationViewModel,
+    IApplication application,
+    Folder sourceFolder,
+    List<string> recentTargetPaths)
+    : BaseViewModel(application)
 {
     private string? _targetPath;
 
-    public FolderNavigationViewModel(
-        IApplication application,
-        Folder sourceFolder,
-        Folder? lastSelectedFolder,
-        List<string> recentTargetPaths) : base(application)
-    {
-        SourceFolder = sourceFolder;
-        MoveAssetsLastSelectedFolder = lastSelectedFolder;
-        RecentTargetPaths = [..recentTargetPaths];
-    }
+    public ApplicationViewModel ApplicationViewModel { get; } = applicationViewModel;
 
-    public Folder SourceFolder { get; }
+    public Folder SourceFolder { get; } = sourceFolder;
 
+    // TODO: Not great having a new guid each time
     public Folder? SelectedFolder => !string.IsNullOrWhiteSpace(TargetPath) ? new() { Id = Guid.NewGuid(), Path = TargetPath } : null;
+
+    public Folder? LastSelectedFolder => ApplicationViewModel.MoveAssetsLastSelectedFolder;
 
     public bool CanConfirm
     {
@@ -42,7 +41,7 @@ public class FolderNavigationViewModel : ApplicationViewModel
 
     public bool HasConfirmed { get; set; }
 
-    public ObservableCollection<string> RecentTargetPaths { get; private set; }
+    public ObservableCollection<string> RecentTargetPaths { get; private set; } = [..recentTargetPaths];
 
     public string? TargetPath
     {

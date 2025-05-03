@@ -3,12 +3,10 @@ using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
-using PhotoManager.UI.Windows;
 using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -34,11 +32,10 @@ public partial class ThumbnailsUserControl
         }
     }
 
-    public event ThumbnailSelectedEventHandler? ThumbnailSelected;
+    public event EventHandler? ThumbnailSelected;
 
     private ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
 
-    // TODO: At Startup, the root is called twice (so calling twice GetAssets), need to handle this case to prevent perf issues
     // TODO: No async void -> async Task
     public async void GoToFolder(IApplication application, string selectedImagePath)
     {
@@ -70,26 +67,11 @@ public partial class ThumbnailsUserControl
         return Task.Run(() => application.GetAssetsByPath(directory));
     }
 
-    private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-        try
-        {
-            Asset asset = (Asset)((FrameworkElement)sender).DataContext;
-            ViewModel.GoToAsset(asset);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex);
-        }
-    }
-
-    // TODO: Delete this method
     private void ContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         try
         {
-            Asset asset = (Asset)((FrameworkElement)sender).DataContext;
-            ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs { Asset = asset });
+            ThumbnailSelected?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {

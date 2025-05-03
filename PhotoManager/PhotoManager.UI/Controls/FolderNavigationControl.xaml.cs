@@ -31,7 +31,7 @@ public partial class FolderNavigationControl
         SelectedPath = string.Empty;
     }
 
-    public ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
+    private FolderNavigationViewModel ViewModel => (FolderNavigationViewModel)DataContext;
 
     public string SelectedPath { get; set; }
 
@@ -40,7 +40,7 @@ public partial class FolderNavigationControl
         try
         {
             foldersTreeView.Items.Clear();
-            Folder[] rootFolders = ViewModel.GetRootCatalogFolders();
+            Folder[] rootFolders = ViewModel.ApplicationViewModel.GetRootCatalogFolders();
 
             foreach (Folder folder in rootFolders)
             {
@@ -67,22 +67,22 @@ public partial class FolderNavigationControl
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
         Initialize();
-        ViewModel.FolderAdded += ViewModel_FolderAdded;
-        ViewModel.FolderRemoved += ViewModel_FolderRemoved;
+        ViewModel.ApplicationViewModel.FolderAdded += ViewModel_FolderAdded;
+        ViewModel.ApplicationViewModel.FolderRemoved += ViewModel_FolderRemoved;
     }
 
     private void ViewModel_FolderAdded(object sender, FolderAddedEventArgs e)
     {
-        ViewModel.IsRefreshingFolders = true;
+        ViewModel.ApplicationViewModel.IsRefreshingFolders = true;
         Initialize();
-        ViewModel.IsRefreshingFolders = false;
+        ViewModel.ApplicationViewModel.IsRefreshingFolders = false;
     }
 
     private void ViewModel_FolderRemoved(object sender, FolderRemovedEventArgs e)
     {
-        ViewModel.IsRefreshingFolders = true;
+        ViewModel.ApplicationViewModel.IsRefreshingFolders = true;
         Initialize();
-        ViewModel.IsRefreshingFolders = false;
+        ViewModel.ApplicationViewModel.IsRefreshingFolders = false;
     }
 
     private void Item_Expanded(object sender, RoutedEventArgs e)
@@ -171,7 +171,7 @@ public partial class FolderNavigationControl
         {
             item.Items.Clear();
 
-            Folder[] folders = ViewModel.GetSubFolders((Folder)item.Tag);
+            Folder[] folders = ViewModel.ApplicationViewModel.GetSubFolders((Folder)item.Tag);
             folders = [..folders.OrderBy(f => f.Name)];
 
             foreach (Folder folder in folders)

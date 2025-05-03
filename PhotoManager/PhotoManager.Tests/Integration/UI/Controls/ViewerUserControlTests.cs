@@ -1,6 +1,5 @@
 ﻿using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
-using PhotoManager.UI.Windows;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
@@ -21,7 +20,7 @@ public class ViewerUserControlTests
     private ApplicationViewModel? _applicationViewModel;
     private AssetRepository? _assetRepository;
 
-    public event ThumbnailSelectedEventHandler? ThumbnailSelected;
+    private event EventHandler? ThumbnailSelected;
 
     private Asset _asset1;
     private Asset _asset2;
@@ -177,7 +176,7 @@ public class ViewerUserControlTests
     }
 
     [Test]
-    public async Task ContentControlMouseDoubleClick_CurrentAssetIsNotNull_SendsThumbnailSelectedEventWithCurrentAsset()
+    public async Task ContentControlMouseDoubleClick_CurrentAssetIsNotNull_SendsEvent()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
@@ -189,7 +188,7 @@ public class ViewerUserControlTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        List<Asset> thumbnailSelectedEvents = NotifyThumbnailSelected();
+        List<string> thumbnailSelectedEvents = NotifyThumbnailSelected();
 
         try
         {
@@ -205,18 +204,14 @@ public class ViewerUserControlTests
             _asset3 = _asset3.WithFolder(folder!);
             _asset4 = _asset4.WithFolder(folder!);
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
-
             const int firstExpectedViewerPosition = 0;
-            string expectedAppTitle = $"  - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-            ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs { Asset = _applicationViewModel.CurrentAsset! });
+            ThumbnailSelected?.Invoke(this, EventArgs.Empty);
 
             Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(1));
-            Assert.That(thumbnailSelectedEvents[0], Is.EqualTo(observableAssets[firstExpectedViewerPosition]));
-            Assert.That(thumbnailSelectedEvents[0], Is.EqualTo(_applicationViewModel.CurrentAsset));
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -252,17 +247,13 @@ public class ViewerUserControlTests
 
             // GoToNextAsset
             const int secondExpectedViewerPosition = 1;
-            expectedAppTitle = $"  - {assetsDirectory} - image 2 of 4 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 2 of 4 - sorted by file name ascending";
 
             _applicationViewModel!.GoToNextAsset();
 
-            ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs { Asset = _applicationViewModel.CurrentAsset! });
+            ThumbnailSelected?.Invoke(this, EventArgs.Empty);
 
             Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(2));
-            Assert.That(thumbnailSelectedEvents[0], Is.EqualTo(observableAssets[firstExpectedViewerPosition]));
-            Assert.That(thumbnailSelectedEvents[0], Is.Not.EqualTo(_applicationViewModel.CurrentAsset));
-            Assert.That(thumbnailSelectedEvents[1], Is.EqualTo(observableAssets[secondExpectedViewerPosition]));
-            Assert.That(thumbnailSelectedEvents[1], Is.EqualTo(_applicationViewModel.CurrentAsset));
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -325,7 +316,7 @@ public class ViewerUserControlTests
     }
 
     [Test]
-    public async Task ContentControlMouseDoubleClick_CurrentAssetIsNull_SendsThumbnailSelectedEventWithoutAsset()
+    public async Task ContentControlMouseDoubleClick_CurrentAssetIsNull_SendsEvent()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
 
@@ -337,7 +328,7 @@ public class ViewerUserControlTests
             List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
         ) = NotifyPropertyChangedEvents();
 
-        List<Asset> thumbnailSelectedEvents = NotifyThumbnailSelected();
+        List<string> thumbnailSelectedEvents = NotifyThumbnailSelected();
 
         try
         {
@@ -348,14 +339,12 @@ public class ViewerUserControlTests
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"  - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
 
-            ThumbnailSelected?.Invoke(this, new ThumbnailSelectedEventArgs { Asset = _applicationViewModel.CurrentAsset! });
+            ThumbnailSelected?.Invoke(this, EventArgs.Empty);
 
             Assert.That(thumbnailSelectedEvents, Has.Count.EqualTo(1));
-            Assert.That(thumbnailSelectedEvents[0], Is.Null);
-            Assert.That(thumbnailSelectedEvents[0], Is.EqualTo(_applicationViewModel.CurrentAsset));
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -430,7 +419,7 @@ public class ViewerUserControlTests
             List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
 
             int expectedViewerPosition = 0;
-            string expectedAppTitle = $"  - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
@@ -481,7 +470,7 @@ public class ViewerUserControlTests
 
             // Second ShowImage (heic)
             expectedViewerPosition = 3;
-            expectedAppTitle = $"  - {assetsDirectory} - image 4 of 4 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 4 of 4 - sorted by file name ascending";
 
             _applicationViewModel!.GoToAsset(observableAssets[expectedViewerPosition]);
 
@@ -585,7 +574,7 @@ public class ViewerUserControlTests
             _asset4 = _asset4.WithFolder(folder!);
 
             const int expectedViewerPosition = -1;
-            string expectedAppTitle = $"  - {assetsDirectory} - image 0 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 4 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
@@ -678,7 +667,7 @@ public class ViewerUserControlTests
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"  - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
 
             BitmapImage? bitmapImage = ShowImage();
@@ -761,13 +750,13 @@ public class ViewerUserControlTests
         return (notifyPropertyChangedEvents, applicationViewModelInstances, folderAddedEvents, folderRemovedEvents);
     }
 
-    private List<Asset> NotifyThumbnailSelected()
+    private List<string> NotifyThumbnailSelected()
     {
-        List<Asset> thumbnailSelectedEvents = [];
+        List<string> thumbnailSelectedEvents = [];
 
-        ThumbnailSelected += delegate(object _, ThumbnailSelectedEventArgs e)
+        ThumbnailSelected += delegate
         {
-            thumbnailSelectedEvents.Add(e.Asset);
+            thumbnailSelectedEvents.Add(string.Empty);
         };
 
         return thumbnailSelectedEvents;
@@ -776,8 +765,6 @@ public class ViewerUserControlTests
     private void CheckBeforeChanges(string expectedRootDirectory)
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
-        Assert.That(_applicationViewModel!.Product, Is.Null);
-        Assert.That(_applicationViewModel!.Version, Is.Null);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -790,12 +777,16 @@ public class ViewerUserControlTests
         Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void CheckAfterChanges(
@@ -811,8 +802,6 @@ public class ViewerUserControlTests
         bool expectedCanGoToNextAsset)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
-        Assert.That(applicationViewModelInstance.Product, Is.Null);
-        Assert.That(applicationViewModelInstance.Version, Is.Null);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -840,6 +829,9 @@ public class ViewerUserControlTests
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.EqualTo(expectedCanGoToPreviousAsset));
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void AssertCurrentAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)
