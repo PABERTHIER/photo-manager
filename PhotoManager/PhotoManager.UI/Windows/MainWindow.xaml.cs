@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +26,8 @@ public partial class MainWindow
 
     private readonly IApplication _application;
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private Task _catalogTask = new(() => {});
+    private Task _backgroundWorkTask = new (() => {});
+    private Task _catalogTask = new (() => {});
 
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
     {
@@ -37,11 +37,13 @@ public partial class MainWindow
             Current = this;
             DataContext = viewModel;
 
-            folderTreeView.DataContext = new FolderNavigationViewModel(
+            FolderNavigationViewModel folderNavigationViewModel = new (
                 ViewModel,
                 application,
                 new() { Id = Guid.NewGuid(), Path = ViewModel.CurrentFolderPath },
                 application.GetRecentTargetPaths());
+            folderTreeView.DataContext = folderNavigationViewModel;
+            folderTreeView.SelectedPath = folderNavigationViewModel.SourceFolder.Path;
         }
         catch (Exception ex)
         {
@@ -57,21 +59,17 @@ public partial class MainWindow
 
     public ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
 
-    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         try
         {
-            thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolderPath);
-            folderTreeView.SelectedPath = ViewModel?.CurrentFolderPath;
-            await DoBackgroundWork();
+            thumbnailsUserControl.GoToFolder(_application, ViewModel.CurrentFolderPath); // TODO: Remove those two lines
+            folderTreeView.SelectedPath = ViewModel.CurrentFolderPath;
+            _backgroundWorkTask = StartBackgroundWorkAsync();
         }
         catch (Exception ex)
         {
             Log.Error(ex);
-        }
-        finally
-        {
-            ViewModel.StatusMessage = "";
         }
     }
 
@@ -281,56 +279,79 @@ public partial class MainWindow
         ViewModel.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
     }
 
-    private async void Window_Closing(object sender, CancelEventArgs e)
+    private void Window_Closing(object sender, CancelEventArgs e)
     {
-        Task taskCancellation = Task.Run(() =>
+        _cancellationTokenSource.Cancel();
+
+        _ = _backgroundWorkTask.ContinueWith(task =>
         {
-            _cancellationTokenSource.Cancel();
-        });
-
-        await taskCancellation.ConfigureAwait(true);
-        await _catalogTask.ConfigureAwait(true);
-        //e.Cancel = catalogTask != null && !catalogTask.IsCompleted; // Now that all tasks are canceled, the window can be closed properly
-    }
-
-    private async Task DoBackgroundWork()
-    {
-        Stopwatch stopwatch = new();
-        stopwatch.Start();
-
-        ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolderPath;
-
-        if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perf
-        {
-            ushort minutes = ViewModel.GetCatalogCooldownMinutes();
-
-            while (true)
+            if (task.IsFaulted)
             {
-                await Initialization(stopwatch);
-                await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
+                Log.Error(task.Exception, new Exception("BackgroundWorkTask faulted during shutdown"));
             }
-        }
+        }, TaskScheduler.Default);
 
-        await Initialization(stopwatch);
+        _backgroundWorkTask = Task.CompletedTask;
     }
 
-    private async Task Initialization(Stopwatch stopwatch)
+    private async Task StartBackgroundWorkAsync()
     {
         try
         {
-            _catalogTask = ViewModel.CatalogAssets(
-            async (e) =>
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            ViewModel.StatusMessage = $"Cataloging thumbnails for {ViewModel.CurrentFolderPath}";
+
+            // The calling thread cannot access this object because a different thread owns it
+            await InitializeOnceAsync(stopwatch).ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
+
+            if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perf
             {
-                // The InvokeAsync method is used to avoid freezing the application when the task is cancelled.
-                await Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e));
-            }, _cancellationTokenSource.Token);
+                ushort minutes = ViewModel.GetCatalogCooldownMinutes();
+                TimeSpan delay = TimeSpan.FromMinutes(minutes);
+
+                while (!_cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await Task.Delay(delay, _cancellationTokenSource.Token).ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+
+                    await InitializeOnceAsync(stopwatch).ConfigureAwait(true);  // Due to the WPF context, need to set it true to prevent thread exceptions
+                }
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Log.Error(ex, new Exception("Unexpected error in background work"));
+        }
+    }
+
+    // TODO: Rework the cancellation from here to CatalogAssetsService
+    private async Task InitializeOnceAsync(Stopwatch stopwatch)
+    {
+        _catalogTask = ViewModel.CatalogAssets(
+            e =>
+            {
+                // The InvokeAsync method is used to avoid freezing the application when the task is cancelled + to keep updating the UI
+                // To prevent this issue : The calling thread cannot access this object because a different thread owns it
+                Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e));
+            },
+            _cancellationTokenSource.Token
+        );
+
+        try
+        {
+            await _catalogTask.ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
         }
         catch (OperationCanceledException ex)
         {
             Log.Error(ex);
         }
 
-        await _catalogTask.ConfigureAwait(true);
         ViewModel.CalculateGlobalAssetsCounter();
         stopwatch.Stop();
         ViewModel.SetExecutionTime(stopwatch.Elapsed);
