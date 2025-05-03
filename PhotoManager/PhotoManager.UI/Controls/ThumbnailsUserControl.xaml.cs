@@ -36,7 +36,6 @@ public partial class ThumbnailsUserControl
 
     private ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
 
-    // TODO: At Startup, the root is called twice (so calling twice GetAssets), need to handle this case to prevent perf issues
     // TODO: No async void -> async Task
     public async void GoToFolder(IApplication application, string selectedImagePath)
     {

@@ -34,7 +34,6 @@ public partial class MainWindow
         try
         {
             InitializeComponent();
-            Current = this;
             DataContext = viewModel;
 
             FolderNavigationViewModel folderNavigationViewModel = new (
@@ -55,16 +54,12 @@ public partial class MainWindow
         _cancellationTokenSource = new();
     }
 
-    public static MainWindow Current { get; private set; }
-
-    public ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
+    private ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         try
         {
-            thumbnailsUserControl.GoToFolder(_application, ViewModel.CurrentFolderPath); // TODO: Remove those two lines
-            folderTreeView.SelectedPath = ViewModel.CurrentFolderPath;
             _backgroundWorkTask = StartBackgroundWorkAsync();
         }
         catch (Exception ex)
