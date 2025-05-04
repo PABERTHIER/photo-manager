@@ -194,6 +194,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
             Asset[] expectedObservableAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
 
             BitmapImage image1 = _applicationViewModel!.LoadBitmapHeicImageFromPath();
@@ -212,7 +213,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 _applicationViewModel!,
                 0,
                 assetsDirectory,
-                1,
+                expectedAppTitle,
                 expectedObservableAssets,
                 expectedStatusMessage,
                 _asset1,
@@ -243,12 +244,14 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 applicationViewModelInstances,
                 0,
                 assetsDirectory,
-                1,
+                expectedAppTitle,
                 expectedObservableAssets,
                 expectedStatusMessage,
                 _asset1,
                 false,
                 true);
+
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 2 of 4 - sorted by file name ascending";
 
             _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[1]);
 
@@ -268,7 +271,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 _applicationViewModel!,
                 1,
                 assetsDirectory,
-                2,
+                expectedAppTitle,
                 expectedObservableAssets,
                 expectedStatusMessage,
                 _asset2,
@@ -305,12 +308,14 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 applicationViewModelInstances,
                 1,
                 assetsDirectory,
-                2,
+                expectedAppTitle,
                 expectedObservableAssets,
                 expectedStatusMessage,
                 _asset2,
                 true,
                 true);
+
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 3 of 4 - sorted by file name ascending";
 
             _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[2]);
 
@@ -330,7 +335,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 _applicationViewModel!,
                 2,
                 assetsDirectory,
-                3,
+                expectedAppTitle,
                 expectedObservableAssets,
                 expectedStatusMessage,
                 _asset3,
@@ -373,12 +378,14 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 applicationViewModelInstances,
                 2,
                 assetsDirectory,
-                3,
+                expectedAppTitle,
                 expectedObservableAssets,
                 expectedStatusMessage,
                 _asset3,
                 true,
                 true);
+
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 4 of 4 - sorted by file name ascending";
 
             _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[3]);
 
@@ -398,7 +405,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 _applicationViewModel!,
                 3,
                 assetsDirectory,
-                4,
+                expectedAppTitle,
                 expectedObservableAssets,
                 expectedStatusMessage,
                 _asset4,
@@ -447,7 +454,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 applicationViewModelInstances,
                 3,
                 assetsDirectory,
-                4,
+                expectedAppTitle,
                 expectedObservableAssets,
                 expectedStatusMessage,
                 _asset4,
@@ -483,11 +490,13 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
             Assert.That(exception?.Message, Is.EqualTo("CurrentAsset is null"));
 
-            CheckAfterChanges(_applicationViewModel!, 0, _dataDirectory!, 1, [], null, null, false, false);
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+
+            CheckAfterChanges(_applicationViewModel!, 0, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, 0, _dataDirectory!, 1, [], null, null, false, false);
+            CheckInstance(applicationViewModelInstances, 0, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -563,7 +572,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         ApplicationViewModel applicationViewModelInstance,
         int expectedViewerPosition,
         string expectedLastDirectoryInspected,
-        int expectedCurrentImageAppTitlePosition,
+        string expectedAppTitle,
         Asset[] expectedAssets,
         string? expectedStatusMessage,
         Asset? expectedCurrentAsset,
@@ -583,8 +592,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
-        Assert.That(applicationViewModelInstance.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedLastDirectoryInspected} - image {expectedCurrentImageAppTitlePosition} of {expectedAssets.Length} - sorted by file name ascending"));
+        Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));
 
         if (expectedCurrentAsset != null)
@@ -608,7 +616,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         List<ApplicationViewModel> applicationViewModelInstances,
         int expectedViewerPosition,
         string expectedLastDirectoryInspected,
-        int expectedAppTitleAssetsCount,
+        string expectedAppTitle,
         Asset[] expectedAssets,
         string? expectedStatusMessage,
         Asset? expectedCurrentAsset,
@@ -631,7 +639,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 applicationViewModelInstances[0],
                 expectedViewerPosition,
                 expectedLastDirectoryInspected,
-                expectedAppTitleAssetsCount,
+                expectedAppTitle,
                 expectedAssets,
                 expectedStatusMessage,
                 expectedCurrentAsset,
