@@ -59,7 +59,7 @@
     </UserControl.Resources>
     <Grid>
         <ListBox Name="ThumbnailsListView"
-                 ItemsSource="{Binding ObservableAssets}"
+                 ItemsSource="{Binding ObservableAssets, Mode=OneWay}"
                  ItemTemplate="{DynamicResource ThumbnailDataTemplate}"
                  Background="#FF3C3C3C"
                  SelectedIndex="{Binding ViewerPosition}"

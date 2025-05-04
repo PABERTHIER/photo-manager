@@ -37,13 +37,12 @@ public class ApplicationViewModel : BaseViewModel
         _currentFolderPath = Application.GetInitialFolderPath();
 
         AboutInformation = Application.GetAboutInformation(GetType().Assembly);
-        UpdateAppTitle(); // TODO: Temp fix waiting for the fix of UpdateAppTitle
+        UpdateAppTitle();
     }
 
     public event FolderAddedEventHandler? FolderAdded;
     public event FolderRemovedEventHandler? FolderRemoved;
 
-    // TODO: Remove update on ObservableAssets and use _observableAssets instead ?
     public ObservableCollection<Asset> ObservableAssets => _observableAssets;
 
     public AppMode AppMode
@@ -136,13 +135,13 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public Asset? CurrentAsset => ObservableAssets.Count > 0 ? ObservableAssets[ViewerPosition] : null;
+    public Asset? CurrentAsset => _observableAssets.Count > 0 ? _observableAssets[ViewerPosition] : null;
 
     public Folder? MoveAssetsLastSelectedFolder { get; set; }
 
     public bool CanGoToPreviousAsset => ViewerPosition > 0;
 
-    public bool CanGoToNextAsset => ViewerPosition < (ObservableAssets.Count - 1);
+    public bool CanGoToNextAsset => ViewerPosition < (_observableAssets.Count - 1);
 
     public string GlobalAssetsCounterWording
     {
@@ -212,21 +211,21 @@ public class ApplicationViewModel : BaseViewModel
 
     public void RemoveAssets(Asset[] assets)
     {
-        int initialObservableAssetsCount = ObservableAssets.Count;
+        int initialObservableAssetsCount = _observableAssets.Count;
 
         if (initialObservableAssetsCount > 0 && assets.Length > 0)
         {
             for (int i = 0; i < assets.Length; i++)
             {
-                ObservableAssets.Remove(assets[i]);
+                _observableAssets.Remove(assets[i]);
 
-                if (ViewerPosition == ObservableAssets.Count)
+                if (ViewerPosition == _observableAssets.Count)
                 {
                     GoToPreviousAsset();
                 }
             }
 
-            if (initialObservableAssetsCount != ObservableAssets.Count)
+            if (initialObservableAssetsCount != _observableAssets.Count)
             {
                 OnObservableAssetsUpdated();
             }
@@ -245,11 +244,11 @@ public class ApplicationViewModel : BaseViewModel
         Asset? observableAsset = null;
         int newViewerPosition = -1;
 
-        for (int i = 0; i < ObservableAssets.Count; i++)
+        for (int i = 0; i < _observableAssets.Count; i++)
         {
-            if (ObservableAssets[i].FileName.AsSpan() == asset.FileName.AsSpan())
+            if (_observableAssets[i].FileName.AsSpan() == asset.FileName.AsSpan())
             {
-                observableAsset = ObservableAssets[i];
+                observableAsset = _observableAssets[i];
                 newViewerPosition = i;
                 break;
             }
@@ -428,7 +427,7 @@ public class ApplicationViewModel : BaseViewModel
         string sortCriteria = GetSortCriteriaDescription();
         int viewerPosition = 0;
 
-        if (ObservableAssets.Count > 0)
+        if (_observableAssets.Count > 0)
         {
             viewerPosition = ViewerPosition + 1;
         }
@@ -442,7 +441,7 @@ public class ApplicationViewModel : BaseViewModel
                 AboutInformation.Version,
                 CurrentFolderPath,
                 viewerPosition,
-                ObservableAssets.Count,
+                _observableAssets.Count,
                 sortCriteria);
         }
         else
@@ -455,7 +454,7 @@ public class ApplicationViewModel : BaseViewModel
                 CurrentFolderPath,
                 CurrentAsset?.FileName,
                 viewerPosition,
-                ObservableAssets.Count,
+                _observableAssets.Count,
                 sortCriteria);
         }
 
@@ -496,13 +495,13 @@ public class ApplicationViewModel : BaseViewModel
 
     private void AddAsset(Asset asset)
     {
-        ObservableAssets.Add(asset);
+        _observableAssets.Add(asset);
         OnObservableAssetsUpdated();
     }
 
     private void UpdateAsset(Asset asset)
     {
-        Asset? updatedAsset = ObservableAssets.FirstOrDefault(
+        Asset? updatedAsset = _observableAssets.FirstOrDefault(
             a => string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
 
         if (updatedAsset != null)

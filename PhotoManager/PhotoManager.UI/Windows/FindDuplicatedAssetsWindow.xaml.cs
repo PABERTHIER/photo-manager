@@ -125,6 +125,7 @@ public partial class FindDuplicatedAssetsWindow
     private void FindDuplicatedAssetsWindow_Closing(object sender, CancelEventArgs e)
     {
         RefreshAssetsCounter?.Invoke(this);
+        // TODO: Event to refresh CalculateTotalFilesCount as well
     }
 
     private void DeleteAssets(List<DuplicatedAssetViewModel> assetsToDelete)

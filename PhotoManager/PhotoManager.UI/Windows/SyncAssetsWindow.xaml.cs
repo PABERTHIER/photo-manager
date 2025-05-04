@@ -16,7 +16,7 @@ namespace PhotoManager.UI.Windows
     /// Interaction logic for SyncAssetsWindow.xaml
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public partial class SyncAssetsWindow : Window
+    public partial class SyncAssetsWindow
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
@@ -113,6 +113,7 @@ namespace PhotoManager.UI.Windows
             }
         }
 
+        // TODO: async task
         private async void RunButton_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
             try
