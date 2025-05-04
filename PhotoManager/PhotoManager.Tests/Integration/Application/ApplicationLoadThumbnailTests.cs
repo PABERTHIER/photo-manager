@@ -283,9 +283,10 @@ public class ApplicationLoadThumbnailTests
     public async Task LoadThumbnail_CataloguedAssetFromVideo_SetsBitmapImageToTheAsset()
     {
         string tempDirectory = Path.Combine(_dataDirectory!, "TempFolder");
-        string outputFirstFrameDirectory = Path.Combine(tempDirectory, "OutputVideoFirstFrame");
 
         ConfigureApplication(100, tempDirectory, 200, 150, false, false, false, true);
+
+        string outputFirstFrameDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
         try
         {

@@ -12,9 +12,9 @@ namespace PhotoManager.UI.Windows;
 /// Interaction logic for FolderNavigationWindow.xaml
 /// </summary>
 [ExcludeFromCodeCoverage]
-public partial class FolderNavigationWindow : Window
+public partial class FolderNavigationWindow
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
     public FolderNavigationWindow(FolderNavigationViewModel viewModel)
     {
@@ -23,18 +23,17 @@ public partial class FolderNavigationWindow : Window
             InitializeComponent();
 
             DataContext = viewModel;
-            folderTreeView.SelectedPath = viewModel.LastSelectedFolder != null ? viewModel.LastSelectedFolder.Path : viewModel.SourceFolder.Path;
+            folderTreeView.SelectedPath = viewModel.LastSelectedFolder != null
+                ? viewModel.LastSelectedFolder.Path
+                : viewModel.SourceFolder.Path;
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
-    public FolderNavigationViewModel ViewModel
-    {
-        get { return (FolderNavigationViewModel)DataContext; }
-    }
+    public FolderNavigationViewModel ViewModel => (FolderNavigationViewModel)DataContext;
 
     private void FolderTreeView_FolderSelected(object sender, EventArgs e)
     {
@@ -62,14 +61,19 @@ public partial class FolderNavigationWindow : Window
             case Key.Escape:
                 Cancel();
                 break;
+            // ReSharper disable once RedundantEmptySwitchSection
+            default:
+                break;
         }
     }
 
     private void Confirm()
     {
-        // TODO: SHOULD VALIDATE IF THE PATH IS VALID.
-        //this.ViewModel.SelectedFolder = new Domain.Folder { Path = this.ViewModel.TargetPath };
-        ViewModel.HasConfirmed = true;
+        if (ViewModel.CanConfirm)
+        {
+            ViewModel.HasConfirmed = true;
+        }
+
         Close();
     }
 

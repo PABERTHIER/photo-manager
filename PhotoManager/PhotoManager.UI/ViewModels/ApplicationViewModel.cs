@@ -1,7 +1,10 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
+using PhotoManager.Domain.Comparers;
+using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -11,61 +14,43 @@ using System.Windows.Media.Imaging;
 
 namespace PhotoManager.UI.ViewModels;
 
-// TODO: Move these 4 into separated file
-public class FolderAddedEventArgs
-{
-    public Folder Folder { get; set; }
-}
-
-public class FolderRemovedEventArgs
-{
-    public Folder Folder { get; set; }
-}
-
-public delegate void FolderAddedEventHandler(object sender, FolderAddedEventArgs e);
-public delegate void FolderRemovedEventHandler(object sender, FolderRemovedEventArgs e);
-
 public class ApplicationViewModel : BaseViewModel
 {
-    private AppMode appMode;
-    private int viewerPosition;
-    private string currentFolder;
-    private Asset[] cataloguedAssets; // TODO: ByPath
-    private ObservableCollection<Asset> observableAssets; // TODO: ByPath
-    private string globaleAssetsCounter;
-    private string executionTime;
-    private string totalFilesNumber;
-    private Asset[] selectedAssets;
-    private string appTitle;
-    private string statusMessage;
-    private SortCriteria sortCriteria;
-    private SortCriteria previousSortCriteria;
+    private AppMode _appMode;
+    private string _appTitle;
+    private string _currentFolderPath;
+    private int _viewerPosition;
+    private SortableObservableCollection<Asset> _observableAssets;
+    private Asset[] _selectedAssets;
+    private string _statusMessage;
+    private SortCriteria _sortCriteria;
+    private SortCriteria _previousSortCriteria;
+    private string _globalAssetsCounterWording;
+    private string _executionTimeWording;
+    private string _totalFilesCountWording;
 
-    public bool SortAscending { get; private set; } = true;
-    public string? Product { get; set; }
-    public string? Version { get; set; }
-    public bool IsRefreshingFolders { get; set; }
-
-    public event FolderAddedEventHandler FolderAdded;
-    public event FolderRemovedEventHandler FolderRemoved;
-
-    public ApplicationViewModel(IApplication application, SortCriteria initialSortCriteria = Enums.SortCriteria.FileName) : base(application)
+    // TODO: Private set for all props + Update UI to set mode OneWay
+    public ApplicationViewModel(IApplication application) : base(application)
     {
-        cataloguedAssets = [];
-        observableAssets = [];
-        selectedAssets = [];
+        _observableAssets = [];
+        _selectedAssets = [];
+        _currentFolderPath = Application.GetInitialFolderPath();
 
-        SortCriteria = initialSortCriteria; // TODO: Should be FileName the default one -> delete this line and the parameter in the ctor
-        // TODO: Rename to CurrentFolderPath
-        CurrentFolder = Application.GetInitialFolderPath();
+        AboutInformation = Application.GetAboutInformation(GetType().Assembly);
+        UpdateAppTitle();
     }
+
+    public event FolderAddedEventHandler? FolderAdded;
+    public event FolderRemovedEventHandler? FolderRemoved;
+
+    public ObservableCollection<Asset> ObservableAssets => _observableAssets;
 
     public AppMode AppMode
     {
-        get { return appMode; }
+        get => _appMode;
         private set
         {
-            appMode = value;
+            _appMode = value;
             NotifyPropertyChanged(nameof(AppMode), nameof(ThumbnailsVisible), nameof(ViewerVisible));
             UpdateAppTitle();
         }
@@ -73,45 +58,30 @@ public class ApplicationViewModel : BaseViewModel
 
     public SortCriteria SortCriteria
     {
-        get { return sortCriteria; }
+        get => _sortCriteria;
         private set
         {
-            sortCriteria = value;
+            _sortCriteria = value;
             NotifyPropertyChanged(nameof(SortCriteria));
         }
     }
 
-    public void ChangeAppMode()
-    {
-        AppMode = AppMode switch
-        {
-            AppMode.Viewer => AppMode.Thumbnails,
-            AppMode.Thumbnails => AppMode.Viewer,
-            _ => AppMode
-        };
-    }
+    public bool SortAscending { get; private set; } = true;
 
-    public void ChangeAppMode(AppMode appMode)
-    {
-        AppMode = appMode;
-    }
+    public Visibility ThumbnailsVisible => AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden;
 
-    public Visibility ThumbnailsVisible
-    {
-        get { return AppMode == AppMode.Thumbnails ? Visibility.Visible : Visibility.Hidden; }
-    }
+    public Visibility ViewerVisible => AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden;
 
-    public Visibility ViewerVisible
-    {
-        get { return AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden; }
-    }
-
+    // TODO: Rework ViewerPosition to make the setter private (xaml binding issues)
     public int ViewerPosition
     {
-        get { return viewerPosition; }
+        get => _viewerPosition;
         set
         {
-            viewerPosition = value;
+            // TODO: ViewerPosition is reset to -1 when moving and deleting assets from MainWindow
+            // For this case, the best would be keeping the old ViewerPosition so that we can go to the nearest asset
+            _viewerPosition = value < 0 ? 0 : value;
+
             NotifyPropertyChanged(
                 nameof(ViewerPosition),
                 nameof(CanGoToPreviousAsset),
@@ -123,260 +93,178 @@ public class ApplicationViewModel : BaseViewModel
 
     public Asset[] SelectedAssets
     {
-        get { return selectedAssets; }
+        get => _selectedAssets;
         set
         {
-            selectedAssets = value;
+            _selectedAssets = value;
             NotifyPropertyChanged(nameof(SelectedAssets));
         }
     }
 
-    // TODO: Rename to CurrentFolderPath
-    public string CurrentFolder
+    public string CurrentFolderPath
     {
-        get { return currentFolder; }
-        // TODO: Set the setter into private -> rework SetAssets to pass the path as parameter into it, to set the value of CurrentFolder
-        set
+        get => _currentFolderPath;
+        private set
         {
-            currentFolder = value;
-            NotifyPropertyChanged(nameof(CurrentFolder));
+            _currentFolderPath = value;
+            NotifyPropertyChanged(nameof(CurrentFolderPath));
             UpdateAppTitle();
         }
     }
 
-    // TODO: Not the best thing to update ObservableAssets while CataloguedAssets can also be updated, need to improve this
-    // TODO: ByPath
-    public ObservableCollection<Asset> ObservableAssets
-    {
-        get { return observableAssets; }
-        private set
-        {
-            observableAssets = value;
-            NotifyPropertyChanged(nameof(ObservableAssets));
-            UpdateAppTitle();
-        }
-    }
+    public bool IsRefreshingFolders { get; set; }
 
-    // TODO: Rename to GlobalAssetsCounterWording
-    public string GlobaleAssetsCounter
-    {
-        get { return globaleAssetsCounter; }
-        private set
-        {
-            globaleAssetsCounter = value;
-            NotifyPropertyChanged(nameof(GlobaleAssetsCounter));
-        }
-    }
-
-    // TODO: Rename to ExecutionTimeWording
-    public string ExecutionTime
-    {
-        get { return executionTime; }
-        private set
-        {
-            executionTime = value;
-            NotifyPropertyChanged(nameof(ExecutionTime));
-        }
-    }
-
-    // TODO: Rename to TotalFilesNumberWording
-    public string TotalFilesNumber
-    {
-        get { return totalFilesNumber; }
-        private set
-        {
-            totalFilesNumber = value;
-            NotifyPropertyChanged(nameof(TotalFilesNumber));
-        }
-    }
-
-    public void SetAssets(Asset[] assets)
-    {
-        // The assets that have no image data are filtered out.
-        // If a folder is being catalogued for the first time and
-        // the GetImages method is called, since the thumbnails file is not
-        // created yet, the assets catalogued so far are returned without
-        // its thumbnails.
-        cataloguedAssets = assets?.Where(a => a.ImageData != null).ToArray() ?? [];
-        SortAssets();
-    }
-
-    private void SortAssets()
-    {
-        bool isCataloguedAssetsEmpty = cataloguedAssets.Length == 0;
-
-        if (!isCataloguedAssetsEmpty)
-        {
-            switch (SortCriteria)
-            {
-                case SortCriteria.FileName:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileName).ToArray();
-                    break;
-
-                case SortCriteria.ThumbnailCreationDateTime:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.ThumbnailCreationDateTime).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.ThumbnailCreationDateTime).ThenByDescending(a => a.FileName).ToArray();
-                    break;
-
-                case SortCriteria.FileCreationDateTime:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileProperties.Creation).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileProperties.Creation).ThenByDescending(a => a.FileName).ToArray();
-                    break;
-
-                case SortCriteria.FileModificationDateTime:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileProperties.Modification).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileProperties.Modification).ThenByDescending(a => a.FileName).ToArray();
-                    break;
-
-                case SortCriteria.FileSize:
-                    cataloguedAssets = SortAscending ?
-                        cataloguedAssets.OrderBy(a => a.FileProperties.Size).ThenBy(a => a.FileName).ToArray() :
-                        cataloguedAssets.OrderByDescending(a => a.FileProperties.Size).ThenByDescending(a => a.FileName).ToArray();
-                    break;
-            }
-        }
-        
-
-        ObservableAssets = !isCataloguedAssetsEmpty ? new ObservableCollection<Asset>(cataloguedAssets) : [];
-    }
-
+    // TODO: Private set + Update UI to set mode OneWay
     public string AppTitle
     {
-        get { return appTitle; }
+        get => _appTitle;
         set
         {
-            appTitle = value;
+            _appTitle = value;
             NotifyPropertyChanged(nameof(AppTitle));
         }
     }
 
     public string StatusMessage
     {
-        get { return statusMessage; }
+        get => _statusMessage;
         set
         {
-            statusMessage = value;
+            _statusMessage = value;
             NotifyPropertyChanged(nameof(StatusMessage));
         }
     }
 
-    public Asset? CurrentAsset
-    {
-        get { return ObservableAssets?.Count > 0 && ViewerPosition >= 0 ? ObservableAssets?[ViewerPosition] : null; }
-    }
+    public Asset? CurrentAsset => _observableAssets.Count > 0 ? _observableAssets[ViewerPosition] : null;
 
-    public Folder LastSelectedFolder { get; set; }
+    public Folder? MoveAssetsLastSelectedFolder { get; set; }
 
-    private void AddAsset(Asset asset)
+    public bool CanGoToPreviousAsset => ViewerPosition > 0;
+
+    public bool CanGoToNextAsset => ViewerPosition < (_observableAssets.Count - 1);
+
+    public string GlobalAssetsCounterWording
     {
-        if (ObservableAssets != null)
+        get => _globalAssetsCounterWording;
+        private set
         {
-            ObservableAssets.Add(asset);
-            NotifyPropertyChanged(nameof(ObservableAssets));
-            UpdateAppTitle();
+            _globalAssetsCounterWording = value;
+            NotifyPropertyChanged(nameof(GlobalAssetsCounterWording));
         }
     }
 
-    private void UpdateAsset(Asset asset)
+    public string ExecutionTimeWording
     {
-        if (ObservableAssets != null)
+        get => _executionTimeWording;
+        private set
         {
-            // TODO: Need to also check path and hash (even if the path is checked above)
-            var updatedAsset = ObservableAssets.FirstOrDefault(
-                a => string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
+            _executionTimeWording = value;
+            NotifyPropertyChanged(nameof(ExecutionTimeWording));
+        }
+    }
 
-            if (updatedAsset != null)
+    public string TotalFilesCountWording
+    {
+        get => _totalFilesCountWording;
+        private set
+        {
+            _totalFilesCountWording = value;
+            NotifyPropertyChanged(nameof(TotalFilesCountWording));
+        }
+    }
+
+    public AboutInformation AboutInformation { get; }
+
+    public void ChangeAppMode()
+    {
+        AppMode = AppMode == AppMode.Thumbnails ? AppMode.Viewer : AppMode.Thumbnails;
+    }
+
+    public void SetAssets(string newCurrentFolderPath, Asset[] assets)
+    {
+        if (CurrentFolderPath.AsSpan() != newCurrentFolderPath.AsSpan())
+        {
+            CurrentFolderPath = newCurrentFolderPath;
+        }
+
+        List<Asset> filteredAssets = [];
+
+        for (int i = 0; i < assets.Length; i++)
+        {
+            if (assets[i].ImageData != null)
             {
-                RemoveAssets(new Asset[] { updatedAsset });
-                AddAsset(asset);
-                NotifyPropertyChanged(nameof(ObservableAssets));
-                UpdateAppTitle();
+                filteredAssets.Add(assets[i]);
             }
         }
+
+        _observableAssets = [..filteredAssets];
+
+        if (_observableAssets.Count == 0)
+        {
+            OnObservableAssetsUpdated();
+
+            return;
+        }
+
+        SortAssets();
     }
 
     public void RemoveAssets(Asset[] assets)
     {
-        int observableAssetsCount = ObservableAssets.Count;
+        int initialObservableAssetsCount = _observableAssets.Count;
 
-        if (observableAssetsCount > 0 && assets != null)
+        if (initialObservableAssetsCount > 0 && assets.Length > 0)
         {
-            foreach (var asset in assets)
+            for (int i = 0; i < assets.Length; i++)
             {
-                int position = ViewerPosition;
-                ObservableAssets.Remove(asset);
+                _observableAssets.Remove(assets[i]);
 
-                if (position == observableAssetsCount)
+                if (ViewerPosition == _observableAssets.Count)
                 {
-                    position--;
+                    GoToPreviousAsset();
                 }
-
-                ViewerPosition = position;
             }
 
-            NotifyPropertyChanged(nameof(ObservableAssets));
+            if (initialObservableAssetsCount != _observableAssets.Count)
+            {
+                OnObservableAssetsUpdated();
+            }
         }
     }
 
-    private void AddFolder(Folder folder) => FolderAdded?.Invoke(this, new FolderAddedEventArgs { Folder = folder });
-
-    private void RemoveFolder(Folder folder) => FolderRemoved?.Invoke(this, new FolderRemovedEventArgs { Folder = folder });
-
-    // TODO: Need to rework the content of the title + case where init getting -> image 1 de 0 -> not good
-    // TODO: Called to many times, need to rework this
-    private void UpdateAppTitle()
-    {
-        string title = null;
-        string sortCriteria = GetSortCriteriaDescription();
-
-        if (AppMode == AppMode.Thumbnails)
-        {
-            title = string.Format(
-                Thread.CurrentThread.CurrentCulture,
-                "{0} {1} - {2} - image {3} of {4} - sorted by {5}",
-                Product,
-                Version,
-                CurrentFolder,
-                ViewerPosition + 1,
-                ObservableAssets?.Count,
-                sortCriteria);
-        }
-        else if (AppMode == AppMode.Viewer)
-        {
-            title = string.Format(
-                Thread.CurrentThread.CurrentCulture,
-                "{0} {1} - {2} - {3} - image {4} of {5} - sorted by {6}",
-                Product,
-                Version,
-                CurrentFolder,
-                CurrentAsset?.FileName,
-                ViewerPosition + 1,
-                ObservableAssets?.Count,
-                sortCriteria);
-        }
-
-        AppTitle = title;
-    }
-
+    // TODO: Dead code: Delete this method and tests
     public void GoToAsset(Asset asset)
     {
         GoToAsset(asset, AppMode);
     }
 
+    // TODO: Dead code: Delete this method and tests
     public void GoToAsset(Asset asset, AppMode newAppMode)
     {
-        Asset targetAsset = ObservableAssets.FirstOrDefault(f => f.FileName == asset.FileName);
+        Asset? observableAsset = null;
+        int newViewerPosition = -1;
 
-        if (targetAsset != null && Application.FileExists(targetAsset.FullPath))
+        for (int i = 0; i < _observableAssets.Count; i++)
         {
-            int position = ObservableAssets.IndexOf(targetAsset);
-            ChangeAppMode(newAppMode);
-            ViewerPosition = position;
+            if (_observableAssets[i].FileName.AsSpan() == asset.FileName.AsSpan())
+            {
+                observableAsset = _observableAssets[i];
+                newViewerPosition = i;
+                break;
+            }
+        }
+
+        if (observableAsset != null && Application.FileExists(observableAsset.FullPath))
+        {
+            if (AppMode != newAppMode)
+            {
+                ChangeAppMode();
+            }
+
+            if (newViewerPosition > -1)
+            {
+                ViewerPosition = newViewerPosition;
+            }
         }
     }
 
@@ -396,42 +284,23 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public bool CanGoToPreviousAsset
+    public void SortAssetsByCriteria(SortCriteria newSortCriteria)
     {
-        get
-        {
-            return ViewerPosition > 0;
-        }
-    }
-
-    public bool CanGoToNextAsset
-    {
-        get
-        {
-            return ViewerPosition < (ObservableAssets?.Count - 1);
-        }
+        _previousSortCriteria = SortCriteria;
+        SortCriteria = newSortCriteria;
+        SortAscending = (SortCriteria != _previousSortCriteria) || !SortAscending; // To change ascending order when clicking on the same criteria
+        SortAssets();
     }
 
     public void NotifyCatalogChange(CatalogChangeCallbackEventArgs e)
     {
-        StatusMessage = e?.Message;
+        StatusMessage = e.Message;
 
-        switch (e?.Reason)
+        switch (e.Reason)
         {
             case CatalogChangeReason.AssetCreated:
-                if (e?.Asset?.Folder?.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolderPath)
                 {
-                    // // If the files list is empty or belongs to other directory
-                    // if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssetsByPath != null)
-                    // {
-                    //     cataloguedAssets = e.CataloguedAssetsByPath.Where(a => a.ImageData != null).ToArray();
-                    //     SortAssets();
-                    // }
-                    // else
-                    // {
-                    //     AddAsset(e.Asset);
-                    // }
-
                     Application.LoadThumbnail(e.Asset);
                     AddAsset(e.Asset);
                 }
@@ -439,19 +308,8 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.AssetUpdated:
-                if (e?.Asset?.Folder?.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolderPath)
                 {
-                    // // If the files list is empty or belongs to other directory
-                    // if ((ObservableAssets.Count == 0 || ObservableAssets[0].Folder.Path != CurrentFolder) && e.CataloguedAssetsByPath != null)
-                    // {
-                    //     cataloguedAssets = e.CataloguedAssetsByPath.Where(a => a.ImageData != null).ToArray();
-                    //     SortAssets();
-                    // }
-                    // else
-                    // {
-                    //     UpdateAsset(e.Asset);
-                    // }
-
                     Application.LoadThumbnail(e.Asset);
                     UpdateAsset(e.Asset);
                 }
@@ -459,7 +317,7 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.AssetDeleted:
-                if (e?.Asset?.Folder?.Path == CurrentFolder)
+                if (e.Asset?.Folder.Path == CurrentFolderPath)
                 {
                     RemoveAssets([e.Asset]);
                 }
@@ -467,21 +325,140 @@ public class ApplicationViewModel : BaseViewModel
                 break;
 
             case CatalogChangeReason.FolderCreated:
-                AddFolder(e.Folder);
+                if (e.Folder != null)
+                {
+                    AddFolder(e.Folder);
+                }
+
                 break;
 
             case CatalogChangeReason.FolderDeleted:
-                RemoveFolder(e.Folder);
+                if (e.Folder != null)
+                {
+                    RemoveFolder(e.Folder);
+                }
+
+                break;
+
+            // ReSharper disable once RedundantEmptySwitchSection
+            default:
                 break;
         }
     }
 
-    public void SortAssetsByCriteria(SortCriteria sortCriteria)
+    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) => await Application.CatalogAssetsAsync(callback, token);
+
+    public ushort GetCatalogCooldownMinutes() => Application.GetCatalogCooldownMinutes();
+
+    public bool GetSyncAssetsEveryXMinutes() => Application.GetSyncAssetsEveryXMinutes();
+
+    public string GetExemptedFolderPath() => Application.GetExemptedFolderPath();
+
+    public Folder[] GetRootCatalogFolders() => Application.GetRootCatalogFolders();
+
+    public Folder[] GetSubFolders(Folder parentFolder) => Application.GetSubFolders(parentFolder);
+
+    public BitmapImage LoadBitmapImageFromPath()
     {
-        previousSortCriteria = SortCriteria;
-        SortCriteria = sortCriteria;
-        SortAscending = SortCriteria != previousSortCriteria || !SortAscending;
-        SortAssets();
+        if (CurrentAsset == null)
+        {
+            throw new NullReferenceException("CurrentAsset is null");
+        }
+
+        return Application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+    }
+
+    public BitmapImage LoadBitmapHeicImageFromPath()
+    {
+        if (CurrentAsset == null)
+        {
+            throw new NullReferenceException("CurrentAsset is null");
+        }
+
+        return Application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+    }
+
+    public void CalculateGlobalAssetsCounter()
+    {
+        int globalAssetsCounter = Application.GetAssetsCounter();
+        GlobalAssetsCounterWording = $"Total number of assets: {globalAssetsCounter}";
+    }
+
+    public void SetExecutionTime(TimeSpan executionTime)
+    {
+        ExecutionTimeWording = $"Execution time: {executionTime}";
+    }
+
+    public void CalculateTotalFilesCount()
+    {
+        int totalFilesCount = Application.GetTotalFilesCount();
+        TotalFilesCountWording = $"{totalFilesCount} files found";
+    }
+
+    private void SortAssets()
+    {
+        if (_observableAssets.Count == 0)
+        {
+            UpdateAppTitle();
+
+            return;
+        }
+
+        IComparer<Asset> comparer = SortCriteria switch
+        {
+            SortCriteria.FileName => new StringAssetComparer(SortAscending, asset => asset.FileName),
+            SortCriteria.FileSize => new LongAssetComparer(SortAscending, asset => asset.FileProperties.Size),
+            SortCriteria.FileCreationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.FileProperties.Creation),
+            SortCriteria.FileModificationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.FileProperties.Modification),
+            SortCriteria.ThumbnailCreationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.ThumbnailCreationDateTime),
+            _ => throw new ArgumentOutOfRangeException(nameof(SortCriteria), "Unknown sort criteria")
+        };
+
+        _observableAssets.Sort(comparer);
+
+        OnObservableAssetsUpdated();
+    }
+
+    // TODO: Need to rework how the title is built
+    // TODO: Called to many times, need to rework this (reduce event "AppTitle")
+    private void UpdateAppTitle()
+    {
+        string title;
+        string sortCriteria = GetSortCriteriaDescription();
+        int viewerPosition = 0;
+
+        if (_observableAssets.Count > 0)
+        {
+            viewerPosition = ViewerPosition + 1;
+        }
+
+        if (AppMode == AppMode.Thumbnails)
+        {
+            title = string.Format(
+                Thread.CurrentThread.CurrentCulture,
+                "{0} {1} - {2} - image {3} of {4} - sorted by {5}",
+                AboutInformation.Product,
+                AboutInformation.Version,
+                CurrentFolderPath,
+                viewerPosition,
+                _observableAssets.Count,
+                sortCriteria);
+        }
+        else
+        {
+            title = string.Format(
+                Thread.CurrentThread.CurrentCulture,
+                "{0} {1} - {2} - {3} - image {4} of {5} - sorted by {6}",
+                AboutInformation.Product,
+                AboutInformation.Version,
+                CurrentFolderPath,
+                CurrentAsset?.FileName,
+                viewerPosition,
+                _observableAssets.Count,
+                sortCriteria);
+        }
+
+        AppTitle = title;
     }
 
     private string GetSortCriteriaDescription()
@@ -516,37 +493,31 @@ public class ApplicationViewModel : BaseViewModel
         return result;
     }
 
-    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) => await Application.CatalogAssetsAsync(callback, token);
-
-    public ushort GetCatalogCooldownMinutes() => Application.GetCatalogCooldownMinutes();
-
-    public bool GetSyncAssetsEveryXMinutes() => Application.GetSyncAssetsEveryXMinutes();
-
-    public string GetExemptedFolderPath() => Application.GetExemptedFolderPath();
-
-    public Folder[] GetRootCatalogFolders() => Application.GetRootCatalogFolders();
-
-    // TODO: Remove includeHidden
-    public Folder[] GetSubFolders(Folder parentFolder, bool includeHidden) => Application.GetSubFolders(parentFolder);
-
-    public BitmapImage LoadBitmapImageFromPath() => Application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
-    public BitmapImage LoadBitmapHeicImageFromPath() => Application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
-
-    public void CalculateGlobaleAssetsCounter()
+    private void AddAsset(Asset asset)
     {
-        var globaleAssetsCounter = Application.GetAssetsCounter();
-        GlobaleAssetsCounter = $"Total number of assets: {globaleAssetsCounter}";
+        _observableAssets.Add(asset);
+        OnObservableAssetsUpdated();
     }
 
-    public void SetExecutionTime(TimeSpan executionTime)
+    private void UpdateAsset(Asset asset)
     {
-        ExecutionTime = $"Execution time: {executionTime}";
+        Asset? updatedAsset = _observableAssets.FirstOrDefault(
+            a => string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
+
+        if (updatedAsset != null)
+        {
+            RemoveAssets([updatedAsset]);
+            AddAsset(asset);
+        }
     }
 
-    // TODO: Rename totalFilesNumber to totalFilesCount
-    public void CalculateTotalFilesNumber()
+    private void OnObservableAssetsUpdated()
     {
-        var totalFilesNumber = Application.GetTotalFilesCount();
-        TotalFilesNumber = $"{totalFilesNumber} files found";
+        NotifyPropertyChanged(nameof(ObservableAssets));
+        UpdateAppTitle();
     }
+
+    private void AddFolder(Folder folder) => FolderAdded?.Invoke(this, new FolderAddedEventArgs { Folder = folder });
+
+    private void RemoveFolder(Folder folder) => FolderRemoved?.Invoke(this, new FolderRemovedEventArgs { Folder = folder });
 }

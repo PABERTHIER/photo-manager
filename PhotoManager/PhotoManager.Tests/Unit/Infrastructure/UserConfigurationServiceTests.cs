@@ -36,6 +36,7 @@ public class UserConfigurationServiceTests
         AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(typeof(int).Assembly);
 
         Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
+        Assert.That(aboutInformation.Product, Is.EqualTo("Microsoft® .NET"));
         Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
         Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
     }

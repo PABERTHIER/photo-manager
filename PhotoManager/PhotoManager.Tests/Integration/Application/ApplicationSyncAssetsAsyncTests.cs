@@ -743,15 +743,15 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(firstDestinationDirectory));
             Assert.That(result[0].SyncedImages, Is.EqualTo(2));
             Assert.That(result[0].Message, Is.EqualTo($"2 images synced from '{firstSourceDirectory}' to '{firstDestinationDirectory}'."));
-            Assert.That(statusChanges, Has.Count.EqualTo(4));
-            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
-            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(secondSourceDirectory));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(secondDestinationDirectory));
             Assert.That(result[1].SyncedImages, Is.EqualTo(2));
             Assert.That(result[1].Message, Is.EqualTo($"2 images synced from '{secondSourceDirectory}' to '{secondDestinationDirectory}'."));
+
             Assert.That(statusChanges, Has.Count.EqualTo(4));
+            Assert.That(statusChanges[0].NewStatus, Is.EqualTo($"'{assetSourcePath1}' => '{assetDestinationPath1}'"));
+            Assert.That(statusChanges[1].NewStatus, Is.EqualTo($"'{assetSourcePath2}' => '{assetDestinationPath2}'"));
             Assert.That(statusChanges[2].NewStatus, Is.EqualTo($"'{assetSourcePath5}' => '{assetDestinationPath5}'"));
             Assert.That(statusChanges[3].NewStatus, Is.EqualTo($"'{assetSourcePath7}' => '{assetDestinationPath7}'"));
         }

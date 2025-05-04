@@ -13,7 +13,7 @@
         <c:TernaryConverter x:Key="TernaryConverter" />
         <DataTemplate x:Key="ThumbnailDataTemplate">
             <!-- ContentControl_MouseDoubleClick will open the image in full screen mode in the ViewerUserControl -->
-            <ContentControl MouseDown="ContentControl_MouseDown" MouseDoubleClick="ContentControl_MouseDoubleClick" Margin="10">
+            <ContentControl MouseDoubleClick="ContentControl_MouseDoubleClick" Margin="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -58,8 +58,8 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
-        <ListBox Name="thumbnailsListView"
-                 ItemsSource="{Binding ObservableAssets}"
+        <ListBox Name="ThumbnailsListView"
+                 ItemsSource="{Binding ObservableAssets, Mode=OneWay}"
                  ItemTemplate="{DynamicResource ThumbnailDataTemplate}"
                  Background="#FF3C3C3C"
                  SelectedIndex="{Binding ViewerPosition}"

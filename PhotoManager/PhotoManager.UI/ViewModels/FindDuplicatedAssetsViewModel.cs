@@ -1,98 +1,55 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
-using PhotoManager.UI.Windows;
+using PhotoManager.UI.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class FindDuplicatedAssetsViewModel : BaseViewModel
+public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewModel(application)
 {
-    private List<List<Asset>> _duplicatedAssets;
-    private List<DuplicatedSetViewModel> _collection;
+    private List<DuplicatedSetViewModel> _duplicatedAssetSets = [];
     private int _duplicatedAssetSetsPosition;
     private int _duplicatedAssetPosition;
 
-    public FindDuplicatedAssetsViewModel(IApplication application) : base(application)
-    {
-    }
+    public event MessageBoxInformationSentEventHandler? MessageBoxInformationSent;
 
-    public List<DuplicatedSetViewModel> DuplicatedAssetSetsCollection
+    public List<DuplicatedSetViewModel> DuplicatedAssetSets
     {
-        get { return _collection; }
+        get => _duplicatedAssetSets;
         private set
         {
-            _collection = value;
-            NotifyPropertyChanged(nameof(DuplicatedAssetSetsCollection));
+            _duplicatedAssetSets = value;
+            NotifyPropertyChanged(nameof(DuplicatedAssetSets));
             DuplicatedAssetSetsPosition = 0;
         }
     }
 
-    public List<DuplicatedSetViewModel> GetAllDuplicatedAssets()
-    {
-        return _collection;
-    }
-
     public int DuplicatedAssetSetsPosition
     {
-        get { return _duplicatedAssetSetsPosition; }
+        get => _duplicatedAssetSetsPosition;
         set
         {
             _duplicatedAssetSetsPosition = value;
             NotifyPropertyChanged(nameof(DuplicatedAssetSetsPosition), nameof(CurrentDuplicatedAssetSet));
-            DuplicatedAssetPosition = 0;
+            ResetDuplicatedAssetPosition();
         }
-    }
-
-    public void SetDuplicates(List<List<Asset>> duplicatedAssets)
-    {
-        if (duplicatedAssets == null)
-        {
-            throw new ArgumentNullException(nameof(duplicatedAssets));
-        }
-
-        _duplicatedAssets = duplicatedAssets;
-        List<DuplicatedSetViewModel> collection = new();
-
-        foreach (var duplicatedSet in duplicatedAssets)
-        {
-            DuplicatedSetViewModel duplicatedSetViewModel = new();
-
-            foreach (var asset in duplicatedSet)
-            {
-                duplicatedSetViewModel.Add(
-                    new DuplicatedAssetViewModel(Application)
-                    {
-                        Asset = asset,
-                        Visible = Visibility.Visible,
-                        ParentViewModel = duplicatedSetViewModel
-                    });
-            }
-
-            collection.Add(duplicatedSetViewModel);
-        }
-
-        DuplicatedAssetSetsCollection = collection;
     }
 
     public int DuplicatedAssetPosition
     {
-        get { return _duplicatedAssetPosition; }
+        get => _duplicatedAssetPosition;
         set
         {
             _duplicatedAssetPosition = value;
 
-            DuplicatedAssetViewModel assetViewModel = CurrentDuplicatedAsset;
-
-            if (assetViewModel != null && assetViewModel.Asset != null && assetViewModel.Asset.ImageData == null)
+            if (CurrentDuplicatedAsset is { Asset.ImageData: null })
             {
-                Application.LoadThumbnail(assetViewModel.Asset);
+                Application.LoadThumbnail(CurrentDuplicatedAsset.Asset);
             }
 
-            if (assetViewModel != null && assetViewModel.Asset != null && assetViewModel.Asset.ImageData == null)
+            if (CurrentDuplicatedAsset is { Asset.ImageData: null })
             {
                 Refresh();
             }
@@ -107,24 +64,24 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
     {
         get
         {
-            DuplicatedSetViewModel result = null;
+            DuplicatedSetViewModel result = [];
 
-            if (DuplicatedAssetSetsCollection != null && DuplicatedAssetSetsCollection.Count > 0 && DuplicatedAssetSetsPosition >= 0)
+            if (DuplicatedAssetSets.Count > 0 && DuplicatedAssetSetsPosition >= 0)
             {
-                result = DuplicatedAssetSetsCollection[DuplicatedAssetSetsPosition];
+                result = DuplicatedAssetSets[DuplicatedAssetSetsPosition];
             }
 
             return result;
         }
     }
 
-    public DuplicatedAssetViewModel CurrentDuplicatedAsset
+    public DuplicatedAssetViewModel? CurrentDuplicatedAsset
     {
         get
         {
-            DuplicatedAssetViewModel result = null;
+            DuplicatedAssetViewModel? result = null;
 
-            if (CurrentDuplicatedAssetSet != null && CurrentDuplicatedAssetSet.Count > 0 && DuplicatedAssetPosition >= 0)
+            if (CurrentDuplicatedAssetSet.Count > 0 && DuplicatedAssetPosition >= 0)
             {
                 result = CurrentDuplicatedAssetSet[DuplicatedAssetPosition];
             }
@@ -133,140 +90,231 @@ public class FindDuplicatedAssetsViewModel : BaseViewModel
         }
     }
 
-    public void Refresh()
+    public void SetDuplicates(List<List<Asset>> assetsSets)
     {
-        var duplicates = Application.GetDuplicatedAssets();
-        SetDuplicates(duplicates);
+        if (assetsSets == null)
+        {
+            throw new ArgumentNullException(nameof(assetsSets));
+        }
+
+        List<DuplicatedSetViewModel> duplicatedAssetSets = [];
+
+        foreach (List<Asset> assets in assetsSets)
+        {
+            DuplicatedSetViewModel duplicatedSetViewModel = [];
+
+            foreach (Asset asset in assets)
+            {
+                duplicatedSetViewModel.Add(new (Application) { Asset = asset, ParentViewModel = duplicatedSetViewModel });
+            }
+
+            duplicatedAssetSets.Add(duplicatedSetViewModel);
+        }
+
+        DuplicatedAssetSets = duplicatedAssetSets;
     }
 
-    public void DeleteAsset(DuplicatedAssetViewModel assetViewModel, MainWindow mainWindowInstance)
+    public void Refresh()
     {
-        mainWindowInstance.DeleteDuplicateAssets(new Asset[] { assetViewModel.Asset });
+        List<List<Asset>> duplicatedAssetsSets = Application.GetDuplicatedAssets();
+        SetDuplicates(duplicatedAssetsSets);
+    }
 
-        assetViewModel.Visible = Visibility.Collapsed;
+    public List<DuplicatedAssetViewModel> GetDuplicatedAssets(Asset asset)
+    {
+        if (DuplicatedAssetSets.Count == 0)
+        {
+            return [];
+        }
 
-        if (assetViewModel.ParentViewModel.Where(x => x.Visible == Visibility.Visible).Count() <= 1) // We want to navigate only when we are deleting the last duplicate
+        string assetHash = asset.Hash;
+        string assetFolderPath = asset.Folder.Path;
+        string assetFileName = asset.FileName;
+
+        DuplicatedSetViewModel duplicatedSetViewModel = [];
+
+        for (int i = 0; i < DuplicatedAssetSets.Count; i++)
+        {
+            DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
+
+            for (int j = 0; j < duplicatedAssetSet.Count;)
+            {
+                if (duplicatedAssetSet[j].Asset.Hash != assetHash)
+                {
+                    break;
+                }
+
+                duplicatedSetViewModel = duplicatedAssetSet;
+                break;
+            }
+
+            if (duplicatedSetViewModel.Count != 0)
+            {
+                break;
+            }
+        }
+
+        if (duplicatedSetViewModel.Count == 0)
+        {
+            return [];
+        }
+
+        List<DuplicatedAssetViewModel> assetsToDelete = [];
+
+        for (int i = 0; i < duplicatedSetViewModel.Count; i++)
+        {
+            if ((duplicatedSetViewModel[i].Asset.Folder.Path == assetFolderPath
+                 && duplicatedSetViewModel[i].Asset.FileName == assetFileName)
+                || duplicatedSetViewModel[i].Visible == Visibility.Collapsed)
+            {
+                continue;
+            }
+
+            assetsToDelete.Add(duplicatedSetViewModel[i]);
+        }
+
+        return assetsToDelete;
+    }
+
+    public List<DuplicatedAssetViewModel> GetNotExemptedDuplicatedAssets(string exemptedFolderPath)
+    {
+        if (DuplicatedAssetSets.Count == 0)
+        {
+            return [];
+        }
+
+        List<DuplicatedAssetViewModel> exemptedAssets = [];
+        List<DuplicatedAssetViewModel> duplicatedAssetsFiltered = [];
+
+        for (int i = 0; i < DuplicatedAssetSets.Count; i++)
+        {
+            DuplicatedSetViewModel duplicatedAssetSet = DuplicatedAssetSets[i];
+
+            for (int j = 0; j < duplicatedAssetSet.Count; j++)
+            {
+                DuplicatedAssetViewModel duplicatedAsset = duplicatedAssetSet[j];
+
+                if (duplicatedAsset.Asset.Folder.Path == exemptedFolderPath)
+                {
+                    exemptedAssets.Add(duplicatedAsset);
+                }
+                else if (duplicatedAsset.Visible != Visibility.Collapsed)
+                {
+                    duplicatedAssetsFiltered.Add(duplicatedAsset);
+                }
+            }
+        }
+
+        List<DuplicatedAssetViewModel> assetsToDelete = [];
+
+        for (int i = 0; i < duplicatedAssetsFiltered.Count; i++)
+        {
+            DuplicatedAssetViewModel filteredAsset = duplicatedAssetsFiltered[i];
+
+            for (int j = 0; j < exemptedAssets.Count; j++)
+            {
+                DuplicatedAssetViewModel exemptedAsset = exemptedAssets[j];
+
+                if (filteredAsset.Asset.Hash != exemptedAsset.Asset.Hash)
+                {
+                    continue;
+                }
+
+                assetsToDelete.Add(filteredAsset);
+                break;
+            }
+        }
+
+        return assetsToDelete;
+    }
+
+    public void CollapseAssets(List<DuplicatedAssetViewModel> duplicatedAssets)
+    {
+        for (int i = 0; i < duplicatedAssets.Count; i++)
+        {
+            duplicatedAssets[i].Visible = Visibility.Collapsed;
+        }
+
+        // We want to navigate to another set only when we are collapsing the last duplicate of the current set
+        if (CurrentDuplicatedAssetSet.Visible == Visibility.Visible)
+        {
+            if (CurrentDuplicatedAsset!.Visible == Visibility.Collapsed)
+            {
+                ResetDuplicatedAssetPosition();
+            }
+        }
+        else
         {
             NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
         }
     }
 
-    public void DeleteAssets(List<DuplicatedAssetViewModel> assetViewModelList, MainWindow mainWindowInstance)
+    private void ResetDuplicatedAssetPosition()
     {
-        mainWindowInstance.DeleteDuplicateAssets(assetViewModelList.Select(x => x.Asset).ToArray());
+        if (DuplicatedAssetSets.Count == 0 || CurrentDuplicatedAssetSet.Visible != Visibility.Visible)
+        {
+            DuplicatedAssetPosition = 0;
 
-        assetViewModelList.ForEach(x => x.Visible = Visibility.Collapsed);
+            return;
+        }
 
-        NavigateToNextVisibleSet(DuplicatedAssetSetsPosition);
+        for (int i = 0; i < CurrentDuplicatedAssetSet.Count; i++)
+        {
+            if (CurrentDuplicatedAssetSet[i].Visible != Visibility.Visible)
+            {
+                continue;
+            }
+
+            DuplicatedAssetPosition = i;
+
+            return;
+        }
     }
 
     private void NavigateToNextVisibleSet(int currentIndex)
     {
-        var nextVisibleSet = DuplicatedAssetSetsCollection
-            .Where(s => s.Visible == Visibility.Visible
-                && DuplicatedAssetSetsCollection.IndexOf(s) > currentIndex)
-            .FirstOrDefault();
+        for (int i = currentIndex; i < DuplicatedAssetSets.Count; i++)
+        {
+            if (DuplicatedAssetSets[i].Visible == Visibility.Visible)
+            {
+                DuplicatedAssetSetsPosition = i;
+                return;
+            }
+        }
 
-        if (nextVisibleSet != null)
-        {
-            int nextIndex = DuplicatedAssetSetsCollection.IndexOf(nextVisibleSet);
-            DuplicatedAssetSetsPosition = nextIndex;
-        }
-        else
-        {
-            NavigateToPreviousVisibleSet(currentIndex);
-        }
+        // No visible set found after or at currentIndex, fallback
+        NavigateToPreviousVisibleSet(currentIndex);
     }
 
     private void NavigateToPreviousVisibleSet(int currentIndex)
     {
-        var previousVisibleSet = DuplicatedAssetSetsCollection
-            .Where(s => s.Visible == Visibility.Visible
-                && DuplicatedAssetSetsCollection.IndexOf(s) < currentIndex)
-            .LastOrDefault();
+        int duplicatedAssetSetsCount = DuplicatedAssetSets.Count;
 
-        if (previousVisibleSet != null)
+        // If currentIndex is out of range, adjust it to the last valid index
+        if (currentIndex >= duplicatedAssetSetsCount)
         {
-            int nextIndex = DuplicatedAssetSetsCollection.IndexOf(previousVisibleSet);
-            DuplicatedAssetSetsPosition = nextIndex;
+            currentIndex = duplicatedAssetSetsCount - 1;
         }
-        else
+
+        for (int i = currentIndex; i >= 0; i--)
         {
-            MessageBox.Show("All duplicates have been deleted. \nGood Job ;)", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (DuplicatedAssetSets[i].Visible == Visibility.Visible)
+            {
+                DuplicatedAssetSetsPosition = i;
+                return;
+            }
         }
-    }
-}
 
-public class DuplicatedAssetViewModel : BaseViewModel
-{
-    private Asset asset;
-    private Visibility visible;
-
-    public DuplicatedAssetViewModel(IApplication application) : base(application)
-    {
-    }
-
-    public Asset Asset
-    {
-        get { return asset; }
-        set
+        // If no visible set is found, reset the position to 0
+        if (DuplicatedAssetSetsPosition != 0)
         {
-            asset = value;
-            NotifyPropertyChanged(nameof(Asset));
+            DuplicatedAssetSetsPosition = 0;
         }
-    }
 
-    public Visibility Visible
-    {
-        get { return visible; }
-        set
+        MessageBoxInformationSent?.Invoke(this, new()
         {
-            visible = value;
-            NotifyPropertyChanged(nameof(Visible));
-            ParentViewModel?.NotifyAssetChanged(this);
-        }
-    }
-
-    public DuplicatedSetViewModel ParentViewModel { get; internal set; }
-}
-
-public class DuplicatedSetViewModel : List<DuplicatedAssetViewModel>, INotifyPropertyChanged
-{
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected void NotifyPropertyChanged(params string[] propertyNames)
-    {
-        foreach (string propertyName in propertyNames)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
-    private int GetVisibleDuplicates()
-    {
-        return this.Count(vm => vm.Visible == Visibility.Visible);
-    }
-
-    public string FileName
-    {
-        get { return this[0].Asset.FileName; }
-    }
-
-    public int DuplicatesCount
-    {
-        get { return GetVisibleDuplicates(); }
-    }
-
-    public Visibility Visible
-    {
-        get
-        {
-            return GetVisibleDuplicates() > 1 ? Visibility.Visible : Visibility.Collapsed;
-        }
-    }
-
-    public void NotifyAssetChanged(DuplicatedAssetViewModel asset)
-    {
-        NotifyPropertyChanged(nameof(DuplicatesCount), nameof(Visible));
+            Message = "All duplicates have been deleted. \nGood Job ;)",
+            Caption = "Information"
+        });
     }
 }

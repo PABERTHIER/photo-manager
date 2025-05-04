@@ -5,8 +5,9 @@ using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.ViewModels.Enums;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,79 +16,66 @@ using System.Windows.Input;
 
 namespace PhotoManager.UI.Windows;
 
-public class ThumbnailSelectedEventArgs : EventArgs
-{
-    public Asset Asset { get; set; }
-}
-
-public delegate void ThumbnailSelectedEventHandler(object sender, ThumbnailSelectedEventArgs e);
-
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 [ExcludeFromCodeCoverage]
-public partial class MainWindow : Window
+public partial class MainWindow
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+
     private readonly IApplication _application;
-    private readonly CancellationTokenSource _cts;
-    Task catalogTask;
+    private readonly CancellationTokenSource _cancellationTokenSource;
+    private Task _backgroundWorkTask = new (() => {});
+    private Task _catalogTask = new (() => {});
 
-    public static MainWindow Current { get; private set; }
-
-    // TODO: Refacto about to get it only once
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
     {
         try
         {
             InitializeComponent();
-            Current = this;
-            _cts = new CancellationTokenSource();
-
-            _application = application;
-            var aboutInformation = application.GetAboutInformation(GetType().Assembly);
-            viewModel.Product = aboutInformation.Product; // TODO: Add Author here and above
-            viewModel.Version = aboutInformation.Version;
             DataContext = viewModel;
+
+            FolderNavigationViewModel folderNavigationViewModel = new (
+                ViewModel,
+                application,
+                new() { Id = Guid.NewGuid(), Path = ViewModel.CurrentFolderPath },
+                application.GetRecentTargetPaths());
+            folderTreeView.DataContext = folderNavigationViewModel;
+            folderTreeView.SelectedPath = folderNavigationViewModel.SourceFolder.Path;
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
+            throw;
         }
+
+        _application = application;
+        _cancellationTokenSource = new();
     }
 
-    public ApplicationViewModel ViewModel
-    {
-        get { return (ApplicationViewModel)DataContext; }
-    }
+    private ApplicationViewModel ViewModel => (ApplicationViewModel)DataContext;
 
-    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         try
         {
-            ViewModel?.ChangeAppMode(AppMode.Thumbnails);
-            thumbnailsUserControl.GoToFolder(_application, ViewModel?.CurrentFolder);
-            folderTreeView.SelectedPath = ViewModel?.CurrentFolder;
-            await DoBackgroundWork();
+            _backgroundWorkTask = StartBackgroundWorkAsync();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
-        }
-        finally
-        {
-            ViewModel.StatusMessage = "";
+            Log.Error(ex);
         }
     }
 
+    // TODO: Add a help page to describe all shortcuts available
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
         try
         {
-            // TODO: Rework this code because there is no way to trigger MoveAssets by doing ctrl + C / M
-            // Window_KeyDown is instantly triggered after the ctrl click
             if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
             {
+                // To trigger these events below, need to hold the Ctrl key and press C or M in the meantime
                 switch (e.Key)
                 {
                     case Key.C:
@@ -97,6 +85,9 @@ public partial class MainWindow : Window
                     case Key.M:
                         MoveAssets(preserveOriginalFiles: false);
                         break;
+                    // ReSharper disable once RedundantEmptySwitchSection
+                    default:
+                        break;
                 }
             }
             else
@@ -104,69 +95,47 @@ public partial class MainWindow : Window
                 switch (e.Key)
                 {
                     case Key.Delete:
-                        DeleteAssets();
+                        DeleteSelectedAssets();
                         break;
 
                     case Key.PageUp:
                     case Key.Left:
-                        ViewModel?.GoToPreviousAsset();
+                        ViewModel.GoToPreviousAsset();
                         ShowImage();
                         break;
 
                     case Key.PageDown:
                     case Key.Right:
-                        ViewModel?.GoToNextAsset();
+                        ViewModel.GoToNextAsset();
                         ShowImage();
                         break;
 
                     case Key.F1:
-                        ViewModel?.ChangeAppMode();
+                        ViewModel.ChangeAppMode();
                         ShowImage();
+                        break;
+                    // ReSharper disable once RedundantEmptySwitchSection
+                    default:
                         break;
                 }
             }
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
-    private void ShowImage()
-    {
-        if (ViewModel.AppMode == AppMode.Viewer)
-        {
-            viewerUserControl.ShowImage();
-        }
-        else
-        {
-            thumbnailsUserControl.ShowImage();
-        }
-    }
-
-    private void ThumbnailsUserControl_ThumbnailSelected(object sender, ThumbnailSelectedEventArgs e)
+    private void ToggleImageView(object sender, EventArgs e)
     {
         try
         {
-            ViewModel?.GoToAsset(e.Asset, AppMode.Viewer);
+            ViewModel.ChangeAppMode();
             ShowImage();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
-        }
-    }
-
-    private void ViewerUserControl_ThumbnailSelected(object sender, ThumbnailSelectedEventArgs e)
-    {
-        try
-        {
-            ViewModel?.GoToAsset(e.Asset, AppMode.Thumbnails);
-            ShowImage();
-        }
-        catch (Exception ex)
-        {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -178,7 +147,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -186,17 +155,19 @@ public partial class MainWindow : Window
     {
         try
         {
-            var duplicates = _application.GetDuplicatedAssets();
+            List<List<Asset>> assetsSets = _application.GetDuplicatedAssets();
 
-            if (duplicates.Count > 0)
+            if (assetsSets.Count > 0)
             {
-                FindDuplicatedAssetsViewModel viewModel = new (_application);
-                viewModel.SetDuplicates(duplicates);
-                DuplicatedAssetsWindow duplicatedAssetsWindow = new (viewModel) // DuplicatedAssetsWindow is FindDuplicatedAssetsWindow.xaml
-                {
-                    MainWindowInstance = Current
-                };
-                duplicatedAssetsWindow.ShowDialog();
+                FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModel = new (_application);
+                findDuplicatedAssetsViewModel.SetDuplicates(assetsSets);
+                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new (findDuplicatedAssetsViewModel);
+
+                findDuplicatedAssetsWindow.GetExemptedFolderPath += GetExemptedFolderPath;
+                findDuplicatedAssetsWindow.DeleteDuplicatedAssets += DeleteDuplicatedAssets;
+                findDuplicatedAssetsWindow.RefreshAssetsCounter += RefreshAssetsCounter;
+
+                findDuplicatedAssetsWindow.ShowDialog();
             }
             else
             {
@@ -205,7 +176,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -213,13 +184,13 @@ public partial class MainWindow : Window
     {
         try
         {
-            SyncAssetsViewModel viewModel = new (_application);
-            SyncAssetsWindow syncAssetsWindow = new (viewModel);
+            SyncAssetsViewModel syncAssetsViewModel = new (_application);
+            SyncAssetsWindow syncAssetsWindow = new (syncAssetsViewModel);
             syncAssetsWindow.ShowDialog();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -227,13 +198,12 @@ public partial class MainWindow : Window
     {
         try
         {
-            var about = _application.GetAboutInformation(GetType().Assembly);
-            AboutWindow duplicatedAssetsWindow = new (about);  // TODO: Add Author above
-            duplicatedAssetsWindow.ShowDialog();
+            AboutWindow aboutWindow = new (ViewModel.AboutInformation);
+            aboutWindow.ShowDialog();
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
@@ -247,108 +217,31 @@ public partial class MainWindow : Window
         MoveAssets(preserveOriginalFiles: false);
     }
 
-    private void MoveAssets(bool preserveOriginalFiles)
+    private void DeleteDuplicatedAssets(object sender, Asset[] assets)
     {
         try
         {
-            var assets = ViewModel.SelectedAssets;
-
-            if (assets != null && assets.Length > 0)
+            if (assets.Length > 0)
             {
-                FolderNavigationWindow folderNavigationWindow = new(
-                    new FolderNavigationViewModel(
-                        _application,
-                        assets.First().Folder,
-                        ViewModel.LastSelectedFolder,
-                        _application.GetRecentTargetPaths()));
-
-                folderNavigationWindow.Closed += (sender, e) =>
-                {
-                    if (folderNavigationWindow.ViewModel.HasConfirmed)
-                    {
-                        bool result = true;
-
-                        result = _application.MoveAssets(assets,
-                            folderNavigationWindow.ViewModel.SelectedFolder,
-                            preserveOriginalFiles);
-
-                        if (result)
-                        {
-                            ViewModel.LastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
-                            ViewModel.IsRefreshingFolders = true;
-                            folderTreeView.Initialize();
-                            ViewModel.IsRefreshingFolders = false;
-
-                            if (!preserveOriginalFiles)
-                            {
-                                ViewModel.RemoveAssets(assets);
-
-                                if (ViewModel.AppMode == AppMode.Viewer)
-                                {
-                                    viewerUserControl.ShowImage();
-                                }
-                            }
-                        }
-                    }
-                };
-
-                folderNavigationWindow.Show();
+                DeleteAssets(assets);
             }
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
     }
 
-    private void DeleteAssets()
+    private void RefreshAssetsCounter(object sender)
     {
-        try
-        {
-            var assets = ViewModel.SelectedAssets;
-
-            if (assets != null)
-            {
-                _application.DeleteAssets(assets);
-                ViewModel.RemoveAssets(assets);
-                ShowImage();
-            }
-        }
-        catch (Exception ex)
-        {
-            log.Error(ex);
-        }
+        ViewModel.CalculateGlobalAssetsCounter();
     }
 
-    public void DeleteDuplicateAssets(Asset[] assets )
-    {
-        try
-        {
-            if (assets != null)
-            {
-                _application.DeleteAssets(assets);
-                ViewModel.RemoveAssets(assets);
-            }
-        }
-        catch (Exception ex)
-        {
-            log.Error(ex);
-        }
-    }
-
-    public void RefreshAssetsCounter()
-    {
-        ViewModel.CalculateGlobaleAssetsCounter();
-    }
-
-    public string GetExemptedFolderPath()
-    {
-        return ViewModel.GetExemptedFolderPath();
-    }
+    private string GetExemptedFolderPath(object sender) => ViewModel.GetExemptedFolderPath();
 
     private void DeleteAssets_Click(object sender, RoutedEventArgs e)
     {
-        DeleteAssets();
+        DeleteSelectedAssets();
     }
 
     private void Exit_Click(object sender, RoutedEventArgs e)
@@ -381,59 +274,171 @@ public partial class MainWindow : Window
         ViewModel.SortAssetsByCriteria(SortCriteria.ThumbnailCreationDateTime);
     }
 
-    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void Window_Closing(object sender, CancelEventArgs e)
     {
-        var taskCancellation = Task.Run(() =>
+        _cancellationTokenSource.Cancel();
+
+        _ = _backgroundWorkTask.ContinueWith(task =>
         {
-            _cts.Cancel();
-        });
-
-        await taskCancellation.ConfigureAwait(true);
-        await catalogTask.ConfigureAwait(true);
-        //e.Cancel = catalogTask != null && !catalogTask.IsCompleted; // Now that all tasks are canceled, the window can be closed properly
-    }
-
-    private async Task DoBackgroundWork()
-    {
-        Stopwatch stopwatch = new();
-        stopwatch.Start();
-
-        ViewModel.StatusMessage = "Cataloging thumbnails for " + ViewModel.CurrentFolder;
-
-        if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perfs
-        {
-            ushort minutes = ViewModel.GetCatalogCooldownMinutes();
-
-            while (true)
+            if (task.IsFaulted)
             {
-                await Initialization(stopwatch);
-                await Task.Delay(1000 * 60 * minutes, CancellationToken.None).ConfigureAwait(true);
+                Log.Error(task.Exception, new Exception("BackgroundWorkTask faulted during shutdown"));
             }
-        }
+        }, TaskScheduler.Default);
 
-        await Initialization(stopwatch);
+        _backgroundWorkTask = Task.CompletedTask;
     }
 
-    private async Task Initialization(Stopwatch stopwatch)
+    private async Task StartBackgroundWorkAsync()
     {
         try
         {
-            catalogTask = ViewModel.CatalogAssets(
-            async (e) =>
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            ViewModel.StatusMessage = $"Cataloging thumbnails for {ViewModel.CurrentFolderPath}";
+
+            // The calling thread cannot access this object because a different thread owns it
+            await InitializeOnceAsync(stopwatch).ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
+
+            if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perf
             {
-                // The InvokeAsync method is used to avoid freezing the application when the task is cancelled.
-                await Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e));
-            }, _cts.Token);
+                ushort minutes = ViewModel.GetCatalogCooldownMinutes();
+                TimeSpan delay = TimeSpan.FromMinutes(minutes);
+
+                while (!_cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await Task.Delay(delay, _cancellationTokenSource.Token).ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+
+                    await InitializeOnceAsync(stopwatch).ConfigureAwait(true);  // Due to the WPF context, need to set it true to prevent thread exceptions
+                }
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Log.Error(ex, new Exception("Unexpected error in background work"));
+        }
+    }
+
+    // TODO: Rework the cancellation from here to CatalogAssetsService
+    private async Task InitializeOnceAsync(Stopwatch stopwatch)
+    {
+        _catalogTask = ViewModel.CatalogAssets(
+            e =>
+            {
+                // The InvokeAsync method is used to avoid freezing the application when the task is cancelled + to keep updating the UI
+                // To prevent this issue : The calling thread cannot access this object because a different thread owns it
+                Dispatcher.InvokeAsync(() => ViewModel.NotifyCatalogChange(e));
+            },
+            _cancellationTokenSource.Token
+        );
+
+        try
+        {
+            await _catalogTask.ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
         }
         catch (OperationCanceledException ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
 
-        await catalogTask.ConfigureAwait(true);
-        ViewModel?.CalculateGlobaleAssetsCounter();
+        ViewModel.CalculateGlobalAssetsCounter();
         stopwatch.Stop();
-        ViewModel?.SetExecutionTime(stopwatch.Elapsed);
-        ViewModel?.CalculateTotalFilesNumber();
+        ViewModel.SetExecutionTime(stopwatch.Elapsed);
+        ViewModel.CalculateTotalFilesCount();
+    }
+
+    private void ShowImage()
+    {
+        if (ViewModel.AppMode == AppMode.Viewer)
+        {
+            viewerUserControl.ShowImage();
+        }
+        else
+        {
+            thumbnailsUserControl.ShowImage();
+        }
+    }
+
+    private void DeleteSelectedAssets()
+    {
+        try
+        {
+            Asset[] selectedAssets = ViewModel.SelectedAssets;
+
+            if (selectedAssets.Length > 0)
+            {
+                DeleteAssets(selectedAssets);
+                ShowImage();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+        }
+    }
+
+    private void DeleteAssets(Asset[] assets)
+    {
+        _application.DeleteAssets(assets); // TODO: Need to rework how the deletion is handled
+        ViewModel.RemoveAssets(assets);
+    }
+
+    private void MoveAssets(bool preserveOriginalFiles)
+    {
+        try
+        {
+            Asset[] assets = ViewModel.SelectedAssets;
+
+            if (assets.Length > 0)
+            {
+                FolderNavigationWindow folderNavigationWindow = new(
+                    new FolderNavigationViewModel(
+                        ViewModel,
+                        _application,
+                        assets[0].Folder,
+                        _application.GetRecentTargetPaths()));
+
+                folderNavigationWindow.Closed += (_, _) =>
+                {
+                    if (folderNavigationWindow.ViewModel is { SelectedFolder: not null, HasConfirmed: true })
+                    {
+                        bool result = _application.MoveAssets(
+                            assets,
+                            folderNavigationWindow.ViewModel.SelectedFolder,
+                            preserveOriginalFiles);
+
+                        if (result)
+                        {
+                            ViewModel.MoveAssetsLastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
+                            ViewModel.IsRefreshingFolders = true;
+                            folderTreeView.Initialize();
+                            ViewModel.IsRefreshingFolders = false;
+
+                            if (!preserveOriginalFiles)
+                            {
+                                ViewModel.RemoveAssets(assets);
+
+                                if (ViewModel.AppMode == AppMode.Viewer)
+                                {
+                                    viewerUserControl.ShowImage();
+                                }
+                            }
+                        }
+                    }
+                };
+
+                folderNavigationWindow.Show();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+        }
     }
 }

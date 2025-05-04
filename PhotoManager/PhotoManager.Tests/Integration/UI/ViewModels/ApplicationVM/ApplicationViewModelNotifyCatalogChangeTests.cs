@@ -1,4 +1,6 @@
-﻿using PhotoManager.UI.ViewModels.Enums;
+﻿using PhotoManager.UI.Models;
+using PhotoManager.UI.ViewModels.Enums;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 
@@ -391,6 +393,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _asset3 = _asset3!.WithFolder(folder!);
             _asset4 = _asset4!.WithFolder(folder!);
 
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
@@ -459,7 +462,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -473,7 +476,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                expectedAppTitle,
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -501,7 +504,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                expectedAppTitle,
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -693,7 +696,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -706,7 +709,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -718,7 +721,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -743,7 +746,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -765,7 +768,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 folderToAssetsMapping[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -774,11 +777,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(22));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
@@ -786,7 +789,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -966,7 +969,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -980,7 +983,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1002,7 +1005,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1022,20 +1025,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 videoFirstFrameFolder!,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(19));
-            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
@@ -1043,7 +1046,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1188,7 +1191,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -1202,7 +1205,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1224,7 +1227,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1382,14 +1385,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
                     ref increment);
             }
 
-            NotifyCatalogChangeAssetNotCreated(catalogChanges, assetsDirectory, 1, folderToAssetsMapping[folder!], imagePath1ToCopy, ref increment);
+            NotifyCatalogChangeAssetNotCreated(
+                catalogChanges,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                folderToAssetsMapping[folder!],
+                imagePath1ToCopy,
+                ref increment);
+
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -1397,7 +1407,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1417,7 +1427,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1538,7 +1548,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
 
-            CheckAfterNotifyCatalogChanges(_applicationViewModel!, assetsDirectory, 0, [], null!, folder!, false);
+            CheckAfterNotifyCatalogChanges(
+                _applicationViewModel!,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                [],
+                null,
+                folder!,
+                false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(4));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
@@ -1546,7 +1563,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("StatusMessage"));
 
-            CheckInstance(applicationViewModelInstances, assetsDirectory, 0, [], null!, folder!, false);
+            CheckInstance(
+                applicationViewModelInstances,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                [],
+                null,
+                folder!,
+                false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -1702,7 +1726,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -1716,7 +1740,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1747,7 +1771,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1857,13 +1881,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(36));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(30));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
@@ -1886,27 +1910,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
@@ -2095,7 +2113,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -2108,7 +2126,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -2120,7 +2138,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2145,7 +2163,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2243,7 +2261,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2274,7 +2292,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2296,7 +2314,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 folderToAssetsMapping[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -2305,11 +2323,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
@@ -2317,7 +2335,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2494,7 +2512,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -2508,7 +2526,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2530,7 +2548,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2619,7 +2637,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2645,7 +2663,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2665,20 +2683,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 videoFirstFrameFolder!,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
@@ -2686,7 +2704,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2833,7 +2851,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -2847,7 +2865,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2866,7 +2884,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2962,7 +2980,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 _asset3Temp,
                 folder!,
@@ -2974,7 +2992,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3001,7 +3019,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3159,7 +3177,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -3173,7 +3191,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3195,7 +3213,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3294,7 +3312,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                folderToAssetsMappingUpdated[folder!].Count,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {folderToAssetsMappingUpdated[folder!].Count} - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 _asset2Temp,
                 folder!,
@@ -3307,13 +3325,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 false);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(19));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
@@ -3327,21 +3345,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[11], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[12], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[13], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[14], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3505,7 +3519,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -3519,7 +3533,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3550,7 +3564,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3662,13 +3676,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(36));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(30));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
@@ -3691,27 +3705,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
-                folderToAssetsMapping[folder!],
-                folderToAssetsMapping[folder!][0],
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                folderToAssetsMappingUpdated[folder!],
+                folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
@@ -3870,7 +3878,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -3884,7 +3892,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3915,7 +3923,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4008,7 +4016,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            NotifyCatalogChangeAssetDeleted(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsUpdated.Count, expectedAssetsUpdated, _asset1Temp, folder!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {expectedAssetsUpdated.Count} - sorted by file name ascending",
+                expectedAssetsUpdated,
+                _asset1Temp,
+                folder!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -4016,13 +4033,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
                 true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
@@ -4045,21 +4062,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -4253,7 +4266,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -4266,7 +4279,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -4278,7 +4291,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4303,7 +4316,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4398,7 +4411,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4429,7 +4442,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4451,7 +4464,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 folderToAssetsMapping[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -4460,11 +4473,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
-            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
@@ -4472,7 +4485,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4654,7 +4667,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -4668,7 +4681,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4690,7 +4703,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4778,7 +4791,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4804,7 +4817,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4824,20 +4837,20 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 videoFirstFrameFolder!,
                 false);
 
             GoToFolderEmulation(assetsDirectory);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(23));
-            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[15], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[16], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("AppTitle"));
@@ -4845,7 +4858,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5012,7 +5025,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMappingFirstSync[folder!][..(i + 1)],
                     folderToAssetsMappingFirstSync[folder!][i],
                     folder!,
@@ -5026,7 +5039,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[folder!],
                 folderToAssetsMappingFirstSync[folder!][0],
                 folder!,
@@ -5057,7 +5070,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[folder!],
                 folderToAssetsMappingFirstSync[folder!][0],
                 folder!,
@@ -5138,7 +5151,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            NotifyCatalogChangeAssetDeleted(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsSecondSync.Count, expectedAssetsSecondSync, _asset1Temp, folder!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {expectedAssetsSecondSync.Count} - sorted by file name ascending",
+                expectedAssetsSecondSync,
+                _asset1Temp,
+                folder!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -5146,13 +5168,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[folder!],
                 folderToAssetsMappingSecondSync[folder!][0],
                 folder!,
                 true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
@@ -5175,21 +5197,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[folder!],
                 folderToAssetsMappingSecondSync[folder!][0],
                 folder!,
@@ -5277,7 +5295,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            NotifyCatalogChangeAssetCreated(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsThirdSync.Count, expectedAssetsThirdSync, _asset1Temp, folder!, ref increment);
+            NotifyCatalogChangeAssetCreated(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {expectedAssetsThirdSync.Count} - sorted by file name ascending",
+                expectedAssetsThirdSync,
+                _asset1Temp,
+                folder!,
+                ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -5285,13 +5311,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingThirdSync[folder!],
                 folderToAssetsMappingThirdSync[folder!][0],
                 folder!,
                 true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(40));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(36));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
@@ -5314,29 +5340,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[32], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[33], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[36], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[38], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[35], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingThirdSync[folder!],
                 folderToAssetsMappingThirdSync[folder!][0],
                 folder!,
@@ -5489,7 +5511,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -5503,7 +5525,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5522,7 +5544,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5616,7 +5638,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 _asset3Temp,
                 folder!,
@@ -5628,7 +5650,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -5655,7 +5677,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -5819,7 +5841,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -5833,7 +5855,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5864,7 +5886,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5959,7 +5981,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
-            NotifyCatalogChangeAssetDeleted(catalogChanges, assetsDirectory, assetsDirectory, expectedAssetsUpdated.Count, expectedAssetsUpdated, _asset1Temp, folder!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                assetsDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {expectedAssetsUpdated.Count} - sorted by file name ascending",
+                expectedAssetsUpdated,
+                _asset1Temp,
+                folder!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -5967,13 +5998,13 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 expectedAssetsUpdated,
                 expectedAssetsUpdated[0],
                 folder!,
                 true);
 
-            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(32));
+            Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(28));
             Assert.That(notifyPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
@@ -5996,21 +6027,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(notifyPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("StatusMessage"));
             Assert.That(notifyPropertyChangedEvents[21], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ViewerPosition"));
-            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("CanGoToPreviousAsset"));
-            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("CanGoToNextAsset"));
-            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("CurrentAsset"));
-            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[29], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[30], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[22], Is.EqualTo("ObservableAssets"));
+            Assert.That(notifyPropertyChangedEvents[23], Is.EqualTo("AppTitle"));
+            Assert.That(notifyPropertyChangedEvents[24], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[26], Is.EqualTo("StatusMessage"));
+            Assert.That(notifyPropertyChangedEvents[27], Is.EqualTo("StatusMessage"));
 
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 expectedAssetsUpdated,
                 expectedAssetsUpdated[0],
                 folder!,
@@ -6175,7 +6202,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -6190,7 +6217,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -6221,7 +6248,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -6320,7 +6347,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -6335,7 +6362,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -6522,7 +6549,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder1!][..(i + 1)],
                     folderToAssetsMapping[folder1!][i],
                     folder1!,
@@ -6538,7 +6565,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     tempDirectory,
                     assetsDirectory,
-                    folderToAssetsMapping[folder1!].Count,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {folderToAssetsMapping[folder1!].Count} - sorted by file name ascending",
                     folderToAssetsMapping[folder2!][..(i + 1)],
                     folderToAssetsMapping[folder2!][i],
                     folder2!,
@@ -6552,7 +6579,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder1!],
                 folderToAssetsMapping[folder1!][0],
                 folder1!,
@@ -6582,7 +6609,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder1!],
                 folderToAssetsMapping[folder1!][0],
                 folder1!,
@@ -6680,7 +6707,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeAssetDeleted(catalogChanges, tempDirectory, assetsDirectory, 4, assetsFromRepositoryByPath2, _asset1Temp, folder2!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                tempDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                assetsFromRepositoryByPath2,
+                _asset1Temp,
+                folder2!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
@@ -6689,7 +6725,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder1!],
                 folderToAssetsMappingUpdated[folder1!][0],
                 folder1!,
@@ -6727,7 +6763,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder1!],
                 folderToAssetsMappingUpdated[folder1!][0],
                 folder1!,
@@ -6898,7 +6934,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 tempDirectory,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[folder2!],
                 _asset2Temp,
                 folder2!,
@@ -6910,9 +6946,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -6929,9 +6965,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7016,7 +7052,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 tempDirectory,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[folder2!],
                 _asset2,
                 folder2!,
@@ -7028,9 +7064,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7055,9 +7091,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7133,7 +7169,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 2, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeAssetDeleted(catalogChanges, tempDirectory, assetsDirectory, 0, [_asset2], _asset2Temp, folder2!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                tempDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                [_asset2],
+                _asset2Temp,
+                folder2!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             NotifyCatalogChangeEnd(catalogChanges, ref increment);
@@ -7141,9 +7186,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7175,9 +7220,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7250,7 +7295,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, 1, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
-            NotifyCatalogChangeAssetDeleted(catalogChanges, tempDirectory, assetsDirectory, 0, [], _asset2, folder2!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                tempDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                [],
+                _asset2,
+                folder2!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderDeleted(catalogChanges, 1, foldersInRepository.Length, tempDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, tempDirectory, ref increment);
             NotifyCatalogChangeBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
@@ -7259,9 +7313,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7301,9 +7355,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder1!,
                 false);
 
@@ -7598,7 +7652,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 _asset4,
                 rootFolder!,
@@ -7610,7 +7664,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageDeletedFolder!],
                 _asset2,
                 imageDeletedFolder!,
@@ -7622,7 +7676,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageUpdatedDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageUpdatedFolder!],
                 _asset2Temp,
                 imageUpdatedFolder!,
@@ -7634,7 +7688,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 subDirDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[subDirFolder!],
                 _asset3Temp,
                 subDirFolder!,
@@ -7652,7 +7706,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     firstFrameVideosDirectory,
                     assetsDirectory,
-                    1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                     folderToAssetsMappingFirstSync[videoFirstFrameFolder!][..(i + 1)],
                     folderToAssetsMappingFirstSync[videoFirstFrameFolder!][i],
                     videoFirstFrameFolder!,
@@ -7666,7 +7720,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -7700,7 +7754,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -7860,7 +7914,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            NotifyCatalogChangeAssetDeleted(catalogChanges, imageDeletedDirectory, assetsDirectory, 1, [], _asset2!, imageDeletedFolder!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                imageDeletedDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                [],
+                _asset2!,
+                imageDeletedFolder!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageDeletedDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
             NotifyCatalogChangeAssetUpdated(
@@ -7884,7 +7947,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -7935,7 +7998,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -7961,9 +8024,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageDeletedDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 imageDeletedFolder!,
                 false);
 
@@ -7975,7 +8038,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageUpdatedDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!],
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!][0],
                 imageUpdatedFolder!,
@@ -7989,7 +8052,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subDirDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[subDirFolder!],
                 folderToAssetsMappingSecondSync[subDirFolder!][0],
                 subDirFolder!,
@@ -8003,9 +8066,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subSubDirDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 subSubDirFolder!,
                 false);
 
@@ -8017,7 +8080,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -8031,34 +8094,34 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
                 false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(64));
-            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("AppTitle"));
@@ -8339,7 +8402,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 _asset4,
                 rootFolder!,
@@ -8351,7 +8414,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageDeletedFolder!],
                 _asset2,
                 imageDeletedFolder!,
@@ -8363,7 +8426,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageUpdatedDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageUpdatedFolder!],
                 _asset2Temp,
                 imageUpdatedFolder!,
@@ -8375,7 +8438,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 subDirDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[subDirFolder!],
                 _asset3Temp,
                 subDirFolder!,
@@ -8390,7 +8453,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -8403,7 +8466,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -8436,7 +8499,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -8592,7 +8655,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            NotifyCatalogChangeAssetDeleted(catalogChanges, imageDeletedDirectory, assetsDirectory, 1, [], _asset2!, imageDeletedFolder!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                imageDeletedDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                [],
+                _asset2!,
+                imageDeletedFolder!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageDeletedDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
             NotifyCatalogChangeAssetUpdated(
@@ -8616,7 +8688,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -8666,7 +8738,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -8692,9 +8764,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageDeletedDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 imageDeletedFolder!,
                 false);
 
@@ -8706,7 +8778,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageUpdatedDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!],
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!][0],
                 imageUpdatedFolder!,
@@ -8720,7 +8792,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subDirDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[subDirFolder!],
                 folderToAssetsMappingSecondSync[subDirFolder!][0],
                 subDirFolder!,
@@ -8734,9 +8806,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subSubDirDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 subSubDirFolder!,
                 false);
 
@@ -8748,7 +8820,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -8762,34 +8834,34 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
                 false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(63));
-            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[39], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("AppTitle"));
@@ -9073,7 +9145,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 _asset4,
                 rootFolder!,
@@ -9085,7 +9157,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageDeletedFolder!],
                 _asset2,
                 imageDeletedFolder!,
@@ -9097,7 +9169,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageUpdatedDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageUpdatedFolder!],
                 _asset2Temp,
                 imageUpdatedFolder!,
@@ -9109,7 +9181,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -9121,7 +9193,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 subDirDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[subDirFolder!],
                 _asset3Temp,
                 subDirFolder!,
@@ -9137,7 +9209,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -9170,7 +9242,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -9328,7 +9400,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment); // Keep the previous events + new sync but same content so no new asset added
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, assetsDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageDeletedDirectory, ref increment);
-            NotifyCatalogChangeAssetDeleted(catalogChanges, imageDeletedDirectory, assetsDirectory, 1, [], _asset2!, imageDeletedFolder!, false, ref increment);
+            NotifyCatalogChangeAssetDeleted(
+                catalogChanges,
+                imageDeletedDirectory,
+                assetsDirectory,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                [],
+                _asset2!,
+                imageDeletedFolder!,
+                false,
+                ref increment);
             NotifyCatalogChangeFolderInspectionCompleted(catalogChanges, imageDeletedDirectory, ref increment);
             NotifyCatalogChangeFolderInspectionInProgress(catalogChanges, folders.Count, foldersInRepository, imageUpdatedDirectory, ref increment);
             NotifyCatalogChangeAssetUpdated(
@@ -9345,7 +9426,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
                 _asset5Temp!,
                 videoFirstFrameFolder!,
@@ -9361,7 +9442,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -9412,7 +9493,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -9438,9 +9519,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageDeletedDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 imageDeletedFolder!,
                 false);
 
@@ -9452,7 +9533,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageUpdatedDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!],
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!][0],
                 imageUpdatedFolder!,
@@ -9466,7 +9547,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                2,
+                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -9480,7 +9561,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subDirDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[subDirFolder!],
                 folderToAssetsMappingSecondSync[subDirFolder!][0],
                 subDirFolder!,
@@ -9494,9 +9575,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subSubDirDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 subSubDirFolder!,
                 false);
 
@@ -9508,34 +9589,34 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                1,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
                 false);
 
             Assert.That(notifyPropertyChangedEvents, Has.Count.EqualTo(64));
-            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[40], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[41], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[42], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[43], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[44], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[46], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[47], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[48], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[49], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[52], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[53], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[54], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[55], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[56], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[58], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[59], Is.EqualTo("AppTitle"));
-            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolder"));
+            Assert.That(notifyPropertyChangedEvents[60], Is.EqualTo("CurrentFolderPath"));
             Assert.That(notifyPropertyChangedEvents[61], Is.EqualTo("AppTitle"));
             Assert.That(notifyPropertyChangedEvents[62], Is.EqualTo("ObservableAssets"));
             Assert.That(notifyPropertyChangedEvents[63], Is.EqualTo("AppTitle"));
@@ -9644,9 +9725,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 _defaultAssetsDirectory!,
-                0,
+                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9660,9 +9741,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 _defaultAssetsDirectory!,
-                0,
+                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9762,9 +9843,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 _defaultAssetsDirectory!,
-                0,
+                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9778,9 +9859,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 _defaultAssetsDirectory!,
-                0,
+                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9883,9 +9964,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -9899,9 +9980,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -10012,9 +10093,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 _defaultAssetsDirectory!,
-                0,
+                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -10027,9 +10108,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 _defaultAssetsDirectory!,
-                0,
+                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 folder!,
                 false);
 
@@ -10189,7 +10270,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -10203,7 +10284,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10231,7 +10312,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10303,7 +10384,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10335,7 +10416,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10490,7 +10571,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -10504,7 +10585,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10532,7 +10613,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10637,7 +10718,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 expectedAssetsUpdated,
                 _asset1Temp,
                 folder!,
@@ -10649,7 +10730,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -10685,7 +10766,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -10841,7 +10922,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    i + 1,
+                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -10855,7 +10936,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10883,7 +10964,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                4,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10995,7 +11076,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 expectedAssetsUpdated,
                 _asset1Temp,
                 folder!,
@@ -11010,7 +11091,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -11046,7 +11127,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                5,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -11198,9 +11279,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 rootFolder!,
                 false);
 
@@ -11212,9 +11293,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                0,
+                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
-                null!,
+                null,
                 rootFolder!,
                 false);
 
@@ -11268,8 +11349,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private void CheckBeforeNotifyCatalogChanges(string expectedRootDirectory)
     {
         Assert.That(_applicationViewModel!.SortAscending, Is.True);
-        Assert.That(_applicationViewModel!.Product, Is.Null);
-        Assert.That(_applicationViewModel!.Version, Is.Null);
         Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
         Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -11277,31 +11356,33 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.CurrentFolder, Is.EqualTo(expectedRootDirectory));
+        Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.GlobaleAssetsCounter, Is.Null);
-        Assert.That(_applicationViewModel!.ExecutionTime, Is.Null);
-        Assert.That(_applicationViewModel!.TotalFilesNumber, Is.Null);
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
+        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
+        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
-        Assert.That(_applicationViewModel!.LastSelectedFolder, Is.Null); // TODO: Should it be the root folder (add it in the ctor) ?
+        Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
     private static void CheckAfterNotifyCatalogChanges(
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
-        int expectedAppTitleAssetsCount,
-        IReadOnlyCollection<Asset> expectedObservableAssets,
-        Asset expectedCurrentAsset,
+        string expectedAppTitle,
+        List<Asset> expectedAssets,
+        Asset? expectedCurrentAsset,
         Folder expectedFolder,
         bool expectedCanGoToNextAsset)
     {
         Assert.That(applicationViewModelInstance.SortAscending, Is.True);
-        Assert.That(applicationViewModelInstance.Product, Is.Null);
-        Assert.That(applicationViewModelInstance.Version, Is.Null);
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
@@ -11309,25 +11390,32 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
-        Assert.That(applicationViewModelInstance.CurrentFolder, Is.EqualTo(expectedLastDirectoryInspected));
-        Assert.That(applicationViewModelInstance.ObservableAssets, Has.Count.EqualTo(expectedObservableAssets.Count));
-        Assert.That(applicationViewModelInstance.GlobaleAssetsCounter, Is.Null);
-        Assert.That(applicationViewModelInstance.ExecutionTime, Is.Null);
-        Assert.That(applicationViewModelInstance.TotalFilesNumber, Is.Null);
-        Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo($"  - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
+        Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
+        AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
+        Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo("The catalog process has ended."));
 
-        if (applicationViewModelInstance.CurrentAsset != null)
+        if (expectedCurrentAsset != null)
         {
-            AssertCurrentAssetPropertyValidity(applicationViewModelInstance.CurrentAsset, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
+            AssertCurrentAssetPropertyValidity(applicationViewModelInstance.CurrentAsset!, expectedCurrentAsset, expectedCurrentAsset.FullPath, expectedLastDirectoryInspected, expectedFolder);
+        }
+        else
+        {
+            Assert.That(applicationViewModelInstance.CurrentAsset, Is.Null);
         }
 
-        Assert.That(applicationViewModelInstance.LastSelectedFolder, Is.Null); // TODO: Should it be the root folder (add it in the ctor) ?
+        Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
     }
 
-    private void NotifyCatalogChangeFolderInspectionInProgress(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
+    private void NotifyCatalogChangeFolderInspectionInProgress(List<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11345,7 +11433,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeFolderInspectionCompleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string assetsDirectory, ref int increment)
+    private void NotifyCatalogChangeFolderInspectionCompleted(List<CatalogChangeCallbackEventArgs> catalogChanges, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11360,7 +11448,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeFolderCreated(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
+    private void NotifyCatalogChangeFolderCreated(List<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11378,7 +11466,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeFolderDeleted(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
+    private void NotifyCatalogChangeFolderDeleted(List<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, int foldersCount, string assetsDirectory, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11396,11 +11484,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     }
 
     private void NotifyCatalogChangeAssetCreated(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        List<CatalogChangeCallbackEventArgs> catalogChanges,
         string assetsDirectory,
         string currentDirectory,
-        int expectedAppTitleAssetsCount,
-        IReadOnlyList<Asset> expectedAssets,
+        string expectedAppTitle,
+        List<Asset> expectedAssets,
         Asset expectedAsset,
         Folder folder,
         ref int increment)
@@ -11443,15 +11531,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
 
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Image {expectedAsset.FullPath} added to catalog."));
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo(expectedAppTitle));
         increment++;
     }
 
     private void NotifyCatalogChangeAssetNotCreated(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        List<CatalogChangeCallbackEventArgs> catalogChanges,
         string currentDirectory,
-        int expectedAppTitleAssetsCount,
-        IReadOnlyList<Asset> expectedAssets,
+        string expectedAppTitle,
+        List<Asset> expectedAssets,
         string expectedAssetPath,
         ref int increment)
     {
@@ -11472,15 +11560,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         AssertObservableAssets(currentDirectory, expectedAssets, _applicationViewModel!.ObservableAssets);
 
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Image {expectedAssetPath} not added to catalog (corrupted)."));
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo(expectedAppTitle));
         increment++;
     }
 
     private void NotifyCatalogChangeAssetUpdated(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        List<CatalogChangeCallbackEventArgs> catalogChanges,
         string assetsDirectory,
         string currentDirectory,
-        IReadOnlyList<Asset> expectedAssets,
+        List<Asset> expectedAssets,
         Asset expectedAsset,
         Folder folder,
         ref int increment)
@@ -11523,16 +11611,17 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
 
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Image {expectedAsset.FullPath} updated in catalog."));
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {currentDirectory} - image 1 of {expectedAssets.Count} - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {currentDirectory} - image 1 of {expectedAssets.Count} - sorted by file name ascending"));
         increment++;
     }
 
     private void NotifyCatalogChangeAssetDeleted(
-        IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges,
+        List<CatalogChangeCallbackEventArgs> catalogChanges,
         string assetsDirectory,
         string currentDirectory,
-        int expectedAppTitleAssetsCount,
-        IReadOnlyList<Asset> expectedAssets,
+        string expectedAppTitle,
+        List<Asset> expectedAssets,
         Asset expectedAsset,
         Folder folder,
         bool isCorrupted,
@@ -11568,11 +11657,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
 
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(expectedStatusMessage));
-        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo($"  - {currentDirectory} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.AppTitle, Is.EqualTo(expectedAppTitle));
         increment++;
     }
 
-    private void NotifyCatalogChangeBackup(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
+    private void NotifyCatalogChangeBackup(List<CatalogChangeCallbackEventArgs> catalogChanges, string expectedMessage, ref int increment)
     {
         CatalogChangeReason catalogChangeReason = string.Equals(expectedMessage, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE) ? CatalogChangeReason.BackupCreationStarted : CatalogChangeReason.BackupUpdateStarted;
 
@@ -11601,7 +11690,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangesNoBackupChanges(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    private void NotifyCatalogChangesNoBackupChanges(List<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11616,7 +11705,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeEnd(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
+    private void NotifyCatalogChangeEnd(List<CatalogChangeCallbackEventArgs> catalogChanges, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11631,7 +11720,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private void NotifyCatalogChangeException(IReadOnlyList<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
+    private void NotifyCatalogChangeException(List<CatalogChangeCallbackEventArgs> catalogChanges, Exception exceptionExpected, ref int increment)
     {
         CatalogChangeCallbackEventArgs catalogChange = catalogChanges[increment];
         Assert.That(catalogChange.Asset, Is.Null);
@@ -11648,7 +11737,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         increment++;
     }
 
-    private static void AssertCataloguedAssetsByPathPropertyValidity(IReadOnlyList<Asset> expectedAssets, CatalogChangeCallbackEventArgs catalogChange, int cataloguedAssetsByPathCount)
+    private static void AssertCataloguedAssetsByPathPropertyValidity(List<Asset> expectedAssets, CatalogChangeCallbackEventArgs catalogChange, int cataloguedAssetsByPathCount)
     {
         for (int i = 0; i < cataloguedAssetsByPathCount; i++)
         {
@@ -11715,47 +11804,48 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(asset.ImageData, Is.Not.Null); // Unlike below (Application, CatalogAssetsService), it is set here
     }
 
-    private static void AssertObservableAssets(string currentDirectory, IReadOnlyList<Asset> expectedAssets, IReadOnlyList<Asset> observableAssets)
+    private static void AssertObservableAssets(string currentDirectory, List<Asset> expectedAssets, ObservableCollection<Asset> observableAssets)
     {
         Assert.That(observableAssets, Has.Count.EqualTo(expectedAssets.Count));
 
         for (int i = 0; i < observableAssets.Count; i++)
         {
             Asset currentExpectedAsset = expectedAssets[i];
-            Asset currentObservableAssets = observableAssets[i];
+            Asset currentObservableAsset = observableAssets[i];
 
-            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAssets, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
+            CatalogAssetsAsyncAsserts.AssertAssetPropertyValidity(currentObservableAsset, currentExpectedAsset, currentExpectedAsset.FullPath, currentExpectedAsset.Folder.Path, currentExpectedAsset.Folder);
 
-            if (string.Equals(currentObservableAssets.Folder.Path, currentDirectory))
+            if (string.Equals(currentObservableAsset.Folder.Path, currentDirectory))
             {
-                Assert.That(currentObservableAssets.ImageData, Is.Not.Null);
+                Assert.That(currentObservableAsset.ImageData, Is.Not.Null);
             }
             else
             {
-                Assert.That(currentObservableAssets.ImageData, Is.Null);
+                Assert.That(currentObservableAsset.ImageData, Is.Null);
             }
         }
     }
 
     private static void CheckInstance(
-        IReadOnlyList<ApplicationViewModel> applicationViewModelInstances,
+        List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
-        int expectedAppTitleAssetsCount,
-        IReadOnlyCollection<Asset> expectedObservableAssets,
-        Asset expectedCurrentAsset,
+        string expectedAppTitle,
+        List<Asset> expectedAssets,
+        Asset? expectedCurrentAsset,
         Folder expectedFolder,
         bool expectedCanGoToNextAsset)
     {
         int applicationViewModelInstancesCount = applicationViewModelInstances.Count;
+
         Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
-        // No need to go deeper same instance because ref updated each time
+        // No need to go deeper, same instance because ref updated each time
         Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
 
         CheckAfterNotifyCatalogChanges(
             applicationViewModelInstances[0],
             expectedLastDirectoryInspected,
-            expectedAppTitleAssetsCount,
-            expectedObservableAssets,
+            expectedAppTitle,
+            expectedAssets,
             expectedCurrentAsset,
             expectedFolder,
             expectedCanGoToNextAsset);
@@ -11763,8 +11853,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
     private void GoToFolderEmulation(string assetsDirectory)
     {
-        _applicationViewModel!.CurrentFolder = assetsDirectory;
         Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
-        _applicationViewModel!.SetAssets(assets);
+        _applicationViewModel!.SetAssets(assetsDirectory, assets);
     }
 }

@@ -1,4 +1,9 @@
-﻿namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
+﻿using PhotoManager.UI.Models;
+using PhotoManager.UI.ViewModels.Enums;
+using System.ComponentModel;
+using System.Windows;
+
+namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 
 [TestFixture]
 public class ApplicationViewModelCatalogAssetsTests
@@ -325,8 +330,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -454,6 +467,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -468,8 +491,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -646,6 +677,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -661,8 +702,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -821,6 +870,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -838,8 +897,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
 
@@ -961,6 +1028,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -978,8 +1055,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -1111,6 +1196,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1133,8 +1228,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -1241,6 +1344,16 @@ public class ApplicationViewModelCatalogAssetsTests
                 assetNameToByteSizeMapping);
 
             Assert.That(catalogChangeCallback, Is.Null);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1259,8 +1372,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(catalogBatchSize, assetsDirectory, 200, 150, false, false, false, false);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -1338,6 +1459,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1357,8 +1488,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -1490,6 +1629,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             _asset1Temp.FileProperties = _asset1Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
@@ -1599,6 +1744,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1615,8 +1770,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -1791,6 +1954,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             File.SetLastWriteTime(videoPath1ToCopy, _asset4Temp.ThumbnailCreationDateTime);
@@ -1897,6 +2066,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -1912,8 +2091,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -2070,6 +2257,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             _asset4Temp!.FileProperties = _asset4Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
@@ -2161,6 +2354,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -2178,8 +2381,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -2304,6 +2515,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -2412,6 +2629,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -2430,8 +2657,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -2562,6 +2797,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             // Corrupt image
@@ -2675,6 +2916,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -2698,8 +2949,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -2830,6 +3089,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
 
             // Second sync
 
@@ -2942,6 +3207,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -2962,8 +3237,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -3095,6 +3378,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             File.Delete(destinationFilePathToCopy);
@@ -3201,6 +3490,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -3221,8 +3520,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -3396,6 +3703,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             File.Delete(videoPath1ToCopy);
@@ -3499,6 +3812,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -3520,8 +3843,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -3677,6 +4008,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             File.Delete(videoPath1ToCopy);
@@ -3767,6 +4104,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -3790,8 +4137,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -3930,6 +4285,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             File.Delete(destinationFilePathToCopy);
@@ -4024,6 +4385,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
 
             // Third sync
 
@@ -4126,6 +4493,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -4147,8 +4524,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -4271,6 +4656,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             List<string> assetPathsUpdated = [imagePath1ToCopy, imagePath2ToCopy];
@@ -4377,6 +4768,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -4400,8 +4801,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -4532,6 +4941,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
 
             // Second sync
 
@@ -4641,6 +5056,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -4665,8 +5090,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -4798,6 +5231,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             File.Delete(destinationFilePathToCopy);
@@ -4906,6 +5345,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -4929,8 +5378,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(tempDirectory);
 
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
@@ -5099,6 +5556,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             Directory.Delete(tempDirectory, true);
@@ -5223,6 +5686,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -5245,8 +5718,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
             Directory.CreateDirectory(tempDirectory);
 
@@ -5375,6 +5856,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
@@ -5459,6 +5946,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
 
             // Third sync
 
@@ -5548,6 +6041,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
 
             // Fourth sync
 
@@ -5642,6 +6141,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, tempDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -5666,8 +6175,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
@@ -5949,6 +6466,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
             
             // Second Sync
 
@@ -6140,6 +6663,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -6163,8 +6696,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
@@ -6435,6 +6976,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
             
             // Second Sync
 
@@ -6619,6 +7166,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, firstFrameVideosDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -6642,8 +7199,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
@@ -6917,6 +7482,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
             
             // Second Sync
 
@@ -7110,6 +7681,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, subSubDirDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -7132,8 +7713,16 @@ public class ApplicationViewModelCatalogAssetsTests
     {
         ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(_defaultAssetsDirectory!);
+
             Directory.CreateDirectory(_defaultAssetsDirectory!);
 
             string[] assetsInDirectory = Directory.GetFiles(_defaultAssetsDirectory!);
@@ -7203,6 +7792,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, _defaultAssetsDirectory!, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, _defaultAssetsDirectory!);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, _defaultAssetsDirectory!);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -7218,8 +7817,16 @@ public class ApplicationViewModelCatalogAssetsTests
     {
         ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(_defaultAssetsDirectory!);
+
             Folder? folder = _testableAssetRepository!.GetFolderByPath(_defaultAssetsDirectory!);
             Assert.That(folder, Is.Null);
 
@@ -7284,6 +7891,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, _defaultAssetsDirectory!, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, _defaultAssetsDirectory!);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, _defaultAssetsDirectory!);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -7300,8 +7917,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Folder? folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Null);
 
@@ -7366,6 +7991,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -7384,8 +8019,16 @@ public class ApplicationViewModelCatalogAssetsTests
     {
         ConfigureApplicationViewModel(catalogBatchSize, _defaultAssetsDirectory!, 200, 150, false, false, false, false);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(_defaultAssetsDirectory!);
+
             if (folderExists)
             {
                 Directory.CreateDirectory(_defaultAssetsDirectory!);
@@ -7456,6 +8099,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, _defaultAssetsDirectory!, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, _defaultAssetsDirectory!);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, _defaultAssetsDirectory!);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -7479,8 +8132,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -7610,6 +8271,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
             // Second sync
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add);
@@ -7687,6 +8354,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesNoBackupChanges(catalogChanges, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -7704,8 +8381,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -7833,6 +8518,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
 
             // Second sync
 
@@ -7942,6 +8633,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.UPDATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -7962,8 +8663,16 @@ public class ApplicationViewModelCatalogAssetsTests
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
             string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
             string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
@@ -8089,6 +8798,12 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
 
             // Second sync
 
@@ -8206,6 +8921,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
 
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
+
             Assert.That(File.Exists(oldBackupFilePath), Is.True);
             Assert.That(File.Exists(backupFilePath), Is.True);
         }
@@ -8261,8 +8986,16 @@ public class ApplicationViewModelCatalogAssetsTests
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
         LoggingAssertsService loggingAssertsService = new();
 
+        (
+            List<string> notifyPropertyChangedEvents,
+            List<ApplicationViewModel> applicationViewModelInstances,
+            List<Folder> folderAddedEvents, List<Folder> folderRemovedEvents
+        ) = NotifyPropertyChangedEvents();
+
         try
         {
+            CheckBeforeChanges(assetsDirectory);
+
             Directory.CreateDirectory(assetsDirectory);
 
             string imagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
@@ -8339,6 +9072,16 @@ public class ApplicationViewModelCatalogAssetsTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesException(catalogChanges, unauthorizedAccessException, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
+
+            CheckAfterChanges(_applicationViewModel!, assetsDirectory);
+
+            Assert.That(notifyPropertyChangedEvents, Is.Empty);
+
+            CheckInstance(applicationViewModelInstances, assetsDirectory);
+
+            // Because the root folder is already added
+            Assert.That(folderAddedEvents, Is.Empty);
+            Assert.That(folderRemovedEvents, Is.Empty);
         }
         finally
         {
@@ -8349,4 +9092,108 @@ public class ApplicationViewModelCatalogAssetsTests
         }
     }
     // ERROR SECTION (End) -------------------------------------------------------------------------------------
+
+    private
+        (List<string> notifyPropertyChangedEvents,
+        List<ApplicationViewModel> applicationViewModelInstances,
+        List<Folder> folderAddedEvents,
+        List<Folder> folderRemovedEvents)
+        NotifyPropertyChangedEvents()
+    {
+        List<string> notifyPropertyChangedEvents = [];
+        List<ApplicationViewModel> applicationViewModelInstances = [];
+
+        _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        {
+            notifyPropertyChangedEvents.Add(e.PropertyName!);
+            applicationViewModelInstances.Add((ApplicationViewModel)sender!);
+        };
+
+        List<Folder> folderAddedEvents = [];
+
+        _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        {
+            folderAddedEvents.Add(e.Folder);
+        };
+
+        List<Folder> folderRemovedEvents = [];
+
+        _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        {
+            folderRemovedEvents.Add(e.Folder);
+        };
+
+        return (notifyPropertyChangedEvents, applicationViewModelInstances, folderAddedEvents, folderRemovedEvents);
+    }
+
+    private void CheckBeforeChanges(string expectedRootDirectory)
+    {
+        Assert.That(_applicationViewModel!.SortAscending, Is.True);
+        Assert.That(_applicationViewModel!.IsRefreshingFolders, Is.False);
+        Assert.That(_applicationViewModel!.AppMode, Is.EqualTo(AppMode.Thumbnails));
+        Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
+        Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
+        Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
+        Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
+        Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
+        Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
+        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
+        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
+        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
+        Assert.That(_applicationViewModel!.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+        Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
+        Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
+        Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
+        Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
+        Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
+        Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+    }
+
+    private static void CheckAfterChanges(ApplicationViewModel applicationViewModelInstance, string expectedLastDirectoryInspected)
+    {
+        Assert.That(applicationViewModelInstance.SortAscending, Is.True);
+        Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
+        Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
+        Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
+        Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
+        Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
+        Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
+        Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
+        Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
+        Assert.That(applicationViewModelInstance.ObservableAssets, Is.Empty);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
+        Assert.That(applicationViewModelInstance.AppTitle,
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
+        Assert.That(applicationViewModelInstance.StatusMessage, Is.Null);
+        Assert.That(applicationViewModelInstance.CurrentAsset, Is.Null);
+        Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
+        Assert.That(applicationViewModelInstance.CanGoToPreviousAsset, Is.False);
+        Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.False);
+        Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+    }
+
+    private static void CheckInstance(List<ApplicationViewModel> applicationViewModelInstances, string expectedLastDirectoryInspected)
+    {
+        int applicationViewModelInstancesCount = applicationViewModelInstances.Count;
+
+        if (applicationViewModelInstancesCount > 1)
+        {
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 2], Is.EqualTo(applicationViewModelInstances[0]));
+            // No need to go deeper, same instance because ref updated each time
+            Assert.That(applicationViewModelInstances[applicationViewModelInstancesCount - 1], Is.EqualTo(applicationViewModelInstances[applicationViewModelInstancesCount - 2]));
+        }
+
+        if (applicationViewModelInstancesCount > 0)
+        {
+            CheckAfterChanges(applicationViewModelInstances[0], expectedLastDirectoryInspected); 
+        }
+    }
 }

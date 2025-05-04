@@ -1,4 +1,4 @@
-﻿<Window x:Class="PhotoManager.UI.Windows.DuplicatedAssetsWindow"
+﻿<Window x:Class="PhotoManager.UI.Windows.FindDuplicatedAssetsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -11,7 +11,7 @@
         Height="450"
         Width="800"
         Background="#FF3C3C3C"
-        Closing="FindDuplicatesAssetsWindow_Closing">
+        Closing="FindDuplicatedAssetsWindow_Closing">
     <Window.Resources>
         <c:FileSizeConverter x:Key="FileSizeConverter" />
         <c:PixelSizeConverter x:Key="PixelSizeConverter" />
@@ -28,13 +28,13 @@
             <ColumnDefinition Width="500"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" Foreground="#FFFFFFFF" Content="{Binding DuplicatedAssetSetsCollection.Count}" ContentStringFormat="Duplicated sets: {0}"/>
+        <Label Grid.Row="0" Grid.Column="0" Foreground="#FFFFFFFF" Content="{Binding DuplicatedAssetSets.Count}" ContentStringFormat="Duplicated sets: {0}"/>
         <Label Grid.Row="0" Grid.Column="1" x:Name="refreshLabel" Padding="5" MouseLeftButtonDown="RefreshLabel_MouseLeftButtonDown" Content="Refresh" Style="{StaticResource ButtonStyle}" />
         <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
-            <Label x:Name="deleteEveryLabel" Padding="5" MouseLeftButtonDown="DeleteEveryDuplicatesLabel_MouseLeftButtonDown" Content="Delete Every Duplicates Linked To Exempt Folder" Style="{StaticResource ButtonStyle}" />
+            <Label x:Name="deleteNotExemptedLabel" Padding="5" MouseLeftButtonDown="DeleteAllNotExemptedLabel_MouseLeftButtonDown" Content="Delete Every Duplicates Linked To Exempt Folder" Style="{StaticResource ButtonStyle}" />
             <Label x:Name="copyToClipboardAndOpenInFileExploerer" Padding="5" MouseLeftButtonDown="CopyToClipboard_OpenInFileExplorer_MouseLeftButtonDown" Content="Open in File Explorer" Style="{StaticResource ButtonStyle}" />
         </StackPanel>
-        <DataGrid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" ItemsSource="{Binding DuplicatedAssetSetsCollection}" SelectedIndex="{Binding DuplicatedAssetSetsPosition}" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserAddRows="False" SelectionMode="Single" SelectionUnit="FullRow" Margin="10 0 10 0" Background="#FF3C3C3C">
+        <DataGrid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" ItemsSource="{Binding DuplicatedAssetSets}" SelectedIndex="{Binding DuplicatedAssetSetsPosition}" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserAddRows="False" SelectionMode="Single" SelectionUnit="FullRow" Margin="10 0 10 0" Background="#FF3C3C3C">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="Background" Value="#FF3C3C3C"/>
@@ -81,7 +81,7 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <!-- Displaying the pictures in thumbnails mode, at the bottom of the page, duplicatedAssets page -->
+        <!-- Displaying the pictures in thumbnails mode, at the bottom of the page, FindDuplicatedAssets page -->
         <Image Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Source="{ Binding CurrentDuplicatedAsset.Asset.ImageData }" Width="200" Height="150">
             <Image.Effect>
                 <DropShadowEffect/>

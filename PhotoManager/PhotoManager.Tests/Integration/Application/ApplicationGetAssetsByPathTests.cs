@@ -13,6 +13,7 @@ public class ApplicationGetAssetsByPathTests
 
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
+    private UserConfigurationService? _userConfigurationService;
     private Database? _database;
     private Mock<IStorageService>? _storageServiceMock;
 
@@ -147,23 +148,23 @@ public class ApplicationGetAssetsByPathTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new (configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
         _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _testableAssetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        _testableAssetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new (_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
+        AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        CatalogAssetsService catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
         MoveAssetsService moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_testableAssetRepository, storageService, userConfigurationService);
-        _application = new (_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
+        _application = new (_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
     }
 
     [Test]
@@ -267,9 +268,10 @@ public class ApplicationGetAssetsByPathTests
         string duplicatesNewFolder1Directory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
         string duplicatesNewFolder2Directory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
         string testFolderDirectory = Path.Combine(_dataDirectory!, "TestFolder");
-        string outputVideoFirstFrameDirectory = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
 
         ConfigureApplication(100, rootDirectory, 200, 150, false, false, false, analyseVideos);
+
+        string outputVideoFirstFrameDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 
         try
         {

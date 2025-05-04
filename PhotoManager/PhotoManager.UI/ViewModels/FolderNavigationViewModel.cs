@@ -6,46 +6,49 @@ using System.Collections.ObjectModel;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class FolderNavigationViewModel : ApplicationViewModel
+public class FolderNavigationViewModel(
+    ApplicationViewModel applicationViewModel,
+    IApplication application,
+    Folder sourceFolder,
+    List<string> recentTargetPaths)
+    : BaseViewModel(application)
 {
-    private string targetPath;
+    private string? _targetPath;
 
-    public FolderNavigationViewModel(IApplication application, Folder sourceFolder, Folder lastSelectedFolder, List<string> recentTargetPaths) : base(application)
-    {
-        SourceFolder = sourceFolder;
-        LastSelectedFolder = lastSelectedFolder;
-        RecentTargetPaths = new ObservableCollection<string>(recentTargetPaths);
-    }
+    public ApplicationViewModel ApplicationViewModel { get; } = applicationViewModel;
 
-    public Folder SourceFolder { get; private set; }
+    public Folder SourceFolder { get; } = sourceFolder;
 
-    public Folder SelectedFolder
-    {
-        get
-        {
-            return !string.IsNullOrEmpty(TargetPath) ? new() { Id = Guid.NewGuid(), Path = TargetPath } : null;
-        }
-    }
+    // TODO: Not great having a new guid each time
+    public Folder? SelectedFolder => !string.IsNullOrWhiteSpace(TargetPath) ? new() { Id = Guid.NewGuid(), Path = TargetPath } : null;
+
+    public Folder? LastSelectedFolder => ApplicationViewModel.MoveAssetsLastSelectedFolder;
 
     public bool CanConfirm
     {
         get
         {
-            return SourceFolder != null
-                && SelectedFolder != null
-                && SourceFolder.Path != SelectedFolder.Path;
+            if (SelectedFolder == null)
+            {
+                return false;
+            }
+
+            string sourceFolderPathFormatted = SourceFolder.Path.EndsWith('\\') ? SourceFolder.Path[..^1] : SourceFolder.Path;
+
+            return sourceFolderPathFormatted != SelectedFolder.Path;
         }
     }
 
     public bool HasConfirmed { get; set; }
-    public ObservableCollection<string> RecentTargetPaths { get; private set; }
 
-    public string TargetPath
+    public ObservableCollection<string> RecentTargetPaths { get; private set; } = [..recentTargetPaths];
+
+    public string? TargetPath
     {
-        get { return targetPath; }
+        get => _targetPath;
         set
         {
-            targetPath = !string.IsNullOrEmpty(value) && value.EndsWith("\\") ? value[0..^1] : value;
+            _targetPath = !string.IsNullOrWhiteSpace(value) && value.EndsWith('\\') ? value[..^1] : value;
             NotifyPropertyChanged(nameof(TargetPath), nameof(SelectedFolder), nameof(CanConfirm));
         }
     }

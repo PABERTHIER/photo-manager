@@ -16,9 +16,9 @@ namespace PhotoManager.UI.Windows
     /// Interaction logic for SyncAssetsWindow.xaml
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public partial class SyncAssetsWindow : Window
+    public partial class SyncAssetsWindow
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
         public SyncAssetsWindow(SyncAssetsViewModel viewModel)
         {
@@ -31,22 +31,16 @@ namespace PhotoManager.UI.Windows
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Error(ex);
             }
         }
 
-        public SyncAssetsViewModel ViewModel
-        {
-            get { return (SyncAssetsViewModel)DataContext; }
-        }
+        public SyncAssetsViewModel ViewModel => (SyncAssetsViewModel)DataContext;
 
         private void Initialize()
         {
-            var configuration = ViewModel.GetProcessConfiguration();
-
-            configuration ??= new SyncAssetsConfiguration();
-
-            ViewModel.Definitions = new ObservableCollection<SyncAssetsDirectoriesDefinition>(configuration.Definitions);
+            SyncAssetsConfiguration configuration = ViewModel.GetProcessConfiguration();
+            ViewModel.Definitions = [..configuration.Definitions];
         }
 
         private void ContinueButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -58,7 +52,7 @@ namespace PhotoManager.UI.Windows
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Error(ex);
             }
             finally
             {
@@ -74,7 +68,7 @@ namespace PhotoManager.UI.Windows
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Error(ex);
             }
         }
 
@@ -86,7 +80,7 @@ namespace PhotoManager.UI.Windows
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Error(ex);
             }
         }
 
@@ -98,7 +92,7 @@ namespace PhotoManager.UI.Windows
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Error(ex);
             }
         }
 
@@ -111,7 +105,7 @@ namespace PhotoManager.UI.Windows
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Error(ex);
             }
             finally
             {
@@ -119,17 +113,18 @@ namespace PhotoManager.UI.Windows
             }
         }
 
+        // TODO: async task
         private async void RunButton_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
             try
             {
                 Cursor = Cursors.Wait;
-                ViewModel.AdvanceStep();
                 await RunProcess().ConfigureAwait(true);
+                ViewModel.AdvanceStep();
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Error(ex);
             }
             finally
             {
@@ -141,11 +136,11 @@ namespace PhotoManager.UI.Windows
         {
             try
             {
-                this.Close();
+                Close();
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Log.Error(ex);
             }
         }
 
@@ -178,9 +173,9 @@ namespace PhotoManager.UI.Windows
 
         private void Save(ObservableCollection<SyncAssetsDirectoriesDefinition> definitions)
         {
-            SyncAssetsConfiguration configuration = new();
-            configuration.Definitions.AddRange(definitions);
-            ViewModel.SetProcessConfiguration(configuration);
+            SyncAssetsConfiguration syncAssetsConfiguration = new();
+            syncAssetsConfiguration.Definitions.AddRange(definitions);
+            ViewModel.SetProcessConfiguration(syncAssetsConfiguration);
         }
 
         private async Task RunProcess()

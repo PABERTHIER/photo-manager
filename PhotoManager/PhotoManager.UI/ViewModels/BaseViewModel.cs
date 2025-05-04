@@ -14,7 +14,7 @@ public abstract class BaseViewModel : INotifyPropertyChanged
     /// </summary>
     protected IApplication Application { get; private set; }
 
-    protected BaseViewModel(IApplication application)
+    protected BaseViewModel(IApplication application) // TODO: Remove IApplication application
     {
         Application = application;
     }
