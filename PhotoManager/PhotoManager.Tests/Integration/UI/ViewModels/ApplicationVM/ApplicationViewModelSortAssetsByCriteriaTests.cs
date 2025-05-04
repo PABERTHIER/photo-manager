@@ -562,7 +562,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             const string expectedStatusMessage = "The catalog process has ended.";
             SortCriteria sortCriteria = SortCriteria.FileName;
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name descending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name descending";
 
             // SortAssetsByCriteria FileName
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
@@ -592,7 +592,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             // SortAssetsByCriteria FileSize
             sortCriteria = SortCriteria.FileSize;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file size ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file size ascending";
 
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
@@ -624,7 +624,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             // SortAssetsByCriteria FileCreationDateTime
             sortCriteria = SortCriteria.FileCreationDateTime;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file creation ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file creation ascending";
 
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
@@ -659,7 +659,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             // SortAssetsByCriteria FileModificationDateTime
             sortCriteria = SortCriteria.FileModificationDateTime;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file modification ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file modification ascending";
 
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
@@ -697,7 +697,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             // SortAssetsByCriteria ThumbnailCreationDateTime
             sortCriteria = SortCriteria.ThumbnailCreationDateTime;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by thumbnail creation ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by thumbnail creation ascending";
 
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
@@ -738,7 +738,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
 
             // SortAssetsByCriteria FileName
             sortCriteria = SortCriteria.FileName;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.SortAssetsByCriteria(sortCriteria);
 
@@ -852,7 +852,7 @@ public class ApplicationViewModelSortAssetsByCriteriaTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

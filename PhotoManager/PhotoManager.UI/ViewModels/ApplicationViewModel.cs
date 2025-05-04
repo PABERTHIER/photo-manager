@@ -73,14 +73,16 @@ public class ApplicationViewModel : BaseViewModel
 
     public Visibility ViewerVisible => AppMode == AppMode.Viewer ? Visibility.Visible : Visibility.Hidden;
 
-    // TODO: Add check to prevent ViewerPosition having value -1
     // TODO: Rework ViewerPosition to make the setter private (xaml binding issues)
     public int ViewerPosition
     {
         get => _viewerPosition;
         set
         {
-            _viewerPosition = value;
+            // TODO: ViewerPosition is reset to -1 when moving and deleting assets from MainWindow
+            // For this case, the best would be keeping the old ViewerPosition so that we can go to the nearest asset
+            _viewerPosition = value < 0 ? 0 : value;
+
             NotifyPropertyChanged(
                 nameof(ViewerPosition),
                 nameof(CanGoToPreviousAsset),
@@ -134,7 +136,7 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public Asset? CurrentAsset => ObservableAssets.Count > 0 && ViewerPosition >= 0 ? ObservableAssets[ViewerPosition] : null;
+    public Asset? CurrentAsset => ObservableAssets.Count > 0 ? ObservableAssets[ViewerPosition] : null;
 
     public Folder? MoveAssetsLastSelectedFolder { get; set; }
 
@@ -418,12 +420,18 @@ public class ApplicationViewModel : BaseViewModel
         OnObservableAssetsUpdated();
     }
 
-    // TODO: Need to rework the content of the title + case where init getting -> image 1 of 0 -> not good
+    // TODO: Need to rework how the title is built
     // TODO: Called to many times, need to rework this (reduce event "AppTitle")
     private void UpdateAppTitle()
     {
-        string title = null;
+        string title;
         string sortCriteria = GetSortCriteriaDescription();
+        int viewerPosition = 0;
+
+        if (ObservableAssets.Count > 0)
+        {
+            viewerPosition = ViewerPosition + 1;
+        }
 
         if (AppMode == AppMode.Thumbnails)
         {
@@ -433,11 +441,11 @@ public class ApplicationViewModel : BaseViewModel
                 AboutInformation.Product,
                 AboutInformation.Version,
                 CurrentFolderPath,
-                ViewerPosition + 1,
+                viewerPosition,
                 ObservableAssets.Count,
                 sortCriteria);
         }
-        else if (AppMode == AppMode.Viewer)
+        else
         {
             title = string.Format(
                 Thread.CurrentThread.CurrentCulture,
@@ -446,7 +454,7 @@ public class ApplicationViewModel : BaseViewModel
                 AboutInformation.Version,
                 CurrentFolderPath,
                 CurrentAsset?.FileName,
-                ViewerPosition + 1,
+                viewerPosition,
                 ObservableAssets.Count,
                 sortCriteria);
         }

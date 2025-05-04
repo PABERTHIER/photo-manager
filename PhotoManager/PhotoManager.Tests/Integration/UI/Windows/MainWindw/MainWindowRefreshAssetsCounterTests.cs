@@ -316,7 +316,7 @@ public class MainWindowRefreshAssetsCounterTests
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             const string expectedGlobalAssetsCounterWording = "Total number of assets: 0";
 
             RefreshAssetsCounter();
@@ -419,7 +419,7 @@ public class MainWindowRefreshAssetsCounterTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

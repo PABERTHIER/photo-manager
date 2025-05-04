@@ -531,7 +531,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -590,7 +590,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 0 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -649,7 +649,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -708,7 +708,7 @@ public class ApplicationViewModelSetAssetsTests
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 0 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -769,7 +769,7 @@ public class ApplicationViewModelSetAssetsTests
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -828,7 +828,7 @@ public class ApplicationViewModelSetAssetsTests
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 0 of 0 - sorted by file name ascending";
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -915,7 +915,7 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

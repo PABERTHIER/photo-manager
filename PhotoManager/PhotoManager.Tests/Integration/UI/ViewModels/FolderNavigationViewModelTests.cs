@@ -529,7 +529,7 @@ public class FolderNavigationViewModelTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ExecutionTimeWording, Is.Null);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.TotalFilesCountWording, Is.Null);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.StatusMessage, Is.Null);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentAsset, Is.Null);
 

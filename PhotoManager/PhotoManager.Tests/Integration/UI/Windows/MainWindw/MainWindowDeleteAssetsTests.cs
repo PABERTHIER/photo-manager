@@ -198,7 +198,7 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([observableAssets[0], observableAssets[1]]);
@@ -332,7 +332,7 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([observableAssets[0]]);
@@ -1112,7 +1112,7 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(assetsDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([]);
@@ -1248,8 +1248,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} -  - image 1 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager v1.0.0 - {destinationDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             string result = DeleteSelectedAssets();
@@ -1430,8 +1430,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} -  - image 1 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager v1.0.0 - {destinationDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             string result = DeleteSelectedAssets();
@@ -2500,8 +2500,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 1 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             string result = DeleteSelectedAssets();
@@ -2634,7 +2634,7 @@ public class MainWindowDeleteAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

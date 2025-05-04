@@ -362,7 +362,7 @@ public class ApplicationViewModelChangeAppModeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} -  - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} -  - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -386,7 +386,7 @@ public class ApplicationViewModelChangeAppModeTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerVisible"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
 
-            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -487,7 +487,7 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

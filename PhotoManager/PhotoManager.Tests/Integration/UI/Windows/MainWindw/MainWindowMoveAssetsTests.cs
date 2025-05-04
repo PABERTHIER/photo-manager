@@ -466,8 +466,8 @@ public class MainWindowMoveAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} -  - image 1 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager v1.0.0 - {destinationDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             _hasConfirmed = true;
@@ -2463,8 +2463,8 @@ public class MainWindowMoveAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 1 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             string result = CopyAssets();
@@ -2600,8 +2600,8 @@ public class MainWindowMoveAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 1 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             string result = MoveAssets();
@@ -2746,7 +2746,7 @@ public class MainWindowMoveAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
 

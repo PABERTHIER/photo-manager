@@ -562,7 +562,7 @@ public class MainWindowSortAssetsTests
 
             // SortAssetsByFileSize
             SortCriteria expectedSortCriteria = SortCriteria.FileSize;
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file size ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file size ascending";
 
             SortAssetsByFileSize();
 
@@ -598,7 +598,7 @@ public class MainWindowSortAssetsTests
 
             // SortAssetsByFileCreationDateTime
             expectedSortCriteria = SortCriteria.FileCreationDateTime;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file creation ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file creation ascending";
 
             SortAssetsByFileCreationDateTime();
 
@@ -637,7 +637,7 @@ public class MainWindowSortAssetsTests
 
             // SortAssetsByFileModificationDateTime
             expectedSortCriteria = SortCriteria.FileModificationDateTime;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file modification ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file modification ascending";
 
             SortAssetsByFileModificationDateTime();
 
@@ -679,7 +679,7 @@ public class MainWindowSortAssetsTests
 
             // SortAssetsByThumbnailCreationDateTime
             expectedSortCriteria = SortCriteria.ThumbnailCreationDateTime;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by thumbnail creation ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by thumbnail creation ascending";
 
             SortAssetsByThumbnailCreationDateTime();
 
@@ -724,7 +724,7 @@ public class MainWindowSortAssetsTests
 
             // SortAssetsByFileName
             expectedSortCriteria = SortCriteria.FileName;
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             SortAssetsByFileName();
 
@@ -839,7 +839,7 @@ public class MainWindowSortAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

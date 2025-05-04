@@ -82,7 +82,7 @@ public partial class ViewerUserControl
     // Triggered when double-clicked on the thumbnail image from ThumbnailsUserControl to pass into fullscreen mode
     public void ShowImage()
     {
-        if (ViewModel is { ViewerPosition: >= 0, CurrentAsset: not null })
+        if (ViewModel is { CurrentAsset: not null })
         {
             bool isHeic = ViewModel.CurrentAsset.FileName.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
 

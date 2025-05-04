@@ -564,7 +564,7 @@ public class MainWindowToggleImageViewTests
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             // First ToggleImageView
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
 
             string result = ToggleImageView();
 
@@ -611,7 +611,7 @@ public class MainWindowToggleImageViewTests
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
 
             // Second ToggleImageView
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             result = ToggleImageView();
 
@@ -735,7 +735,7 @@ public class MainWindowToggleImageViewTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

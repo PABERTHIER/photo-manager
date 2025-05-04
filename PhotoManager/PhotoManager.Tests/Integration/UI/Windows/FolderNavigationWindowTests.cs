@@ -445,7 +445,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -507,7 +507,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -571,7 +571,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder2, folder1, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -631,7 +631,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, null, folder, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -689,7 +689,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, null, null, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => Init());
 
@@ -751,7 +751,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
             string selectedPath = Init();
@@ -836,7 +836,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
             string selectedPath = Init();
@@ -923,7 +923,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder2, folder1, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
 
             string selectedPath = Init();
@@ -1006,7 +1006,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, null, folder, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
             string selectedPath = Init();
@@ -1093,7 +1093,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = expectedTargetPath };
 
             string selectedPath = Init();
@@ -1183,7 +1183,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = null!;
 
             string selectedPath = Init();
@@ -1271,7 +1271,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder2, folder1, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
 
             string selectedPath = Init();
@@ -1378,7 +1378,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -1504,7 +1504,7 @@ public class FolderNavigationWindowTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ExecutionTimeWording, Is.Null);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.TotalFilesCountWording, Is.Null);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.StatusMessage, Is.Null);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentAsset, Is.Null);
 

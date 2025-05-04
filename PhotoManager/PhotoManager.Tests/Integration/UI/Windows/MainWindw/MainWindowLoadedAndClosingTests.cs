@@ -403,7 +403,7 @@ public class MainWindowLoadedAndClosingTests
             _asset3 = _asset3.WithFolder(folder!);
             _asset4 = _asset4.WithFolder(folder!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
             const string expectedGlobalAssetsCounterWording = "Total number of assets: 0";
             string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
@@ -648,7 +648,7 @@ public class MainWindowLoadedAndClosingTests
             Assert.That(_stopwatch.IsRunning, Is.False);
             Assert.That(_stopwatch.Elapsed, Is.GreaterThan(TimeSpan.FromMilliseconds(0)));
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             const string expectedGlobalAssetsCounterWording = "Total number of assets: 0";
             string expectedExecutionTimeWording = $"Execution time: {_stopwatch.Elapsed}";
             const string expectedTotalFilesCountWording = "0 files found";
@@ -756,7 +756,7 @@ public class MainWindowLoadedAndClosingTests
 
             MainWindowsInit();
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             TaskCompletionSource<bool> taskCompletionSource = new();
             _catalogTask = taskCompletionSource.Task;
@@ -852,7 +852,7 @@ public class MainWindowLoadedAndClosingTests
 
             MainWindowsInit();
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             TaskCompletionSource<bool> taskCompletionSource = new();
             _catalogTask = taskCompletionSource.Task;
@@ -974,7 +974,7 @@ public class MainWindowLoadedAndClosingTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

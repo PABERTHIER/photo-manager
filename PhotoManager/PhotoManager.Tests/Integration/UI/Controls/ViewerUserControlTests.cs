@@ -339,7 +339,7 @@ public class ViewerUserControlTests
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
 
             ThumbnailSelected?.Invoke(this, EventArgs.Empty);
@@ -547,7 +547,7 @@ public class ViewerUserControlTests
     }
 
     [Test]
-    public async Task ShowImage_CataloguedAssetsAndNegativeViewerPosition_ReturnsNull()
+    public async Task ShowImage_CataloguedAssetsAndNegativeViewerPosition_ReturnsBitmapImage()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
 
@@ -573,17 +573,24 @@ public class ViewerUserControlTests
             _asset3 = _asset3.WithFolder(folder!);
             _asset4 = _asset4.WithFolder(folder!);
 
-            const int expectedViewerPosition = -1;
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 4 - sorted by file name ascending";
+            const int expectedViewerPosition = 0;
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
-            _applicationViewModel!.ViewerPosition = expectedViewerPosition;
+            _applicationViewModel!.ViewerPosition = -1;
 
-            // First ShowImage
             BitmapImage? bitmapImage = ShowImage();
 
-            Assert.That(bitmapImage, Is.Null);
+            Assert.That(bitmapImage, Is.Not.Null);
+            Assert.That(bitmapImage.StreamSource, Is.Null);
+            Assert.That(bitmapImage.Rotation, Is.EqualTo(_asset1.ImageRotation));
+            Assert.That(bitmapImage.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
+            Assert.That(bitmapImage.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
+            Assert.That(bitmapImage.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
+            Assert.That(bitmapImage.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
+            Assert.That(bitmapImage.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(bitmapImage.DecodePixelHeight, Is.EqualTo(0));
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -592,8 +599,8 @@ public class ViewerUserControlTests
                 expectedAppTitle,
                 expectedStatusMessage,
                 expectedAssets,
-                null,
-                null!,
+                expectedAssets[expectedViewerPosition],
+                folder,
                 false,
                 true);
 
@@ -630,8 +637,8 @@ public class ViewerUserControlTests
                 expectedAppTitle,
                 expectedStatusMessage,
                 expectedAssets,
-                null,
-                null!,
+                expectedAssets[expectedViewerPosition],
+                folder,
                 false,
                 true);
 
@@ -667,7 +674,7 @@ public class ViewerUserControlTests
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             const string expectedStatusMessage = "The catalog process has ended.";
 
             BitmapImage? bitmapImage = ShowImage();
@@ -778,7 +785,7 @@ public class ViewerUserControlTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -903,7 +910,7 @@ public class ViewerUserControlTests
     {
         BitmapImage? bitmapImage = null;
 
-        if (_applicationViewModel is { ViewerPosition: >= 0, CurrentAsset: not null })
+        if (_applicationViewModel is { CurrentAsset: not null })
         {
             bool isHeic = _applicationViewModel.CurrentAsset.FileName.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
 

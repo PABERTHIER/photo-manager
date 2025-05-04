@@ -387,7 +387,7 @@ public class ApplicationViewModelSetAssetsTests
 
             const string expectedStatusMessage = "The catalog process has ended.";
             const SortCriteria sortCriteria = SortCriteria.FileName;
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
 
@@ -463,7 +463,7 @@ public class ApplicationViewModelSetAssetsTests
 
             const string expectedStatusMessage = "The catalog process has ended.";
             const SortCriteria sortCriteria = SortCriteria.FileName;
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 0 of 0 - sorted by file name ascending";
 
             Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
 
@@ -566,7 +566,7 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

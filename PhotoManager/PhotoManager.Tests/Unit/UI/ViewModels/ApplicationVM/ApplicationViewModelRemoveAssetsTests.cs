@@ -428,7 +428,7 @@ public class ApplicationViewModelRemoveAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
             Asset[] expectedAssets = [];
@@ -492,7 +492,7 @@ public class ApplicationViewModelRemoveAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             Asset[] assets = [_asset1];
             Asset[] expectedAssets = [];
@@ -681,7 +681,7 @@ public class ApplicationViewModelRemoveAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.RemoveAssets([_asset1, _asset3]);
 
@@ -734,7 +734,7 @@ public class ApplicationViewModelRemoveAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.RemoveAssets([]);
 
@@ -787,7 +787,7 @@ public class ApplicationViewModelRemoveAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.RemoveAssets(null!);
 
@@ -998,7 +998,7 @@ public class ApplicationViewModelRemoveAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

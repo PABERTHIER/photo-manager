@@ -486,7 +486,7 @@ public class ApplicationViewModelGoToNextAssetTests
             CheckBeforeChanges(_dataDirectory!);
 
             const int expectedViewerPosition = 0;
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.GoToNextAsset();
 
@@ -579,7 +579,7 @@ public class ApplicationViewModelGoToNextAssetTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);

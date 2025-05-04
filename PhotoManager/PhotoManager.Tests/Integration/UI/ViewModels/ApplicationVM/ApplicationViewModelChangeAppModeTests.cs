@@ -337,7 +337,7 @@ public class ApplicationViewModelChangeAppModeTests
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             const string expectedStatusMessage = "The catalog process has ended.";
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 1 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
 
             // First ChangeAppMode
             _applicationViewModel!.ChangeAppMode();
@@ -369,7 +369,7 @@ public class ApplicationViewModelChangeAppModeTests
             Assert.That(notifyPropertyChangedEvents[8], Is.EqualTo("AppTitle"));
 
             // Second ChangeAppMode
-            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 0 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -477,7 +477,7 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 1 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
