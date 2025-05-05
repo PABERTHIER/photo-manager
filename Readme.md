@@ -182,7 +182,7 @@ Improvements **WIP**.
 - [.NET 8.0](https://dotnet.microsoft.com/)
 - [Windows Presentation Foundation](https://docs.microsoft.com/en-us/dotnet/framework/wpf/)
 - [NUnit](https://nunit.org/)
-- [Moq framework for .NET](https://github.com/moq/moq4)
+- [Moq framework for .NET (v4.18.4)](https://github.com/moq/moq4)
 - [MagickImage](https://github.com/dlemstra/Magick.NET)
 - [log4net](https://logging.apache.org/log4net/)
 - [coverlet](https://github.com/coverlet-coverage/coverlet)
