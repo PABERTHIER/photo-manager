@@ -484,11 +484,11 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            CheckAfterChanges(_applicationViewModel!, 0, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckAfterChanges(_applicationViewModel!, 0, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, 0, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckInstance(applicationViewModelInstances, 0, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);

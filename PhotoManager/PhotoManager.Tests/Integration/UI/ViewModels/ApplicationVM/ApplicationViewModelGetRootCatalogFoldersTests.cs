@@ -281,11 +281,11 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
 
             string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -326,11 +326,11 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
 
             string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);

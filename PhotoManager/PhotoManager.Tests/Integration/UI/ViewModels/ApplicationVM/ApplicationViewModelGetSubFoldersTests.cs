@@ -219,11 +219,11 @@ public class ApplicationViewModelGetSubFoldersTests
             Assert.That(childFolders2, Is.Empty);
             Assert.That(childFolders3, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, null);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, null);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -262,11 +262,11 @@ public class ApplicationViewModelGetSubFoldersTests
             Assert.That(parentFolders1, Is.Empty);
             Assert.That(parentFolders2, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, null);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, null);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -305,11 +305,11 @@ public class ApplicationViewModelGetSubFoldersTests
             Assert.That(parentFolders1, Is.Empty);
             Assert.That(parentFolders2, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, null);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, null);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -346,11 +346,11 @@ public class ApplicationViewModelGetSubFoldersTests
 
             Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, null);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, null);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
