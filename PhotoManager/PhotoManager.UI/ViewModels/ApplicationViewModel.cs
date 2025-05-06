@@ -435,46 +435,17 @@ public class ApplicationViewModel : BaseViewModel
         OnObservableAssetsUpdated();
     }
 
-    // TODO: Need to rework how the title is built
     // TODO: Called to many times, need to rework this (reduce event "AppTitle")
     private void UpdateAppTitle()
     {
-        string title;
-        string sortCriteria = GetSortCriteriaDescription();
-        int viewerPosition = 0;
+        int observableAssetsCount = _observableAssets.Count;
+        int viewerPosition = observableAssetsCount > 0 ? ViewerPosition + 1 : 0;
+        string sortCriteriaDescription = GetSortCriteriaDescription();
+        string baseTitle = $"{AboutInformation.Product} {AboutInformation.Version} - {CurrentFolderPath}";
 
-        if (_observableAssets.Count > 0)
-        {
-            viewerPosition = ViewerPosition + 1;
-        }
-
-        if (AppMode == AppMode.Thumbnails)
-        {
-            title = string.Format(
-                Thread.CurrentThread.CurrentCulture,
-                "{0} {1} - {2} - image {3} of {4} - sorted by {5}",
-                AboutInformation.Product,
-                AboutInformation.Version,
-                CurrentFolderPath,
-                viewerPosition,
-                _observableAssets.Count,
-                sortCriteria);
-        }
-        else
-        {
-            title = string.Format(
-                Thread.CurrentThread.CurrentCulture,
-                "{0} {1} - {2} - {3} - image {4} of {5} - sorted by {6}",
-                AboutInformation.Product,
-                AboutInformation.Version,
-                CurrentFolderPath,
-                CurrentAsset?.FileName,
-                viewerPosition,
-                _observableAssets.Count,
-                sortCriteria);
-        }
-
-        AppTitle = title;
+        AppTitle = AppMode == AppMode.Thumbnails
+            ? $"{baseTitle} - image {viewerPosition} of {observableAssetsCount} - sorted by {sortCriteriaDescription}"
+            : $"{baseTitle} - {CurrentAsset?.FileName} - image {viewerPosition} of {observableAssetsCount} - sorted by {sortCriteriaDescription}";
     }
 
     private string GetSortCriteriaDescription() =>
