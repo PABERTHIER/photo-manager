@@ -29,6 +29,16 @@ public class ApplicationViewModel : BaseViewModel
     private string _executionTimeWording;
     private string _totalFilesCountWording;
 
+    private static readonly Dictionary<SortCriteria, string> CriteriaDescriptions =
+        new()
+        {
+            [SortCriteria.FileName] = "file name",
+            [SortCriteria.FileSize] = "file size",
+            [SortCriteria.FileCreationDateTime] = "file creation",
+            [SortCriteria.FileModificationDateTime] = "file modification",
+            [SortCriteria.ThumbnailCreationDateTime] = "thumbnail creation"
+        };
+
     // TODO: Private set for all props + Update UI to set mode OneWay
     public ApplicationViewModel(IApplication application) : base(application)
     {
@@ -467,37 +477,8 @@ public class ApplicationViewModel : BaseViewModel
         AppTitle = title;
     }
 
-    private string GetSortCriteriaDescription()
-    {
-        string result = "";
-
-        switch (SortCriteria)
-        {
-            case SortCriteria.FileName:
-                result = "file name";
-                break;
-
-            case SortCriteria.FileSize:
-                result = "file size";
-                break;
-
-            case SortCriteria.FileCreationDateTime:
-                result = "file creation";
-                break;
-
-            case SortCriteria.FileModificationDateTime:
-                result = "file modification";
-                break;
-
-            case SortCriteria.ThumbnailCreationDateTime:
-                result = "thumbnail creation";
-                break;
-        }
-
-        result += SortAscending ? " ascending" : " descending";
-
-        return result;
-    }
+    private string GetSortCriteriaDescription() =>
+        $"{CriteriaDescriptions[SortCriteria]} {(SortAscending ? "ascending" : "descending")}";
 
     private void AddAsset(Asset asset)
     {
