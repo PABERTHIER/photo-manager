@@ -32,9 +32,15 @@ public class ApplicationViewModel : BaseViewModel
     // TODO: Private set for all props + Update UI to set mode OneWay
     public ApplicationViewModel(IApplication application) : base(application)
     {
+        _appTitle = string.Empty;
+        _statusMessage = string.Empty;
         _observableAssets = [];
         _selectedAssets = [];
         _currentFolderPath = Application.GetInitialFolderPath();
+
+        _globalAssetsCounterWording = string.Empty;
+        _executionTimeWording = string.Empty;
+        _totalFilesCountWording = string.Empty;
 
         AboutInformation = Application.GetAboutInformation(GetType().Assembly);
         UpdateAppTitle();

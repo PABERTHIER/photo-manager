@@ -1500,12 +1500,12 @@ public class FolderNavigationWindowTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SelectedAssets, Is.Empty);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ObservableAssets, Is.Empty);
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ExecutionTimeWording, Is.Null);
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.TotalFilesCountWording, Is.Null);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppTitle,
             Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.StatusMessage, Is.Null);
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentAsset, Is.Null);
 
         if (expectedMoveAssetsLastSelectedFolder != null)
@@ -1588,9 +1588,9 @@ public class FolderNavigationWindowTests
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SelectedAssets, Is.Empty);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, folderNavigationViewModelInstance.ApplicationViewModel.ObservableAssets);
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ExecutionTimeWording, Is.Null);
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.TotalFilesCountWording, Is.Null);
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AppTitle, Is.EqualTo(expectedAppTitle));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.StatusMessage, Is.EqualTo(expectedStatusMessage));
 

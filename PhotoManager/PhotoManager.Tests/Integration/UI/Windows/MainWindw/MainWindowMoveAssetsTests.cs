@@ -2742,12 +2742,12 @@ public class MainWindowMoveAssetsTests
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
-        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
+        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
             Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
-        Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
 
         if (expectedMoveAssetsLastSelectedFolder != null)
@@ -2792,9 +2792,9 @@ public class MainWindowMoveAssetsTests
         AssertSelectedAssets(expectedSelectedAssets, applicationViewModelInstance.SelectedAssets);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
-        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
-        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo("The catalog process has ended."));
 
