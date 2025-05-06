@@ -219,11 +219,11 @@ public class ApplicationViewModelGetSubFoldersTests
             Assert.That(childFolders2, Is.Empty);
             Assert.That(childFolders3, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, null);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, null);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -262,11 +262,11 @@ public class ApplicationViewModelGetSubFoldersTests
             Assert.That(parentFolders1, Is.Empty);
             Assert.That(parentFolders2, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, null);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, null);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -305,11 +305,11 @@ public class ApplicationViewModelGetSubFoldersTests
             Assert.That(parentFolders1, Is.Empty);
             Assert.That(parentFolders2, Is.Empty);
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, null);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, null);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -346,11 +346,11 @@ public class ApplicationViewModelGetSubFoldersTests
 
             Assert.That(exception?.Message, Is.EqualTo("Delegate to an instance method cannot have null 'this'."));
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, null);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, string.Empty);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, null);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, string.Empty);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -407,12 +407,12 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
-        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
+        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
             Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
-        Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
@@ -437,9 +437,9 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         Assert.That(applicationViewModelInstance.ObservableAssets, Is.Empty);
-        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
-        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle,
             Is.EqualTo($"PhotoManager v1.0.0 - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));

@@ -281,11 +281,11 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
 
             string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -326,11 +326,11 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
 
             string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
 
-            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckAfterChanges(_applicationViewModel!, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             Assert.That(notifyPropertyChangedEvents, Is.Empty);
 
-            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], null, null, false, false);
+            CheckInstance(applicationViewModelInstances, _dataDirectory!, expectedAppTitle, [], string.Empty, null, false, false);
 
             // Because the root folder is already added
             Assert.That(folderAddedEvents, Is.Empty);
@@ -387,12 +387,12 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
-        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
+        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
             Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
-        Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
@@ -422,9 +422,9 @@ public class ApplicationViewModelGetRootCatalogFoldersTests
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
-        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
-        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));
 

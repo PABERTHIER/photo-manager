@@ -222,7 +222,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -237,7 +236,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -287,7 +285,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -304,7 +301,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -347,7 +343,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -362,7 +357,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -414,7 +408,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -431,7 +424,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -477,7 +469,6 @@ public class ApplicationViewModelSetAssetsTests
                 otherDirectory,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -495,7 +486,6 @@ public class ApplicationViewModelSetAssetsTests
                 otherDirectory,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 expectedAssets,
                 expectedAssets[0],
@@ -537,7 +527,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -552,7 +541,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -596,7 +584,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -613,7 +600,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -655,7 +641,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -670,7 +655,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -714,7 +698,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -731,7 +714,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -775,7 +757,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -788,7 +769,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 _dataDirectory!,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -834,7 +814,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -849,7 +828,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 otherDirectory,
                 true,
-                SortCriteria.FileName,
                 expectedAppTitle,
                 [],
                 null,
@@ -911,12 +889,12 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
-        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
+        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
             Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
-        Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
@@ -930,7 +908,6 @@ public class ApplicationViewModelSetAssetsTests
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
         bool expectedSortAscending,
-        SortCriteria expectedSortCriteria,
         string expectedAppTitle,
         Asset[] expectedAssets,
         Asset? expectedCurrentAsset,
@@ -940,18 +917,18 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(applicationViewModelInstance.SortAscending, Is.EqualTo(expectedSortAscending));
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
-        Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(expectedSortCriteria));
+        Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedAssets, applicationViewModelInstance.ObservableAssets);
-        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
-        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
-        Assert.That(applicationViewModelInstance.StatusMessage, Is.Null);
+        Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(string.Empty));
 
         if (expectedCurrentAsset != null)
         {
@@ -975,7 +952,6 @@ public class ApplicationViewModelSetAssetsTests
         string expectedLastDirectoryInspected,
         string assetsDirectory,
         bool expectedSortAscending,
-        SortCriteria expectedSortCriteria,
         string expectedAppTitle,
         Asset[] expectedAssets,
         Asset? expectedCurrentAsset,
@@ -985,18 +961,18 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(applicationViewModelInstance.SortAscending, Is.EqualTo(expectedSortAscending));
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
-        Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(expectedSortCriteria));
+        Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedAssets, applicationViewModelInstance.ObservableAssets);
-        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
-        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
-        Assert.That(applicationViewModelInstance.StatusMessage, Is.Null);
+        Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(string.Empty));
 
         if (expectedCurrentAsset != null)
         {
@@ -1056,7 +1032,6 @@ public class ApplicationViewModelSetAssetsTests
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
         bool expectedSortAscending,
-        SortCriteria expectedSortCriteria,
         string expectedAppTitle,
         Asset[] expectedAssets,
         Asset? expectedCurrentAsset,
@@ -1078,7 +1053,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances[0],
                 expectedLastDirectoryInspected,
                 expectedSortAscending,
-                expectedSortCriteria,
                 expectedAppTitle,
                 expectedAssets,
                 expectedCurrentAsset,
@@ -1092,7 +1066,6 @@ public class ApplicationViewModelSetAssetsTests
         string expectedLastDirectoryInspected,
         string assetsDirectory,
         bool expectedSortAscending,
-        SortCriteria expectedSortCriteria,
         string expectedAppTitle,
         Asset[] expectedAssets,
         Asset? expectedCurrentAsset,
@@ -1115,7 +1088,6 @@ public class ApplicationViewModelSetAssetsTests
                 expectedLastDirectoryInspected,
                 assetsDirectory,
                 expectedSortAscending,
-                expectedSortCriteria,
                 expectedAppTitle,
                 expectedAssets,
                 expectedCurrentAsset,

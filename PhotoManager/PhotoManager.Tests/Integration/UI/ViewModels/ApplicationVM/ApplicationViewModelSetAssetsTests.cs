@@ -200,7 +200,6 @@ public class ApplicationViewModelSetAssetsTests
             _asset4 = _asset4.WithFolder(folder!);
 
             const string expectedStatusMessage = "The catalog process has ended.";
-            const SortCriteria sortCriteria = SortCriteria.FileName;
             string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
@@ -212,7 +211,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 assetsDirectory,
                 true,
-                sortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 expectedAssets,
@@ -247,7 +245,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 assetsDirectory,
                 true,
-                sortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 expectedAssets,
@@ -299,7 +296,6 @@ public class ApplicationViewModelSetAssetsTests
             _asset4.ImageData = new();
 
             const string expectedStatusMessage = "The catalog process has ended.";
-            const SortCriteria sortCriteria = SortCriteria.FileName;
             string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
@@ -309,7 +305,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 otherDirectory,
                 true,
-                sortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 expectedAssets,
@@ -346,7 +341,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 otherDirectory,
                 true,
-                sortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 expectedAssets,
@@ -386,7 +380,6 @@ public class ApplicationViewModelSetAssetsTests
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             const string expectedStatusMessage = "The catalog process has ended.";
-            const SortCriteria sortCriteria = SortCriteria.FileName;
             string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
@@ -397,7 +390,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 assetsDirectory,
                 true,
-                sortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 [],
@@ -420,7 +412,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 assetsDirectory,
                 true,
-                sortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 [],
@@ -462,7 +453,6 @@ public class ApplicationViewModelSetAssetsTests
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
             const string expectedStatusMessage = "The catalog process has ended.";
-            const SortCriteria sortCriteria = SortCriteria.FileName;
             string expectedAppTitle = $"PhotoManager v1.0.0 - {otherDirectory} - image 0 of 0 - sorted by file name ascending";
 
             Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
@@ -473,7 +463,6 @@ public class ApplicationViewModelSetAssetsTests
                 _applicationViewModel!,
                 otherDirectory,
                 true,
-                sortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 [],
@@ -498,7 +487,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances,
                 otherDirectory,
                 true,
-                sortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 [],
@@ -562,12 +550,12 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
-        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.Null);
-        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.Null);
+        Assert.That(_applicationViewModel!.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
             Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
-        Assert.That(_applicationViewModel!.StatusMessage, Is.Null);
+        Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
         Assert.That(_applicationViewModel!.CanGoToPreviousAsset, Is.False);
@@ -581,7 +569,6 @@ public class ApplicationViewModelSetAssetsTests
         ApplicationViewModel applicationViewModelInstance,
         string expectedLastDirectoryInspected,
         bool expectedSortAscending,
-        SortCriteria expectedSortCriteria,
         string expectedAppTitle,
         string expectedStatusMessage,
         Asset[] expectedAssets,
@@ -592,16 +579,16 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(applicationViewModelInstance.SortAscending, Is.EqualTo(expectedSortAscending));
         Assert.That(applicationViewModelInstance.IsRefreshingFolders, Is.False);
         Assert.That(applicationViewModelInstance.AppMode, Is.EqualTo(AppMode.Thumbnails));
-        Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(expectedSortCriteria));
+        Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
         Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
-        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.Null);
-        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.Null);
-        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.Null);
+        Assert.That(applicationViewModelInstance.GlobalAssetsCounterWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
+        Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle, Is.EqualTo(expectedAppTitle));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));
 
@@ -654,7 +641,6 @@ public class ApplicationViewModelSetAssetsTests
         List<ApplicationViewModel> applicationViewModelInstances,
         string expectedLastDirectoryInspected,
         bool expectedSortAscending,
-        SortCriteria expectedSortCriteria,
         string expectedAppTitle,
         string expectedStatusMessage,
         Asset[] expectedAssets,
@@ -677,7 +663,6 @@ public class ApplicationViewModelSetAssetsTests
                 applicationViewModelInstances[0],
                 expectedLastDirectoryInspected,
                 expectedSortAscending,
-                expectedSortCriteria,
                 expectedAppTitle,
                 expectedStatusMessage,
                 expectedAssets,

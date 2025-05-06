@@ -29,12 +29,28 @@ public class ApplicationViewModel : BaseViewModel
     private string _executionTimeWording;
     private string _totalFilesCountWording;
 
+    private static readonly Dictionary<SortCriteria, string> CriteriaDescriptions =
+        new()
+        {
+            [SortCriteria.FileName] = "file name",
+            [SortCriteria.FileSize] = "file size",
+            [SortCriteria.FileCreationDateTime] = "file creation",
+            [SortCriteria.FileModificationDateTime] = "file modification",
+            [SortCriteria.ThumbnailCreationDateTime] = "thumbnail creation"
+        };
+
     // TODO: Private set for all props + Update UI to set mode OneWay
     public ApplicationViewModel(IApplication application) : base(application)
     {
+        _appTitle = string.Empty;
+        _statusMessage = string.Empty;
         _observableAssets = [];
         _selectedAssets = [];
         _currentFolderPath = Application.GetInitialFolderPath();
+
+        _globalAssetsCounterWording = string.Empty;
+        _executionTimeWording = string.Empty;
+        _totalFilesCountWording = string.Empty;
 
         AboutInformation = Application.GetAboutInformation(GetType().Assembly);
         UpdateAppTitle();
@@ -419,79 +435,21 @@ public class ApplicationViewModel : BaseViewModel
         OnObservableAssetsUpdated();
     }
 
-    // TODO: Need to rework how the title is built
     // TODO: Called to many times, need to rework this (reduce event "AppTitle")
     private void UpdateAppTitle()
     {
-        string title;
-        string sortCriteria = GetSortCriteriaDescription();
-        int viewerPosition = 0;
+        int observableAssetsCount = _observableAssets.Count;
+        int viewerPosition = observableAssetsCount > 0 ? ViewerPosition + 1 : 0;
+        string sortCriteriaDescription = GetSortCriteriaDescription();
+        string baseTitle = $"{AboutInformation.Product} {AboutInformation.Version} - {CurrentFolderPath}";
 
-        if (_observableAssets.Count > 0)
-        {
-            viewerPosition = ViewerPosition + 1;
-        }
-
-        if (AppMode == AppMode.Thumbnails)
-        {
-            title = string.Format(
-                Thread.CurrentThread.CurrentCulture,
-                "{0} {1} - {2} - image {3} of {4} - sorted by {5}",
-                AboutInformation.Product,
-                AboutInformation.Version,
-                CurrentFolderPath,
-                viewerPosition,
-                _observableAssets.Count,
-                sortCriteria);
-        }
-        else
-        {
-            title = string.Format(
-                Thread.CurrentThread.CurrentCulture,
-                "{0} {1} - {2} - {3} - image {4} of {5} - sorted by {6}",
-                AboutInformation.Product,
-                AboutInformation.Version,
-                CurrentFolderPath,
-                CurrentAsset?.FileName,
-                viewerPosition,
-                _observableAssets.Count,
-                sortCriteria);
-        }
-
-        AppTitle = title;
+        AppTitle = AppMode == AppMode.Thumbnails
+            ? $"{baseTitle} - image {viewerPosition} of {observableAssetsCount} - sorted by {sortCriteriaDescription}"
+            : $"{baseTitle} - {CurrentAsset?.FileName} - image {viewerPosition} of {observableAssetsCount} - sorted by {sortCriteriaDescription}";
     }
 
-    private string GetSortCriteriaDescription()
-    {
-        string result = "";
-
-        switch (SortCriteria)
-        {
-            case SortCriteria.FileName:
-                result = "file name";
-                break;
-
-            case SortCriteria.FileSize:
-                result = "file size";
-                break;
-
-            case SortCriteria.FileCreationDateTime:
-                result = "file creation";
-                break;
-
-            case SortCriteria.FileModificationDateTime:
-                result = "file modification";
-                break;
-
-            case SortCriteria.ThumbnailCreationDateTime:
-                result = "thumbnail creation";
-                break;
-        }
-
-        result += SortAscending ? " ascending" : " descending";
-
-        return result;
-    }
+    private string GetSortCriteriaDescription() =>
+        $"{CriteriaDescriptions[SortCriteria]} {(SortAscending ? "ascending" : "descending")}";
 
     private void AddAsset(Asset asset)
     {
