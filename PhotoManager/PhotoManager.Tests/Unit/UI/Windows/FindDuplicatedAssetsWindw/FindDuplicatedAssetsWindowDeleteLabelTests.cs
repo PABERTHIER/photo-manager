@@ -15,7 +15,6 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
     private const string DATABASE_END_PATH = "v1.0";
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
-    private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
     private UserConfigurationService? _userConfigurationService;
 
@@ -209,8 +208,8 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
         MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, _userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
-        _findDuplicatedAssetsViewModel = new (_application);
+        PhotoManager.Application.Application application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        _findDuplicatedAssetsViewModel = new (application);
     }
 
     [Test]
@@ -258,7 +257,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -266,28 +265,28 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -386,35 +385,35 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 Visible = Visibility.Collapsed,
@@ -521,7 +520,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -529,28 +528,28 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -647,14 +646,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -662,21 +661,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -770,21 +769,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -792,14 +791,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -893,21 +892,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -915,14 +914,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -1016,28 +1015,28 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -1045,7 +1044,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -1139,35 +1138,35 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 Visible = Visibility.Collapsed,
@@ -1260,7 +1259,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -1268,28 +1267,28 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -1331,7 +1330,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             expectedDuplicatedAssetSet = [];
 
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -1339,14 +1338,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -1354,14 +1353,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
 
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -1406,7 +1405,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             expectedDuplicatedAssetSet = [];
 
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -1414,7 +1413,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -1422,7 +1421,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -1430,14 +1429,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
 
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -1487,7 +1486,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             expectedDuplicatedAssetSet = [];
 
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -1495,7 +1494,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -1503,7 +1502,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -1511,7 +1510,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
 
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -1519,7 +1518,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -1575,7 +1574,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             expectedDuplicatedAssetSet = [];
 
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -1583,7 +1582,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -1591,7 +1590,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -1599,7 +1598,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel3);
 
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -1607,7 +1606,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 Visible = Visibility.Collapsed,
@@ -1717,7 +1716,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -1725,7 +1724,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -1818,14 +1817,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -1920,14 +1919,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -2021,7 +2020,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -2029,7 +2028,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -2130,7 +2129,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -2138,28 +2137,28 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -2202,7 +2201,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             expectedDuplicatedAssetSet1 = [];
             expectedDuplicatedAssetSet2 = [];
 
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -2210,7 +2209,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -2218,21 +2217,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -2282,7 +2281,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             expectedDuplicatedAssetSet1 = [];
             expectedDuplicatedAssetSet2 = [];
 
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -2290,7 +2289,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -2298,14 +2297,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -2313,7 +2312,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -2429,21 +2428,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -2451,14 +2450,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -2506,21 +2505,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             expectedDuplicatedAssetSet1 = [];
             expectedDuplicatedAssetSet2 = [];
 
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -2528,7 +2527,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
 
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -2536,7 +2535,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -2591,7 +2590,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             expectedDuplicatedAssetSet1 = [];
             expectedDuplicatedAssetSet2 = [];
 
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -2599,14 +2598,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -2614,7 +2613,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
 
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -2622,7 +2621,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -2734,7 +2733,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -2742,7 +2741,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -2750,7 +2749,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -2848,7 +2847,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel unknownDuplicatedAssetSet = [];
 
             // Only one duplicate in the set, then set is not visible
-            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new (_application!)
+            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new()
             {
                 Asset = _asset1,
                 ParentViewModel = unknownDuplicatedAssetSet
@@ -2860,28 +2859,28 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet1 = [];
             DuplicatedSetViewModel expectedDuplicatedAssetSet2 = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel3);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -2976,7 +2975,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel unknownDuplicatedAssetSet = [];
 
             // Only one duplicate in the set, then set is not visible
-            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new (_application!)
+            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new()
             {
                 Asset = _asset1,
                 ParentViewModel = unknownDuplicatedAssetSet
@@ -2987,21 +2986,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -3087,21 +3086,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel unknownDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = unknownDuplicatedAssetSet
             };
             unknownDuplicatedAssetSet.Add(unknownDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = unknownDuplicatedAssetSet
             };
             unknownDuplicatedAssetSet.Add(unknownDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = unknownDuplicatedAssetSet
@@ -3112,14 +3111,14 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -3204,7 +3203,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
             DuplicatedSetViewModel unknownDuplicatedAssetSet = [];
 
             // Only one duplicate in the set, then set is not visible
-            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new (_application!)
+            DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new()
             {
                 Asset = _asset1,
                 ParentViewModel = unknownDuplicatedAssetSet
@@ -3215,21 +3214,21 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -3301,7 +3300,7 @@ public class FindDuplicatedAssetsWindowDeleteLabelTests
 
             DuplicatedSetViewModel duplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel = new()
             {
                 Asset = _asset1,
                 ParentViewModel = duplicatedAssetSet

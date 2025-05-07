@@ -1,5 +1,4 @@
-﻿using PhotoManager.Application;
-using PhotoManager.Domain;
+﻿using PhotoManager.Domain;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,10 +7,9 @@ namespace PhotoManager.UI.ViewModels;
 
 public class FolderNavigationViewModel(
     ApplicationViewModel applicationViewModel,
-    IApplication application,
     Folder sourceFolder,
     List<string> recentTargetPaths)
-    : BaseViewModel(application)
+    : BaseViewModel
 {
     private string? _targetPath;
 

@@ -307,7 +307,7 @@ public class MainWindowFindDuplicatesTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -315,7 +315,7 @@ public class MainWindowFindDuplicatesTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -323,7 +323,7 @@ public class MainWindowFindDuplicatesTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset1Temp,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -465,14 +465,14 @@ public class MainWindowFindDuplicatesTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -612,7 +612,7 @@ public class MainWindowFindDuplicatesTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -620,7 +620,7 @@ public class MainWindowFindDuplicatesTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -761,7 +761,7 @@ public class MainWindowFindDuplicatesTests
 
             DuplicatedSetViewModel expectedDuplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset2,
                 Visible = Visibility.Collapsed,
@@ -769,7 +769,7 @@ public class MainWindowFindDuplicatesTests
             };
             expectedDuplicatedAssetSet.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet
@@ -900,7 +900,7 @@ public class MainWindowFindDuplicatesTests
 
             DuplicatedSetViewModel duplicatedAssetSet = [];
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel = new()
             {
                 Asset = _asset2,
                 ParentViewModel = duplicatedAssetSet
@@ -1375,11 +1375,7 @@ public class MainWindowFindDuplicatesTests
 
     private void MainWindowsInit()
     {
-        _folderNavigationViewModel = new (
-            _applicationViewModel!,
-            _application!,
-            _sourceFolder!,
-            []);
+        _folderNavigationViewModel = new (_applicationViewModel!, _sourceFolder!, []);
 
         CancellationTokenSource cancellationTokenSource = new();
 

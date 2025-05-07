@@ -1,10 +1,9 @@
-﻿using PhotoManager.Application;
-using PhotoManager.Domain;
+﻿using PhotoManager.Domain;
 using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class DuplicatedAssetViewModel(IApplication application) : BaseViewModel(application)
+public class DuplicatedAssetViewModel : BaseViewModel
 {
     private Visibility _visible;
 

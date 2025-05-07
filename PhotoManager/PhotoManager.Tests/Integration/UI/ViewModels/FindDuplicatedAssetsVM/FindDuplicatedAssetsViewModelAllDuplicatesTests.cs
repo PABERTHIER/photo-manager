@@ -561,21 +561,21 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             DuplicatedSetViewModel duplicatedAssetSet5 = [];
 
             // Image 1
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = duplicatedAssetSet1
             };
             duplicatedAssetSet1.Add(duplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel2 = new()
             {
                 Asset = _asset6,
                 ParentViewModel = duplicatedAssetSet1
             };
             duplicatedAssetSet1.Add(duplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel3 = new()
             {
                 Asset = _asset7,
                 ParentViewModel = duplicatedAssetSet1
@@ -583,14 +583,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             duplicatedAssetSet1.Add(duplicatedAssetViewModel3);
 
             // Image 2
-            DuplicatedAssetViewModel duplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = duplicatedAssetSet2
             };
             duplicatedAssetSet2.Add(duplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = duplicatedAssetSet2
@@ -598,21 +598,21 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             duplicatedAssetSet2.Add(duplicatedAssetViewModel5);
 
             // Image 9
-            DuplicatedAssetViewModel duplicatedAssetViewModel6 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel6 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = duplicatedAssetSet3
             };
             duplicatedAssetSet3.Add(duplicatedAssetViewModel6);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel7 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel7 = new()
             {
                 Asset = _asset8,
                 ParentViewModel = duplicatedAssetSet3
             };
             duplicatedAssetSet3.Add(duplicatedAssetViewModel7);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel8 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel8 = new()
             {
                 Asset = _asset9,
                 ParentViewModel = duplicatedAssetSet3
@@ -620,14 +620,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             duplicatedAssetSet3.Add(duplicatedAssetViewModel8);
 
             // Image 11
-            DuplicatedAssetViewModel duplicatedAssetViewModel9 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel9 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = duplicatedAssetSet4
             };
             duplicatedAssetSet4.Add(duplicatedAssetViewModel9);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel10 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel10 = new()
             {
                 Asset = _asset10,
                 ParentViewModel = duplicatedAssetSet4
@@ -635,28 +635,28 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             duplicatedAssetSet4.Add(duplicatedAssetViewModel10);
 
             // Image 1336
-            DuplicatedAssetViewModel duplicatedAssetViewModel11 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel11 = new()
             {
                 Asset = _asset11,
                 ParentViewModel = duplicatedAssetSet5
             };
             duplicatedAssetSet5.Add(duplicatedAssetViewModel11);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel12 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel12 = new()
             {
                 Asset = _asset12,
                 ParentViewModel = duplicatedAssetSet5
             };
             duplicatedAssetSet5.Add(duplicatedAssetViewModel12);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel13 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel13 = new()
             {
                 Asset = _asset13,
                 ParentViewModel = duplicatedAssetSet5
             };
             duplicatedAssetSet5.Add(duplicatedAssetViewModel13);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel14 = new (_application!)
+            DuplicatedAssetViewModel duplicatedAssetViewModel14 = new()
             {
                 Asset = _asset14,
                 ParentViewModel = duplicatedAssetSet5
@@ -971,7 +971,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             _asset6.ImageData = new();
 
             // Image 1
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -979,14 +979,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset6,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset7,
                 ParentViewModel = expectedDuplicatedAssetSet1
@@ -994,14 +994,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
             // Image 2
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -1009,21 +1009,21 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
             // Image 9
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel7 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel7 = new()
             {
                 Asset = _asset8,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel7);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel8 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel8 = new()
             {
                 Asset = _asset9,
                 ParentViewModel = expectedDuplicatedAssetSet3
@@ -1031,14 +1031,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel8);
 
             // Image 11
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel9 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel9 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet4
             };
             expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel9);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel10 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel10 = new()
             {
                 Asset = _asset10,
                 ParentViewModel = expectedDuplicatedAssetSet4
@@ -1046,28 +1046,28 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel10);
 
             // Image 1336
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel11 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel11 = new()
             {
                 Asset = _asset11,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel12 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel12 = new()
             {
                 Asset = _asset12,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel13 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel13 = new()
             {
                 Asset = _asset13,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel13);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel14 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel14 = new()
             {
                 Asset = _asset14,
                 ParentViewModel = expectedDuplicatedAssetSet5
@@ -1120,7 +1120,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet5 = [];
 
             // Image 1336
-            expectedDuplicatedAssetViewModel11 = new (_application!)
+            expectedDuplicatedAssetViewModel11 = new()
             {
                 Asset = _asset11,
                 Visible = Visibility.Collapsed,
@@ -1128,21 +1128,21 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
 
-            expectedDuplicatedAssetViewModel12 = new (_application!)
+            expectedDuplicatedAssetViewModel12 = new()
             {
                 Asset = _asset12,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
 
-            expectedDuplicatedAssetViewModel13 = new (_application!)
+            expectedDuplicatedAssetViewModel13 = new()
             {
                 Asset = _asset13,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel13);
 
-            expectedDuplicatedAssetViewModel14 = new (_application!)
+            expectedDuplicatedAssetViewModel14 = new()
             {
                 Asset = _asset14,
                 Visible = Visibility.Collapsed,
@@ -1199,7 +1199,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet3 = [];
 
             // Image 9
-            expectedDuplicatedAssetViewModel6 = new (_application!)
+            expectedDuplicatedAssetViewModel6 = new()
             {
                 Asset = _asset4,
                 Visible = Visibility.Collapsed,
@@ -1207,7 +1207,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
-            expectedDuplicatedAssetViewModel7 = new (_application!)
+            expectedDuplicatedAssetViewModel7 = new()
             {
                 Asset = _asset8,
                 Visible = Visibility.Collapsed,
@@ -1215,7 +1215,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel7);
 
-            expectedDuplicatedAssetViewModel8 = new (_application!)
+            expectedDuplicatedAssetViewModel8 = new()
             {
                 Asset = _asset9,
                 Visible = Visibility.Collapsed,
@@ -1271,7 +1271,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet1 = [];
 
             // Image 1
-            expectedDuplicatedAssetViewModel1 = new (_application!)
+            expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 Visible = Visibility.Collapsed,
@@ -1279,7 +1279,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            expectedDuplicatedAssetViewModel2 = new (_application!)
+            expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset6,
                 Visible = Visibility.Collapsed,
@@ -1287,7 +1287,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            expectedDuplicatedAssetViewModel3 = new (_application!)
+            expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset7,
                 ParentViewModel = expectedDuplicatedAssetSet1
@@ -1347,14 +1347,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet2 = [];
 
             // Image 2
-            expectedDuplicatedAssetViewModel4 = new (_application!)
+            expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            expectedDuplicatedAssetViewModel5 = new (_application!)
+            expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset3,
                 Visible = Visibility.Collapsed,
@@ -1420,7 +1420,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet4 = [];
 
             // Image 11
-            expectedDuplicatedAssetViewModel9 = new (_application!)
+            expectedDuplicatedAssetViewModel9 = new()
             {
                 Asset = _asset5,
                 Visible = Visibility.Collapsed,
@@ -1428,7 +1428,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel9);
 
-            expectedDuplicatedAssetViewModel10 = new (_application!)
+            expectedDuplicatedAssetViewModel10 = new()
             {
                 Asset = _asset10,
                 ParentViewModel = expectedDuplicatedAssetSet4
@@ -1501,7 +1501,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet5 = [];
 
             // Image 1336
-            expectedDuplicatedAssetViewModel11 = new (_application!)
+            expectedDuplicatedAssetViewModel11 = new()
             {
                 Asset = _asset11,
                 Visible = Visibility.Collapsed,
@@ -1509,7 +1509,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
 
-            expectedDuplicatedAssetViewModel12 = new (_application!)
+            expectedDuplicatedAssetViewModel12 = new()
             {
                 Asset = _asset12,
                 Visible = Visibility.Collapsed,
@@ -1517,14 +1517,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
 
-            expectedDuplicatedAssetViewModel13 = new (_application!)
+            expectedDuplicatedAssetViewModel13 = new()
             {
                 Asset = _asset13,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel13);
 
-            expectedDuplicatedAssetViewModel14 = new (_application!)
+            expectedDuplicatedAssetViewModel14 = new()
             {
                 Asset = _asset14,
                 Visible = Visibility.Collapsed,
@@ -1872,21 +1872,21 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet5 = [];
 
             // Image 1
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset6,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset7,
                 ParentViewModel = expectedDuplicatedAssetSet1
@@ -1894,14 +1894,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
             // Image 2
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -1909,21 +1909,21 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
             // Image 9
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel7 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel7 = new()
             {
                 Asset = _asset8,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel7);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel8 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel8 = new()
             {
                 Asset = _asset9,
                 ParentViewModel = expectedDuplicatedAssetSet3
@@ -1931,14 +1931,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel8);
 
             // Image 11
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel9 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel9 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet4
             };
             expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel9);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel10 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel10 = new()
             {
                 Asset = _asset10,
                 ParentViewModel = expectedDuplicatedAssetSet4
@@ -1946,28 +1946,28 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel10);
 
             // Image 1336
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel11 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel11 = new()
             {
                 Asset = _asset11,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel12 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel12 = new()
             {
                 Asset = _asset12,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel13 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel13 = new()
             {
                 Asset = _asset13,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel13);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel14 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel14 = new()
             {
                 Asset = _asset14,
                 ParentViewModel = expectedDuplicatedAssetSet5
@@ -2527,21 +2527,21 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             DuplicatedSetViewModel expectedDuplicatedAssetSet5 = [];
 
             // Image 1
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel1 = new()
             {
                 Asset = _asset1,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel1);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel2 = new()
             {
                 Asset = _asset6,
                 ParentViewModel = expectedDuplicatedAssetSet1
             };
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel2);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel3 = new()
             {
                 Asset = _asset7,
                 ParentViewModel = expectedDuplicatedAssetSet1
@@ -2549,14 +2549,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet1.Add(expectedDuplicatedAssetViewModel3);
 
             // Image 2
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel4 = new()
             {
                 Asset = _asset2,
                 ParentViewModel = expectedDuplicatedAssetSet2
             };
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel4);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel5 = new()
             {
                 Asset = _asset3,
                 ParentViewModel = expectedDuplicatedAssetSet2
@@ -2564,21 +2564,21 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet2.Add(expectedDuplicatedAssetViewModel5);
 
             // Image 9
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel6 = new()
             {
                 Asset = _asset4,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel6);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel7 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel7 = new()
             {
                 Asset = _asset8,
                 ParentViewModel = expectedDuplicatedAssetSet3
             };
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel7);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel8 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel8 = new()
             {
                 Asset = _asset9,
                 ParentViewModel = expectedDuplicatedAssetSet3
@@ -2586,14 +2586,14 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet3.Add(expectedDuplicatedAssetViewModel8);
 
             // Image 11
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel9 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel9 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = expectedDuplicatedAssetSet4
             };
             expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel9);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel10 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel10 = new()
             {
                 Asset = _asset10,
                 ParentViewModel = expectedDuplicatedAssetSet4
@@ -2601,28 +2601,28 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
             expectedDuplicatedAssetSet4.Add(expectedDuplicatedAssetViewModel10);
 
             // Image 1336
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel11 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel11 = new()
             {
                 Asset = _asset11,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel11);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel12 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel12 = new()
             {
                 Asset = _asset12,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel12);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel13 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel13 = new()
             {
                 Asset = _asset13,
                 ParentViewModel = expectedDuplicatedAssetSet5
             };
             expectedDuplicatedAssetSet5.Add(expectedDuplicatedAssetViewModel13);
 
-            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel14 = new (_application!)
+            DuplicatedAssetViewModel expectedDuplicatedAssetViewModel14 = new()
             {
                 Asset = _asset14,
                 ParentViewModel = expectedDuplicatedAssetSet5

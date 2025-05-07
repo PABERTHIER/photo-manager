@@ -2813,11 +2813,7 @@ public class MainWindowDeleteAssetsTests
 
     private void MainWindowsInit()
     {
-        _folderNavigationViewModel = new (
-            _applicationViewModel!,
-            _application!,
-            _sourceFolder!,
-            []);
+        _folderNavigationViewModel = new (_applicationViewModel!, _sourceFolder!, []);
 
         CancellationTokenSource cancellationTokenSource = new();
 

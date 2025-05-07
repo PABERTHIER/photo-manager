@@ -16,6 +16,8 @@ namespace PhotoManager.UI.ViewModels;
 
 public class ApplicationViewModel : BaseViewModel
 {
+    private readonly IApplication _application;
+
     private AppMode _appMode;
     private string _appTitle;
     private string _currentFolderPath;
@@ -40,19 +42,21 @@ public class ApplicationViewModel : BaseViewModel
         };
 
     // TODO: Private set for all props + Update UI to set mode OneWay
-    public ApplicationViewModel(IApplication application) : base(application)
+    public ApplicationViewModel(IApplication application)
     {
+        _application = application;
+
         _appTitle = string.Empty;
         _statusMessage = string.Empty;
         _observableAssets = [];
         _selectedAssets = [];
-        _currentFolderPath = Application.GetInitialFolderPath();
+        _currentFolderPath = _application.GetInitialFolderPath();
 
         _globalAssetsCounterWording = string.Empty;
         _executionTimeWording = string.Empty;
         _totalFilesCountWording = string.Empty;
 
-        AboutInformation = Application.GetAboutInformation(GetType().Assembly);
+        AboutInformation = _application.GetAboutInformation(GetType().Assembly);
         UpdateAppTitle();
     }
 
@@ -270,7 +274,7 @@ public class ApplicationViewModel : BaseViewModel
             }
         }
 
-        if (observableAsset != null && Application.FileExists(observableAsset.FullPath))
+        if (observableAsset != null && _application.FileExists(observableAsset.FullPath))
         {
             if (AppMode != newAppMode)
             {
@@ -317,7 +321,7 @@ public class ApplicationViewModel : BaseViewModel
             case CatalogChangeReason.AssetCreated:
                 if (e.Asset?.Folder.Path == CurrentFolderPath)
                 {
-                    Application.LoadThumbnail(e.Asset);
+                    _application.LoadThumbnail(e.Asset);
                     AddAsset(e.Asset);
                 }
 
@@ -326,7 +330,7 @@ public class ApplicationViewModel : BaseViewModel
             case CatalogChangeReason.AssetUpdated:
                 if (e.Asset?.Folder.Path == CurrentFolderPath)
                 {
-                    Application.LoadThumbnail(e.Asset);
+                    _application.LoadThumbnail(e.Asset);
                     UpdateAsset(e.Asset);
                 }
 
@@ -362,17 +366,17 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) => await Application.CatalogAssetsAsync(callback, token);
+    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) => await _application.CatalogAssetsAsync(callback, token);
 
-    public ushort GetCatalogCooldownMinutes() => Application.GetCatalogCooldownMinutes();
+    public ushort GetCatalogCooldownMinutes() => _application.GetCatalogCooldownMinutes();
 
-    public bool GetSyncAssetsEveryXMinutes() => Application.GetSyncAssetsEveryXMinutes();
+    public bool GetSyncAssetsEveryXMinutes() => _application.GetSyncAssetsEveryXMinutes();
 
-    public string GetExemptedFolderPath() => Application.GetExemptedFolderPath();
+    public string GetExemptedFolderPath() => _application.GetExemptedFolderPath();
 
-    public Folder[] GetRootCatalogFolders() => Application.GetRootCatalogFolders();
+    public Folder[] GetRootCatalogFolders() => _application.GetRootCatalogFolders();
 
-    public Folder[] GetSubFolders(Folder parentFolder) => Application.GetSubFolders(parentFolder);
+    public Folder[] GetSubFolders(Folder parentFolder) => _application.GetSubFolders(parentFolder);
 
     public BitmapImage LoadBitmapImageFromPath()
     {
@@ -381,7 +385,7 @@ public class ApplicationViewModel : BaseViewModel
             throw new NullReferenceException("CurrentAsset is null");
         }
 
-        return Application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+        return _application.LoadBitmapImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
     }
 
     public BitmapImage LoadBitmapHeicImageFromPath()
@@ -391,12 +395,12 @@ public class ApplicationViewModel : BaseViewModel
             throw new NullReferenceException("CurrentAsset is null");
         }
 
-        return Application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
+        return _application.LoadBitmapHeicImageFromPath(CurrentAsset.FullPath, CurrentAsset.ImageRotation);
     }
 
     public void CalculateGlobalAssetsCounter()
     {
-        int globalAssetsCounter = Application.GetAssetsCounter();
+        int globalAssetsCounter = _application.GetAssetsCounter();
         GlobalAssetsCounterWording = $"Total number of assets: {globalAssetsCounter}";
     }
 
@@ -407,7 +411,7 @@ public class ApplicationViewModel : BaseViewModel
 
     public void CalculateTotalFilesCount()
     {
-        int totalFilesCount = Application.GetTotalFilesCount();
+        int totalFilesCount = _application.GetTotalFilesCount();
         TotalFilesCountWording = $"{totalFilesCount} files found";
     }
 

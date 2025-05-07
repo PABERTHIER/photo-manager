@@ -19,7 +19,6 @@ public class MainWindowRefreshAssetsCounterTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
-    private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
 
     private Asset _asset1;
@@ -192,8 +191,8 @@ public class MainWindowRefreshAssetsCounterTests
         MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _applicationViewModel = new (_application);
+        PhotoManager.Application.Application application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new (application);
 
         _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
     }
@@ -568,11 +567,7 @@ public class MainWindowRefreshAssetsCounterTests
 
     private void MainWindowsInit()
     {
-        _folderNavigationViewModel = new (
-            _applicationViewModel!,
-            _application!,
-            _sourceFolder!,
-            []);
+        _folderNavigationViewModel = new (_applicationViewModel!, _sourceFolder!, []);
 
         CancellationTokenSource cancellationTokenSource = new();
 
