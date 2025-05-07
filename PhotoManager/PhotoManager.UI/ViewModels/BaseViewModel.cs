@@ -3,21 +3,17 @@ using System.ComponentModel;
 
 namespace PhotoManager.UI.ViewModels;
 
-public abstract class BaseViewModel : INotifyPropertyChanged
+public abstract class BaseViewModel(IApplication application) : INotifyPropertyChanged
 {
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
     /// Gets or sets the application object.
     /// This property is declared as protected so the views
     /// always use the view model as a facade to the application object.
     /// </summary>
-    protected IApplication Application { get; private set; }
-
-    protected BaseViewModel(IApplication application) // TODO: Remove IApplication application
-    {
-        Application = application;
-    }
+    protected IApplication Application { get; private set; } = application;
+    // TODO: Remove IApplication application
 
     protected void NotifyPropertyChanged(params string[] propertyNames)
     {
