@@ -104,7 +104,7 @@ public static class BitmapHelper
                     MagickImageApplyRotation(magickImage, rotation, false); // Apply Rotation because MagickImage does not rotate the image in-place
 
                     // Resize the MagickImage
-                    magickImage.Resize(width, height);
+                    magickImage.Resize((uint)width, (uint)height);
 
                     // Convert the MagickImage to a BitmapImage
                     using (MemoryStream bitmapStream = new())
