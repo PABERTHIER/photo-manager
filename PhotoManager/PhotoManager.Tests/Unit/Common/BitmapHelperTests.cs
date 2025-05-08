@@ -50,26 +50,26 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
-    public void LoadBitmapOriginalImage_EmptyBuffer_ThrowsNullReferenceException()
+    public void LoadBitmapOriginalImage_EmptyBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
         const Rotation rotation = Rotation.Rotate90;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
-    public void LoadBitmapOriginalImage_InvalidBuffer_ThrowsNullReferenceException()
+    public void LoadBitmapOriginalImage_InvalidBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
         const Rotation rotation = Rotation.Rotate90;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -87,15 +87,15 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
-    public void LoadBitmapOriginalImage_InvalidImageFormat_ThrowsNullReferenceException()
+    public void LoadBitmapOriginalImage_InvalidImageFormat_ThrowsNotSupportedException()
     {
         string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = Rotation.Rotate90;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -161,26 +161,26 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
-    public void LoadBitmapThumbnailImage_EmptyBuffer_ThrowsNullReferenceException()
+    public void LoadBitmapThumbnailImage_EmptyBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
         const Rotation rotation = Rotation.Rotate90;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
-    public void LoadBitmapThumbnailImage_InvalidBuffer_ThrowsNullReferenceException()
+    public void LoadBitmapThumbnailImage_InvalidBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
         const Rotation rotation = Rotation.Rotate90;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -198,15 +198,15 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
-    public void LoadBitmapThumbnailImage_InvalidImageFormat_ThrowsNullReferenceException()
+    public void LoadBitmapThumbnailImage_InvalidImageFormat_ThrowsNotSupportedException()
     {
         string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = Rotation.Rotate90;
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -686,36 +686,36 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From AssetRepository")]
-    public void LoadBitmapThumbnailImageAssetRepository_EmptyBuffer_ThrowsNullReferenceException()
+    public void LoadBitmapThumbnailImageAssetRepository_EmptyBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
     [Category("From AssetRepository")]
-    public void LoadBitmapThumbnailImageAssetRepository_InvalidBuffer_ThrowsNullReferenceException()
+    public void LoadBitmapThumbnailImageAssetRepository_InvalidBuffer_ThrowsNotSupportedException()
     {
         byte[] buffer = [];
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
     [Category("From AssetRepository")]
-    public void LoadBitmapThumbnailImageAssetRepository_InvalidImageFormat_ThrowsNullReferenceException()
+    public void LoadBitmapThumbnailImageAssetRepository_InvalidImageFormat_ThrowsNotSupportedException()
     {
         string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]

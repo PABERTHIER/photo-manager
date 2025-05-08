@@ -11,41 +11,55 @@ public static class BitmapHelper
     // From CatalogAssetsService for CreateAsset() to get the originalImage
     public static BitmapImage LoadBitmapOriginalImage(byte[] buffer, Rotation rotation)
     {
-        BitmapImage image = new();
-
-        using (MemoryStream stream = new (buffer))
+        try
         {
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
-            image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            image.StreamSource = stream;
-            image.Rotation = rotation;
-            image.EndInit();
-            image.Freeze();
-        }
+            BitmapImage image = new();
 
-        return image;
+            using (MemoryStream stream = new (buffer))
+            {
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
+                image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+                image.StreamSource = stream;
+                image.Rotation = rotation;
+                image.EndInit();
+                image.Freeze();
+            }
+
+            return image;
+        }
+        catch (Exception e) when (e is not ArgumentException and not ArgumentNullException and not OverflowException)
+        {
+            throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+        }
     }
 
     // From CatalogAssetsService for CreateAsset() to get the thumbnailImage
     public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, Rotation rotation, int width, int height)
     {
-        BitmapImage image = new();
-
-        using (MemoryStream stream = new (buffer))
+        try
         {
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
-            image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            image.StreamSource = stream;
-            image.Rotation = rotation;
-            image.DecodePixelWidth = width;
-            image.DecodePixelHeight = height;
-            image.EndInit();
-            image.Freeze();
-        }
+            BitmapImage image = new();
 
-        return image;
+            using (MemoryStream stream = new (buffer))
+            {
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
+                image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+                image.StreamSource = stream;
+                image.Rotation = rotation;
+                image.DecodePixelWidth = width;
+                image.DecodePixelHeight = height;
+                image.EndInit();
+                image.Freeze();
+            }
+
+            return image;
+        }
+        catch (Exception e) when (e is not ArgumentException and not ArgumentNullException and not OverflowException)
+        {
+            throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+        }
     }
 
     // From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC
@@ -69,7 +83,7 @@ public static class BitmapHelper
 
                         BitmapImage bitmapImage = new();
                         bitmapImage.BeginInit();
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                         bitmapImage.StreamSource = bitmapStream;
                         bitmapImage.Rotation = rotation; // Set the rotation value to save it into the BitmapImage
@@ -114,7 +128,7 @@ public static class BitmapHelper
 
                         BitmapImage bitmapImage = new();
                         bitmapImage.BeginInit();
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
                         bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                         bitmapImage.StreamSource = bitmapStream;
                         bitmapImage.Rotation = rotation; // Set the rotation value to save it into the BitmapImage
@@ -143,7 +157,7 @@ public static class BitmapHelper
         if (File.Exists(imagePath))
         {
             image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
+            image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
             image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
             image.UriSource = new Uri(imagePath);
             image.Rotation = rotation;
@@ -170,7 +184,7 @@ public static class BitmapHelper
 
                 // Create a BitmapImage from the byte array and set the rotation
                 image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after the dispose of the using block
+                image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
                 image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
                 image.StreamSource = new MemoryStream(imageData);
                 image.Rotation = rotation;
@@ -185,21 +199,28 @@ public static class BitmapHelper
     // From AssetRepository
     public static BitmapImage LoadBitmapThumbnailImage(byte[] buffer, int width, int height)
     {
-        BitmapImage thumbnailImage = new();
-
-        using (MemoryStream stream = new (buffer))
+        try
         {
-            thumbnailImage.BeginInit();
-            thumbnailImage.CacheOption = BitmapCacheOption.OnLoad;
-            thumbnailImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            thumbnailImage.StreamSource = stream;
-            thumbnailImage.DecodePixelWidth = width;
-            thumbnailImage.DecodePixelHeight = height;
-            thumbnailImage.EndInit();
-            thumbnailImage.Freeze();
-        }
+            BitmapImage thumbnailImage = new();
 
-        return thumbnailImage;
+            using (MemoryStream stream = new (buffer))
+            {
+                thumbnailImage.BeginInit();
+                thumbnailImage.CacheOption = BitmapCacheOption.OnLoad;
+                thumbnailImage.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+                thumbnailImage.StreamSource = stream;
+                thumbnailImage.DecodePixelWidth = width;
+                thumbnailImage.DecodePixelHeight = height;
+                thumbnailImage.EndInit();
+                thumbnailImage.Freeze();
+            }
+
+            return thumbnailImage;
+        }
+        catch (Exception e) when (e is not ArgumentException and not ArgumentNullException and not OverflowException)
+        {
+            throw new NotSupportedException("No imaging component suitable to complete this operation was found.");
+        }
     }
 
     public static Bitmap? LoadBitmapFromPath(string imagePath)
