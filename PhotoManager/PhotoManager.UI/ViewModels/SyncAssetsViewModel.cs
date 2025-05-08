@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class SyncAssetsViewModel(IApplication application) : BaseProcessViewModel<SyncAssetsConfiguration, SyncAssetsResult>(application)
+public class SyncAssetsViewModel(IApplication application) : BaseProcessViewModel<SyncAssetsConfiguration, SyncAssetsResult>
 {
     private ObservableCollection<SyncAssetsDirectoriesDefinition> _definitions = [];
 
@@ -43,13 +43,13 @@ public class SyncAssetsViewModel(IApplication application) : BaseProcessViewMode
         Definitions.MoveDown(definition);
     }
 
-    public override SyncAssetsConfiguration GetProcessConfiguration() => Application.GetSyncAssetsConfiguration();
+    public override SyncAssetsConfiguration GetProcessConfiguration() => application.GetSyncAssetsConfiguration();
 
-    public override void SetProcessConfiguration(SyncAssetsConfiguration configuration) => Application.SetSyncAssetsConfiguration(configuration);
+    public override void SetProcessConfiguration(SyncAssetsConfiguration configuration) => application.SetSyncAssetsConfiguration(configuration);
 
     public override async Task RunProcessAsync(ProcessStatusChangedCallback callback)
     {
-        List<SyncAssetsResult> results = await Application.SyncAssetsAsync(callback);
+        List<SyncAssetsResult> results = await application.SyncAssetsAsync(callback);
         Results = [..results];
     }
 }

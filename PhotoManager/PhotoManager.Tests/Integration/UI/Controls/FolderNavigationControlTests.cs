@@ -18,7 +18,6 @@ public class FolderNavigationControlTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
-    private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
 
     private event EventHandler? FolderSelected;
@@ -66,8 +65,8 @@ public class FolderNavigationControlTests
         MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _applicationViewModel = new (_application);
+        PhotoManager.Application.Application application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new (application);
     }
 
     [Test]
@@ -91,7 +90,7 @@ public class FolderNavigationControlTests
             Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            _folderNavigationViewModel = new (_applicationViewModel!, _application!, folder1, []);
+            _folderNavigationViewModel = new (_applicationViewModel!, folder1, []);
 
             CheckBeforeChanges(assetsDirectory, null, folder1, []);
 
@@ -148,7 +147,7 @@ public class FolderNavigationControlTests
             Folder folder1 = _assetRepository!.AddFolder(assetsDirectory);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            _folderNavigationViewModel = new (_applicationViewModel!, _application!, folder1, []);
+            _folderNavigationViewModel = new (_applicationViewModel!, folder1, []);
 
             CheckBeforeChanges(assetsDirectory, null, folder1, []);
 

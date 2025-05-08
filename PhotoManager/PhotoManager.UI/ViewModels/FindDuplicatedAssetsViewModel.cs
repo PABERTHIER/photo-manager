@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewModel(application)
+public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewModel
 {
     private List<DuplicatedSetViewModel> _duplicatedAssetSets = [];
     private int _duplicatedAssetSetsPosition;
@@ -46,7 +46,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
             if (CurrentDuplicatedAsset is { Asset.ImageData: null })
             {
-                Application.LoadThumbnail(CurrentDuplicatedAsset.Asset);
+                application.LoadThumbnail(CurrentDuplicatedAsset.Asset);
             }
 
             if (CurrentDuplicatedAsset is { Asset.ImageData: null })
@@ -105,7 +105,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
             foreach (Asset asset in assets)
             {
-                duplicatedSetViewModel.Add(new (Application) { Asset = asset, ParentViewModel = duplicatedSetViewModel });
+                duplicatedSetViewModel.Add(new() { Asset = asset, ParentViewModel = duplicatedSetViewModel });
             }
 
             duplicatedAssetSets.Add(duplicatedSetViewModel);
@@ -116,7 +116,7 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     public void Refresh()
     {
-        List<List<Asset>> duplicatedAssetsSets = Application.GetDuplicatedAssets();
+        List<List<Asset>> duplicatedAssetsSets = application.GetDuplicatedAssets();
         SetDuplicates(duplicatedAssetsSets);
     }
 

@@ -3065,11 +3065,7 @@ public class MainWindowMoveAssetsTests
 
     private void MainWindowsInit()
     {
-        _mainFolderNavigationViewModel = new (
-            _applicationViewModel!,
-            _application!,
-            _sourceFolder!,
-            []);
+        _mainFolderNavigationViewModel = new (_applicationViewModel!, _sourceFolder!, []);
 
         CancellationTokenSource cancellationTokenSource = new();
 
@@ -3144,7 +3140,6 @@ public class MainWindowMoveAssetsTests
     {
         _folderNavigationViewModel = new (
             _applicationViewModel!,
-            _application!,
             assets[0].Folder,
             _application!.GetRecentTargetPaths());
 

@@ -17,7 +17,6 @@ public class FolderNavigationViewModelTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
-    private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
 
     private Asset? _asset1;
@@ -173,8 +172,8 @@ public class FolderNavigationViewModelTests
         MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _applicationViewModel = new (_application);
+        PhotoManager.Application.Application application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new (application);
     }
 
     [Test]
@@ -191,7 +190,7 @@ public class FolderNavigationViewModelTests
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, recentTargetPaths);
+            _folderNavigationViewModel = new (_applicationViewModel, folder, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
@@ -290,7 +289,7 @@ public class FolderNavigationViewModelTests
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, recentTargetPaths);
+            _folderNavigationViewModel = new (_applicationViewModel, folder, recentTargetPaths);
 
             (
                 List<string> notifyPropertyChangedEvents,
@@ -328,7 +327,7 @@ public class FolderNavigationViewModelTests
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder;
 
-            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder, []);
+            _folderNavigationViewModel = new (_applicationViewModel, folder, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
@@ -368,7 +367,7 @@ public class FolderNavigationViewModelTests
 
             _applicationViewModel!.MoveAssetsLastSelectedFolder = folder2;
 
-            _folderNavigationViewModel = new (_applicationViewModel, _application!, folder1, []);
+            _folderNavigationViewModel = new (_applicationViewModel, folder1, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
@@ -404,7 +403,7 @@ public class FolderNavigationViewModelTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _folderNavigationViewModel = new (_applicationViewModel!, _application!, folder, []);
+            _folderNavigationViewModel = new (_applicationViewModel!, folder, []);
 
             (
                 List<string> notifyPropertyChangedEvents,
@@ -438,7 +437,7 @@ public class FolderNavigationViewModelTests
 
         try
         {
-            _folderNavigationViewModel = new (_applicationViewModel!, _application!, null!, []);
+            _folderNavigationViewModel = new (_applicationViewModel!, null!, []);
 
             (
                 List<string> notifyPropertyChangedEvents,

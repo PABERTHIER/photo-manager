@@ -1,5 +1,4 @@
-﻿using PhotoManager.Application;
-using PhotoManager.Domain;
+﻿using PhotoManager.Domain;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -7,7 +6,7 @@ using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
 
-public abstract class BaseProcessViewModel<TC, TR>(IApplication application) : BaseViewModel(application)
+public abstract class BaseProcessViewModel<TC, TR> : BaseViewModel
 {
     private ProcessStep _step = ProcessStep.ViewDescription;
     private ObservableCollection<TR> _results = [];

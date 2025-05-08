@@ -17,7 +17,6 @@ public class MainWindowConstructorTests
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
-    private PhotoManager.Application.Application? _application;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -57,8 +56,8 @@ public class MainWindowConstructorTests
         MoveAssetsService moveAssetsService = new (assetRepository, storageService, assetCreationService);
         SyncAssetsService syncAssetsService = new (assetRepository, storageService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, storageService, userConfigurationService);
-        _application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _applicationViewModel = new (_application);
+        PhotoManager.Application.Application application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new (application);
     }
 
     [Test]
@@ -84,11 +83,7 @@ public class MainWindowConstructorTests
 
             Folder sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
 
-            _folderNavigationViewModel = new (
-                _applicationViewModel!,
-                _application!,
-                sourceFolder,
-                []);
+            _folderNavigationViewModel = new (_applicationViewModel!, sourceFolder, []);
 
             CancellationTokenSource cancellationTokenSource = new();
 

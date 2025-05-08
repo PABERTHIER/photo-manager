@@ -38,7 +38,6 @@ public partial class MainWindow
 
             FolderNavigationViewModel folderNavigationViewModel = new (
                 ViewModel,
-                application,
                 new() { Id = Guid.NewGuid(), Path = ViewModel.CurrentFolderPath },
                 application.GetRecentTargetPaths());
             folderTreeView.DataContext = folderNavigationViewModel;
@@ -400,7 +399,6 @@ public partial class MainWindow
                 FolderNavigationWindow folderNavigationWindow = new(
                     new FolderNavigationViewModel(
                         ViewModel,
-                        _application,
                         assets[0].Folder,
                         _application.GetRecentTargetPaths()));
 
