@@ -17,9 +17,9 @@
     <None Remove="Readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.15" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="System.Reactive" Version="6.0.0" />
+    <PackageReference Include="log4net" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="System.Reactive" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PhotoManager.Common\PhotoManager.Common.csproj" />
