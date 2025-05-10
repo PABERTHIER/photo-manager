@@ -16,7 +16,7 @@ jobs:
     env:
       PROJECT_NAME: PhotoManager/PhotoManager.sln
       PROJECT_TESTRESULTS_PATH: PhotoManager/PhotoManager.Tests/TestResults
-      DOTNET_VERSION: 8.0.x
+      DOTNET_VERSION: 9.0.x
 
     steps:
       # Step 1: Checkout the code
