@@ -544,41 +544,18 @@ public class StorageServiceTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    [TestCase(-100, 100, 100, 133)]
-    [TestCase(100, -100, 75, 100)]
-    public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height, int expectedWidth, int expectedHeight)
+    [TestCase(-100, 100, "width")]
+    [TestCase(100, -100, "height")]
+    [TestCase(-100, -100, "width")]
+    public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height, string exceptionParameter)
     {
         string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = Rotation.Rotate90;
 
-        BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height));
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-        Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
-        Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
-    }
-
-    [Test]
-    [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
-    public void LoadBitmapHeicThumbnailImage_NegativeWidthAndHeight_ReturnsDefaultBitmapImage()
-    {
-        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
-        byte[] buffer = File.ReadAllBytes(filePath);
-
-        BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate90, -100, -100);
-
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(exception?.Message, Is.EqualTo($"Value should not be negative. (Parameter '{exceptionParameter}')"));
     }
 
     [Test]
