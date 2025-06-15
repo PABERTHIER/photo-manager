@@ -1,13 +1,13 @@
 # PhotoManager
 
-![PhotoManager](PhotoManager/Images/AppIcon.png)
+![PhotoManager][app-icon]
 
-[![Build & Test](https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml)
-[![Release](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml)
-[![CodeQL](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml)
-[![Coverage Status](https://codecov.io/gh/PABERTHIER/photo-manager/graph/badge.svg?token=DILR0QRXVN)](https://codecov.io/gh/PABERTHIER/photo-manager)
+[![Build & Test][build-badge]][build-link]
+[![Release][release-badge]][release-link]
+[![CodeQL][code-ql-badge]][code-ql-link]
+[![Coverage Status][coverage-status-badge]][coverage-status-link]
 
-**I used this [repo](https://github.com/jpablodrexler/jp-photo-manager) as a base to shape my own PhotoManager with optimizations, new features, bugs fix...
+**I used this [repo][jp-photo-manager-repo] as a base to shape my own PhotoManager with optimizations, new features, bugs fix...
 Thank you jpablodrexler for your work :heart:**
 
 ## Features :newspaper:
@@ -39,7 +39,7 @@ Even the database is stored in your computer.**
 
 ## Run the application :rocket:
 
-Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-id).
+Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-file-card_file_box).
 
 **Basic usage**: run the .exe file.
 **Advanced usage**: open the solution file `PhotoManager\PhotoManager.sln`, set `PhotoManager\PhotoManager.UI\PhotoManager.UI.csproj` as the project to launch and run it.
@@ -48,11 +48,11 @@ Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#confi
 
 - Download the zip file with the compiled application files (`publish.zip` or `photo-manager-{version}.zip`) for the latest release.
 - Unzip the content of the zip file to a new folder.
-- [Configure the appsettings.json file](#config-id)
+- [Configure the appsettings.json file](#config-file-card_file_box)
 - Run `PhotoManager.UI.exe`.
 - The application saves the cataloged files in the following path: `BackupPath` (Path settings).
 
-## Config file :card_file_box: {#config-id}
+## Config file :card_file_box:
 
 If you use the .exe file, you can find a appsettings.json file in the same directory.
 You can also find it at `PhotoManager\PhotoManager.UI\appsettings.json`.
@@ -179,19 +179,19 @@ Improvements **WIP**.
 
 ## Technologies used :man_technologist:
 
-- [.NET 9.0](https://dotnet.microsoft.com/)
-- [Windows Presentation Foundation](https://docs.microsoft.com/en-us/dotnet/framework/wpf/)
-- [NUnit](https://nunit.org/)
-- [Moq framework for .NET (v4.18.4)](https://github.com/moq/moq4)
-- [MagickImage](https://github.com/dlemstra/Magick.NET)
-- [log4net](https://logging.apache.org/log4net/)
-- [coverlet](https://github.com/coverlet-coverage/coverlet)
-- [ReportGenerator](https://github.com/danielpalme/ReportGenerator)
-- [FFMpegCore](https://github.com/rosenbjerg/FFMpegCore)
+- [.NET 9.0][dotnet]
+- [Windows Presentation Foundation][wpf]
+- [NUnit][nunit]
+- [Moq framework for .NET (v4.18.4)][moq]
+- [MagickImage][magickimage]
+- [log4net][log4net]
+- [coverlet][coverlet]
+- [ReportGenerator][reportgenerator]
+- [FFMpegCore][ffmpegcore]
 
 ## Code coverage :bar_chart:
 
-[![codecov](https://codecov.io/github/PABERTHIER/photo-manager/graphs/sunburst.svg?token=DILR0QRXVN)](https://codecov.io/github/PABERTHIER/photo-manager)
+[![codecov][codecov-badge]][codecov-link]
 
 ## Transparency :handshake:
 
@@ -203,18 +203,49 @@ There are 3 rar files, located here: PhotoManager\PhotoManager.Common\Ffmpeg
 - **ffprobe.rar**
 
 They are used for the video duplicates detection feature and are here to ensure everyone has the same exact version (even for GitHub CI). That will prevent asset generation differences accross various versions.
-To add to that, without them, everyone who wants to use it will have to install on his own Ffmpeg and add the path to the .exe file to the env variables. With the rar file in the project, there is no need to do all of this (working only for Windows because these are .exe files in the end **WIP**).
+To add to that, without them, everyone who want to use it will have to install on their own Ffmpeg and add the path to the .exe file to the env variables. With the rar file in the project, there is no need to do all of this (working only for Windows because these are .exe files in the end **WIP**).
 
 When the project is built for the first time, the three .exe files will be extracted from their rar file (in here: PhotoManager\PhotoManager.Common\Ffmpeg\Bin), done by the **FileExtractionTask.dll**.
 
 The FileExtractionTask.dll is located in here: PhotoManager\PhotoManager.Common\MSBuildTask
 Its goal is only to extract the content of a rar file.
 It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Common\PhotoManager.Common.csproj
-And this dll depends on **SharpCompress** library. To avoid the install of a nuGet just for that, it was better to just add the generated dll of that library.
+And this dll depends on **SharpCompress** library. To avoid the installation of a nuGet just for that, it was better to just add the generated dll of that library.
 
 For the last dll, it is located here: PhotoManager\PhotoManager.Tests\MSBuildTask
 It is only used for the well working of the tests, accross each machine.
 The **FileDateTask.dll** is used to set a fixed date for every tests files used for integration testing.
 It is launched by a MSBuild custom task in here: PhotoManager\PhotoManager.Tests\PhotoManager.Tests.csproj
 
-I've made a specific repo for the two customs dll, injected in the project: [photo-manager-tasks](https://github.com/PABERTHIER/photo-manager-tasks)
+I've made a specific repo for the two customs dll, injected in the project: [photo-manager-tasks][photo-manager-tasks-link]
+
+[app-icon]: PhotoManager/Images/AppIcon.png
+
+[build-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml/badge.svg
+[build-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/build.yml
+
+[release-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml/badge.svg
+[release-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/release.yml
+
+[code-ql-badge]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml/badge.svg
+[code-ql-link]: https://github.com/PABERTHIER/photo-manager/actions/workflows/codeql-analysis.yml
+
+[coverage-status-badge]: https://codecov.io/gh/PABERTHIER/photo-manager/graph/badge.svg?token=DILR0QRXVN
+[coverage-status-link]: https://codecov.io/gh/PABERTHIER/photo-manager
+
+[jp-photo-manager-repo]: https://github.com/jpablodrexler/jp-photo-manager
+
+[dotnet]: https://dotnet.microsoft.com/
+[wpf]: https://docs.microsoft.com/en-us/dotnet/framework/wpf/
+[nunit]: https://nunit.org/
+[moq]: https://github.com/moq/moq4
+[magickimage]: https://github.com/dlemstra/Magick.NET
+[log4net]: https://logging.apache.org/log4net/
+[coverlet]: https://github.com/coverlet-coverage/coverlet
+[reportgenerator]: https://github.com/danielpalme/ReportGenerator
+[ffmpegcore]: https://github.com/rosenbjerg/FFMpegCore
+
+[codecov-badge]: https://codecov.io/github/PABERTHIER/photo-manager/graphs/sunburst.svg?token=DILR0QRXVN
+[codecov-link]: https://codecov.io/github/PABERTHIER/photo-manager
+
+[photo-manager-tasks-link]: https://github.com/PABERTHIER/photo-manager-tasks
