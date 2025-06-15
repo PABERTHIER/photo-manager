@@ -39,7 +39,7 @@ Even the database is stored in your computer.**
 
 ## Run the application :rocket:
 
-Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-id).
+Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-file-card_file_box).
 
 **Basic usage**: run the .exe file.
 **Advanced usage**: open the solution file `PhotoManager\PhotoManager.sln`, set `PhotoManager\PhotoManager.UI\PhotoManager.UI.csproj` as the project to launch and run it.
@@ -48,11 +48,11 @@ Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#confi
 
 - Download the zip file with the compiled application files (`publish.zip` or `photo-manager-{version}.zip`) for the latest release.
 - Unzip the content of the zip file to a new folder.
-- [Configure the appsettings.json file](#config-id)
+- [Configure the appsettings.json file](#config-file-card_file_box)
 - Run `PhotoManager.UI.exe`.
 - The application saves the cataloged files in the following path: `BackupPath` (Path settings).
 
-## Config file :card_file_box: {#config-id}
+## Config file :card_file_box:
 
 If you use the .exe file, you can find a appsettings.json file in the same directory.
 You can also find it at `PhotoManager\PhotoManager.UI\appsettings.json`.
