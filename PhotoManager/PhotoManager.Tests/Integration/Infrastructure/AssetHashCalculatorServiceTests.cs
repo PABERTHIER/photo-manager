@@ -229,7 +229,7 @@ public class AssetHashCalculatorServiceTests
 
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, filePath));
 
-        Assert.That(exception?.Message, Is.EqualTo($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/3571"));
+        Assert.That(exception?.Message, Does.StartWith($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/"));
     }
 
     [Test]
@@ -242,7 +242,7 @@ public class AssetHashCalculatorServiceTests
 
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
 
-        Assert.That(exception?.Message, Is.EqualTo($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/3571"));
+        Assert.That(exception?.Message, Does.StartWith($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/"));
     }
 
     [Test]
