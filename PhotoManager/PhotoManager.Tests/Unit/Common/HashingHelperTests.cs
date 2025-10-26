@@ -92,7 +92,7 @@ public class HashingHelperTests
     {
         MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(_dataDirectory!));
 
-        Assert.That(exception?.Message, Does.StartWith(($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/"));
+        Assert.That(exception?.Message, Does.StartWith($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/"));
     }
 
     [Test]
