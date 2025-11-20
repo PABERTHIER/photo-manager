@@ -1,4 +1,7 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.Storage;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.Storage;
 
 [TestFixture]
 public class BackupStorageTests
@@ -10,7 +13,7 @@ public class BackupStorageTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         _backupStorage = new BackupStorage();
     }
@@ -20,11 +23,11 @@ public class BackupStorageTests
     {
         string[] partialExpectedFiles =
         [
-            Path.Combine(_dataDirectory!, "Homer.gif"),
-            Path.Combine(_dataDirectory!, "Homer.mp4"),
-            Path.Combine(_dataDirectory!, "Image 8.jpeg"),
-            Path.Combine(_dataDirectory!, "Image 9.png"),
-            Path.Combine(_dataDirectory!, "Image_11.heic")
+            Path.Combine(_dataDirectory!, FileNames.HOMER_GIF),
+            Path.Combine(_dataDirectory!, FileNames.HOMER_MP4),
+            Path.Combine(_dataDirectory!, FileNames.IMAGE_8_JPEG),
+            Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG),
+            Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC)
         ];
 
         string[] actualFiles = _backupStorage!.GetBackupFilesPaths(_dataDirectory!);
@@ -77,7 +80,7 @@ public class BackupStorageTests
     [Test]
     public void WriteFolderToZipFile_ValidSourceDirectoryName_SuccessfullyCreatesZipFile()
     {
-        string sourceDirectoryName = Path.Combine(_dataDirectory!, "TestFolder");
+        string sourceDirectoryName = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
         string destinationArchiveFileName = Path.Combine(_dataDirectory!, "TestFolder.zip");
 
         try
@@ -117,7 +120,7 @@ public class BackupStorageTests
     [Test]
     public void WriteFolderToZipFile_DestinationArchiveFileNameIsNull_ThrowsArgumentNullException()
     {
-        string sourceDirectoryName = Path.Combine(_dataDirectory!, "TestFolder");
+        string sourceDirectoryName = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
         string? destinationArchiveFileName = null;
 
         BackupStorage backupStorage = new();
@@ -133,8 +136,8 @@ public class BackupStorageTests
     [Test]
     public void WriteFolderToZipFile_DestinationArchiveFileNameDoesNotExist_ThrowsDirectoryNotFoundException()
     {
-        string sourceDirectoryName = Path.Combine(_dataDirectory!, "TestFolder");
-        string destinationArchiveFileName = Path.Combine(_dataDirectory!, "nonexistent", "backup.zip");
+        string sourceDirectoryName = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
+        string destinationArchiveFileName = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER, "backup.zip");
 
         BackupStorage backupStorage = new();
 
@@ -149,7 +152,7 @@ public class BackupStorageTests
     [Test]
     public void DeleteBackupFile_FileExists_FileDeleted()
     {
-        string sourceDirectoryName = Path.Combine(_dataDirectory!, "TestFolder");
+        string sourceDirectoryName = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
         string destinationArchiveFileName = Path.Combine(_dataDirectory!, "TestFolder.zip");
 
         _backupStorage!.WriteFolderToZipFile(sourceDirectoryName, destinationArchiveFileName);

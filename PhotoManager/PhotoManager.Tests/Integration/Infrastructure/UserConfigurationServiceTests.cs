@@ -1,6 +1,7 @@
 ﻿using PhotoManager.UI;
 using System.Reflection;
 using System.Reflection.Emit;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.Infrastructure;
 
@@ -13,7 +14,7 @@ public class UserConfigurationServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         string configFilePath = Path.Combine(_dataDirectory, "appsettings.json");
 
         IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile(configFilePath, optional: false, reloadOnChange: true);
@@ -31,7 +32,7 @@ public class UserConfigurationServiceTests
         Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
         Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
         Assert.That(aboutInformation.Version, Does.StartWith("v"));
-        Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     [Test]
@@ -42,7 +43,7 @@ public class UserConfigurationServiceTests
         Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
         Assert.That(aboutInformation.Product, Is.EqualTo("Microsoft® .NET"));
         Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     [Test]
@@ -55,7 +56,7 @@ public class UserConfigurationServiceTests
 
         Assert.That(aboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     [Test]
@@ -216,7 +217,7 @@ public class UserConfigurationServiceTests
         Assert.That(assetsDirectory, Is.Not.Null);
         Assert.That(firstFrameVideosPath, Is.Not.Null);
 
-        Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine(assetsDirectory, "OutputVideoFirstFrame")));
+        Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine(assetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
         Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine("E:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame")));
     }
 
@@ -252,7 +253,7 @@ public class UserConfigurationServiceTests
         string folderNameBlobs = _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs;
 
         Assert.That(folderNameBlobs, Is.Not.Null);
-        Assert.That(folderNameBlobs, Is.EqualTo("Blobs"));
+        Assert.That(folderNameBlobs, Is.EqualTo(Directories.BLOBS));
     }
 
     [Test]
@@ -261,7 +262,7 @@ public class UserConfigurationServiceTests
         string foldersNameTables = _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables;
 
         Assert.That(foldersNameTables, Is.Not.Null);
-        Assert.That(foldersNameTables, Is.EqualTo("Tables"));
+        Assert.That(foldersNameTables, Is.EqualTo(Directories.TABLES));
     }
 
     [Test]

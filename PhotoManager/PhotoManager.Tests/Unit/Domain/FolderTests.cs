@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Unit.Domain;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+
+namespace PhotoManager.Tests.Unit.Domain;
 
 [TestFixture]
 public class FolderTests
@@ -8,7 +10,7 @@ public class FolderTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
     }
 
     [Test]

@@ -1,5 +1,14 @@
 ﻿using PhotoManager.UI.Models;
 using System.ComponentModel;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.FindDuplicatedAssetsVM;
 
@@ -9,8 +18,6 @@ public class FindDuplicatedAssetsViewModelPHashTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
     private ApplicationViewModel? _applicationViewModel;
@@ -54,9 +61,9 @@ public class FindDuplicatedAssetsViewModelPHashTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -68,21 +75,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -94,21 +101,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_180_deg.jpg",
+            FileName = FileNames.IMAGE_1_180_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_180_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_180_DEG_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG }
             },
             FileProperties = new()
             {
-                Size = 31535,
+                Size = FileSize.IMAGE_1_180_DEG_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate180,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_180_DEG_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -120,21 +127,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_270_deg.jpg",
+            FileName = FileNames.IMAGE_1_270_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 720, Height = 1280 },
-                Thumbnail = new() { Width = 84, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_270_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_270_DEG_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG }
             },
             FileProperties = new()
             {
-                Size = 31535,
+                Size = FileSize.IMAGE_1_270_DEG_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate270,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_270_DEG_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -146,21 +153,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_90_deg.jpg",
+            FileName = FileNames.IMAGE_1_90_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 720, Height = 1280 },
-                Thumbnail = new() { Width = 84, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_90_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_90_DEG_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG }
             },
             FileProperties = new()
             {
-                Size = 31535,
+                Size = FileSize.IMAGE_1_90_DEG_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate90,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_90_DEG_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -172,21 +179,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 2 duplicated.jpg",
+            FileName = FileNames.IMAGE_2_DUPLICATED_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_DUPLICATED_JPG, Height = PixelHeightAsset.IMAGE_2_DUPLICATED_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, Height = ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG }
             },
             FileProperties = new()
             {
-                Size = 30197,
+                Size = FileSize.IMAGE_2_DUPLICATED_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afba2849d18fc388dc1662da0619b362ee062ee062ee062ee062ee062ee062ee062ee0afba2849d18fc388dc1662da0619b362ee062ee062ee062ee062ee062ee062ee062ee0afba2849d18fc388dc1662da0619b362ee0afba2849d18fc388dc1662da0619b362ee0",
+            Hash = PHashes.IMAGE_2_DUPLICATED_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -198,21 +205,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 2.jpg",
+            FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
             },
             FileProperties = new()
             {
-                Size = 30197,
+                Size = FileSize.IMAGE_2_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afba2849d18fc388dc1662da0619b362ee062ee062ee062ee062ee062ee062ee062ee0afba2849d18fc388dc1662da0619b362ee062ee062ee062ee062ee062ee062ee062ee0afba2849d18fc388dc1662da0619b362ee0afba2849d18fc388dc1662da0619b362ee0",
+            Hash = PHashes.IMAGE_2_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -224,21 +231,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 3.jpg",
+            FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_3_JPG, Height = PixelHeightAsset.IMAGE_3_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
             },
             FileProperties = new()
             {
-                Size = 30276,
+                Size = FileSize.IMAGE_3_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb9e849d08fc428dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc428dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc428dc1a62da1619b362ee0afb9e849d08fc428dc1a62da1619b362ee0",
+            Hash = PHashes.IMAGE_3_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -250,21 +257,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 4.jpg",
+            FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_4_JPG, Height = PixelHeightAsset.IMAGE_4_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_4_JPG, Height = ThumbnailHeightAsset.IMAGE_4_JPG }
             },
             FileProperties = new()
             {
-                Size = 30115,
+                Size = FileSize.IMAGE_4_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb9b849cf8fc488dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afb9b849cf8fc488dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afb9b849cf8fc488dc1b62da1619b462ee0afb9b849cf8fc488dc1b62da1619b462ee0",
+            Hash = PHashes.IMAGE_4_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -276,21 +283,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 5.jpg",
+            FileName = FileNames.IMAGE_5_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_5_JPG, Height = PixelHeightAsset.IMAGE_5_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
             },
             FileProperties = new()
             {
-                Size = 30117,
+                Size = FileSize.IMAGE_5_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb9e849d08fc458dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc458dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc458dc1a62da1619b362ee0afb9e849d08fc458dc1a62da1619b362ee0",
+            Hash = PHashes.IMAGE_5_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -302,21 +309,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 6.jpg",
+            FileName = FileNames.IMAGE_6_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_6_JPG, Height = PixelHeightAsset.IMAGE_6_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_6_JPG, Height = ThumbnailHeightAsset.IMAGE_6_JPG }
             },
             FileProperties = new()
             {
-                Size = 30366,
+                Size = FileSize.IMAGE_6_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb93849ce8fc508dc1d62da2619b462ee062ee062ee062ee062ee062ee062ee062ee0afb93849ce8fc508dc1d62da2619b462ee062ee062ee062ee062ee062ee062ee062ee0afb93849ce8fc508dc1d62da2619b462ee0afb93849ce8fc508dc1d62da2619b462ee0",
+            Hash = PHashes.IMAGE_6_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -328,21 +335,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 7.jpg",
+            FileName = FileNames.IMAGE_7_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_7_JPG, Height = PixelHeightAsset.IMAGE_7_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_7_JPG, Height = ThumbnailHeightAsset.IMAGE_7_JPG }
             },
             FileProperties = new()
             {
-                Size = 29974,
+                Size = FileSize.IMAGE_7_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afbac849d38fc408dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afbac849d38fc408dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afbac849d38fc408dc1b62da1619b462ee0afbac849d38fc408dc1b62da1619b462ee0",
+            Hash = PHashes.IMAGE_7_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -354,21 +361,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 8.jpeg",
+            FileName = FileNames.IMAGE_8_JPEG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_8_JPEG, Height = PixelHeightAsset.IMAGE_8_JPEG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_8_JPEG, Height = ThumbnailHeightAsset.IMAGE_8_JPEG }
             },
             FileProperties = new()
             {
-                Size = 30514,
+                Size = FileSize.IMAGE_8_JPEG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0",
+            Hash = PHashes.IMAGE_8_JPEG,
             ImageData = new(),
             Metadata = new()
             {
@@ -380,21 +387,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee0afb2d849b98fd038dc1062da9619b162ee0",
+            Hash = PHashes.IMAGE_9_PNG,
             ImageData = new(),
             Metadata = new()
             {
@@ -406,21 +413,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 10 portrait.png",
+            FileName = FileNames.IMAGE_10_PORTRAIT_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 720, Height = 1280 },
-                Thumbnail = new() { Width = 84, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_10_PORTRAIT_PNG, Height = PixelHeightAsset.IMAGE_10_PORTRAIT_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG, Height = ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG }
             },
             FileProperties = new()
             {
-                Size = 153318,
+                Size = FileSize.IMAGE_10_PORTRAIT_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0",
+            Hash = PHashes.IMAGE_10_PORTRAIT_PNG,
             ImageData = new(),
             Metadata = new()
             {
@@ -432,21 +439,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d63662071a928c84a96881408945461cb98d63662071",
+            Hash = PHashes.IMAGE_11_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -458,21 +465,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11_180.heic",
+            FileName = FileNames.IMAGE_11_180_DEG_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_180_DEG_HEIC, Height = PixelHeightAsset.IMAGE_11_180_DEG_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1423616,
+                Size = FileSize.IMAGE_11_180_DEG_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate180,
-            Hash = "a928e84a97881448945561cb98d6386206f62ee062ee062ee062ee062ee062ee062ee0a928e84a97881448945561cb98d6386206f62ee062ee062ee062ee062ee062ee062ee0a928e84a97881448945561cb98d6386206fa928e84a97881448945561cb98d6386206f",
+            Hash = PHashes.IMAGE_11_180_DEG_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -484,21 +491,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11_270.heic",
+            FileName = FileNames.IMAGE_11_270_DEG_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_270_DEG_HEIC, Height = PixelHeightAsset.IMAGE_11_270_DEG_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1423616,
+                Size = FileSize.IMAGE_11_270_DEG_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate270,
-            Hash = "a929184a99881458946061cbb8d6606206962ee062ee062ee062ee062ee062ee062ee0a929184a99881458946061cbb8d6606206962ee062ee062ee062ee062ee062ee062ee0a929184a99881458946061cbb8d66062069a929184a99881458946061cbb8d66062069",
+            Hash = PHashes.IMAGE_11_270_DEG_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -510,21 +517,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11_90.heic",
+            FileName = FileNames.IMAGE_11_90_DEG_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_90_DEG_HEIC, Height = PixelHeightAsset.IMAGE_11_90_DEG_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_90_DEG_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate90,
-            Hash = "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a",
+            Hash = PHashes.IMAGE_11_90_DEG_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -536,21 +543,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -562,21 +569,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -588,21 +595,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee0afb2d849b98fd038dc1062da9619b162ee0",
+            Hash = PHashes.IMAGE_9_PNG,
             ImageData = null,
             Metadata = new()
             {
@@ -614,21 +621,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee0afb2d849b98fd038dc1062da9619b162ee0",
+            Hash = PHashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = null,
             Metadata = new()
             {
@@ -640,21 +647,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d63662071a928c84a96881408945461cb98d63662071",
+            Hash = PHashes.IMAGE_11_HEIC,
             ImageData = null,
             Metadata = new()
             {
@@ -666,21 +673,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336.JPG",
+            FileName = FileNames._1336_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_JPG, Height = PixelHeightAsset._1336_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_JPG, Height = ThumbnailHeightAsset._1336_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize._1336_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f71abf9e847058af2e892da61f508b70361f71",
+            Hash = PHashes._1336_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -692,21 +699,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_Original.JPG",
+            FileName = FileNames._1336_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_ORIGINAL_JPG, Height = PixelHeightAsset._1336_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize._1336_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f71abf9e847058af2e892da61f508b70361f71",
+            Hash = PHashes._1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -718,21 +725,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_1K.JPG",
+            FileName = FileNames._1336_1_K_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1024, Height = 768 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_1_K_JPG, Height = PixelHeightAsset._1336_1_K_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_1_K_JPG, Height = ThumbnailHeightAsset._1336_1_K_JPG }
             },
             FileProperties = new()
             {
-                Size = 311067,
+                Size = FileSize._1336_1_K_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf0a846dd8aef48929a61f458b6af61f6262ee062ee062ee062ee062ee062ee062ee0abf0a846dd8aef48929a61f458b6af61f6262ee062ee062ee062ee062ee062ee062ee0abf0a846dd8aef48929a61f458b6af61f62abf0a846dd8aef48929a61f458b6af61f62",
+            Hash = PHashes._1336_1_K_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -744,21 +751,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_2K.JPG",
+            FileName = FileNames._1336_2_K_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 2048, Height = 1536 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_2_K_JPG, Height = PixelHeightAsset._1336_2_K_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_2_K_JPG, Height = ThumbnailHeightAsset._1336_2_K_JPG }
             },
             FileProperties = new()
             {
-                Size = 1154116,
+                Size = FileSize._1336_2_K_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf0b846dd8aef18929961f458b6af61f6262ee062ee062ee062ee062ee062ee062ee0abf0b846dd8aef18929961f458b6af61f6262ee062ee062ee062ee062ee062ee062ee0abf0b846dd8aef18929961f458b6af61f62abf0b846dd8aef18929961f458b6af61f62",
+            Hash = PHashes._1336_2_K_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -770,21 +777,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_4K_Original.JPG",
+            FileName = FileNames.IMAGE_1336_4_K_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset.IMAGE_1336_4_K_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_4_K_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize.IMAGE_1336_4_K_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f71abf9e847058af2e892da61f508b70361f71",
+            Hash = PHashes.IMAGE_1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -796,21 +803,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_Thumbnail.JPG",
+            FileName = FileNames._1336_THUMBNAIL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 202, Height = 152 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_THUMBNAIL_JPG, Height = PixelHeightAsset._1336_THUMBNAIL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_THUMBNAIL_JPG, Height = ThumbnailHeightAsset._1336_THUMBNAIL_JPG }
             },
             FileProperties = new()
             {
-                Size = 19472,
+                Size = FileSize._1336_THUMBNAIL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf0f846de8aeee8929b61f478b6b061f6062ee062ee062ee062ee062ee062ee062ee0abf0f846de8aeee8929b61f478b6b061f6062ee062ee062ee062ee062ee062ee062ee0abf0f846de8aeee8929b61f478b6b061f60abf0f846de8aeee8929b61f478b6b061f60",
+            Hash = PHashes._1336_THUMBNAIL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -822,21 +829,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_1336_Mini.JPG",
+            FileName = FileNames.IMAGE_1336_MINI_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 43, Height = 32 },
-                Thumbnail = new() { Width = 200, Height = 149 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_MINI_JPG, Height = PixelHeightAsset.IMAGE_1336_MINI_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_MINI_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_MINI_JPG }
             },
             FileProperties = new()
             {
-                Size = 1586,
+                Size = FileSize.IMAGE_1336_MINI_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abd4f8464c8af0d8926261f378b61d61f6362ee062ee062ee062ee062ee062ee062ee0abd4f8464c8af0d8926261f378b61d61f6362ee062ee062ee062ee062ee062ee062ee0abd4f8464c8af0d8926261f378b61d61f63abd4f8464c8af0d8926261f378b61d61f63",
+            Hash = PHashes.IMAGE_1336_MINI_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -848,21 +855,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_1336_Original.JPG",
+            FileName = FileNames.IMAGE_1336_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG, Height = PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize.IMAGE_1336_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f71abf9e847058af2e892da61f508b70361f71",
+            Hash = PHashes.IMAGE_1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -874,21 +881,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_1336_ShitQuality.JPG",
+            FileName = FileNames.IMAGE_1336_SHIT_QUALITY_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, Height = PixelHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG }
             },
             FileProperties = new()
             {
-                Size = 370819,
+                Size = FileSize.IMAGE_1336_SHIT_QUALITY_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abd4c846458af188927261f388b63261f6962ee062ee062ee062ee062ee062ee062ee0abd4c846458af188927261f388b63261f6962ee062ee062ee062ee062ee062ee062ee0abd4c846458af188927261f388b63261f69abd4c846458af188927261f388b63261f69",
+            Hash = PHashes.IMAGE_1336_SHIT_QUALITY_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -946,13 +953,13 @@ public class FindDuplicatedAssetsViewModelPHashTests
     public async Task SetDuplicates_CataloguedAssetsAndPHashTypeAndAllDuplicatesSetsAndDetectThumbnailsIsTrue_SetsDuplicates()
     {
         string rootDirectory = Path.Combine(_dataDirectory!);
-        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
-        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, "NewFolder1");
-        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, "NewFolder2");
-        string directorySample1 = Path.Combine(duplicatesDirectory, "NotDuplicate", "Sample1");
-        string directoryPart = Path.Combine(duplicatesDirectory, "Part");
-        string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
-        string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
+        string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
+        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
+        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
+        string directorySample1 = Path.Combine(duplicatesDirectory, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string directoryPart = Path.Combine(duplicatesDirectory, Directories.PART);
+        string directoryResolution = Path.Combine(duplicatesDirectory, Directories.RESOLUTION);
+        string directoryThumbnail = Path.Combine(duplicatesDirectory, Directories.THUMBNAIL);
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, 200, 150, false, false, true, true, true);
 
@@ -1564,13 +1571,13 @@ public class FindDuplicatedAssetsViewModelPHashTests
     public async Task SetDuplicates_CataloguedAssetsAndPHashTypeAndAllDuplicatesSetsAndDetectThumbnailsIsFalse_SetsDuplicates()
     {
         string rootDirectory = Path.Combine(_dataDirectory!);
-        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
-        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, "NewFolder1");
-        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, "NewFolder2");
-        string directorySample1 = Path.Combine(duplicatesDirectory, "NotDuplicate", "Sample1");
-        string directoryPart = Path.Combine(duplicatesDirectory, "Part");
-        string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
-        string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
+        string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
+        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
+        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
+        string directorySample1 = Path.Combine(duplicatesDirectory, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string directoryPart = Path.Combine(duplicatesDirectory, Directories.PART);
+        string directoryResolution = Path.Combine(duplicatesDirectory, Directories.RESOLUTION);
+        string directoryThumbnail = Path.Combine(duplicatesDirectory, Directories.THUMBNAIL);
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, 200, 150, false, false, true, false, true);
 

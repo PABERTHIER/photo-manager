@@ -1,4 +1,11 @@
 ﻿using System.Drawing.Imaging;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure;
 
@@ -13,7 +20,7 @@ public class StorageServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -26,24 +33,24 @@ public class StorageServiceTests
     [Test]
     public void GetSubDirectories_ValidDirectory_ReturnsListOfSubDirectories()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "TestFolder");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
         List<DirectoryInfo> subDirectories = _storageService!.GetSubDirectories(directoryPath);
 
         Assert.That(subDirectories, Is.Not.Null);
         Assert.That(subDirectories, Has.Exactly(3).Items);
-        Assert.That(subDirectories.Any(dir => dir.Name == "TestHiddenSubFolder"), Is.True);
-        Assert.That(subDirectories.Any(dir => dir.Name == "TestSubFolder1"), Is.True);
-        Assert.That(subDirectories.Any(dir => dir.Name == "TestSubFolder2"), Is.True);
-        Assert.That(subDirectories[0].Name, Is.EqualTo("TestHiddenSubFolder"));
-        Assert.That(subDirectories[1].Name, Is.EqualTo("TestSubFolder1"));
-        Assert.That(subDirectories[2].Name, Is.EqualTo("TestSubFolder2"));
+        Assert.That(subDirectories.Any(dir => dir.Name == Directories.TEST_HIDDEN_SUB_FOLDER), Is.True);
+        Assert.That(subDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_1), Is.True);
+        Assert.That(subDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_2), Is.True);
+        Assert.That(subDirectories[0].Name, Is.EqualTo(Directories.TEST_HIDDEN_SUB_FOLDER));
+        Assert.That(subDirectories[1].Name, Is.EqualTo(Directories.TEST_SUB_FOLDER_1));
+        Assert.That(subDirectories[2].Name, Is.EqualTo(Directories.TEST_SUB_FOLDER_2));
     }
 
     [Test]
     public void GetSubDirectories_InvalidDirectory_ThrowsDirectoryNotFoundException()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "NonExistentDirectory");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetSubDirectories(directoryPath));
 
@@ -53,25 +60,25 @@ public class StorageServiceTests
     [Test]
     public void GetRecursiveSubDirectories_ValidDirectory_ReturnsListOfRecursiveSubDirectories()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "TestFolder");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
         List<DirectoryInfo> recursiveSubDirectories = _storageService!.GetRecursiveSubDirectories(directoryPath);
 
         Assert.That(recursiveSubDirectories, Has.Count.EqualTo(4));
-        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == "TestHiddenSubFolder"), Is.True);
-        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder1"), Is.True);
-        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder2"), Is.True);
-        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == "TestSubFolder3"), Is.True);
-        Assert.That(recursiveSubDirectories[0].FullName, Does.EndWith("\\TestHiddenSubFolder"));
-        Assert.That(recursiveSubDirectories[1].FullName, Does.EndWith("\\TestSubFolder1"));
-        Assert.That(recursiveSubDirectories[2].FullName, Does.EndWith("\\TestSubFolder2"));
-        Assert.That(recursiveSubDirectories[3].FullName, Does.EndWith("\\TestSubFolder2\\TestSubFolder3"));
+        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_HIDDEN_SUB_FOLDER), Is.True);
+        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_1), Is.True);
+        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_2), Is.True);
+        Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_3), Is.True);
+        Assert.That(recursiveSubDirectories[0].FullName, Does.EndWith("\\" + Directories.TEST_HIDDEN_SUB_FOLDER));
+        Assert.That(recursiveSubDirectories[1].FullName, Does.EndWith("\\" + Directories.TEST_SUB_FOLDER_1));
+        Assert.That(recursiveSubDirectories[2].FullName, Does.EndWith("\\" + Directories.TEST_SUB_FOLDER_2));
+        Assert.That(recursiveSubDirectories[3].FullName, Does.EndWith("\\" + Directories.TEST_SUB_FOLDER_2 + "\\" + Directories.TEST_SUB_FOLDER_3));
     }
 
     [Test]
     public void GetRecursiveSubDirectories_InvalidDirectory_ReturnsEmptyList()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "NonExistentDirectory");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _storageService!.GetRecursiveSubDirectories(directoryPath));
 
@@ -81,7 +88,7 @@ public class StorageServiceTests
     [Test]
     public void CreateDirectory_ValidDirectory_CreatesDirectory()
     {
-        string testDirectory = Path.Combine(_dataDirectory!, "TestDirectory");
+        string testDirectory = Path.Combine(_dataDirectory!, Directories.TEST_DIRECTORY);
 
         _storageService!.CreateDirectory(testDirectory);
 
@@ -93,8 +100,8 @@ public class StorageServiceTests
     [Test]
     public void DeleteFile_FileExists_DeletesFile()
     {
-        const string fileName = "Image 1.jpg";
-        const string newFileName = "ImageToDelete.jpg";
+        const string fileName = FileNames.IMAGE_1_JPG;
+        const string newFileName = FileNames.IMAGE_TO_DELETE_JPG;
         string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
         string destinationFilePath = Path.Combine(_dataDirectory!, newFileName);
 
@@ -110,7 +117,7 @@ public class StorageServiceTests
     [Test]
     public void DeleteFile_FileDoesNotExist_NoActionTaken()
     {
-        const string testFileName = "NonExistentImage.jpg";
+        const string testFileName = FileNames.NON_EXISTENT_IMAGE_JPG;
         string testFilePath = Path.Combine(_dataDirectory!, testFileName);
 
         Assert.That(File.Exists(testFilePath), Is.False);
@@ -124,14 +131,14 @@ public class StorageServiceTests
         string[] fileNames = _storageService!.GetFileNames(_dataDirectory!);
 
         Assert.That(fileNames, Has.Length.GreaterThanOrEqualTo(2));
-        Assert.That(fileNames, Does.Contain("Image 2.jpg"));
-        Assert.That(fileNames, Does.Contain("Image 1.jpg"));
+        Assert.That(fileNames, Does.Contain(FileNames.IMAGE_2_JPG));
+        Assert.That(fileNames, Does.Contain(FileNames.IMAGE_1_JPG));
     }
 
     [Test]
     public void GetFileBytes_FileExists_ReturnsFileBytes()
     {
-        string testFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+        string testFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
         byte[] actualBytes = _storageService!.GetFileBytes(testFilePath);
 
@@ -142,7 +149,7 @@ public class StorageServiceTests
     [Test]
     public void GetFileBytes_FileDoesNotExist_ThrowsFileNotFoundException()
     {
-        string nonExistentFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
+        string nonExistentFilePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
 
         FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _storageService!.GetFileBytes(nonExistentFilePath));
 
@@ -157,11 +164,11 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase("Image 1.jpg", 1)]
-    [TestCase("Image 1_90_deg.jpg", 6)]
-    [TestCase("Image 1_180_deg.jpg", 3)]
-    [TestCase("Image 1_270_deg.jpg", 8)]
-    [TestCase("Image 8.jpeg", 1)]
+    [TestCase(FileNames.IMAGE_1_JPG, 1)]
+    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, 6)]
+    [TestCase(FileNames.IMAGE_1_180_DEG_JPG, 3)]
+    [TestCase(FileNames.IMAGE_1_270_DEG_JPG, 8)]
+    [TestCase(FileNames.IMAGE_8_JPEG, 1)]
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -176,9 +183,9 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase("Image 10 portrait.png")] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase("Homer.gif")] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase("Image_11.heic")] // Error on BitmapFrame.Create(stream)
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
+    [TestCase(FileNames.HOMER_GIF)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
+    [TestCase(FileNames.IMAGE_11_HEIC)] // Error on BitmapFrame.Create(stream)
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -251,10 +258,10 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase("Image_11.heic", 1)]
-    [TestCase("Image_11_90.heic", 6)]
-    [TestCase("Image_11_180.heic", 3)]
-    [TestCase("Image_11_270.heic", 8)]
+    [TestCase(FileNames.IMAGE_11_HEIC, 1)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 6)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 3)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 8)]
     public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -302,8 +309,8 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase("Image 8.jpeg")]
-    [TestCase("Image 1.jpg")]
+    [TestCase(FileNames.IMAGE_8_JPEG)]
+    [TestCase(FileNames.IMAGE_1_JPG)]
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -314,13 +321,13 @@ public class StorageServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
             Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.jpeg");
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
@@ -333,7 +340,7 @@ public class StorageServiceTests
     [Test]
     public void GetJpegBitmapImage_HeicValidImage_ReturnsJpegByteArray()
     {
-        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -343,13 +350,13 @@ public class StorageServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
             Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.jpeg");
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
@@ -380,8 +387,8 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase("Image 8.jpeg")]
-    [TestCase("Image 1.jpg")]
+    [TestCase(FileNames.IMAGE_8_JPEG)]
+    [TestCase(FileNames.IMAGE_1_JPG)]
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -392,13 +399,13 @@ public class StorageServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
             Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.png");
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
@@ -411,7 +418,7 @@ public class StorageServiceTests
     [Test]
     public void GetPngBitmapImage_HeicValidImage_ReturnsPngByteArray()
     {
-        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -421,13 +428,13 @@ public class StorageServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
             Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.png");
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
@@ -458,8 +465,8 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase("Image 8.jpeg")]
-    [TestCase("Image 1.jpg")]
+    [TestCase(FileNames.IMAGE_8_JPEG)]
+    [TestCase(FileNames.IMAGE_1_JPG)]
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -470,13 +477,13 @@ public class StorageServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
             Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.gif");
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
@@ -489,7 +496,7 @@ public class StorageServiceTests
     [Test]
     public void GetGifBitmapImage_HeicValidImage_ReturnsGifByteArray()
     {
-        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
 
         BitmapImage image = _storageService!.LoadBitmapHeicThumbnailImage(buffer, Rotation.Rotate0, 100, 100);
@@ -499,13 +506,13 @@ public class StorageServiceTests
         Assert.That(imageBuffer, Is.Not.Null);
         Assert.That(imageBuffer, Is.Not.Empty);
 
-        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, "ImageConverted");
+        string destinationNewFileDirectory = Path.Combine(_dataDirectory!, Directories.IMAGE_CONVERTED);
 
         try
         {
             Assert.That(_storageService.IsValidGDIPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
-            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, "image_converted.gif");
+            string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
             Assert.That(IsValidImage(destinationNewFilePath), Is.True);
         }
@@ -543,11 +550,11 @@ public class StorageServiceTests
         {
             FolderId = folder.Id,
             Folder = folder,
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             Hash = string.Empty
         };
@@ -565,11 +572,11 @@ public class StorageServiceTests
         {
             FolderId = folder.Id,
             Folder = folder,
-            FileName = "NonExistent.jpg",
+            FileName = FileNames.NON_EXISTENT_IMAGE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
             },
             Hash = string.Empty
         };
@@ -581,7 +588,7 @@ public class StorageServiceTests
 
     [Test]
     [TestCase("toto", null!, "path2")]
-    [TestCase(null!, "Image 1.jpg", "path1")]
+    [TestCase(null!, FileNames.IMAGE_1_JPG, "path1")]
     public void FileExists_NullFileNameOrNullPath_ThrowsArgumentNullException(string path, string fileName, string exceptionParameter)
     {
         Folder folder = new() { Id = Guid.NewGuid(), Path = path };
@@ -592,8 +599,8 @@ public class StorageServiceTests
             FileName = fileName,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             Hash = string.Empty
         };
@@ -606,7 +613,7 @@ public class StorageServiceTests
     [Test]
     public void FileExistsFullPath_ExistingFile_ReturnsTrue()
     {
-        string fullPath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+        string fullPath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
         bool exists = _storageService!.FileExists(fullPath);
 
@@ -616,7 +623,7 @@ public class StorageServiceTests
     [Test]
     public void FileExistsFullPath_FileDoesNotExist_ReturnsFalse()
     {
-        string fullPath = Path.Combine(_dataDirectory!, "NonExistent.jpg");
+        string fullPath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
 
         bool exists = _storageService!.FileExists(fullPath);
 
@@ -662,17 +669,17 @@ public class StorageServiceTests
     [Test]
     public void UpdateAssetsFileProperties_SomeFilesExist_PopulatesAssetsFileProperties()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationPath);
 
-            const string fileName1 = "Homer.gif";
-            const string fileName2 = "Image 1.jpg";
-            const string fileName3 = "Image 9.png";
-            const string fileName4 = "Image_11.heic";
-            const string fileName5 = "nonexistent.jpg";
+            const string fileName1 = FileNames.HOMER_GIF;
+            const string fileName2 = FileNames.IMAGE_1_JPG;
+            const string fileName3 = FileNames.IMAGE_9_PNG;
+            const string fileName4 = FileNames.IMAGE_11_HEIC;
+            const string fileName5 = FileNames.NON_EXISTENT_IMAGE_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
             string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
@@ -705,8 +712,8 @@ public class StorageServiceTests
                 FileName = fileName1,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
                 },
                 Hash = string.Empty
             };
@@ -717,8 +724,8 @@ public class StorageServiceTests
                 FileName = fileName2,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -729,8 +736,8 @@ public class StorageServiceTests
                 FileName = fileName3,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
                 },
                 Hash = string.Empty
             };
@@ -741,8 +748,8 @@ public class StorageServiceTests
                 FileName = fileName4,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
                 },
                 Hash = string.Empty
             };
@@ -753,8 +760,8 @@ public class StorageServiceTests
                 FileName = fileName5,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -777,19 +784,19 @@ public class StorageServiceTests
 
             _storageService!.UpdateAssetsFileProperties([asset1, asset2, asset3, asset4, asset5]);
 
-            Assert.That(asset1.FileProperties.Size, Is.EqualTo(64123));
+            Assert.That(asset1.FileProperties.Size, Is.EqualTo(FileSize.HOMER_GIF));
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
-            Assert.That(asset2.FileProperties.Size, Is.EqualTo(29857));
+            Assert.That(asset2.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_1_JPG));
             Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
-            Assert.That(asset3.FileProperties.Size, Is.EqualTo(126277));
+            Assert.That(asset3.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_9_PNG));
             Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
-            Assert.That(asset4.FileProperties.Size, Is.EqualTo(1411940));
+            Assert.That(asset4.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_11_HEIC));
             Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
-            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Size, Is.EqualTo(FileSize.NON_EXISTENT_IMAGE_JPG));
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
         }
@@ -818,17 +825,17 @@ public class StorageServiceTests
     [Test]
     public void UpdateAssetsFileProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationPath);
 
-            const string fileName1 = "Homer.gif";
-            const string fileName2 = "Image 1.jpg";
-            const string fileName3 = "Image 9.png";
-            const string fileName4 = "Image_11.heic";
-            const string fileName5 = "nonexistent.jpg";
+            const string fileName1 = FileNames.HOMER_GIF;
+            const string fileName2 = FileNames.IMAGE_1_JPG;
+            const string fileName3 = FileNames.IMAGE_9_PNG;
+            const string fileName4 = FileNames.IMAGE_11_HEIC;
+            const string fileName5 = FileNames.NON_EXISTENT_IMAGE_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
             string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
@@ -863,8 +870,8 @@ public class StorageServiceTests
                 FileName = fileName1,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
                 },
                 Hash = string.Empty
             };
@@ -875,8 +882,8 @@ public class StorageServiceTests
                 FileName = fileName2,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -887,8 +894,8 @@ public class StorageServiceTests
                 FileName = fileName3,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
                 },
                 Hash = string.Empty
             };
@@ -899,8 +906,8 @@ public class StorageServiceTests
                 FileName = fileName4,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
                 },
                 Hash = string.Empty
             };
@@ -911,8 +918,8 @@ public class StorageServiceTests
                 FileName = fileName5,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -962,17 +969,17 @@ public class StorageServiceTests
     [Test]
     public void UpdateAssetsFileProperties_OneAssetIsNull_ThrowsNullReferenceException()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationPath);
 
-            const string fileName1 = "Homer.gif";
-            const string fileName2 = "Image 1.jpg";
-            const string fileName3 = "Image 9.png";
-            const string fileName4 = "Image_11.heic";
-            const string fileName5 = "nonexistent.jpg";
+            const string fileName1 = FileNames.HOMER_GIF;
+            const string fileName2 = FileNames.IMAGE_1_JPG;
+            const string fileName3 = FileNames.IMAGE_9_PNG;
+            const string fileName4 = FileNames.IMAGE_11_HEIC;
+            const string fileName5 = FileNames.NON_EXISTENT_IMAGE_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, fileName1);
             string destinationFilePath1 = Path.Combine(destinationPath, fileName1);
@@ -1005,8 +1012,8 @@ public class StorageServiceTests
                 FileName = fileName1,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
                 },
                 Hash = string.Empty
             };
@@ -1017,8 +1024,8 @@ public class StorageServiceTests
                 FileName = fileName2,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1030,8 +1037,8 @@ public class StorageServiceTests
                 FileName = fileName4,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
                 },
                 Hash = string.Empty
             };
@@ -1042,8 +1049,8 @@ public class StorageServiceTests
                 FileName = fileName5,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1065,10 +1072,10 @@ public class StorageServiceTests
 
             Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
 
-            Assert.That(asset1.FileProperties.Size, Is.EqualTo(64123));
+            Assert.That(asset1.FileProperties.Size, Is.EqualTo(FileSize.HOMER_GIF));
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
-            Assert.That(asset2.FileProperties.Size, Is.EqualTo(29857));
+            Assert.That(asset2.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_1_JPG));
             Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
             Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
@@ -1087,13 +1094,13 @@ public class StorageServiceTests
     [Test]
     public void UpdateAssetFileProperties_FileExists_PopulatesAssetDates()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationPath);
 
-            const string fileName = "Image 1.jpg";
+            const string fileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
             string destinationFilePath = Path.Combine(destinationPath, fileName);
@@ -1114,8 +1121,8 @@ public class StorageServiceTests
                 FileName = fileName,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1126,7 +1133,7 @@ public class StorageServiceTests
 
             _storageService!.UpdateAssetFileProperties(asset);
 
-            Assert.That(asset.FileProperties.Size, Is.EqualTo(29857));
+            Assert.That(asset.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_1_JPG));
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
         }
@@ -1139,13 +1146,13 @@ public class StorageServiceTests
     [Test]
     public void UpdateAssetFileProperties_FileDoesNotExist_DoesNotPopulateAssetDates()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationPath);
 
-            const string fileName = "nonexistent.jpg";
+            const string fileName = FileNames.NON_EXISTENT_IMAGE_JPG;
 
             Folder folder = new() { Id = Guid.NewGuid(), Path = destinationPath };
             Asset asset = new()
@@ -1155,8 +1162,8 @@ public class StorageServiceTests
                 FileName = fileName,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1183,13 +1190,13 @@ public class StorageServiceTests
     [Test]
     public void UpdateAssetFileProperties_FilePathIsNull_ThrowsArgumentNullException()
     {
-        string destinationPath = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationPath);
 
-            const string fileName = "Image 1.jpg";
+            const string fileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath = Path.Combine(_dataDirectory!, fileName);
             string destinationFilePath = Path.Combine(destinationPath, fileName);
@@ -1212,8 +1219,8 @@ public class StorageServiceTests
                 FileName = fileName,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1247,10 +1254,10 @@ public class StorageServiceTests
     }
 
     [Test]
-    [TestCase("Image 1.jpg")]
-    [TestCase("Image 8.jpeg")]
-    [TestCase("Image 10 portrait.png")]
-    [TestCase("Homer.gif")]
+    [TestCase(FileNames.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_8_JPEG)]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)]
+    [TestCase(FileNames.HOMER_GIF)]
     public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -1264,7 +1271,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidGDIPlusImage_InvalidImageData_ReturnsFalse()
     {
-        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] invalidImageData = File.ReadAllBytes(filePath);
 
         bool result = _storageService!.IsValidGDIPlusImage(invalidImageData);
@@ -1285,7 +1292,7 @@ public class StorageServiceTests
     [Test]
     public void IsValidHeic_ValidImageData_ReturnsTrue()
     {
-        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] validHeicData = File.ReadAllBytes(filePath);
 
         bool result = _storageService!.IsValidHeic(validHeicData);
@@ -1323,7 +1330,7 @@ public class StorageServiceTests
     [Test]
     public void GetTotalFilesCount_EmptyDirectory_ReturnsTotalFilesCount()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         try
         {

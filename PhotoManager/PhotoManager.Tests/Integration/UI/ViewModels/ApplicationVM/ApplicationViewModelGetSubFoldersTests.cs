@@ -2,6 +2,7 @@
 using PhotoManager.UI.ViewModels.Enums;
 using System.ComponentModel;
 using System.Windows;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 
@@ -11,7 +12,6 @@ public class ApplicationViewModelGetSubFoldersTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private ApplicationViewModel? _applicationViewModel;
     private AssetRepository? _assetRepository;
@@ -19,9 +19,9 @@ public class ApplicationViewModelGetSubFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -60,7 +60,7 @@ public class ApplicationViewModelGetSubFoldersTests
     [Test]
     public async Task GetSubFolders_CataloguedAssetsAndParentHasSubFolders_ReturnsMatchingSubFolders()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -74,16 +74,16 @@ public class ApplicationViewModelGetSubFoldersTests
         {
             CheckBeforeChanges(assetsDirectory);
 
-            string parentFolderPath1 = Path.Combine(assetsDirectory, "NewFolder1");
-            string parentFolderPath2 = Path.Combine(assetsDirectory, "NewFolder2");
-            string parentFolderPath3 = Path.Combine(assetsDirectory, "NotDuplicate");
-            string parentFolderPath4 = Path.Combine(assetsDirectory, "Part");
-            string parentFolderPath5 = Path.Combine(assetsDirectory, "Resolution");
-            string parentFolderPath6 = Path.Combine(assetsDirectory, "Thumbnail");
+            string parentFolderPath1 = Path.Combine(assetsDirectory, Directories.NEW_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(assetsDirectory, Directories.NEW_FOLDER_2);
+            string parentFolderPath3 = Path.Combine(assetsDirectory, Directories.NOT_DUPLICATE);
+            string parentFolderPath4 = Path.Combine(assetsDirectory, Directories.PART);
+            string parentFolderPath5 = Path.Combine(assetsDirectory, Directories.RESOLUTION);
+            string parentFolderPath6 = Path.Combine(assetsDirectory, Directories.THUMBNAIL);
 
-            string childFolderPath1 = Path.Combine(parentFolderPath3, "Sample1");
-            string childFolderPath2 = Path.Combine(parentFolderPath3, "Sample2");
-            string childFolderPath3 = Path.Combine(parentFolderPath3, "Sample3");
+            string childFolderPath1 = Path.Combine(parentFolderPath3, Directories.SAMPLE_1);
+            string childFolderPath2 = Path.Combine(parentFolderPath3, Directories.SAMPLE_2);
+            string childFolderPath3 = Path.Combine(parentFolderPath3, Directories.SAMPLE_3);
 
             await _applicationViewModel!.CatalogAssets(_applicationViewModel.NotifyCatalogChange);
 
@@ -185,12 +185,12 @@ public class ApplicationViewModelGetSubFoldersTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            string childFolderPath1 = Path.Combine(parentFolderPath1, "TestSubFolder1");
-            string childFolderPath2 = Path.Combine(parentFolderPath2, "TestSubFolder2");
-            string childFolderPath3 = Path.Combine(parentFolderPath2, "TestSubFolder2");
+            string childFolderPath1 = Path.Combine(parentFolderPath1, Directories.TEST_SUB_FOLDER_1);
+            string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
+            string childFolderPath3 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
 
             Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
@@ -250,8 +250,8 @@ public class ApplicationViewModelGetSubFoldersTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
@@ -293,8 +293,8 @@ public class ApplicationViewModelGetSubFoldersTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
             Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
@@ -338,7 +338,7 @@ public class ApplicationViewModelGetSubFoldersTests
 
             Folder? parentFolder1 = null;
 
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the Where on folders
 
@@ -411,7 +411,7 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -419,7 +419,7 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
         Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void CheckAfterChanges(
@@ -441,7 +441,7 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));
         Assert.That(applicationViewModelInstance.CurrentAsset, Is.Null);
         Assert.That(applicationViewModelInstance.MoveAssetsLastSelectedFolder, Is.Null);
@@ -449,7 +449,7 @@ public class ApplicationViewModelGetSubFoldersTests
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.False);
         Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void CheckInstance(

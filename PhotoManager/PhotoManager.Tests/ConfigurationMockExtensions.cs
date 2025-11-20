@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+
+namespace PhotoManager.Tests;
 
 public static class ConfigurationMockExtensions
 {
@@ -32,12 +34,12 @@ public static class ConfigurationMockExtensions
              .MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, "C:\\Path")
              .MockGetValue(UserConfigurationKeys.BACKUP_PATH, "C:\\Path\\To\\Backup")
              .MockGetValue(UserConfigurationKeys.EXEMPTED_FOLDER_PATH, "C:\\Path\\To\\FolderExempted")
-             .MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "OutputVideoFirstFrame")
+             .MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, Directories.OUTPUT_VIDEO_FIRST_FRAME)
              .MockGetValue(UserConfigurationKeys.PROJECT_NAME, "PhotoManager")
              .MockGetValue(UserConfigurationKeys.PROJECT_OWNER, "Toto")
              .MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "2")
-             .MockGetValue(UserConfigurationKeys.BLOBS_FOLDER_NAME, "Blobs")
-             .MockGetValue(UserConfigurationKeys.TABLES_FOLDER_NAME, "Tables")
+             .MockGetValue(UserConfigurationKeys.BLOBS_FOLDER_NAME, Directories.BLOBS)
+             .MockGetValue(UserConfigurationKeys.TABLES_FOLDER_NAME, Directories.TABLES)
              .MockGetValue(UserConfigurationKeys.SEPARATOR, "|")
              .MockGetValue(UserConfigurationKeys.STORAGE_VERSION, "1.0")
              .MockGetValue(UserConfigurationKeys.ASSETS_TABLE_NAME, "Assets")

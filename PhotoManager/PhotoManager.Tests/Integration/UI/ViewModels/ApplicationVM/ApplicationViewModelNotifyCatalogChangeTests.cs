@@ -3,6 +3,15 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 
@@ -14,9 +23,6 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     private string? _databasePath;
     private string? _databaseBackupPath;
     private string? _defaultAssetsDirectory;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
-    private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
 
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
@@ -51,11 +57,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
-        _databaseBackupPath = Path.Combine(_databaseDirectory, DATABASE_BACKUP_END_PATH);
-        _defaultAssetsDirectory = Path.Combine(_dataDirectory, "Path");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _databaseBackupPath = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
+        _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
@@ -72,21 +78,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -97,21 +103,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -122,21 +128,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -147,21 +153,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -172,21 +178,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate_copied.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_COPIED_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_COPIED_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_COPIED_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_COPIED_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_COPIED_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_COPIED_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_COPIED_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -197,21 +203,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -222,21 +228,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Homer.gif",
+            FileName = FileNames.HOMER_GIF,
             Pixel = new()
             {
-                Asset = new() { Width = 320, Height = 320 },
-                Thumbnail = new() { Width = 150, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
             },
             FileProperties = new()
             {
-                Size = 64123,
+                Size = FileSize.HOMER_GIF,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
+            Hash = Hashes.HOMER_GIF,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -247,21 +253,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Homer.jpg",
+            FileName = FileNames.HOMER_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 320, Height = 180 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.HOMER_JPG, Height = PixelHeightAsset.HOMER_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_JPG, Height = ThumbnailHeightAsset.HOMER_JPG }
             },
             FileProperties = new()
             {
-                Size = 6599,
+                Size = FileSize.HOMER_JPG,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
+            Hash = Hashes.HOMER_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -272,21 +278,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "HomerDuplicated.jpg",
+            FileName = FileNames.HOMER_DUPLICATED_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 320, Height = 180 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.HOMER_DUPLICATED_JPG, Height = PixelHeightAsset.HOMER_DUPLICATED_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_DUPLICATED_JPG, Height = ThumbnailHeightAsset.HOMER_DUPLICATED_JPG }
             },
             FileProperties = new()
             {
-                Size = 6599,
+                Size = FileSize.HOMER_DUPLICATED_JPG,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
+            Hash = Hashes.HOMER_DUPLICATED_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -328,7 +334,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExists_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -342,10 +348,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -393,7 +399,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             _asset3 = _asset3!.WithFolder(folder!);
             _asset4 = _asset4!.WithFolder(folder!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             List<Asset> expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!];
 
             Assert.That(_testableAssetRepository!.BackupExists(), Is.True);
@@ -462,7 +468,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -523,7 +529,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExists_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -539,18 +545,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
-            string videoPath2 = Path.Combine(_dataDirectory!, "Homer1s.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(assetsDirectory, "Homer1s.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_1_S_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -696,7 +702,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -709,7 +715,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -721,7 +727,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -746,7 +752,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -768,7 +774,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 folderToAssetsMapping[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -789,7 +795,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -805,7 +811,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -821,18 +827,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
-            string videoPath2 = Path.Combine(_dataDirectory!, "Homer1s.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(assetsDirectory, "Homer1s.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_1_S_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -969,7 +975,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -983,7 +989,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1005,7 +1011,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1025,7 +1031,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 videoFirstFrameFolder!,
@@ -1046,7 +1052,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1064,7 +1070,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -1078,8 +1084,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
 
             List<string> assetPaths = [imagePath1, imagePath2];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE];
@@ -1191,7 +1197,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -1205,7 +1211,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1227,7 +1233,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1248,8 +1254,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_NotifiesChangesButNotTheCorruptedImage(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -1265,11 +1271,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -1385,7 +1391,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -1395,7 +1401,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             NotifyCatalogChangeAssetNotCreated(
                 catalogChanges,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 imagePath1ToCopy,
                 ref increment);
@@ -1407,7 +1413,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1427,7 +1433,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1456,7 +1462,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(false, 0)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndIsCancellationRequestedOrCatalogBatchSizeIsEqualTo0_NotifiesNoAssetChanges(bool canceled, int catalogBatchSize)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(catalogBatchSize, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1470,10 +1476,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
 
@@ -1551,7 +1557,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -1566,7 +1572,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -1589,7 +1595,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -1604,10 +1610,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -1726,7 +1732,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -1740,7 +1746,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1771,7 +1777,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -1881,7 +1887,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -1922,7 +1928,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -1943,7 +1949,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -1959,16 +1965,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -2113,7 +2119,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -2126,7 +2132,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -2138,7 +2144,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2163,7 +2169,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2261,7 +2267,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2292,7 +2298,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2314,7 +2320,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 folderToAssetsMapping[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -2335,7 +2341,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2351,7 +2357,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -2367,16 +2373,16 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -2512,7 +2518,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -2526,7 +2532,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2548,7 +2554,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2637,7 +2643,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2663,7 +2669,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2683,7 +2689,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 videoFirstFrameFolder!,
@@ -2704,7 +2710,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2722,7 +2728,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -2738,11 +2744,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
 
@@ -2851,7 +2857,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -2865,7 +2871,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2884,7 +2890,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -2980,7 +2986,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 _asset3Temp,
                 folder!,
@@ -2992,7 +2998,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3019,7 +3025,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3041,8 +3047,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -3058,11 +3064,11 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -3177,7 +3183,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -3191,7 +3197,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3213,7 +3219,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3312,7 +3318,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {folderToAssetsMappingUpdated[folder!].Count} - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {folderToAssetsMappingUpdated[folder!].Count} - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 _asset2Temp,
                 folder!,
@@ -3325,7 +3331,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3355,7 +3361,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3382,7 +3388,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3397,10 +3403,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -3519,7 +3525,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -3533,7 +3539,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3564,7 +3570,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3676,7 +3682,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3717,7 +3723,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -3741,7 +3747,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -3756,10 +3762,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -3878,7 +3884,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -3892,7 +3898,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -3923,7 +3929,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4020,7 +4026,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {expectedAssetsUpdated.Count} - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {expectedAssetsUpdated.Count} - sorted by file name ascending",
                 expectedAssetsUpdated,
                 _asset1Temp,
                 folder!,
@@ -4033,7 +4039,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -4072,7 +4078,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -4096,8 +4102,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -4113,15 +4119,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -4266,7 +4272,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -4279,7 +4285,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -4291,7 +4297,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4316,7 +4322,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4411,7 +4417,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4442,7 +4448,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4464,7 +4470,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[videoFirstFrameFolder!],
                 folderToAssetsMapping[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -4485,7 +4491,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4506,8 +4512,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -4523,15 +4529,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -4667,7 +4673,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -4681,7 +4687,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4703,7 +4709,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4791,7 +4797,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4817,7 +4823,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4837,7 +4843,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 videoFirstFrameFolder!,
@@ -4858,7 +4864,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -4881,7 +4887,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -4896,10 +4902,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -5025,7 +5031,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMappingFirstSync[folder!][..(i + 1)],
                     folderToAssetsMappingFirstSync[folder!][i],
                     folder!,
@@ -5039,7 +5045,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[folder!],
                 folderToAssetsMappingFirstSync[folder!][0],
                 folder!,
@@ -5070,7 +5076,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[folder!],
                 folderToAssetsMappingFirstSync[folder!][0],
                 folder!,
@@ -5155,7 +5161,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {expectedAssetsSecondSync.Count} - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {expectedAssetsSecondSync.Count} - sorted by file name ascending",
                 expectedAssetsSecondSync,
                 _asset1Temp,
                 folder!,
@@ -5168,7 +5174,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[folder!],
                 folderToAssetsMappingSecondSync[folder!][0],
                 folder!,
@@ -5207,7 +5213,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[folder!],
                 folderToAssetsMappingSecondSync[folder!][0],
                 folder!,
@@ -5299,7 +5305,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {expectedAssetsThirdSync.Count} - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {expectedAssetsThirdSync.Count} - sorted by file name ascending",
                 expectedAssetsThirdSync,
                 _asset1Temp,
                 folder!,
@@ -5311,7 +5317,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingThirdSync[folder!],
                 folderToAssetsMappingThirdSync[folder!][0],
                 folder!,
@@ -5358,7 +5364,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingThirdSync[folder!],
                 folderToAssetsMappingThirdSync[folder!][0],
                 folder!,
@@ -5383,8 +5389,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -5400,9 +5406,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
 
@@ -5511,7 +5517,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -5525,7 +5531,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5544,7 +5550,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5638,7 +5644,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 _asset3Temp,
                 folder!,
@@ -5650,7 +5656,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -5677,7 +5683,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -5704,7 +5710,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -5719,10 +5725,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -5841,7 +5847,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -5855,7 +5861,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5886,7 +5892,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -5985,7 +5991,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {expectedAssetsUpdated.Count} - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {expectedAssetsUpdated.Count} - sorted by file name ascending",
                 expectedAssetsUpdated,
                 _asset1Temp,
                 folder!,
@@ -5998,7 +6004,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 expectedAssetsUpdated,
                 expectedAssetsUpdated[0],
                 folder!,
@@ -6037,7 +6043,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 expectedAssetsUpdated,
                 expectedAssetsUpdated[0],
                 folder!,
@@ -6065,7 +6071,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_NotifiesNoAssetChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -6080,10 +6086,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -6202,7 +6208,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -6217,7 +6223,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -6248,7 +6254,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -6347,7 +6353,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -6362,7 +6368,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -6388,8 +6394,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string tempDirectory = Path.Combine(assetsDirectory, "TempFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -6406,10 +6412,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(tempDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4, destinationFilePathToCopy];
@@ -6549,7 +6555,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder1!][..(i + 1)],
                     folderToAssetsMapping[folder1!][i],
                     folder1!,
@@ -6565,7 +6571,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     tempDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {folderToAssetsMapping[folder1!].Count} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {folderToAssetsMapping[folder1!].Count} - sorted by file name ascending",
                     folderToAssetsMapping[folder2!][..(i + 1)],
                     folderToAssetsMapping[folder2!][i],
                     folder2!,
@@ -6579,7 +6585,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder1!],
                 folderToAssetsMapping[folder1!][0],
                 folder1!,
@@ -6609,7 +6615,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder1!],
                 folderToAssetsMapping[folder1!][0],
                 folder1!,
@@ -6711,7 +6717,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 tempDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 assetsFromRepositoryByPath2,
                 _asset1Temp,
                 folder2!,
@@ -6725,7 +6731,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder1!],
                 folderToAssetsMappingUpdated[folder1!][0],
                 folder1!,
@@ -6763,7 +6769,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder1!],
                 folderToAssetsMappingUpdated[folder1!][0],
                 folder1!,
@@ -6792,8 +6798,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string tempDirectory = Path.Combine(assetsDirectory, "FolderToDelete");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string tempDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_TO_DELETE);
 
         ConfigureApplicationViewModel(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -6810,8 +6816,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Directory.CreateDirectory(assetsDirectory);
             Directory.CreateDirectory(tempDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
             string destinationFilePathToCopy1 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
             string destinationFilePathToCopy2 = Path.Combine(tempDirectory, _asset2!.FileName);
             File.Copy(imagePath1, destinationFilePathToCopy1);
@@ -6934,7 +6940,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 tempDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[folder2!],
                 _asset2Temp,
                 folder2!,
@@ -6946,7 +6952,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder1!,
@@ -6965,7 +6971,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder1!,
@@ -7052,7 +7058,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 tempDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[folder2!],
                 _asset2,
                 folder2!,
@@ -7064,7 +7070,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder1!,
@@ -7091,7 +7097,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder1!,
@@ -7173,7 +7179,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 tempDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [_asset2],
                 _asset2Temp,
                 folder2!,
@@ -7186,7 +7192,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder1!,
@@ -7220,7 +7226,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder1!,
@@ -7299,7 +7305,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 tempDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 _asset2,
                 folder2!,
@@ -7313,7 +7319,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder1!,
@@ -7355,7 +7361,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder1!,
@@ -7385,9 +7391,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
-        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
+        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -7403,30 +7409,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
-            string subDirDirectory = Path.Combine(assetsDirectory, "FolderSubDir");
-            string subSubDirDirectory = Path.Combine(subDirDirectory, "FolderSubSubDir");
+            string imageUpdatedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_UPDATED);
+            string subDirDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_SUB_DIR);
+            string subSubDirDirectory = Path.Combine(subDirDirectory, Directories.FOLDER_SUB_SUB_DIR);
 
             Directory.CreateDirectory(imageDeletedDirectory);
             Directory.CreateDirectory(imageUpdatedDirectory);
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image_11.heic");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
-            string imagePath3 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath4 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image_11.heic");
-            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, "Image 1.jpg");
-            string imagePath4ToCopy = Path.Combine(subDirDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, "HomerDuplicated.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath4ToCopy = Path.Combine(subDirDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, FileNames.HOMER_DUPLICATED_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
-            string firstFramePath2 = Path.Combine(firstFrameVideosDirectory, "HomerDuplicated.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
+            string firstFramePath2 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_DUPLICATED_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -7652,7 +7658,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 _asset4,
                 rootFolder!,
@@ -7664,7 +7670,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageDeletedFolder!],
                 _asset2,
                 imageDeletedFolder!,
@@ -7676,7 +7682,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageUpdatedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageUpdatedFolder!],
                 _asset2Temp,
                 imageUpdatedFolder!,
@@ -7688,7 +7694,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 subDirDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[subDirFolder!],
                 _asset3Temp,
                 subDirFolder!,
@@ -7706,7 +7712,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     firstFrameVideosDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                     folderToAssetsMappingFirstSync[videoFirstFrameFolder!][..(i + 1)],
                     folderToAssetsMappingFirstSync[videoFirstFrameFolder!][i],
                     videoFirstFrameFolder!,
@@ -7720,7 +7726,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -7754,7 +7760,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -7918,7 +7924,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 [],
                 _asset2!,
                 imageDeletedFolder!,
@@ -7947,7 +7953,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -7998,7 +8004,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -8024,7 +8030,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageDeletedDirectory,
-                $"PhotoManager v1.0.0 - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 imageDeletedFolder!,
@@ -8038,7 +8044,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageUpdatedDirectory,
-                $"PhotoManager v1.0.0 - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!],
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!][0],
                 imageUpdatedFolder!,
@@ -8052,7 +8058,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subDirDirectory,
-                $"PhotoManager v1.0.0 - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[subDirFolder!],
                 folderToAssetsMappingSecondSync[subDirFolder!][0],
                 subDirFolder!,
@@ -8066,7 +8072,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subSubDirDirectory,
-                $"PhotoManager v1.0.0 - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 subSubDirFolder!,
@@ -8080,7 +8086,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -8094,7 +8100,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -8142,9 +8148,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
-        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
+        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -8160,29 +8166,29 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
-            string subDirDirectory = Path.Combine(assetsDirectory, "FolderSubDir");
-            string subSubDirDirectory = Path.Combine(subDirDirectory, "FolderSubSubDir");
+            string imageUpdatedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_UPDATED);
+            string subDirDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_SUB_DIR);
+            string subSubDirDirectory = Path.Combine(subDirDirectory, Directories.FOLDER_SUB_SUB_DIR);
 
             Directory.CreateDirectory(imageDeletedDirectory);
             Directory.CreateDirectory(imageUpdatedDirectory);
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image_11.heic");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
-            string imagePath3 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath4 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image_11.heic");
-            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, "Image 1.jpg");
-            string imagePath4ToCopy = Path.Combine(subDirDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, "Homer.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath4ToCopy = Path.Combine(subDirDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, FileNames.HOMER_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -8402,7 +8408,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 _asset4,
                 rootFolder!,
@@ -8414,7 +8420,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageDeletedFolder!],
                 _asset2,
                 imageDeletedFolder!,
@@ -8426,7 +8432,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageUpdatedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageUpdatedFolder!],
                 _asset2Temp,
                 imageUpdatedFolder!,
@@ -8438,7 +8444,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 subDirDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[subDirFolder!],
                 _asset3Temp,
                 subDirFolder!,
@@ -8453,7 +8459,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -8466,7 +8472,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -8499,7 +8505,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -8659,7 +8665,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 [],
                 _asset2!,
                 imageDeletedFolder!,
@@ -8688,7 +8694,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -8738,7 +8744,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -8764,7 +8770,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageDeletedDirectory,
-                $"PhotoManager v1.0.0 - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 imageDeletedFolder!,
@@ -8778,7 +8784,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageUpdatedDirectory,
-                $"PhotoManager v1.0.0 - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!],
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!][0],
                 imageUpdatedFolder!,
@@ -8792,7 +8798,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subDirDirectory,
-                $"PhotoManager v1.0.0 - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[subDirFolder!],
                 folderToAssetsMappingSecondSync[subDirFolder!][0],
                 subDirFolder!,
@@ -8806,7 +8812,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subSubDirDirectory,
-                $"PhotoManager v1.0.0 - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 subSubDirFolder!,
@@ -8820,7 +8826,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -8834,7 +8840,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -8882,9 +8888,9 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [Test]
     public async Task NotifyCatalogChange_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_NotifiesChanges()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
-        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
+        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -8900,30 +8906,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
-            string subDirDirectory = Path.Combine(assetsDirectory, "ZFolderSubDir");
-            string subSubDirDirectory = Path.Combine(subDirDirectory, "FolderSubSubDir");
+            string imageUpdatedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_UPDATED);
+            string subDirDirectory = Path.Combine(assetsDirectory, Directories.Z_FOLDER_SUB_DIR);
+            string subSubDirDirectory = Path.Combine(subDirDirectory, Directories.FOLDER_SUB_SUB_DIR);
 
             Directory.CreateDirectory(imageDeletedDirectory);
             Directory.CreateDirectory(imageUpdatedDirectory);
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image_11.heic");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
-            string imagePath3 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath4 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image_11.heic");
-            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, "Image 1.jpg");
-            string imagePath4ToCopy = Path.Combine(subDirDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, "HomerDuplicated.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath4ToCopy = Path.Combine(subDirDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, FileNames.HOMER_DUPLICATED_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
-            string firstFramePath2 = Path.Combine(firstFrameVideosDirectory, "HomerDuplicated.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
+            string firstFramePath2 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_DUPLICATED_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -9145,7 +9151,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 _asset4,
                 rootFolder!,
@@ -9157,7 +9163,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageDeletedFolder!],
                 _asset2,
                 imageDeletedFolder!,
@@ -9169,7 +9175,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageUpdatedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[imageUpdatedFolder!],
                 _asset2Temp,
                 imageUpdatedFolder!,
@@ -9181,7 +9187,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[videoFirstFrameFolder!],
                 _asset4Temp!,
                 videoFirstFrameFolder!,
@@ -9193,7 +9199,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 subDirDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[subDirFolder!],
                 _asset3Temp,
                 subDirFolder!,
@@ -9209,7 +9215,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -9242,7 +9248,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingFirstSync[rootFolder!],
                 folderToAssetsMappingFirstSync[rootFolder!][0],
                 rootFolder!,
@@ -9404,7 +9410,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 imageDeletedDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 [],
                 _asset2!,
                 imageDeletedFolder!,
@@ -9426,7 +9432,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 firstFrameVideosDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
                 _asset5Temp!,
                 videoFirstFrameFolder!,
@@ -9442,7 +9448,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -9493,7 +9499,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -9519,7 +9525,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageDeletedDirectory,
-                $"PhotoManager v1.0.0 - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {imageDeletedDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 imageDeletedFolder!,
@@ -9533,7 +9539,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 imageUpdatedDirectory,
-                $"PhotoManager v1.0.0 - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {imageUpdatedDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!],
                 folderToAssetsMappingSecondSync[imageUpdatedFolder!][0],
                 imageUpdatedFolder!,
@@ -9547,7 +9553,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 firstFrameVideosDirectory,
-                $"PhotoManager v1.0.0 - {firstFrameVideosDirectory} - image 1 of 2 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {firstFrameVideosDirectory} - image 1 of 2 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!],
                 folderToAssetsMappingSecondSync[videoFirstFrameFolder!][0],
                 videoFirstFrameFolder!,
@@ -9561,7 +9567,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subDirDirectory,
-                $"PhotoManager v1.0.0 - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {subDirDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[subDirFolder!],
                 folderToAssetsMappingSecondSync[subDirFolder!][0],
                 subDirFolder!,
@@ -9575,7 +9581,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 subSubDirDirectory,
-                $"PhotoManager v1.0.0 - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {subSubDirDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 subSubDirFolder!,
@@ -9589,7 +9595,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 1 - sorted by file name ascending",
                 folderToAssetsMappingSecondSync[rootFolder!],
                 folderToAssetsMappingSecondSync[rootFolder!][0],
                 rootFolder!,
@@ -9725,7 +9731,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 _defaultAssetsDirectory!,
-                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -9741,7 +9747,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 _defaultAssetsDirectory!,
-                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -9843,7 +9849,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 _defaultAssetsDirectory!,
-                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -9859,7 +9865,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 _defaultAssetsDirectory!,
-                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -9882,7 +9888,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_RootCatalogFolderPointsToAFile_NotifiesNoAssetChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Image 1.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -9964,7 +9970,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -9980,7 +9986,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -10093,7 +10099,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 _defaultAssetsDirectory!,
-                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -10108,7 +10114,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 _defaultAssetsDirectory!,
-                $"PhotoManager v1.0.0 - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {_defaultAssetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 folder!,
@@ -10136,7 +10142,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -10150,10 +10156,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -10270,7 +10276,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -10284,7 +10290,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10312,7 +10318,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10384,7 +10390,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10416,7 +10422,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10437,7 +10443,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -10452,10 +10458,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -10571,7 +10577,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -10585,7 +10591,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10613,7 +10619,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10718,7 +10724,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 expectedAssetsUpdated,
                 _asset1Temp,
                 folder!,
@@ -10730,7 +10736,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -10766,7 +10772,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -10788,7 +10794,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_NotifiesChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
         string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
         string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
@@ -10805,10 +10811,10 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         {
             CheckBeforeNotifyCatalogChanges(assetsDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -10922,7 +10928,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                     catalogChanges,
                     assetsDirectory,
                     assetsDirectory,
-                    $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
+                    $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of {i + 1} - sorted by file name ascending",
                     folderToAssetsMapping[folder!][..(i + 1)],
                     folderToAssetsMapping[folder!][i],
                     folder!,
@@ -10936,7 +10942,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -10964,7 +10970,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending",
                 folderToAssetsMapping[folder!],
                 folderToAssetsMapping[folder!][0],
                 folder!,
@@ -11076,7 +11082,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 catalogChanges,
                 assetsDirectory,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 expectedAssetsUpdated,
                 _asset1Temp,
                 folder!,
@@ -11091,7 +11097,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -11127,7 +11133,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 5 - sorted by file name ascending",
                 folderToAssetsMappingUpdated[folder!],
                 folderToAssetsMappingUpdated[folder!][0],
                 folder!,
@@ -11184,7 +11190,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
     [TestCase(true)]
     public async Task NotifyCatalogChange_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsErrorAndNotifiesNoAssetChanges(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
         LoggingAssertsService loggingAssertsService = new();
@@ -11201,8 +11207,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePathToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
+            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePathToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath, imagePathToCopy);
 
@@ -11279,7 +11285,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckAfterNotifyCatalogChanges(
                 _applicationViewModel!,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 rootFolder!,
@@ -11293,7 +11299,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             CheckInstance(
                 applicationViewModelInstances,
                 assetsDirectory,
-                $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
+                $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending",
                 [],
                 null,
                 rootFolder!,
@@ -11362,7 +11368,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -11370,7 +11376,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
         Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void CheckAfterNotifyCatalogChanges(
@@ -11412,7 +11418,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
         Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private void NotifyCatalogChangeFolderInspectionInProgress(List<CatalogChangeCallbackEventArgs> catalogChanges, int expectedFoldersCount, IReadOnlyCollection<Folder> folders, string assetsDirectory, ref int increment)
@@ -11612,7 +11618,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo($"Image {expectedAsset.FullPath} updated in catalog."));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {currentDirectory} - image 1 of {expectedAssets.Count} - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {currentDirectory} - image 1 of {expectedAssets.Count} - sorted by file name ascending"));
         increment++;
     }
 
