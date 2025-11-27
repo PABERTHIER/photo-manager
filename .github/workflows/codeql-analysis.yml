@@ -11,7 +11,7 @@ on:
 jobs:
   analyze:
     name: Windows CodeQL Analysis
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     env:
       PROJECT_NAME: PhotoManager/PhotoManager.sln
