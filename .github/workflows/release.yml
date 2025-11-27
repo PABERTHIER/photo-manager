@@ -9,7 +9,7 @@ on:
 jobs:
   release:
     name: Windows Release
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     env:
       PROJECT_NAME: PhotoManager/PhotoManager.sln
