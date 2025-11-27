@@ -3,6 +3,15 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
@@ -14,8 +23,6 @@ public class MainWindowDeleteAssetsTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
@@ -30,9 +37,9 @@ public class MainWindowDeleteAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -42,21 +49,21 @@ public class MainWindowDeleteAssetsTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -68,21 +75,21 @@ public class MainWindowDeleteAssetsTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             ImageData = new(),
             Metadata = new()
             {
@@ -146,7 +153,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndMultipleAssets_DeletesAssets()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -162,8 +169,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -198,7 +205,7 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([observableAssets[0], observableAssets[1]]);
@@ -280,7 +287,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndDeleteTwice_DeletesAssets()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -296,8 +303,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -332,7 +339,7 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([observableAssets[0]]);
@@ -418,7 +425,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndCurrentAsset_DeletesAsset()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -434,8 +441,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -468,7 +475,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset2Temp];
 
             DeleteDuplicatedAssets([_applicationViewModel.CurrentAsset!]);
@@ -551,7 +558,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndNotCurrentAsset_DeletesAsset()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -567,8 +574,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -603,7 +610,7 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp];
 
             DeleteDuplicatedAssets([observableAssets[1]]);
@@ -686,7 +693,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndEmptyArray_DoesNothing()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -702,8 +709,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -736,7 +743,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             DeleteDuplicatedAssets([]);
@@ -818,7 +825,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndUnknownAssetsAndFileExists_DeletesFiles()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -834,8 +841,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -868,7 +875,7 @@ public class MainWindowDeleteAssetsTests
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset1TempFileName), Is.True);
             Assert.That(_assetRepository!.ContainsThumbnail(folder.Path, asset2TempFileName), Is.True);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             DeleteDuplicatedAssets([_asset1Temp, _asset2Temp]);
@@ -947,7 +954,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_CataloguedAssetsAndOneAssetAndFileDoesNotExistAnymore_ThrowsFileNotFoundException()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -963,8 +970,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -999,7 +1006,7 @@ public class MainWindowDeleteAssetsTests
 
             List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             File.Delete(imagePath2ToCopy);
@@ -1086,7 +1093,7 @@ public class MainWindowDeleteAssetsTests
     [Test]
     public async Task DeleteDuplicatedAssets_NoCataloguedAssets_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -1112,7 +1119,7 @@ public class MainWindowDeleteAssetsTests
             Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(assetsDirectory);
             Assert.That(assetsInRepository, Is.Empty);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             DeleteDuplicatedAssets([]);
@@ -1185,7 +1192,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1201,8 +1208,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -1248,8 +1255,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} -  - image 0 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager {Constants.VERSION} - {destinationDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             string result = DeleteSelectedAssets();
@@ -1369,7 +1376,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1385,8 +1392,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -1430,8 +1437,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 0 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} -  - image 0 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager {Constants.VERSION} - {destinationDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             string result = DeleteSelectedAssets();
@@ -1569,7 +1576,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1585,8 +1592,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -1630,8 +1637,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 1 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} - {asset2TempFileName} - image 1 of 1 - sorted by file name ascending";
+                    ? $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending"
+                    : $"PhotoManager {Constants.VERSION} - {destinationDirectory} - {asset2TempFileName} - image 1 of 1 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset2Temp];
 
             string result = DeleteSelectedAssets();
@@ -1752,7 +1759,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1768,8 +1775,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -1815,8 +1822,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 1 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} - {asset1TempFileName} - image 1 of 1 - sorted by file name ascending";
+                    ? $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 1 - sorted by file name ascending"
+                    : $"PhotoManager {Constants.VERSION} - {destinationDirectory} - {asset1TempFileName} - image 1 of 1 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp];
 
             string result = DeleteSelectedAssets();
@@ -1937,7 +1944,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -1953,8 +1960,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -1994,8 +2001,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 2 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} - {asset1TempFileName} - image 1 of 2 - sorted by file name ascending";
+                    ? $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending"
+                    : $"PhotoManager {Constants.VERSION} - {destinationDirectory} - {asset1TempFileName} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             string result = DeleteSelectedAssets();
@@ -2107,7 +2114,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -2123,8 +2130,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -2168,8 +2175,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 2 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} - {asset1TempFileName} - image 1 of 2 - sorted by file name ascending";
+                    ? $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending"
+                    : $"PhotoManager {Constants.VERSION} - {destinationDirectory} - {asset1TempFileName} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             string result = DeleteSelectedAssets();
@@ -2283,7 +2290,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplicationViewModel(100, destinationDirectory, 200, 150, false, false, false, true);
 
@@ -2299,8 +2306,8 @@ public class MainWindowDeleteAssetsTests
 
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1TempFileName = "Image 1.jpg";
-            const string asset2TempFileName = "Image 9.png";
+            const string asset1TempFileName = FileNames.IMAGE_1_JPG;
+            const string asset2TempFileName = FileNames.IMAGE_9_PNG;
 
             string imagePath1 = Path.Combine(_dataDirectory!, asset1TempFileName);
             string imagePath1ToCopy = Path.Combine(destinationDirectory, asset1TempFileName);
@@ -2346,8 +2353,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {destinationDirectory} - image 1 of 2 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {destinationDirectory} - {asset1TempFileName} - image 1 of 2 - sorted by file name ascending";
+                    ? $"PhotoManager {Constants.VERSION} - {destinationDirectory} - image 1 of 2 - sorted by file name ascending"
+                    : $"PhotoManager {Constants.VERSION} - {destinationDirectory} - {asset1TempFileName} - image 1 of 2 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1Temp, _asset2Temp];
 
             File.Delete(imagePath2ToCopy);
@@ -2467,7 +2474,7 @@ public class MainWindowDeleteAssetsTests
         Visibility expectedThumbnailsVisible,
         Visibility expectedViewerVisible)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplicationViewModel(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -2500,8 +2507,8 @@ public class MainWindowDeleteAssetsTests
 
             string expectedAppTitle =
                 appMode == AppMode.Thumbnails
-                    ? $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending"
-                    : $"PhotoManager v1.0.0 - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
+                    ? $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending"
+                    : $"PhotoManager {Constants.VERSION} - {assetsDirectory} -  - image 0 of 0 - sorted by file name ascending";
             Asset[] expectedAssets = [];
 
             string result = DeleteSelectedAssets();
@@ -2634,7 +2641,7 @@ public class MainWindowDeleteAssetsTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -2642,7 +2649,7 @@ public class MainWindowDeleteAssetsTests
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
         Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void CheckAfterChanges(
@@ -2687,7 +2694,7 @@ public class MainWindowDeleteAssetsTests
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
         Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void CheckFolderNavigationViewModel(

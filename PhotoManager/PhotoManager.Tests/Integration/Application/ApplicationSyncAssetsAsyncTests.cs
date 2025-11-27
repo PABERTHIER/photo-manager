@@ -1,4 +1,7 @@
-﻿namespace PhotoManager.Tests.Integration.Application;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+
+namespace PhotoManager.Tests.Integration.Application;
 
 [TestFixture]
 public class ApplicationSyncAssetsAsyncTests
@@ -6,7 +9,6 @@ public class ApplicationSyncAssetsAsyncTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
@@ -19,9 +21,9 @@ public class ApplicationSyncAssetsAsyncTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -59,8 +61,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreEmpty_NoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToSync");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_SYNC);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -105,8 +107,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmpty_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -114,10 +116,10 @@ public class ApplicationSyncAssetsAsyncTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -212,9 +214,9 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceIsEmptyAndDestinationIsNotEmpty_NoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceToCopyPath = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string sourceDirectory = Path.Combine(sourceToCopyPath, "Source");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceToCopyPath = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceDirectory = Path.Combine(sourceToCopyPath, Directories.SOURCE);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -223,10 +225,10 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -344,8 +346,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyMultipleNewImages_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -353,10 +355,10 @@ public class ApplicationSyncAssetsAsyncTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -456,8 +458,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyOneNewImage_StatusChangesAndImageAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -465,10 +467,10 @@ public class ApplicationSyncAssetsAsyncTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -570,10 +572,10 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyMultipleNewImagesAndTwoDefinitions_StatusChangesAndImagesAreAdded()
     {
-        string firstSourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string secondSourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
-        string firstDestinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync1");
-        string secondDestinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync2");
+        string firstSourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string secondSourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
+        string firstDestinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC_1);
+        string secondDestinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC_2);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -582,15 +584,15 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(firstDestinationDirectory);
             Directory.CreateDirectory(secondDestinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
-            const string assetName5 = "Image_1336_Mini.JPG";
-            const string assetName6 = "Image_1336_Original.JPG";
-            const string assetName7 = "Image_1336_ShitQuality.JPG";
-            const string assetName8 = "Image_1336_Small.JPG";
+            const string assetName5 = FileNames.IMAGE_1336_MINI_JPG;
+            const string assetName6 = FileNames.IMAGE_1336_ORIGINAL_JPG;
+            const string assetName7 = FileNames.IMAGE_1336_SHIT_QUALITY_JPG;
+            const string assetName8 = FileNames.IMAGE_1336_SMALL_JPG;
 
             string assetSourcePath1 = Path.Combine(firstSourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(firstSourceDirectory, assetName2);
@@ -766,10 +768,10 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
-        string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
+        string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -779,10 +781,10 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(destinationSubDirectory1);
             Directory.CreateDirectory(destinationSubDirectory2);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -926,10 +928,10 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyAllImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreSingleLevel_StatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
-        string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
+        string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -939,10 +941,10 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(destinationSubDirectory1);
             Directory.CreateDirectory(destinationSubDirectory2);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -1088,13 +1090,13 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsFalse_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
-        string sourceSubDirectory2 = Path.Combine(sourceDirectory, "SubDirectory2");
-        string sourceToCopy = Path.Combine(_dataDirectory!, "Duplicates\\Part");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
-        string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
+        string sourceSubDirectory2 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_2);
+        string sourceToCopy = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
+        string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1104,12 +1106,12 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(sourceSubDirectory1);
             Directory.CreateDirectory(sourceSubDirectory2);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
-            const string assetName5 = "1336_BottomLeftPart.JPG";
-            const string assetName6 = "1336_TopRightPart.JPG";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
+            const string assetName5 = FileNames._1336_BOTTOM_LEFT_PART_JPG;
+            const string assetName6 = FileNames._1336_TOP_RIGHT_PART_JPG;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -1250,13 +1252,13 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
-        string sourceSubDirectory2 = Path.Combine(sourceDirectory, "SubDirectory2");
-        string sourceToCopy = Path.Combine(_dataDirectory!, "Duplicates\\Part");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
-        string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
+        string sourceSubDirectory2 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_2);
+        string sourceToCopy = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
+        string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1266,12 +1268,12 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(sourceSubDirectory1);
             Directory.CreateDirectory(sourceSubDirectory2);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
-            const string assetName5 = "1336_BottomLeftPart.JPG";
-            const string assetName6 = "1336_TopRightPart.JPG";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
+            const string assetName5 = FileNames._1336_BOTTOM_LEFT_PART_JPG;
+            const string assetName6 = FileNames._1336_TOP_RIGHT_PART_JPG;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -1442,13 +1444,13 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceAndDestinationSubDirectoriesAreSingleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
-        string sourceSubDirectory2 = Path.Combine(sourceDirectory, "SubDirectory2");
-        string sourceToCopy = Path.Combine(_dataDirectory!, "Duplicates\\Part");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
-        string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
+        string sourceSubDirectory2 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_2);
+        string sourceToCopy = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
+        string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1460,12 +1462,12 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(destinationSubDirectory1);
             Directory.CreateDirectory(destinationSubDirectory2);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
-            const string assetName5 = "1336_BottomLeftPart.JPG";
-            const string assetName6 = "1336_TopRightPart.JPG";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
+            const string assetName5 = FileNames._1336_BOTTOM_LEFT_PART_JPG;
+            const string assetName6 = FileNames._1336_TOP_RIGHT_PART_JPG;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -1642,10 +1644,10 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationOrSubDirectoriesAndDestinationSubDirectoriesAreMultipleLevel_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory2//SubDirectory2");
-        string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory3//SubDirectory4//SubDirectory5");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, $"{Directories.SUB_DIRECTORY_2}\\{Directories.SUB_DIRECTORY_2}");
+        string destinationSubDirectory2 = Path.Combine(destinationDirectory, $"{Directories.SUB_DIRECTORY_3}\\{Directories.SUB_DIRECTORY_4}\\{Directories.SUB_DIRECTORY_5}");
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1655,10 +1657,10 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(destinationSubDirectory1);
             Directory.CreateDirectory(destinationSubDirectory2);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -1802,15 +1804,15 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndSourceSubDirectoriesAreMultipleLevelAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
-        string sourceSubDirectory2 = Path.Combine(sourceSubDirectory1, "SubDirectory2");
-        string sourceSubDirectory3 = Path.Combine(sourceDirectory, "SubDirectory3");
-        string sourceToCopy = Path.Combine(_dataDirectory!, "Duplicates\\Part");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
-        string destinationSubDirectory2 = Path.Combine(destinationSubDirectory1, "SubDirectory2");
-        string destinationSubDirectory3 = Path.Combine(destinationDirectory, "SubDirectory3");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
+        string sourceSubDirectory2 = Path.Combine(sourceSubDirectory1, Directories.SUB_DIRECTORY_2);
+        string sourceSubDirectory3 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_3);
+        string sourceToCopy = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
+        string destinationSubDirectory2 = Path.Combine(destinationSubDirectory1, Directories.SUB_DIRECTORY_2);
+        string destinationSubDirectory3 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_3);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -1821,12 +1823,12 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(sourceSubDirectory2);
             Directory.CreateDirectory(sourceSubDirectory3);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
-            const string assetName5 = "1336_BottomLeftPart.JPG";
-            const string assetName6 = "1336_TopRightPart.JPG";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
+            const string assetName5 = FileNames._1336_BOTTOM_LEFT_PART_JPG;
+            const string assetName6 = FileNames._1336_TOP_RIGHT_PART_JPG;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -1943,7 +1945,7 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
             Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            string [] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Is.Empty);
 
             string[] fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
@@ -2013,10 +2015,10 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptySomeImagesAreInDestinationAndDuplicatedAssetInSourceAndIncludeSubFoldersIsTrue_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2025,10 +2027,10 @@ public class ApplicationSyncAssetsAsyncTests
             Directory.CreateDirectory(destinationDirectory);
             Directory.CreateDirectory(sourceSubDirectory1);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -2164,9 +2166,9 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceAndDestinationAreNotEmptyBothContainDifferentImagesAndDeleteAssetsNotInSourceIsTrue_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationToCopy = Path.Combine(_dataDirectory!, "Duplicates\\Thumbnail");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationToCopy = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.THUMBNAIL}");
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2174,15 +2176,15 @@ public class ApplicationSyncAssetsAsyncTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
-            const string assetName5 = "Image_1336_Mini.JPG";
-            const string assetName6 = "Image_1336_Original.JPG";
-            const string assetName7 = "Image_1336_ShitQuality.JPG";
-            const string assetName8 = "Image_1336_Small.JPG";
+            const string assetName5 = FileNames.IMAGE_1336_MINI_JPG;
+            const string assetName6 = FileNames.IMAGE_1336_ORIGINAL_JPG;
+            const string assetName7 = FileNames.IMAGE_1336_SHIT_QUALITY_JPG;
+            const string assetName8 = FileNames.IMAGE_1336_SMALL_JPG;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -2317,8 +2319,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsEmpty_NoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2326,10 +2328,10 @@ public class ApplicationSyncAssetsAsyncTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -2403,8 +2405,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public void SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationDefinitionIsNull_ThrowsNullReferenceException()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2412,10 +2414,10 @@ public class ApplicationSyncAssetsAsyncTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -2474,8 +2476,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationNotSaved_NoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2483,10 +2485,10 @@ public class ApplicationSyncAssetsAsyncTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -2557,8 +2559,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public void SyncAssetsAsync_SourceIsNotEmptyAndDestinationIsEmptyAndSyncAssetsConfigurationIsNull_ThrowsNullReferenceException()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2566,10 +2568,10 @@ public class ApplicationSyncAssetsAsyncTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -2623,8 +2625,8 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceDirectoryDoesNotExist_NoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToSync");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_SYNC);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2668,7 +2670,7 @@ public class ApplicationSyncAssetsAsyncTests
     public async Task SyncAssetsAsync_SourceDirectoryIsNull_NoStatusChangesAndNoImagesAreAdded()
     {
         string? sourceDirectory = null;
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -2712,17 +2714,17 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationDirectoryDoesNotExist_StatusChangesAndImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);
@@ -2811,17 +2813,17 @@ public class ApplicationSyncAssetsAsyncTests
     [Test]
     public async Task SyncAssetsAsync_SourceIsNotEmptyAndDestinationDirectoryIsNull_NoStatusChangesAndNoImagesAreAdded()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
         string? destinationDirectory = null;
 
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);

@@ -3,6 +3,12 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 
@@ -12,7 +18,6 @@ public class ApplicationViewModelChangeAppModeTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private ApplicationViewModel? _applicationViewModel;
     private PhotoManager.Application.Application? _application;
@@ -26,9 +31,9 @@ public class ApplicationViewModelChangeAppModeTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         Guid folderId = Guid.NewGuid();
 
@@ -36,11 +41,11 @@ public class ApplicationViewModelChangeAppModeTests
         {
             FolderId = folderId,
             Folder = new() { Id = folderId, Path = _dataDirectory! },
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             Hash = string.Empty,
             ImageData = new(),
@@ -61,11 +66,11 @@ public class ApplicationViewModelChangeAppModeTests
         {
             FolderId = folderId,
             Folder = new() { Id = folderId, Path = _dataDirectory! },
-            FileName = "Image 2.jpg",
+            FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
             },
             Hash = string.Empty,
             ImageData = new(),
@@ -86,11 +91,11 @@ public class ApplicationViewModelChangeAppModeTests
         {
             FolderId = folderId,
             Folder = new() { Id = folderId, Path = _dataDirectory! },
-            FileName = "Image 3.jpg",
+            FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_3_JPG, Height = PixelHeightAsset.IMAGE_3_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
             },
             Hash = string.Empty,
             ImageData = new(),
@@ -111,11 +116,11 @@ public class ApplicationViewModelChangeAppModeTests
         {
             FolderId = folderId,
             Folder = new() { Id = folderId, Path = _dataDirectory! },
-            FileName = "Image 4.jpg",
+            FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_4_JPG, Height = PixelHeightAsset.IMAGE_4_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_4_JPG, Height = ThumbnailHeightAsset.IMAGE_4_JPG }
             },
             Hash = string.Empty,
             ImageData = new(),
@@ -136,13 +141,12 @@ public class ApplicationViewModelChangeAppModeTests
         {
             FolderId = folderId,
             Folder = new() { Id = folderId, Path = _dataDirectory! },
-            FileName = "Image 5.jpg",
-            Pixel =
-                new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
+            FileName = FileNames.IMAGE_5_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_5_JPG, Height = PixelHeightAsset.IMAGE_5_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
+            },
             Hash = string.Empty,
             ImageData = new(),
             FileProperties = new()
@@ -216,7 +220,7 @@ public class ApplicationViewModelChangeAppModeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - Image 4.jpg - image 4 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory} - Image 4.jpg - image 4 of 5 - sorted by file name ascending";
             const int expectedViewerPosition = 3;
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5 ];
@@ -272,7 +276,7 @@ public class ApplicationViewModelChangeAppModeTests
             Assert.That(notifyPropertyChangedEvents[20], Is.EqualTo("AppTitle"));
 
             // Second ChangeAppMode
-            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory} - image 4 of 5 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 4 of 5 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -362,7 +366,7 @@ public class ApplicationViewModelChangeAppModeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} -  - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} -  - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -386,7 +390,7 @@ public class ApplicationViewModelChangeAppModeTests
             Assert.That(notifyPropertyChangedEvents[2], Is.EqualTo("ViewerVisible"));
             Assert.That(notifyPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
 
-            expectedAppTitle = $"PhotoManager v1.0.0 - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
+            expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory!} - image 0 of 0 - sorted by file name ascending";
 
             _applicationViewModel!.ChangeAppMode();
 
@@ -487,7 +491,7 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -495,7 +499,7 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
         Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void CheckAfterChanges(
@@ -542,7 +546,7 @@ public class ApplicationViewModelChangeAppModeTests
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
         Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void AssertAssetPropertyValidity(Asset asset, Asset expectedAsset, string assetPath, string folderPath, Folder folder)

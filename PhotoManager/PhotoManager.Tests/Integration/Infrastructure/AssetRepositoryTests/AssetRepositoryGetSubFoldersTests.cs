@@ -1,4 +1,5 @@
 ﻿using Reactive = System.Reactive;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -8,7 +9,6 @@ public class AssetRepositoryGetSubFoldersTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
@@ -17,9 +17,9 @@ public class AssetRepositoryGetSubFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -44,12 +44,12 @@ public class AssetRepositoryGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
-            string childFolderPath1 = Path.Combine(parentFolderPath1, "TestSubFolder1");
-            string childFolderPath2 = Path.Combine(parentFolderPath2, "TestSubFolder2");
-            string childFolderPath3 = Path.Combine(parentFolderPath2, "TestSubFolder2");
+            string childFolderPath1 = Path.Combine(parentFolderPath1, Directories.TEST_SUB_FOLDER_1);
+            string childFolderPath2 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
+            string childFolderPath3 = Path.Combine(parentFolderPath2, Directories.TEST_SUB_FOLDER_2);
 
             Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
@@ -95,8 +95,8 @@ public class AssetRepositoryGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder parentFolder1 = _assetRepository!.AddFolder(parentFolderPath1);
             Folder parentFolder2 = _assetRepository!.AddFolder(parentFolderPath2);
@@ -124,8 +124,8 @@ public class AssetRepositoryGetSubFoldersTests
 
         try
         {
-            string parentFolderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string parentFolderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder parentFolder1 = new() { Id = Guid.NewGuid(), Path = parentFolderPath1 };
             Folder parentFolder2 = new() { Id = Guid.NewGuid(), Path = parentFolderPath2 };
@@ -155,7 +155,7 @@ public class AssetRepositoryGetSubFoldersTests
         {
             Folder? parentFolder1 = null;
 
-            string parentFolderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string parentFolderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             _assetRepository!.AddFolder(parentFolderPath2); // At least one folder to trigger the Where on folders
 

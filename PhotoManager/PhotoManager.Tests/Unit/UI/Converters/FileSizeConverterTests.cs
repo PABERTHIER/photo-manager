@@ -86,7 +86,7 @@ public class FileSizeConverterTests
     public void Convert_Overflow_ThrowsOverflowException()
     {
         FileSizeConverter fileSizeConverter = new();
-        string input = long.MaxValue.ToString() + "0"; // Adding a digit to exceed the maximum value
+        string input = long.MaxValue + "0"; // Adding a digit to exceed the maximum value
         object? parameter = null;
 
         OverflowException? exception = Assert.Throws<OverflowException>(() =>

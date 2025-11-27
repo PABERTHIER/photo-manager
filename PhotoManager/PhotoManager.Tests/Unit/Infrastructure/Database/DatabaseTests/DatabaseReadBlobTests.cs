@@ -1,4 +1,7 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseReadBlobTests
@@ -8,12 +11,10 @@ public class DatabaseReadBlobTests
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
 
-    private const char SEMICOLON_SEPARATOR = ';';
-
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -31,19 +32,19 @@ public class DatabaseReadBlobTests
     public void ReadBlob_FileExistsAndSemicolonSeparator_ReturnsBlob()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { "Image1.jpg", [1, 2, 3]},
-            { "Image2.png", [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3]},
+            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
         };
 
         try
         {
             _database!.Initialize(
                 directoryPath,
-                SEMICOLON_SEPARATOR,
+                Constants.SEMICOLON_SEPARATOR,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
@@ -56,16 +57,16 @@ public class DatabaseReadBlobTests
             Assert.That(blob, Is.InstanceOf<Dictionary<string, byte[]>?>());
             Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(blobFilePath));
             Assert.That(blob!, Has.Count.EqualTo(blobToWrite.Count));
-            Assert.That(blob.ContainsKey("Image1.jpg"), Is.True);
-            Assert.That(blob["Image1.jpg"], Is.EqualTo(blobToWrite["Image1.jpg"]).AsCollection);
-            Assert.That(blob["Image2.png"], Is.EqualTo(blobToWrite["Image2.png"]).AsCollection);
+            Assert.That(blob.ContainsKey(FileNames.IMAGE1_JPG), Is.True);
+            Assert.That(blob[FileNames.IMAGE1_JPG], Is.EqualTo(blobToWrite[FileNames.IMAGE1_JPG]).AsCollection);
+            Assert.That(blob[FileNames.IMAGE_2_PNG], Is.EqualTo(blobToWrite[FileNames.IMAGE_2_PNG]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
             Assert.That(blob, Is.EqualTo(blobToWrite));
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -73,12 +74,12 @@ public class DatabaseReadBlobTests
     public void ReadBlob_FileExistsAndPipeSeparator_ReturnsBlob()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { "Image1.jpg", [1, 2, 3]},
-            { "Image2.png", [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3]},
+            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
         };
 
         try
@@ -98,16 +99,16 @@ public class DatabaseReadBlobTests
             Assert.That(blob, Is.InstanceOf<Dictionary<string, byte[]>?>());
             Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(blobFilePath));
             Assert.That(blob!, Has.Count.EqualTo(blobToWrite.Count));
-            Assert.That(blob.ContainsKey("Image1.jpg"), Is.True);
-            Assert.That(blob["Image1.jpg"], Is.EqualTo(blobToWrite["Image1.jpg"]).AsCollection);
-            Assert.That(blob["Image2.png"], Is.EqualTo(blobToWrite["Image2.png"]).AsCollection);
+            Assert.That(blob.ContainsKey(FileNames.IMAGE1_JPG), Is.True);
+            Assert.That(blob[FileNames.IMAGE1_JPG], Is.EqualTo(blobToWrite[FileNames.IMAGE1_JPG]).AsCollection);
+            Assert.That(blob[FileNames.IMAGE_2_PNG], Is.EqualTo(blobToWrite[FileNames.IMAGE_2_PNG]).AsCollection);
             Assert.That(blobToWrite, Is.EquivalentTo(blob));
             Assert.That(blob, Is.EqualTo(blobToWrite));
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -115,7 +116,7 @@ public class DatabaseReadBlobTests
     public void ReadBlob_FileDoesNotExistsAndPipeSeparator_ReturnsNull()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
 
         try
@@ -134,7 +135,7 @@ public class DatabaseReadBlobTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 }

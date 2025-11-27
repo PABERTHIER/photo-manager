@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseWriteObjectListTests
@@ -13,12 +15,11 @@ public class DatabaseWriteObjectListTests
     private string? _csvEscapedTextWithPipe;
     private string? _csvUnescapedTextWithPipe;
     private string? _csvSomeUnescapedTextWithPipe;
-    private const char SEMICOLON_SEPARATOR = ';';
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -60,19 +61,19 @@ public class DatabaseWriteObjectListTests
         string csv = csvType == "EscapedText" ? _csvEscapedTextWithSemicolon! : _csvUnescapedTextWithSemicolon!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            WriteObjectList(directoryPath, SEMICOLON_SEPARATOR, tableName, escapeText);
+            WriteObjectList(directoryPath, Constants.SEMICOLON_SEPARATOR, tableName, escapeText);
 
             Asserts(filePath, csv);
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -84,7 +85,7 @@ public class DatabaseWriteObjectListTests
         string csv = csvType == "EscapedText" ? _csvEscapedTextWithPipe! : _csvUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -96,7 +97,7 @@ public class DatabaseWriteObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -104,7 +105,7 @@ public class DatabaseWriteObjectListTests
     public void WriteObjectList_AllColumnsAndPipeSeparatorWithoutDataTableProperties_ThrowsException()
     {
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -170,7 +171,7 @@ public class DatabaseWriteObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -180,7 +181,7 @@ public class DatabaseWriteObjectListTests
         string csv = _csvSomeUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -265,7 +266,7 @@ public class DatabaseWriteObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -275,7 +276,7 @@ public class DatabaseWriteObjectListTests
         string csv = _csvUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -366,7 +367,7 @@ public class DatabaseWriteObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -374,7 +375,7 @@ public class DatabaseWriteObjectListTests
     public void WriteObjectList_ListIsNullAndAllColumnsWithUnescapedTextAndPipeSeparator_ThrowsArgumentNullException()
     {
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -402,7 +403,7 @@ public class DatabaseWriteObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -411,7 +412,7 @@ public class DatabaseWriteObjectListTests
     [TestCase(" ")]
     public void WriteObjectList_TableNameIsInvalidAllColumnsWithEscapedTextAndPipeSeparator_ThrowsArgumentNullException(string tableName)
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -483,7 +484,7 @@ public class DatabaseWriteObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -491,7 +492,7 @@ public class DatabaseWriteObjectListTests
     public void WriteObjectList_TableNameIsNullAllColumnsWithEscapedTextAndPipeSeparator_ThrowsTwoArgumentNullException()
     {
         string? tableName = null;
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -565,7 +566,7 @@ public class DatabaseWriteObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 

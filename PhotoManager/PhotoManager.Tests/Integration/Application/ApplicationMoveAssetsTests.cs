@@ -1,4 +1,11 @@
-﻿namespace PhotoManager.Tests.Integration.Application;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+
+namespace PhotoManager.Tests.Integration.Application;
 
 [TestFixture]
 public class ApplicationMoveAssetsTests
@@ -6,7 +13,6 @@ public class ApplicationMoveAssetsTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
     private MoveAssetsService? _moveAssetsService;
@@ -18,9 +24,9 @@ public class ApplicationMoveAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -58,9 +64,9 @@ public class ApplicationMoveAssetsTests
     [Test]
     public async Task MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsTrue_MoveSucceeds()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "AssetsTests");
-        string sourceDirectory = Path.Combine(assetsDirectory, "SourceToMove");
-        string destinationDirectory = Path.Combine(assetsDirectory, "DestinationToMove");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.ASSETS_TESTS);
+        string sourceDirectory = Path.Combine(assetsDirectory, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(assetsDirectory, Directories.DESTINATION_TO_MOVE);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -70,8 +76,8 @@ public class ApplicationMoveAssetsTests
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1FileName = "Image 6.jpg";
-            const string asset2FileName = "Image 1.jpg";
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
             string newSourceFilePath1 = Path.Combine(sourceDirectory, asset1FileName);
@@ -104,7 +110,7 @@ public class ApplicationMoveAssetsTests
             Folder? destinationFolder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(destinationFolder, Is.Not.Null);
 
-            Asset[] assetsInSource= _assetRepository!.GetAssetsByPath(sourceDirectory);
+            Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(sourceDirectory);
             Assert.That(assetsInSource, Is.Not.Empty);
             Assert.That(assetsInSource, Has.Length.EqualTo(2));
             Assert.That(assetsInSource[0].FileName, Is.EqualTo(asset2FileName));
@@ -202,9 +208,9 @@ public class ApplicationMoveAssetsTests
     [Test]
     public async Task MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsFalse_MoveSucceeds()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "AssetsTests");
-        string sourceDirectory = Path.Combine(assetsDirectory, "SourceToMove");
-        string destinationDirectory = Path.Combine(assetsDirectory, "DestinationToMove");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.ASSETS_TESTS);
+        string sourceDirectory = Path.Combine(assetsDirectory, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(assetsDirectory, Directories.DESTINATION_TO_MOVE);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -214,8 +220,8 @@ public class ApplicationMoveAssetsTests
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1FileName = "Image 6.jpg";
-            const string asset2FileName = "Image 1.jpg";
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
             string newSourceFilePath1 = Path.Combine(sourceDirectory, asset1FileName);
@@ -338,8 +344,8 @@ public class ApplicationMoveAssetsTests
     [Test]
     public async Task MoveAssets_AssetsAreValidAndDestinationFolderNotCataloguedAndPreserveOriginalFilesIsTrue_MoveSucceeds()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         ConfigureApplication(100, sourceDirectory, 200, 150, false, false, false, false);
 
@@ -348,8 +354,8 @@ public class ApplicationMoveAssetsTests
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1FileName = "Image 6.jpg";
-            const string asset2FileName = "Image 1.jpg";
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
             string newSourceFilePath1 = Path.Combine(sourceDirectory, asset1FileName);
@@ -483,8 +489,8 @@ public class ApplicationMoveAssetsTests
     [Test]
     public async Task MoveAssets_AssetsAreValidAndDestinationFolderNotCataloguedAndPreserveOriginalFilesIsFalse_MoveSucceeds()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         ConfigureApplication(100, sourceDirectory, 200, 150, false, false, false, false);
 
@@ -493,8 +499,8 @@ public class ApplicationMoveAssetsTests
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1FileName = "Image 6.jpg";
-            const string asset2FileName = "Image 1.jpg";
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
             string newSourceFilePath1 = Path.Combine(sourceDirectory, asset1FileName);
@@ -622,9 +628,9 @@ public class ApplicationMoveAssetsTests
     [TestCase(false)]
     public async Task MoveAssets_AssetIsValidButDirectoryIsInReadOnlyMode_ReturnFalseAndLogsItAndDoesNotMoveFile(bool preserveOriginalFile)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "AssetsTests");
-        string sourceDirectory = Path.Combine(assetsDirectory, "SourceToMove");
-        string destinationDirectory = Path.Combine(assetsDirectory, "NoMoveDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.ASSETS_TESTS);
+        string sourceDirectory = Path.Combine(assetsDirectory, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(assetsDirectory, Directories.NO_MOVE_DIRECTORY);
         LoggingAssertsService loggingAssertsService = new();
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
@@ -638,7 +644,7 @@ public class ApplicationMoveAssetsTests
             // Deny write access to the directory
             DirectoryHelper.DenyWriteAccess(destinationDirectory);
 
-            const string assetFileName = "Image 1.jpg";
+            const string assetFileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath = Path.Combine(_dataDirectory!, assetFileName);
             string newSourceFilePath = Path.Combine(sourceDirectory, assetFileName);
@@ -745,9 +751,9 @@ public class ApplicationMoveAssetsTests
     [Test]
     public async Task MoveAssets_AssetIsInTheDestinationButNotInTheSourceAndPreserveOriginalFilesIsTrue_ThrowsFileNotFoundException()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "AssetsTests");
-        string sourceDirectory = Path.Combine(assetsDirectory, "SourceToMove");
-        string destinationDirectory = Path.Combine(assetsDirectory, "DestinationToMove");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.ASSETS_TESTS);
+        string sourceDirectory = Path.Combine(assetsDirectory, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(assetsDirectory, Directories.DESTINATION_TO_MOVE);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -757,8 +763,8 @@ public class ApplicationMoveAssetsTests
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1FileName = "Image 6.jpg";
-            const string asset2FileName = "Image 1.jpg";
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
             string newSourceFilePath1 = Path.Combine(sourceDirectory, asset1FileName);
@@ -885,9 +891,9 @@ public class ApplicationMoveAssetsTests
     [Test]
     public async Task MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsTrueAndRecentTargetPathAlreadyAdded_MoveSucceeds()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "AssetsTests");
-        string sourceDirectory = Path.Combine(assetsDirectory, "SourceToMove");
-        string destinationDirectory = Path.Combine(assetsDirectory, "DestinationToMove");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.ASSETS_TESTS);
+        string sourceDirectory = Path.Combine(assetsDirectory, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(assetsDirectory, Directories.DESTINATION_TO_MOVE);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -897,8 +903,8 @@ public class ApplicationMoveAssetsTests
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1FileName = "Image 6.jpg";
-            const string asset2FileName = "Image 1.jpg";
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
             string newSourceFilePath1 = Path.Combine(sourceDirectory, asset1FileName);
@@ -931,7 +937,7 @@ public class ApplicationMoveAssetsTests
             Folder? destinationFolder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(destinationFolder, Is.Not.Null);
 
-            string fakeRecentTargetPath = Path.Combine(destinationDirectory, "fake");
+            string fakeRecentTargetPath = Path.Combine(destinationDirectory, Directories.FAKE);
             _assetRepository.SaveRecentTargetPaths([fakeRecentTargetPath, destinationDirectory]);
 
             Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(sourceDirectory);
@@ -1038,7 +1044,7 @@ public class ApplicationMoveAssetsTests
     [TestCase(false)]
     public async Task MoveAssets_SameSourceAndDestination_ReturnsTrueAndLogsItAndDoesNotMoveFile(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
         LoggingAssertsService loggingAssertsService = new();
 
         ConfigureApplication(100, destinationDirectory, 200, 150, false, false, false, false);
@@ -1047,8 +1053,8 @@ public class ApplicationMoveAssetsTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -1064,7 +1070,7 @@ public class ApplicationMoveAssetsTests
             Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
             Assert.That(assetsInRepository, Has.Length.EqualTo(1));
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
             Asset asset = assetsInRepository[0];
 
             Assert.That(_assetRepository!.ContainsThumbnail(sourceFolder.Path, asset.FileName), Is.True);
@@ -1093,8 +1099,8 @@ public class ApplicationMoveAssetsTests
     [TestCase(false)]
     public async Task MoveAssets_DifferentFileNameBetweenSourceAndDestination_ThrowsFileNotFoundException(bool preserveOriginalFile)
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         ConfigureApplication(100, sourceDirectory, 200, 150, false, false, false, false);
 
@@ -1103,8 +1109,8 @@ public class ApplicationMoveAssetsTests
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetOldFileName = "Image 1.jpg";
-            const string assetNewFileName = "Image 2.jpg";
+            const string assetOldFileName = FileNames.IMAGE_1_JPG;
+            const string assetNewFileName = FileNames.IMAGE_2_JPG;
 
             string sourceFilePath = Path.Combine(_dataDirectory!, assetOldFileName);
             string newSourceFilePath = Path.Combine(sourceDirectory, assetOldFileName);
@@ -1161,7 +1167,7 @@ public class ApplicationMoveAssetsTests
                 ImageRotation = asset.ImageRotation,
                 Hash = asset.Hash,
                 ImageData = asset.ImageData,
-                ThumbnailCreationDateTime  = asset.ThumbnailCreationDateTime,
+                ThumbnailCreationDateTime = asset.ThumbnailCreationDateTime,
                 Metadata = asset.Metadata,
             };
             Asset[] assets = [newAsset];
@@ -1216,7 +1222,7 @@ public class ApplicationMoveAssetsTests
     [TestCase(false)]
     public async Task MoveAssets_DifferentFileNameAndSameSourceAndDestination_MovesFileAndReturnsTrue(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         ConfigureApplication(100, destinationDirectory, 200, 150, false, false, false, false);
 
@@ -1224,8 +1230,8 @@ public class ApplicationMoveAssetsTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetOldFileName = "Image 1.jpg";
-            const string assetNewFileName = "Image 2.jpg";
+            const string assetOldFileName = FileNames.IMAGE_1_JPG;
+            const string assetNewFileName = FileNames.IMAGE_2_JPG;
 
             string sourceFilePath = Path.Combine(_dataDirectory!, assetOldFileName);
             string destinationFilePath = Path.Combine(destinationDirectory, assetOldFileName);
@@ -1274,7 +1280,7 @@ public class ApplicationMoveAssetsTests
                 ImageRotation = asset.ImageRotation,
                 Hash = asset.Hash,
                 ImageData = asset.ImageData,
-                ThumbnailCreationDateTime  = asset.ThumbnailCreationDateTime,
+                ThumbnailCreationDateTime = asset.ThumbnailCreationDateTime,
                 Metadata = asset.Metadata
             };
             Asset[] assets = [newAsset];
@@ -1377,11 +1383,11 @@ public class ApplicationMoveAssetsTests
             {
                 FolderId = folderId1,
                 Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1390,11 +1396,11 @@ public class ApplicationMoveAssetsTests
             {
                 FolderId = folderId2,
                 Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1431,11 +1437,11 @@ public class ApplicationMoveAssetsTests
             {
                 FolderId = folderId1,
                 Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1443,11 +1449,11 @@ public class ApplicationMoveAssetsTests
             {
                 FolderId = Guid.Empty,
                 Folder = folder!,
-                FileName = "NonExistentFile.jpg",
+                FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 0, Height = 0 },
-                    Thumbnail = new() { Width = 0, Height = 0 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1455,11 +1461,11 @@ public class ApplicationMoveAssetsTests
             {
                 FolderId = folderId2,
                 Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1495,11 +1501,11 @@ public class ApplicationMoveAssetsTests
                 {
                     FolderId = folder.Id,
                     Folder = folder,
-                    FileName = "NonExistentFile.jpg",
+                    FileName = FileNames.NON_EXISTENT_FILE_JPG,
                     Pixel = new()
                     {
-                        Asset = new() { Width = 0, Height = 0 },
-                        Thumbnail = new() { Width = 0, Height = 0 }
+                        Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                        Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                     },
                     Hash = string.Empty
                 }
@@ -1525,14 +1531,14 @@ public class ApplicationMoveAssetsTests
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "NonExistentFile.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.NON_EXISTENT_FILE_JPG);
 
             Assert.That(File.Exists(sourceFilePath), Is.False);
             Assert.That(File.Exists(destinationFilePath), Is.False);
@@ -1544,11 +1550,11 @@ public class ApplicationMoveAssetsTests
             {
                 FolderId = sourceFolder.Id,
                 Folder = sourceFolder,
-                FileName = "NonExistentFile.jpg",
+                FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 0, Height = 0 },
-                    Thumbnail = new() { Width = 0, Height = 0 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                 },
                 Hash = string.Empty
             };

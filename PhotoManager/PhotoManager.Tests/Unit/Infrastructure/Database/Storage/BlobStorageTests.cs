@@ -1,4 +1,7 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.Storage;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.Storage;
 
 [TestFixture]
 public class BlobStorageTests
@@ -12,7 +15,7 @@ public class BlobStorageTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -31,7 +34,11 @@ public class BlobStorageTests
     [TestCase("f1f00403-0554-4201-9b6b-11a6b4cea3a9.bin", 7, "1336.JPG")]
     public void ReadFromBinaryFile_FileExists_ReturnsDeserializedObject(string blobFileName, int countExpected, string keyContained)
     {
-        string blobFilePath = Path.Combine(_dataDirectory!, "TestBackup\\v1.0", _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobFileName);
+        string blobFilePath = Path.Combine(
+            _dataDirectory!,
+            Directories.TEST_BACKUP,
+            Constants.DATABASE_END_PATH,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobFileName);
 
         Dictionary<string, byte[]>? deserializedObject = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 
@@ -44,7 +51,12 @@ public class BlobStorageTests
     [Test]
     public void ReadFromBinaryFile_FileDoesNotExist_ReturnsNull()
     {
-        string blobFilePath = Path.Combine(_dataDirectory!, "TestBackup\\v1.0\\Blobs\\eacd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
+        string blobFilePath = Path.Combine(
+            _dataDirectory!,
+            Directories.TEST_BACKUP,
+            Constants.DATABASE_END_PATH,
+            _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+            "eacd6c1b-d432-4424-9498-8c4c8d8940dd.bin");
 
         Dictionary<string, byte[]>? result = _blobStorage!.ReadFromBinaryFile(blobFilePath);
 
@@ -78,8 +90,8 @@ public class BlobStorageTests
         {
             Dictionary<string, byte[]> data = new()
             {
-                { "Image1.jpg", [1, 2, 3]},
-                { "Image2.png", [4, 5, 6]}
+                { FileNames.IMAGE1_JPG, [1, 2, 3]},
+                { FileNames.IMAGE_2_PNG, [4, 5, 6]}
             };
 
             _blobStorage!.WriteToBinaryFile(data, binaryFilePath);
@@ -89,8 +101,8 @@ public class BlobStorageTests
             Dictionary<string, byte[]>? dataRead = _blobStorage!.ReadFromBinaryFile(binaryFilePath);
             Assert.That(dataRead, Is.Not.Null);
             Assert.That(dataRead!, Has.Count.EqualTo(data.Count));
-            Assert.That(dataRead["Image1.jpg"], Is.EqualTo(data["Image1.jpg"]).AsCollection);
-            Assert.That(dataRead["Image2.png"], Is.EqualTo(data["Image2.png"]).AsCollection);
+            Assert.That(dataRead[FileNames.IMAGE1_JPG], Is.EqualTo(data[FileNames.IMAGE1_JPG]).AsCollection);
+            Assert.That(dataRead[FileNames.IMAGE_2_PNG], Is.EqualTo(data[FileNames.IMAGE_2_PNG]).AsCollection);
         }
         finally
         {
@@ -146,8 +158,8 @@ public class BlobStorageTests
     {
         Dictionary<string, byte[]> data = new()
         {
-            { "Image1.jpg", [1, 2, 3]},
-            { "Image2.png", [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3]},
+            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
         };
 
         UnauthorizedAccessException? exception = Assert.Throws<UnauthorizedAccessException>(() => _blobStorage!.WriteToBinaryFile(data, _dataDirectory!));
@@ -162,8 +174,8 @@ public class BlobStorageTests
 
         Dictionary<string, byte[]> data = new()
         {
-            { "Image1.jpg", [1, 2, 3]},
-            { "Image2.png", [4, 5, 6]}
+            { FileNames.IMAGE1_JPG, [1, 2, 3]},
+            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
         };
 
         ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _blobStorage!.WriteToBinaryFile(data, binaryFilePath!));

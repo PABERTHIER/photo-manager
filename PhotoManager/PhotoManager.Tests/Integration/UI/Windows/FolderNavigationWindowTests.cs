@@ -3,6 +3,15 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.UI.Windows;
 
@@ -14,8 +23,6 @@ public class FolderNavigationWindowTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private FolderNavigationViewModel? _folderNavigationViewModel;
     private ApplicationViewModel? _applicationViewModel;
@@ -29,9 +36,9 @@ public class FolderNavigationWindowTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -41,21 +48,21 @@ public class FolderNavigationWindowTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -66,21 +73,21 @@ public class FolderNavigationWindowTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -91,21 +98,21 @@ public class FolderNavigationWindowTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -116,21 +123,21 @@ public class FolderNavigationWindowTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -181,8 +188,8 @@ public class FolderNavigationWindowTests
     [Test]
     public async Task ConstructorAndFolderTreeViewFolderSelectedAndConfirmAndCancel_CataloguedAssets_PerformsCorrectly()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string otherDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2", "Toto");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string otherDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2, Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -218,7 +225,7 @@ public class FolderNavigationWindowTests
             _asset4 = _asset4!.WithFolder(folder!);
 
             const string expectedStatusMessage = "The catalog process has ended.";
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
 
@@ -422,7 +429,7 @@ public class FolderNavigationWindowTests
     [Test]
     public void Constructor_SourceFolderAndLastSelectedFolderIsSourceAndRecentTargetPaths_SetsSelectedPathWithMoveAssetsLastSelectedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -444,7 +451,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -485,7 +492,7 @@ public class FolderNavigationWindowTests
     [Test]
     public void Constructor_SourceFolderAndLastSelectedFolderIsSourceAndNoRecentTargetPaths_SetsSelectedPathWithMoveAssetsLastSelectedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -506,7 +513,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -547,8 +554,8 @@ public class FolderNavigationWindowTests
     [Test]
     public void Constructor_SourceFolderAndLastSelectedFolderIsNotSourceAndNoRecentTargetPaths_SetsSelectedPathWithMoveAssetsLastSelectedFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
-        string otherDirectory = Path.Combine(_dataDirectory!, "Toto");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string otherDirectory = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -570,7 +577,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder2, folder1, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -611,7 +618,7 @@ public class FolderNavigationWindowTests
     [Test]
     public void Constructor_SourceFolderAndLastSelectedFolderIsNullAndNoRecentTargetPaths_SetsSelectedPathWithSourceFolder()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -630,7 +637,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, null, folder, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -671,7 +678,7 @@ public class FolderNavigationWindowTests
     [Test]
     public void Constructor_SourceFolderIsNullAndLastSelectedFolderIsNullAndNoRecentTargetPaths_ThrowsNullReferenceException()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -688,7 +695,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, null, null, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => Init());
 
@@ -728,7 +735,7 @@ public class FolderNavigationWindowTests
     [Test]
     public void FolderTreeViewFolderSelected_SourceFolderAndLastSelectedFolderIsSourceAndRecentTargetPaths_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -750,7 +757,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
             string selectedPath = Init();
@@ -814,7 +821,7 @@ public class FolderNavigationWindowTests
     [Test]
     public void FolderTreeViewFolderSelected_SourceFolderAndLastSelectedFolderIsSourceAndNoRecentTargetPaths_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -835,7 +842,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
             string selectedPath = Init();
@@ -899,8 +906,8 @@ public class FolderNavigationWindowTests
     [Test]
     public void FolderTreeViewFolderSelected_SourceFolderAndLastSelectedFolderIsNotSourceAndNoRecentTargetPaths_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
-        string otherDirectory = Path.Combine(_dataDirectory!, "Toto");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string otherDirectory = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -922,7 +929,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder2, folder1, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
 
             string selectedPath = Init();
@@ -986,7 +993,7 @@ public class FolderNavigationWindowTests
     [Test]
     public void FolderTreeViewFolderSelected_SourceFolderAndLastSelectedFolderIsNullAndNoRecentTargetPaths_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1005,7 +1012,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, null, folder, false, []);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = assetsDirectory };
 
             string selectedPath = Init();
@@ -1069,8 +1076,8 @@ public class FolderNavigationWindowTests
     [Test]
     public void FolderTreeViewFolderSelected_SourceFolderPathEndsWithAntiSlash_SetsTargetPath()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder\\");
-        string expectedTargetPath = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.TEMP_EMPTY_FOLDER}\\");
+        string expectedTargetPath = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1092,7 +1099,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = expectedTargetPath };
 
             string selectedPath = Init();
@@ -1160,7 +1167,7 @@ public class FolderNavigationWindowTests
     [TestCase("     ")]
     public void FolderTreeViewFolderSelected_SourceFolderPathHasWrongValue_SetsTargetPath(string sourceFolderPath)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1182,7 +1189,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = null!;
 
             string selectedPath = Init();
@@ -1246,8 +1253,8 @@ public class FolderNavigationWindowTests
     [Test]
     public void ConfirmAndCancel_SourceFolderAndLastSelectedFolderIsNotSourceAndRecentTargetPaths_UpdatesHasConfirmed()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
-        string otherDirectory = Path.Combine(_dataDirectory!, "Toto");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string otherDirectory = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1270,7 +1277,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder2, folder1, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
             Folder expectedSelectedFolder = new() { Id = Guid.NewGuid(), Path = otherDirectory };
 
             string selectedPath = Init();
@@ -1355,7 +1362,7 @@ public class FolderNavigationWindowTests
     [Test]
     public void ConfirmAndCancel_SourceFolderAndLastSelectedFolderIsSourceAndRecentTargetPaths_DoesNotUpdateHasConfirmed()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1377,7 +1384,7 @@ public class FolderNavigationWindowTests
 
             CheckBeforeChanges(assetsDirectory, folder, folder, false, [..recentTargetPaths]);
 
-            string expectedAppTitle = $"PhotoManager v1.0.0 - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 0 of 0 - sorted by file name ascending";
 
             string selectedPath = Init();
 
@@ -1503,7 +1510,7 @@ public class FolderNavigationWindowTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentAsset, Is.Null);
 
@@ -1523,7 +1530,7 @@ public class FolderNavigationWindowTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CanGoToNextAsset, Is.False);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
         // From FolderNavigationViewModel
         if (expectedSourceFolder != null)
@@ -1623,7 +1630,7 @@ public class FolderNavigationWindowTests
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
         // From FolderNavigationViewModel
         if (expectedSourceFolder != null)

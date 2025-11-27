@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseReadObjectListTests
@@ -14,12 +16,11 @@ public class DatabaseReadObjectListTests
     private string? _csvUnescapedTextWithPipe;
     private string? _csvSomeUnescapedTextWithPipe;
     private string? _csvInvalid;
-    private const char SEMICOLON_SEPARATOR = ';';
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -63,19 +64,19 @@ public class DatabaseReadObjectListTests
         string csv = csvType == "EscapedText" ? _csvEscapedTextWithSemicolon! : _csvUnescapedTextWithSemicolon!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
         {
-            List<Asset> assets = ReadObjectList(directoryPath, SEMICOLON_SEPARATOR, filePath, csv, tableName, escapeText);
+            List<Asset> assets = ReadObjectList(directoryPath, Constants.SEMICOLON_SEPARATOR, filePath, csv, tableName, escapeText);
 
             Asserts(assets, filePath, csv);
         }
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -87,7 +88,7 @@ public class DatabaseReadObjectListTests
         string csv = csvType == "EscapedText" ? _csvEscapedTextWithPipe! : _csvUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -99,7 +100,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -109,7 +110,7 @@ public class DatabaseReadObjectListTests
         string csv = _csvEscapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
@@ -133,7 +134,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -143,7 +144,7 @@ public class DatabaseReadObjectListTests
         string csv = _csvUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -163,7 +164,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -173,7 +174,7 @@ public class DatabaseReadObjectListTests
         string csv = _csvSomeUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -214,7 +215,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -224,7 +225,7 @@ public class DatabaseReadObjectListTests
         string csv = _csvUnescapedTextWithPipe!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -265,7 +266,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -277,7 +278,7 @@ public class DatabaseReadObjectListTests
         string? csv = null;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -289,7 +290,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -301,7 +302,7 @@ public class DatabaseReadObjectListTests
         string csv = string.Empty;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
 
         try
@@ -313,7 +314,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -325,7 +326,7 @@ public class DatabaseReadObjectListTests
         string csv = _csvInvalid!;
 
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
@@ -345,7 +346,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -354,7 +355,7 @@ public class DatabaseReadObjectListTests
     {
         string csv = _csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         Func<string[], Asset>? nullFunc = null;
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
@@ -385,7 +386,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -394,7 +395,7 @@ public class DatabaseReadObjectListTests
     {
         string csv = _csvUnescapedTextWithPipe!;
         string tableName = "assets" + Guid.NewGuid();
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         string filePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, tableName + ".db");
         string exceptionMessage = $"Error while trying to read data table {tableName}.\n" +
             $"DataDirectory: {directoryPath}\n" +
@@ -428,7 +429,7 @@ public class DatabaseReadObjectListTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 

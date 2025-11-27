@@ -1,6 +1,13 @@
 ﻿using PhotoManager.UI.Models;
 using System.ComponentModel;
 using System.Windows;
+using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Unit.UI.ViewModels.FindDuplicatedAssetsVM;
 
@@ -10,7 +17,6 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
     private AssetRepository? _assetRepository;
@@ -26,9 +32,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -38,11 +44,11 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             FolderId = Guid.Empty, // Set in each tests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             Hash = string.Empty, // Set in each tests
             ImageData = new(),
@@ -63,11 +69,11 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             FolderId = Guid.Empty, // Set in each tests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = "Image 2.jpg",
+            FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
             },
             Hash = string.Empty, // Set in each tests
             ImageData = new(),
@@ -88,11 +94,11 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             FolderId = Guid.Empty, // Set in each tests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = "Image 3.jpg",
+            FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_3_JPG, Height = PixelHeightAsset.IMAGE_3_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
             },
             Hash = string.Empty, // Set in each tests
             ImageData = new(),
@@ -113,11 +119,11 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             FolderId = Guid.Empty, // Set in each tests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = "Image 4.jpg",
+            FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_4_JPG, Height = PixelHeightAsset.IMAGE_4_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_4_JPG, Height = ThumbnailHeightAsset.IMAGE_4_JPG }
             },
             Hash = string.Empty, // Set in each tests
             ImageData = new(),
@@ -138,13 +144,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             FolderId = Guid.Empty, // Set in each tests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = "Image 5.jpg",
-            Pixel =
-                new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
+            FileName = FileNames.IMAGE_5_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_5_JPG, Height = PixelHeightAsset.IMAGE_5_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
+            },
             Hash = string.Empty, // Set in each tests
             ImageData = new(),
             FileProperties = new()
@@ -164,13 +169,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             FolderId = Guid.Empty, // Set in each tests
             Folder = new() { Id = Guid.Empty, Path = "" }, // Set in each tests
-            FileName = "Image 5.jpg",
-            Pixel =
-                new()
-                {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
-                },
+            FileName = FileNames.IMAGE_5_JPG,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_5_JPG, Height = PixelHeightAsset.IMAGE_5_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
+            },
             Hash = string.Empty, // Set in each tests
             ImageData = new(),
             FileProperties = new()
@@ -244,16 +248,16 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            string folder1Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string folder2Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
             Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
 
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
-            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+            const string hash1 = Hashes.IMAGE_1_JPG;
+            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+            const string hash3 = Hashes.IMAGE_5_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
             _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
@@ -422,16 +426,16 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            string folder1Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string folder2Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
             Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
 
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
-            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+            const string hash1 = Hashes.IMAGE_1_JPG;
+            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+            const string hash3 = Hashes.IMAGE_5_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
             _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
@@ -607,16 +611,16 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            string folder1Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string folder2Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
             Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
 
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
-            const string hash3 = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4";
+            const string hash1 = Hashes.IMAGE_1_JPG;
+            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
+            const string hash3 = Hashes.IMAGE_5_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
             _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
@@ -771,15 +775,15 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            string folder1Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string folder2Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
             Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
 
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash1 = Hashes.IMAGE_1_JPG;
+            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
             _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
@@ -922,15 +926,15 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            string folder1Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string folder2Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
             Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
 
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash1 = Hashes.IMAGE_1_JPG;
+            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
             _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
@@ -1065,14 +1069,14 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            string folder1Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string folder2Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
             Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset2 = _asset2.WithFolder(folder3).WithHash(hash);
@@ -1183,14 +1187,14 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string folder1Directory = Path.Combine(_dataDirectory!, "Folder1");
-            string folder2Directory = Path.Combine(_dataDirectory!, "Folder2");
+            string folder1Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
+            string folder2Directory = Path.Combine(_dataDirectory!, Directories.FOLDER_2);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(folder1Directory);
             Folder folder3 = _assetRepository!.AddFolder(folder2Directory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset2 = _asset2.WithFolder(folder3).WithHash(hash);
@@ -1301,12 +1305,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
@@ -1397,12 +1401,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
@@ -1498,12 +1502,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
@@ -1599,12 +1603,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
@@ -1695,12 +1699,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
@@ -1796,12 +1800,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
@@ -1892,12 +1896,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
@@ -1978,12 +1982,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
@@ -2069,12 +2073,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
@@ -2155,12 +2159,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
@@ -2249,7 +2253,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset5 = _asset5.WithFolder(folder).WithHash(hash);
             _asset6 = _asset6.WithFolder(folder).WithHash(hash);
@@ -2331,7 +2335,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset5 = _asset5.WithFolder(folder).WithHash(hash);
             _asset6 = _asset6.WithFolder(folder).WithHash(hash);
@@ -2410,12 +2414,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
@@ -2507,12 +2511,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
@@ -2606,12 +2610,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
@@ -2703,12 +2707,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
@@ -2802,7 +2806,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
-            const string hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+            const string hash = Hashes.IMAGE_1_JPG;
 
             _asset2 = _asset2.WithFolder(folder).WithHash(hash);
             _asset4 = _asset4.WithFolder(folder).WithHash(hash);
@@ -2952,13 +2956,13 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         {
             CheckBeforeChanges();
 
-            string otherDirectory = Path.Combine(_dataDirectory!, "Folder1");
+            string otherDirectory = Path.Combine(_dataDirectory!, Directories.FOLDER_1);
 
             Folder folder1 = _assetRepository!.AddFolder(_dataDirectory!);
             Folder folder2 = _assetRepository!.AddFolder(otherDirectory);
 
-            const string hash1 = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-            const string hash2 = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
+            const string hash1 = Hashes.IMAGE_1_JPG;
+            const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
 
             _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
             _asset3 = _asset3.WithFolder(folder2).WithHash(hash1);

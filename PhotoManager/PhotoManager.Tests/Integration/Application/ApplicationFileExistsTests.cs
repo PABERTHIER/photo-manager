@@ -1,4 +1,7 @@
-﻿namespace PhotoManager.Tests.Integration.Application;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+
+namespace PhotoManager.Tests.Integration.Application;
 
 [TestFixture]
 public class ApplicationFileExistsTests
@@ -6,16 +9,15 @@ public class ApplicationFileExistsTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -57,7 +59,7 @@ public class ApplicationFileExistsTests
 
         try
         {
-            string fullPath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string fullPath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
             bool exists = _application!.FileExists(fullPath);
 
@@ -76,7 +78,7 @@ public class ApplicationFileExistsTests
 
         try
         {
-            string fullPath = Path.Combine(_dataDirectory!, "NonExistent.jpg");
+            string fullPath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
 
             bool exists = _application!.FileExists(fullPath);
 

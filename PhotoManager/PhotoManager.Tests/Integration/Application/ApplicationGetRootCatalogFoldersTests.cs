@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Integration.Application;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+
+namespace PhotoManager.Tests.Integration.Application;
 
 [TestFixture]
 public class ApplicationGetRootCatalogFoldersTests
@@ -6,7 +8,6 @@ public class ApplicationGetRootCatalogFoldersTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
@@ -14,9 +15,9 @@ public class ApplicationGetRootCatalogFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplication(string assetsDirectory)
@@ -47,8 +48,8 @@ public class ApplicationGetRootCatalogFoldersTests
     [Test]
     public async Task GetRootCatalogFolders_CataloguedAssets_ReturnsRootCatalogFolders()
     {
-        const string folderName = "NewFolder2";
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", folderName);
+        const string folderName = Directories.NEW_FOLDER_2;
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, folderName);
 
         ConfigureApplication(assetsDirectory);
 
@@ -88,7 +89,7 @@ public class ApplicationGetRootCatalogFoldersTests
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
             Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
-            Assert.That(folder.Name, Is.EqualTo("TestFiles"));
+            Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
             Assert.That(_assetRepository!.HasChanges(), Is.True);
 
@@ -125,7 +126,7 @@ public class ApplicationGetRootCatalogFoldersTests
             Folder? folder = _assetRepository!.GetFolderByPath(_dataDirectory!);
             Assert.That(folder, Is.Not.Null);
             Assert.That(folder.Path, Is.EqualTo(_dataDirectory!));
-            Assert.That(folder.Name, Is.EqualTo("TestFiles"));
+            Assert.That(folder.Name, Is.EqualTo(Directories.TEST_FILES));
 
             Assert.That(folders, Has.Length.EqualTo(1));
             Assert.That(folders[0].Id, Is.EqualTo(folder.Id));

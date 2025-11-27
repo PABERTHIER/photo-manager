@@ -1,4 +1,13 @@
 ﻿using Reactive = System.Reactive;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.Application;
 
@@ -8,8 +17,6 @@ public class ApplicationGetAssetsByPathTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
@@ -25,9 +32,9 @@ public class ApplicationGetAssetsByPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -37,21 +44,21 @@ public class ApplicationGetAssetsByPathTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -62,21 +69,21 @@ public class ApplicationGetAssetsByPathTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -87,21 +94,21 @@ public class ApplicationGetAssetsByPathTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -112,21 +119,21 @@ public class ApplicationGetAssetsByPathTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -170,7 +177,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public async Task GetAssetsByPath_ValidDirectoryAndFolderExists_ReturnsAssetsArray()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -264,10 +271,10 @@ public class ApplicationGetAssetsByPathTests
     public async Task GetAssetsByPath_ValidDirectoryAndFolderExistsAndNavigateAmongDifferentDirectories_ReturnsAssetsArrays(bool analyseVideos)
     {
         string rootDirectory = _dataDirectory!;
-        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
-        string duplicatesNewFolder1Directory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
-        string duplicatesNewFolder2Directory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string testFolderDirectory = Path.Combine(_dataDirectory!, "TestFolder");
+        string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
+        string duplicatesNewFolder1Directory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+        string duplicatesNewFolder2Directory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string testFolderDirectory = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
         ConfigureApplication(100, rootDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -293,51 +300,51 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsInRepository, Has.Length.EqualTo(20));
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(20));
 
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo("Homer.gif"));
-            Assert.That(assetsInRepository[1].FileName, Is.EqualTo("Image 1.jpg"));
-            Assert.That(assetsInRepository[2].FileName, Is.EqualTo("Image 10 portrait.png"));
-            Assert.That(assetsInRepository[3].FileName, Is.EqualTo("Image 1_180_deg.jpg"));
-            Assert.That(assetsInRepository[4].FileName, Is.EqualTo("Image 1_270_deg.jpg"));
-            Assert.That(assetsInRepository[5].FileName, Is.EqualTo("Image 1_90_deg.jpg"));
-            Assert.That(assetsInRepository[6].FileName, Is.EqualTo("Image 2 duplicated.jpg"));
-            Assert.That(assetsInRepository[7].FileName, Is.EqualTo("Image 2.jpg"));
-            Assert.That(assetsInRepository[8].FileName, Is.EqualTo("Image 3.jpg"));
-            Assert.That(assetsInRepository[9].FileName, Is.EqualTo("Image 4.jpg"));
-            Assert.That(assetsInRepository[10].FileName, Is.EqualTo("Image 5.jpg"));
-            Assert.That(assetsInRepository[11].FileName, Is.EqualTo("Image 6.jpg"));
-            Assert.That(assetsInRepository[12].FileName, Is.EqualTo("Image 7.jpg"));
-            Assert.That(assetsInRepository[13].FileName, Is.EqualTo("Image 8.jpeg"));
-            Assert.That(assetsInRepository[14].FileName, Is.EqualTo("Image 9.png"));
-            Assert.That(assetsInRepository[15].FileName, Is.EqualTo("Image_11.heic"));
-            Assert.That(assetsInRepository[16].FileName, Is.EqualTo("Image_11_180.heic"));
-            Assert.That(assetsInRepository[17].FileName, Is.EqualTo("Image_11_270.heic"));
-            Assert.That(assetsInRepository[18].FileName, Is.EqualTo("Image_11_90.heic"));
-            Assert.That(assetsInRepository[19].FileName, Is.EqualTo("IMAGE_WITH_UPPERCASE_NAME.JPG"));
+            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(FileNames.HOMER_GIF));
+            Assert.That(assetsInRepository[1].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
+            Assert.That(assetsInRepository[2].FileName, Is.EqualTo(FileNames.IMAGE_10_PORTRAIT_PNG));
+            Assert.That(assetsInRepository[3].FileName, Is.EqualTo(FileNames.IMAGE_1_180_DEG_JPG));
+            Assert.That(assetsInRepository[4].FileName, Is.EqualTo(FileNames.IMAGE_1_270_DEG_JPG));
+            Assert.That(assetsInRepository[5].FileName, Is.EqualTo(FileNames.IMAGE_1_90_DEG_JPG));
+            Assert.That(assetsInRepository[6].FileName, Is.EqualTo(FileNames.IMAGE_2_DUPLICATED_JPG));
+            Assert.That(assetsInRepository[7].FileName, Is.EqualTo(FileNames.IMAGE_2_JPG));
+            Assert.That(assetsInRepository[8].FileName, Is.EqualTo(FileNames.IMAGE_3_JPG));
+            Assert.That(assetsInRepository[9].FileName, Is.EqualTo(FileNames.IMAGE_4_JPG));
+            Assert.That(assetsInRepository[10].FileName, Is.EqualTo(FileNames.IMAGE_5_JPG));
+            Assert.That(assetsInRepository[11].FileName, Is.EqualTo(FileNames.IMAGE_6_JPG));
+            Assert.That(assetsInRepository[12].FileName, Is.EqualTo(FileNames.IMAGE_7_JPG));
+            Assert.That(assetsInRepository[13].FileName, Is.EqualTo(FileNames.IMAGE_8_JPEG));
+            Assert.That(assetsInRepository[14].FileName, Is.EqualTo(FileNames.IMAGE_9_PNG));
+            Assert.That(assetsInRepository[15].FileName, Is.EqualTo(FileNames.IMAGE_11_HEIC));
+            Assert.That(assetsInRepository[16].FileName, Is.EqualTo(FileNames.IMAGE_11_180_DEG_HEIC));
+            Assert.That(assetsInRepository[17].FileName, Is.EqualTo(FileNames.IMAGE_11_270_DEG_HEIC));
+            Assert.That(assetsInRepository[18].FileName, Is.EqualTo(FileNames.IMAGE_11_90_DEG_HEIC));
+            Assert.That(assetsInRepository[19].FileName, Is.EqualTo(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG));
 
             Asset[] assets = _application!.GetAssetsByPath(rootDirectory);
 
             Assert.That(assets, Has.Length.EqualTo(20));
 
-            Assert.That(assets[0].FileName, Is.EqualTo("Homer.gif"));
-            Assert.That(assets[1].FileName, Is.EqualTo("Image 1.jpg"));
-            Assert.That(assets[2].FileName, Is.EqualTo("Image 10 portrait.png"));
-            Assert.That(assets[3].FileName, Is.EqualTo("Image 1_180_deg.jpg"));
-            Assert.That(assets[4].FileName, Is.EqualTo("Image 1_270_deg.jpg"));
-            Assert.That(assets[5].FileName, Is.EqualTo("Image 1_90_deg.jpg"));
-            Assert.That(assets[6].FileName, Is.EqualTo("Image 2 duplicated.jpg"));
-            Assert.That(assets[7].FileName, Is.EqualTo("Image 2.jpg"));
-            Assert.That(assets[8].FileName, Is.EqualTo("Image 3.jpg"));
-            Assert.That(assets[9].FileName, Is.EqualTo("Image 4.jpg"));
-            Assert.That(assets[10].FileName, Is.EqualTo("Image 5.jpg"));
-            Assert.That(assets[11].FileName, Is.EqualTo("Image 6.jpg"));
-            Assert.That(assets[12].FileName, Is.EqualTo("Image 7.jpg"));
-            Assert.That(assets[13].FileName, Is.EqualTo("Image 8.jpeg"));
-            Assert.That(assets[14].FileName, Is.EqualTo("Image 9.png"));
-            Assert.That(assets[15].FileName, Is.EqualTo("Image_11.heic"));
-            Assert.That(assets[16].FileName, Is.EqualTo("Image_11_180.heic"));
-            Assert.That(assets[17].FileName, Is.EqualTo("Image_11_270.heic"));
-            Assert.That(assets[18].FileName, Is.EqualTo("Image_11_90.heic"));
-            Assert.That(assets[19].FileName, Is.EqualTo("IMAGE_WITH_UPPERCASE_NAME.JPG"));
+            Assert.That(assets[0].FileName, Is.EqualTo(FileNames.HOMER_GIF));
+            Assert.That(assets[1].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
+            Assert.That(assets[2].FileName, Is.EqualTo(FileNames.IMAGE_10_PORTRAIT_PNG));
+            Assert.That(assets[3].FileName, Is.EqualTo(FileNames.IMAGE_1_180_DEG_JPG));
+            Assert.That(assets[4].FileName, Is.EqualTo(FileNames.IMAGE_1_270_DEG_JPG));
+            Assert.That(assets[5].FileName, Is.EqualTo(FileNames.IMAGE_1_90_DEG_JPG));
+            Assert.That(assets[6].FileName, Is.EqualTo(FileNames.IMAGE_2_DUPLICATED_JPG));
+            Assert.That(assets[7].FileName, Is.EqualTo(FileNames.IMAGE_2_JPG));
+            Assert.That(assets[8].FileName, Is.EqualTo(FileNames.IMAGE_3_JPG));
+            Assert.That(assets[9].FileName, Is.EqualTo(FileNames.IMAGE_4_JPG));
+            Assert.That(assets[10].FileName, Is.EqualTo(FileNames.IMAGE_5_JPG));
+            Assert.That(assets[11].FileName, Is.EqualTo(FileNames.IMAGE_6_JPG));
+            Assert.That(assets[12].FileName, Is.EqualTo(FileNames.IMAGE_7_JPG));
+            Assert.That(assets[13].FileName, Is.EqualTo(FileNames.IMAGE_8_JPEG));
+            Assert.That(assets[14].FileName, Is.EqualTo(FileNames.IMAGE_9_PNG));
+            Assert.That(assets[15].FileName, Is.EqualTo(FileNames.IMAGE_11_HEIC));
+            Assert.That(assets[16].FileName, Is.EqualTo(FileNames.IMAGE_11_180_DEG_HEIC));
+            Assert.That(assets[17].FileName, Is.EqualTo(FileNames.IMAGE_11_270_DEG_HEIC));
+            Assert.That(assets[18].FileName, Is.EqualTo(FileNames.IMAGE_11_90_DEG_HEIC));
+            Assert.That(assets[19].FileName, Is.EqualTo(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG));
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(40));
 
@@ -367,13 +374,13 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsInRepository, Has.Length.EqualTo(1));
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(41));
 
-            Assert.That(assetsInRepository[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(assetsInRepository[0].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
 
             assets = _application!.GetAssetsByPath(duplicatesNewFolder1Directory);
 
             Assert.That(assets, Has.Length.EqualTo(1));
 
-            Assert.That(assets[0].FileName, Is.EqualTo("Image 1.jpg"));
+            Assert.That(assets[0].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
 
             _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(42));
 
@@ -432,13 +439,13 @@ public class ApplicationGetAssetsByPathTests
                 Assert.That(assetsInRepository, Has.Length.EqualTo(1));
                 _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(51));
 
-                Assert.That(assetsInRepository[0].FileName, Is.EqualTo("Homer.jpg"));
+                Assert.That(assetsInRepository[0].FileName, Is.EqualTo(FileNames.HOMER_JPG));
 
                 assets = _application!.GetAssetsByPath(outputVideoFirstFrameDirectory);
 
                 Assert.That(assets, Has.Length.EqualTo(1));
 
-                Assert.That(assets[0].FileName, Is.EqualTo("Homer.jpg"));
+                Assert.That(assets[0].FileName, Is.EqualTo(FileNames.HOMER_JPG));
 
                 _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(52));
             }
@@ -449,28 +456,28 @@ public class ApplicationGetAssetsByPathTests
                 _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(50));
             }
 
-            CheckThumbnail(rootDirectory, "Homer.gif", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 1.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 10 portrait.png", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 1_180_deg.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 1_270_deg.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 1_90_deg.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 2 duplicated.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 2.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 3.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 4.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 5.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 6.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 7.jpg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 8.jpeg", 200, 112);
-            CheckThumbnail(rootDirectory, "Image 9.png", 200, 112);
-            CheckThumbnail(rootDirectory, "Image_11.heic", 200, 112);
-            CheckThumbnail(rootDirectory, "Image_11_180.heic", 200, 112);
-            CheckThumbnail(rootDirectory, "Image_11_270.heic", 200, 112);
-            CheckThumbnail(rootDirectory, "Image_11_90.heic", 200, 112);
-            CheckThumbnail(rootDirectory, "IMAGE_WITH_UPPERCASE_NAME.JPG", 200, 112);
+            CheckThumbnail(rootDirectory, FileNames.HOMER_GIF, ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_10_PORTRAIT_PNG, ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG, ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_180_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG, ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_270_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG, ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_1_90_DEG_JPG, ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG, ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_2_DUPLICATED_JPG, ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_2_JPG, ThumbnailWidthAsset.IMAGE_2_JPG, ThumbnailHeightAsset.IMAGE_2_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_3_JPG, ThumbnailWidthAsset.IMAGE_3_JPG, ThumbnailHeightAsset.IMAGE_3_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_4_JPG, ThumbnailWidthAsset.IMAGE_4_JPG, ThumbnailHeightAsset.IMAGE_4_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_5_JPG, ThumbnailWidthAsset.IMAGE_5_JPG, ThumbnailHeightAsset.IMAGE_5_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_6_JPG, ThumbnailWidthAsset.IMAGE_6_JPG, ThumbnailHeightAsset.IMAGE_6_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_7_JPG, ThumbnailWidthAsset.IMAGE_7_JPG, ThumbnailHeightAsset.IMAGE_7_JPG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_8_JPEG, ThumbnailWidthAsset.IMAGE_8_JPEG, ThumbnailHeightAsset.IMAGE_8_JPEG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_9_PNG, ThumbnailWidthAsset.IMAGE_9_PNG, ThumbnailHeightAsset.IMAGE_9_PNG);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_HEIC, ThumbnailWidthAsset.IMAGE_11_HEIC, ThumbnailHeightAsset.IMAGE_11_HEIC);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC);
+            CheckThumbnail(rootDirectory, FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailWidthAsset.IMAGE_WITH_UPPERCASE_NAME_JPG, ThumbnailHeightAsset.IMAGE_WITH_UPPERCASE_NAME_JPG);
 
-            CheckThumbnail(duplicatesNewFolder1Directory, "Image 1.jpg", 200, 112);
+            CheckThumbnail(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG, ThumbnailWidthAsset.IMAGE_1_JPG, ThumbnailHeightAsset.IMAGE_1_JPG);
 
             CheckThumbnail(duplicatesNewFolder2Directory, _asset1!.FileName, _asset1!.Pixel.Thumbnail.Width, _asset1!.Pixel.Thumbnail.Height);
             CheckThumbnail(duplicatesNewFolder2Directory, _asset2!.FileName, _asset2!.Pixel.Thumbnail.Width, _asset2!.Pixel.Thumbnail.Height);
@@ -479,7 +486,7 @@ public class ApplicationGetAssetsByPathTests
 
             if (analyseVideos)
             {
-                CheckThumbnail(outputVideoFirstFrameDirectory, "Homer.jpg", 200, 112);
+                CheckThumbnail(outputVideoFirstFrameDirectory, FileNames.HOMER_JPG, ThumbnailWidthAsset.HOMER_JPG, ThumbnailHeightAsset.HOMER_JPG);
             }
         }
         finally
@@ -496,7 +503,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public async Task GetAssetsByPath_ValidDirectoryAndFolderDoesNotExist_AddsFolderAndReturnsAssetsArray()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -526,21 +533,21 @@ public class ApplicationGetAssetsByPathTests
             {
                 FolderId = folder.Id,
                 Folder = folder,
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 FileProperties = new()
                 {
-                    Size = 29857,
+                    Size = FileSize.IMAGE_1_JPG,
                     Creation = DateTime.Now,
-                    Modification = new (2024, 06, 07, 08, 54, 37)
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = Rotation.Rotate0,
-                Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+                Hash = Hashes.IMAGE_1_JPG,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -578,7 +585,7 @@ public class ApplicationGetAssetsByPathTests
     [Test]
     public async Task GetAssetsByPath_ValidDirectoryAndFolderExistsButNoAsset_ReturnsEmptyArray()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -652,8 +659,8 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 
@@ -755,7 +762,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder1");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -815,8 +822,8 @@ public class ApplicationGetAssetsByPathTests
                 { _asset2!.FileName, assetData2 }
             };
 
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
@@ -881,8 +888,8 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
@@ -937,7 +944,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
             byte[] assetData = [1, 2, 3];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -981,7 +988,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
             Guid folderId = Guid.NewGuid();
             Folder folder = new() { Id = folderId, Path = folderPath };
 
@@ -1034,7 +1041,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
             _testableAssetRepository!.AddFolder(folderPath);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -1074,7 +1081,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
@@ -1128,7 +1135,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -1186,7 +1193,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder1");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -1252,8 +1259,8 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 

@@ -1,4 +1,11 @@
-﻿namespace PhotoManager.Tests.Integration.Application;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+
+namespace PhotoManager.Tests.Integration.Application;
 
 [TestFixture]
 public class ApplicationDeleteAssetsTests
@@ -6,7 +13,6 @@ public class ApplicationDeleteAssetsTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
     private MoveAssetsService? _moveAssetsService;
@@ -18,9 +24,9 @@ public class ApplicationDeleteAssetsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -58,7 +64,7 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public async Task DeleteAssets_AssetsAreValid_DeletesAssetsAndSavesCatalog()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplication(100, destinationDirectory, 200, 150, false, false, false, false);
 
@@ -66,8 +72,8 @@ public class ApplicationDeleteAssetsTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1FileName = "Image 6.jpg";
-            const string asset2FileName = "Image 1.jpg";
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
             string destinationFilePath1 = Path.Combine(destinationDirectory, asset1FileName);
@@ -131,7 +137,7 @@ public class ApplicationDeleteAssetsTests
     [Test]
     public async Task DeleteAssets_AssetIsValid_DeletesAssetAndSavesCatalog()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         ConfigureApplication(100, destinationDirectory, 200, 150, false, false, false, false);
 
@@ -139,7 +145,7 @@ public class ApplicationDeleteAssetsTests
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetFileName = "Image 1.jpg";
+            const string assetFileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath2 = Path.Combine(_dataDirectory!, assetFileName);
             string destinationFilePath2 = Path.Combine(destinationDirectory, assetFileName);
@@ -240,11 +246,11 @@ public class ApplicationDeleteAssetsTests
             {
                 FolderId = folderId1,
                 Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -253,11 +259,11 @@ public class ApplicationDeleteAssetsTests
             {
                 FolderId = folderId2,
                 Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 Hash = string.Empty
             };
@@ -290,11 +296,11 @@ public class ApplicationDeleteAssetsTests
             {
                 FolderId = folderId1,
                 Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -302,11 +308,11 @@ public class ApplicationDeleteAssetsTests
             {
                 FolderId = Guid.Empty,
                 Folder = folder!,
-                FileName = "NonExistentFile.jpg",
+                FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 0, Height = 0 },
-                    Thumbnail = new() { Width = 0, Height = 0 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -314,11 +320,11 @@ public class ApplicationDeleteAssetsTests
             {
                 FolderId = folderId2,
                 Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 Hash = string.Empty
             };
@@ -349,11 +355,11 @@ public class ApplicationDeleteAssetsTests
             {
                 FolderId = folder.Id,
                 Folder = folder,
-                FileName = "NonExistentFile.jpg",
+                FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 0, Height = 0 },
-                    Thumbnail = new() { Width = 0, Height = 0 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                 },
                 Hash = string.Empty
             };

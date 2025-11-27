@@ -1,6 +1,7 @@
 ﻿using PhotoManager.UI;
 using System.Reflection;
 using System.Reflection.Emit;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.UI.Windows;
 
@@ -12,16 +13,15 @@ public class AboutWindowTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplication(string assetsDirectory, string projectName, string projectOwner)
@@ -70,10 +70,10 @@ public class AboutWindowTests
             Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
             Assert.That(string.IsNullOrWhiteSpace(aboutInformation.Version), Is.False);
             Assert.That(aboutInformation.Version, Does.StartWith("v"));
-            Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
             string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
-            string expectedTitle = $"About {expectedProjectName} v1.0.0";
+            string expectedTitle = $"About {expectedProjectName} {Constants.VERSION}";
 
             Assert.That(title, Is.EqualTo(expectedTitle));
         }
@@ -95,10 +95,10 @@ public class AboutWindowTests
             Assert.That(aboutInformation.Product, Is.Not.EqualTo("PhotoManager"));
             Assert.That(aboutInformation.Product, Is.EqualTo("Microsoft® .NET"));
             Assert.That(aboutInformation.Author, Is.EqualTo("Toto"));
-            Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
             string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
-            const string expectedTitle = "About Microsoft® .NET v1.0.0";
+            const string expectedTitle = $"About Microsoft® .NET {Constants.VERSION}";
 
             Assert.That(title, Is.EqualTo(expectedTitle));
         }
@@ -124,10 +124,10 @@ public class AboutWindowTests
 
             Assert.That(aboutInformation.Product, Is.EqualTo(expectedProjectName));
             Assert.That(aboutInformation.Author, Is.EqualTo(expectedProjectOwner));
-            Assert.That(aboutInformation.Version, Is.EqualTo("v1.0.0"));
+            Assert.That(aboutInformation.Version, Is.EqualTo(Constants.VERSION));
 
             string title = $"About {aboutInformation.Product} {aboutInformation.Version}";
-            string expectedTitle = $"About {expectedProjectName} v1.0.0";
+            string expectedTitle = $"About {expectedProjectName} {Constants.VERSION}";
 
             Assert.That(title, Is.EqualTo(expectedTitle));
         }

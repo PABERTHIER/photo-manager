@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Unit;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+
+namespace PhotoManager.Tests.Unit;
 
 [TestFixture]
 public class ConfigurationMockExtensionsTests
@@ -29,12 +31,12 @@ public class ConfigurationMockExtensionsTests
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY), Is.EqualTo("C:\\Path"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.BACKUP_PATH), Is.EqualTo("C:\\Path\\To\\Backup"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH), Is.EqualTo("C:\\Path\\To\\FolderExempted"));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME), Is.EqualTo("OutputVideoFirstFrame"));
+        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME), Is.EqualTo(Directories.OUTPUT_VIDEO_FIRST_FRAME));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.PROJECT_NAME), Is.EqualTo("PhotoManager"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.PROJECT_OWNER), Is.EqualTo("Toto"));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.BACKUPS_TO_KEEP), Is.EqualTo(2));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.BLOBS_FOLDER_NAME), Is.EqualTo("Blobs"));
-        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME), Is.EqualTo("Tables"));
+        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.BLOBS_FOLDER_NAME), Is.EqualTo(Directories.BLOBS));
+        Assert.That(configuration.GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME), Is.EqualTo(Directories.TABLES));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR), Is.EqualTo("|"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION), Is.EqualTo("1.0"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.ASSETS_TABLE_NAME), Is.EqualTo("Assets"));

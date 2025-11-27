@@ -17,8 +17,8 @@ public class FileNameConverterTests
         FileNameConverter fileNameConverter = new();
         Asset asset = new()
         {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+            FolderId = Guid.Empty,
+            Folder = new() { Id = Guid.Empty, Path = "" },
             FileName = name,
             Pixel = new()
             {

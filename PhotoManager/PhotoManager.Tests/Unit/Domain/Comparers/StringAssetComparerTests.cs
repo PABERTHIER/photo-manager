@@ -1,4 +1,5 @@
 ﻿using PhotoManager.Domain.Comparers;
+using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 
 namespace PhotoManager.Tests.Unit.Domain.Comparers;
 
@@ -19,7 +20,7 @@ public class StringAssetComparerTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Guid folderId = Guid.NewGuid();
 

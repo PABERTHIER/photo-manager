@@ -1,6 +1,15 @@
 ﻿using PhotoManager.UI.Models;
 using System.ComponentModel;
 using System.Windows;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.FindDuplicatedAssetsVM;
 
@@ -10,8 +19,6 @@ public class FindDuplicatedAssetsViewModelTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
     private ApplicationViewModel? _applicationViewModel;
@@ -28,9 +35,9 @@ public class FindDuplicatedAssetsViewModelTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -42,21 +49,21 @@ public class FindDuplicatedAssetsViewModelTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -68,21 +75,21 @@ public class FindDuplicatedAssetsViewModelTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             ImageData = new(),
             Metadata = new()
             {
@@ -94,21 +101,21 @@ public class FindDuplicatedAssetsViewModelTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = new(),
             Metadata = new()
             {
@@ -120,21 +127,21 @@ public class FindDuplicatedAssetsViewModelTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -145,21 +152,21 @@ public class FindDuplicatedAssetsViewModelTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -170,21 +177,21 @@ public class FindDuplicatedAssetsViewModelTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -240,8 +247,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndOneDuplicatesSet_SetsDuplicates()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -346,8 +353,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndNoDuplicates_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NotDuplicate", "Sample1");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -419,8 +426,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task SetDuplicates_NoCataloguedAssets_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -492,8 +499,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task Refresh_DuplicatesAndPreviousDuplicatedAssetSets_SetsDuplicatedAssetSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -637,8 +644,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task Refresh_CataloguedAssetsAndDuplicatesAndNoPreviousDuplicatedAssetSets_SetsDuplicatedAssetSets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -736,8 +743,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task Refresh_CataloguedAssetsAndNoDuplicates_SetsDuplicatedAssetSetsToEmpty()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NotDuplicate", "Sample1");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -805,8 +812,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task Refresh_NoCataloguedAssets_SetsDuplicatedAssetSetsToEmpty()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -874,8 +881,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task CollapseAssets_CataloguedAssetsAndCollapseAllDuplicatedAsset_CollapsesAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -990,8 +997,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task CollapseAssets_CataloguedAssetsAndCollapseCurrentDuplicatedAsset_CollapsesAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1101,8 +1108,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task CollapseAssets_CataloguedAssetsAndCollapseNotCurrentDuplicatedAsset_CollapsesAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1212,8 +1219,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task CollapseAssets_NoCataloguedAssets_DoesNothing()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1281,8 +1288,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsAndCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1394,8 +1401,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsAndNotCurrentDuplicatedAsset_ReturnsOtherDuplicatedAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1507,8 +1514,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsAndNoDuplicates_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NotDuplicate", "Sample1");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1576,8 +1583,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetDuplicatedAssets_NoCataloguedAssets_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1643,8 +1650,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndOneMatchingDuplicatesInExemptedFolder_ReturnsOtherDuplicatedAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1661,8 +1668,8 @@ public class FindDuplicatedAssetsViewModelTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 9.png");
-            string imagePath1ToCopy = Path.Combine(exemptedFolderPath, "Image 9.png");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_9_PNG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
 
@@ -1784,8 +1791,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndTwoSameMatchingDuplicatesInExemptedFolder_ReturnsOtherDuplicatedAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1802,9 +1809,9 @@ public class FindDuplicatedAssetsViewModelTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath1ToCopy = Path.Combine(exemptedFolderPath, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(exemptedFolderPath, "Image 1_duplicate.jpg");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_1_DUPLICATE_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath1, imagePath2ToCopy);
@@ -1947,8 +1954,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndOneMatchingDuplicateInExemptedFolder_ReturnsOtherDuplicatedAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -1965,8 +1972,8 @@ public class FindDuplicatedAssetsViewModelTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath1ToCopy = Path.Combine(exemptedFolderPath, "Image 1.jpg");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
 
@@ -2097,8 +2104,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndNoMatchingDuplicatesInExemptedFolder_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -2115,8 +2122,8 @@ public class FindDuplicatedAssetsViewModelTests
 
             Directory.CreateDirectory(exemptedFolderPath);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 2.jpg");
-            string imagePath1ToCopy = Path.Combine(exemptedFolderPath, "Image 2.jpg");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_2_JPG);
+            string imagePath1ToCopy = Path.Combine(exemptedFolderPath, FileNames.IMAGE_2_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
 
@@ -2221,8 +2228,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndDuplicatesAndNoAssetsInExemptedFolder_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -2337,8 +2344,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndNoDuplicates_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NotDuplicate", "Sample1");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -2411,8 +2418,8 @@ public class FindDuplicatedAssetsViewModelTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_NoCataloguedAssets_ReturnsEmptyList()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
-        string exemptedFolderPath = Path.Combine(assetsDirectory, "Folder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
+        string exemptedFolderPath = Path.Combine(assetsDirectory, Directories.FOLDER_2);
 
         ConfigureFindDuplicatedAssetsViewModel(100, assetsDirectory, exemptedFolderPath, 200, 150, false, false, false, false);
 

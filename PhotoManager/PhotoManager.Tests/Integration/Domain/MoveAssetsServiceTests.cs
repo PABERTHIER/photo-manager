@@ -1,4 +1,11 @@
-﻿namespace PhotoManager.Tests.Integration.Domain;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+
+namespace PhotoManager.Tests.Integration.Domain;
 
 [TestFixture]
 public class MoveAssetsServiceTests
@@ -6,7 +13,6 @@ public class MoveAssetsServiceTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private MoveAssetsService? _moveAssetsService;
     private UserConfigurationService? _userConfigurationService;
@@ -20,9 +26,9 @@ public class MoveAssetsServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -47,16 +53,16 @@ public class MoveAssetsServiceTests
     [Test]
     public void MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsTrue_MoveSucceeds()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
-            string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_6_JPG);
+            string destinationFilePath1 = Path.Combine(destinationDirectory, FileNames.IMAGE_6_JPG);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath2 = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             Assert.That(File.Exists(sourceFilePath1), Is.True);
             Assert.That(File.Exists(destinationFilePath1), Is.False);
@@ -66,15 +72,15 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_6_JPG);
             Assert.That(asset1, Is.Not.Null);
-            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG);
             Assert.That(asset2, Is.Not.Null);
 
             _assetRepository!.SaveCatalog(sourceFolder);
             _assetRepository!.SaveCatalog(destinationFolder);
 
-            Asset[] assetsInSource= _assetRepository!.GetAssetsByPath(_dataDirectory!);
+            Asset[] assetsInSource = _assetRepository!.GetAssetsByPath(_dataDirectory!);
             Assert.That(assetsInSource, Is.Not.Empty);
             Assert.That(assetsInSource, Has.Length.EqualTo(2));
             Assert.That(assetsInSource.Any(x => x.FileName == asset1!.FileName), Is.True);
@@ -170,20 +176,20 @@ public class MoveAssetsServiceTests
     [Test]
     public void MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsFalse_MoveSucceeds()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
-            string newSourceFilePath1 = Path.Combine(sourceDirectory, "Image 6.jpg");
-            string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string newSourceFilePath2 = Path.Combine(sourceDirectory, "Image 1.jpg");
-            string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_6_JPG);
+            string newSourceFilePath1 = Path.Combine(sourceDirectory, FileNames.IMAGE_6_JPG);
+            string destinationFilePath1 = Path.Combine(destinationDirectory, FileNames.IMAGE_6_JPG);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string newSourceFilePath2 = Path.Combine(sourceDirectory, FileNames.IMAGE_1_JPG);
+            string destinationFilePath2 = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             Assert.That(File.Exists(sourceFilePath1), Is.True);
             Assert.That(File.Exists(destinationFilePath1), Is.False);
@@ -205,9 +211,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, FileNames.IMAGE_6_JPG);
             Assert.That(asset1, Is.Not.Null);
-            Asset? asset2 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(sourceDirectory, FileNames.IMAGE_1_JPG);
             Assert.That(asset2, Is.Not.Null);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -302,16 +308,16 @@ public class MoveAssetsServiceTests
     [Test]
     public void MoveAssets_AssetsAreValidAndDestinationFolderNotCataloguedAndPreserveOriginalFilesIsTrue_MoveSucceeds()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
-            string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_6_JPG);
+            string destinationFilePath1 = Path.Combine(destinationDirectory, FileNames.IMAGE_6_JPG);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath2 = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             Assert.That(File.Exists(sourceFilePath1), Is.True);
             Assert.That(File.Exists(destinationFilePath1), Is.False);
@@ -321,9 +327,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = destinationDirectory };
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_6_JPG);
             Assert.That(asset1, Is.Not.Null);
-            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG);
             Assert.That(asset2, Is.Not.Null);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -427,20 +433,20 @@ public class MoveAssetsServiceTests
     [Test]
     public void MoveAssets_AssetsAreValidAndDestinationFolderNotCataloguedAndPreserveOriginalFilesIsFalse_MoveSucceeds()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
-            string newSourceFilePath1 = Path.Combine(sourceDirectory, "Image 6.jpg");
-            string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string newSourceFilePath2 = Path.Combine(sourceDirectory, "Image 1.jpg");
-            string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_6_JPG);
+            string newSourceFilePath1 = Path.Combine(sourceDirectory, FileNames.IMAGE_6_JPG);
+            string destinationFilePath1 = Path.Combine(destinationDirectory, FileNames.IMAGE_6_JPG);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string newSourceFilePath2 = Path.Combine(sourceDirectory, FileNames.IMAGE_1_JPG);
+            string destinationFilePath2 = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             Assert.That(File.Exists(sourceFilePath1), Is.True);
             Assert.That(File.Exists(destinationFilePath1), Is.False);
@@ -462,9 +468,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
             Folder destinationFolder = new() { Id = Guid.NewGuid(), Path = destinationDirectory };
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, FileNames.IMAGE_6_JPG);
             Assert.That(asset1, Is.Not.Null);
-            Asset? asset2 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(sourceDirectory, FileNames.IMAGE_1_JPG);
             Assert.That(asset2, Is.Not.Null);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -563,7 +569,7 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_AssetIsValidButDirectoryIsInReadOnlyMode_ReturnFalseAndLogsItAndDoesNotMoveFile(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "NoMoveDirectory");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.NO_MOVE_DIRECTORY);
         LoggingAssertsService loggingAssertsService = new();
 
         try
@@ -573,8 +579,8 @@ public class MoveAssetsServiceTests
             // Deny write access to the directory
             DirectoryHelper.DenyWriteAccess(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             Assert.That(File.Exists(sourceFilePath), Is.True);
             Assert.That(File.Exists(destinationFilePath), Is.False);
@@ -582,7 +588,7 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 1.jpg");
+            Asset? asset = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG);
             Assert.That(asset, Is.Not.Null);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -672,20 +678,20 @@ public class MoveAssetsServiceTests
     [Test]
     public void MoveAssets_AssetIsInTheDestinationButNotInTheSourceAndPreserveOriginalFilesIsTrue_ThrowsFileNotFoundException()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
-            string newSourceFilePath1 = Path.Combine(sourceDirectory, "Image 6.jpg");
-            string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string newSourceFilePath2 = Path.Combine(sourceDirectory, "Image 1.jpg");
-            string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_6_JPG);
+            string newSourceFilePath1 = Path.Combine(sourceDirectory, FileNames.IMAGE_6_JPG);
+            string destinationFilePath1 = Path.Combine(destinationDirectory, FileNames.IMAGE_6_JPG);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string newSourceFilePath2 = Path.Combine(sourceDirectory, FileNames.IMAGE_1_JPG);
+            string destinationFilePath2 = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             Assert.That(File.Exists(sourceFilePath1), Is.True);
             Assert.That(File.Exists(destinationFilePath1), Is.False);
@@ -707,9 +713,9 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(sourceDirectory);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(sourceDirectory, FileNames.IMAGE_6_JPG);
             Assert.That(asset1, Is.Not.Null);
-            Asset? asset2 = _assetCreationService!.CreateAsset(destinationDirectory, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(destinationDirectory, FileNames.IMAGE_1_JPG);
             Assert.That(asset2, Is.Not.Null);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -808,16 +814,16 @@ public class MoveAssetsServiceTests
     [Test]
     public void MoveAssets_AssetsAreValidAndPreserveOriginalFilesIsTrueAndRecentTargetPathAlreadyAdded_MoveSucceeds()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
-            string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_6_JPG);
+            string destinationFilePath1 = Path.Combine(destinationDirectory, FileNames.IMAGE_6_JPG);
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath2 = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             Assert.That(File.Exists(sourceFilePath1), Is.True);
             Assert.That(File.Exists(destinationFilePath1), Is.False);
@@ -827,12 +833,12 @@ public class MoveAssetsServiceTests
             Folder sourceFolder = _assetRepository!.AddFolder(_dataDirectory!);
             Folder destinationFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            string fakeRecentTargetPath = Path.Combine(destinationDirectory, "fake");
+            string fakeRecentTargetPath = Path.Combine(destinationDirectory, Directories.FAKE);
             _assetRepository.SaveRecentTargetPaths([fakeRecentTargetPath, destinationDirectory]);
 
-            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 6.jpg");
+            Asset? asset1 = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_6_JPG);
             Assert.That(asset1, Is.Not.Null);
-            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, "Image 1.jpg");
+            Asset? asset2 = _assetCreationService!.CreateAsset(_dataDirectory!, FileNames.IMAGE_1_JPG);
             Assert.That(asset2, Is.Not.Null);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -940,15 +946,15 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_SameSourceAndDestination_ReturnsTrueAndLogsItAndDoesNotMoveFile(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
         LoggingAssertsService loggingAssertsService = new();
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -958,7 +964,7 @@ public class MoveAssetsServiceTests
 
             Folder sourceFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, "Image 1.jpg");
+            Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, FileNames.IMAGE_1_JPG);
             Assert.That(asset, Is.Not.Null);
 
             _assetRepository!.SaveCatalog(sourceFolder);
@@ -989,16 +995,16 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_DifferentFileNameBetweenSourceAndDestination_ThrowsFileNotFoundException(bool preserveOriginalFile)
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "SourceToMove");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string sourceDirectory = Path.Combine(_dataDirectory!, Directories.SOURCE_TO_MOVE);
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(sourceDirectory);
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetOldFileName = "Image 1.jpg";
-            const string assetNewFileName = "Image 2.jpg";
+            const string assetOldFileName = FileNames.IMAGE_1_JPG;
+            const string assetNewFileName = FileNames.IMAGE_2_JPG;
 
             string sourceFilePath = Path.Combine(_dataDirectory!, assetOldFileName);
             string newSourceFilePath = Path.Combine(sourceDirectory, assetOldFileName);
@@ -1056,7 +1062,7 @@ public class MoveAssetsServiceTests
                 ImageRotation = asset.ImageRotation,
                 Hash = asset.Hash,
                 ImageData = asset.ImageData,
-                ThumbnailCreationDateTime  = asset.ThumbnailCreationDateTime,
+                ThumbnailCreationDateTime = asset.ThumbnailCreationDateTime,
                 Metadata = asset.Metadata,
             };
             Asset[] assets = [newAsset];
@@ -1111,14 +1117,14 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_DifferentFileNameAndSameSourceAndDestination_MovesFileAndReturnsTrue(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string assetOldFileName = "Image 1.jpg";
-            const string assetNewFileName = "Image 2.jpg";
+            const string assetOldFileName = FileNames.IMAGE_1_JPG;
+            const string assetNewFileName = FileNames.IMAGE_2_JPG;
 
             string sourceFilePath = Path.Combine(_dataDirectory!, assetOldFileName);
             string destinationFilePath = Path.Combine(destinationDirectory, assetOldFileName);
@@ -1168,7 +1174,7 @@ public class MoveAssetsServiceTests
                 ImageRotation = asset.ImageRotation,
                 Hash = asset.Hash,
                 ImageData = asset.ImageData,
-                ThumbnailCreationDateTime  = asset.ThumbnailCreationDateTime,
+                ThumbnailCreationDateTime = asset.ThumbnailCreationDateTime,
                 Metadata = asset.Metadata
             };
             Asset[] assets = [newAsset];
@@ -1265,11 +1271,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folderId1,
                 Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1278,11 +1284,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folderId2,
                 Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1317,11 +1323,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folderId1,
                 Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1329,11 +1335,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = Guid.Empty,
                 Folder = folder!,
-                FileName = "NonExistentFile.jpg",
+                FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 0, Height = 0 },
-                    Thumbnail = new() { Width = 0, Height = 0 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1341,11 +1347,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folderId2,
                 Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1379,11 +1385,11 @@ public class MoveAssetsServiceTests
                 {
                     FolderId = folder.Id,
                     Folder = folder,
-                    FileName = "NonExistentFile.jpg",
+                    FileName = FileNames.NON_EXISTENT_FILE_JPG,
                     Pixel = new()
                     {
-                        Asset = new() { Width = 0, Height = 0 },
-                        Thumbnail = new() { Width = 0, Height = 0 }
+                        Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                        Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                     },
                     Hash = string.Empty
                 }
@@ -1407,14 +1413,14 @@ public class MoveAssetsServiceTests
     [TestCase(false)]
     public void MoveAssets_FileDoesNotExist_ThrowsFileNotFoundException(bool preserveOriginalFile)
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToMove");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_MOVE);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "NonExistentFile.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.NON_EXISTENT_FILE_JPG);
 
             Assert.That(File.Exists(sourceFilePath), Is.False);
             Assert.That(File.Exists(destinationFilePath), Is.False);
@@ -1426,11 +1432,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = sourceFolder.Id,
                 Folder = sourceFolder,
-                FileName = "NonExistentFile.jpg",
+                FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 0, Height = 0 },
-                    Thumbnail = new() { Width = 0, Height = 0 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1448,14 +1454,14 @@ public class MoveAssetsServiceTests
     [Test]
     public void DeleteAssets_AssetsAreValid_DeletesAssetsAndSavesCatalog()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            const string asset1FileName = "Image 6.jpg";
-            const string asset2FileName = "Image 1.jpg";
+            const string asset1FileName = FileNames.IMAGE_6_JPG;
+            const string asset2FileName = FileNames.IMAGE_1_JPG;
 
             string sourceFilePath1 = Path.Combine(_dataDirectory!, asset1FileName);
             string destinationFilePath1 = Path.Combine(destinationDirectory, asset1FileName);
@@ -1523,14 +1529,14 @@ public class MoveAssetsServiceTests
     [Test]
     public void DeleteAssets_AssetIsValid_DeletesAssetAndSavesCatalog()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath1 = Path.Combine(_dataDirectory!, "Image 6.jpg");
-            string destinationFilePath1 = Path.Combine(destinationDirectory, "Image 6.jpg");
+            string sourceFilePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_6_JPG);
+            string destinationFilePath1 = Path.Combine(destinationDirectory, FileNames.IMAGE_6_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath1, destinationFilePath1);
 
@@ -1538,8 +1544,8 @@ public class MoveAssetsServiceTests
             Assert.That(File.Exists(sourceFilePath1), Is.True);
             Assert.That(File.Exists(destinationFilePath1), Is.True);
 
-            string sourceFilePath2 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath2 = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath2 = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath2, destinationFilePath2);
 
@@ -1549,7 +1555,7 @@ public class MoveAssetsServiceTests
 
             Folder sourceFolder = _assetRepository!.AddFolder(destinationDirectory);
 
-            Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, "Image 6.jpg");
+            Asset? asset = _assetCreationService!.CreateAsset(destinationDirectory, FileNames.IMAGE_6_JPG);
             Assert.That(asset, Is.Not.Null);
             _assetRepository!.SaveCatalog(sourceFolder);
 
@@ -1633,11 +1639,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folderId1,
                 Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1646,11 +1652,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folderId2,
                 Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1681,11 +1687,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folderId1,
                 Folder = new() { Id = folderId1, Path = _dataDirectory! },
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1693,11 +1699,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = Guid.Empty,
                 Folder = folder!,
-                FileName = "NonExistentFile.jpg",
+                FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 0, Height = 0 },
-                    Thumbnail = new() { Width = 0, Height = 0 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1705,11 +1711,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folderId2,
                 Folder = new() { Id = folderId2, Path = _dataDirectory! },
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1738,11 +1744,11 @@ public class MoveAssetsServiceTests
             {
                 FolderId = folder.Id,
                 Folder = folder,
-                FileName = "NonExistentFile.jpg",
+                FileName = FileNames.NON_EXISTENT_FILE_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 0, Height = 0 },
-                    Thumbnail = new() { Width = 0, Height = 0 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_FILE_JPG, Height = PixelHeightAsset.NON_EXISTENT_FILE_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_FILE_JPG, Height = ThumbnailHeightAsset.NON_EXISTENT_FILE_JPG }
                 },
                 Hash = string.Empty
             };
@@ -1762,14 +1768,14 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SourceAndDestinationAreValid_CopiesFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -1787,7 +1793,7 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SourceAndDestinationAreValidButDirectoryIsInReadOnlyMode_ReturnFalseAndLogsItAndDoesNotCopyFile()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "NoCopyDirectory");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.NO_COPY_DIRECTORY);
         LoggingAssertsService loggingAssertsService = new();
 
         try
@@ -1797,8 +1803,8 @@ public class MoveAssetsServiceTests
             // Deny to write access to the directory
             DirectoryHelper.DenyWriteAccess(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -1827,14 +1833,14 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SourceFilePathIsADirectory_ReturnFalseAndLogsItAndDoesNotCopyFile()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
         LoggingAssertsService loggingAssertsService = new();
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(_dataDirectory!, destinationFilePath); // Access denied when source file path is a directory -> UnauthorizedAccessException
 
@@ -1858,8 +1864,8 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_DestinationFilePathIsADirectory_DoesNotCopyAndThrowsIOException()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
 
         try
         {
@@ -1878,15 +1884,15 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SameSourceAndDestination_ReturnsTrueAndLogsItAndDoesNotCopyFile()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
         LoggingAssertsService loggingAssertsService = new();
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -1915,14 +1921,14 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_DifferentFileNameBetweenSourceAndDestination_CopiesFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 2.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_2_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -1940,14 +1946,14 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_DifferentFileNameAndSameSourceAndDestination_CopiesFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -1955,8 +1961,8 @@ public class MoveAssetsServiceTests
             Assert.That(File.Exists(sourceFilePath), Is.True);
             Assert.That(File.Exists(destinationFilePath), Is.True);
 
-            sourceFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
-            destinationFilePath = Path.Combine(destinationDirectory, "Image 2.jpg");
+            sourceFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
+            destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_2_JPG);
 
             hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -1974,14 +1980,14 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_FileInSourceDoesNotExist_DoesNotCopyFileAndThrowsFileNotFoundException()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string nonExistentFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image.jpg");
+            string nonExistentFilePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_JPG);
 
             FileNotFoundException? exception = Assert.Throws<FileNotFoundException>(() => _moveAssetsService!.CopyAsset(nonExistentFilePath, destinationFilePath));
 
@@ -1998,15 +2004,15 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SourceDoesNotExist_DoesNotCopyFileAndThrowsDirectoryNotFoundException()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
-        string nonExistentSource = Path.Combine(_dataDirectory!, "toto");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
+        string nonExistentSource = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         try
         {
             Directory.CreateDirectory(destinationDirectory);
 
-            string nonExistentFilePath = Path.Combine(nonExistentSource, "NonExistentFile.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image.jpg");
+            string nonExistentFilePath = Path.Combine(nonExistentSource, FileNames.NON_EXISTENT_FILE_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_JPG);
 
             DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _moveAssetsService!.CopyAsset(nonExistentFilePath, destinationFilePath));
 
@@ -2023,12 +2029,12 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_DestinationDoesNotExist_CopiesFileAndReturnsTrue()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -2050,8 +2056,8 @@ public class MoveAssetsServiceTests
 
         try
         {
-            string sourceFilePath = Path.Combine(_dataDirectory!, "NonExistentFile.jpg");
-            string destinationFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_FILE_JPG);
+            string destinationFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
 
@@ -2074,12 +2080,12 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SourceIsEmpty_ThrowsArgumentException()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             string sourceFilePath = string.Empty;
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath));
 
@@ -2100,7 +2106,7 @@ public class MoveAssetsServiceTests
 
         try
         {
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
             string destinationFilePath = string.Empty;
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath);
@@ -2122,12 +2128,12 @@ public class MoveAssetsServiceTests
     [Test]
     public void CopyAsset_SourceIsNull_ThrowsArgumentNullException()
     {
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToCopy");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
 
         try
         {
             string? sourceFilePath = null;
-            string destinationFilePath = Path.Combine(destinationDirectory, "Image 1.jpg");
+            string destinationFilePath = Path.Combine(destinationDirectory, FileNames.IMAGE_1_JPG);
 
             ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _moveAssetsService!.CopyAsset(sourceFilePath!, destinationFilePath));
 
@@ -2149,7 +2155,7 @@ public class MoveAssetsServiceTests
         try
         {
             string? sourceFilePath = null;
-            string destinationFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string destinationFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath!, destinationFilePath);
 
@@ -2174,7 +2180,7 @@ public class MoveAssetsServiceTests
 
         try
         {
-            string sourceFilePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string sourceFilePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
             string? destinationFilePath = null;
 
             bool hasBeenCopied = _moveAssetsService!.CopyAsset(sourceFilePath, destinationFilePath!);

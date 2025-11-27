@@ -1,4 +1,6 @@
 ﻿using System.Drawing.Imaging;
+using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 
 namespace PhotoManager.Tests.Unit.Common;
 
@@ -12,7 +14,7 @@ public class ExifHelperTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -21,11 +23,11 @@ public class ExifHelperTests
     }
 
     [Test]
-    [TestCase("Image 1.jpg", 1)]
-    [TestCase("Image 1_90_deg.jpg", 6)]
-    [TestCase("Image 1_180_deg.jpg", 3)]
-    [TestCase("Image 1_270_deg.jpg", 8)]
-    [TestCase("Image 8.jpeg", 1)]
+    [TestCase(FileNames.IMAGE_1_JPG, 1)]
+    [TestCase(FileNames.IMAGE_1_90_DEG_JPG, 6)]
+    [TestCase(FileNames.IMAGE_1_180_DEG_JPG, 3)]
+    [TestCase(FileNames.IMAGE_1_270_DEG_JPG, 8)]
+    [TestCase(FileNames.IMAGE_8_JPEG, 1)]
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -40,9 +42,9 @@ public class ExifHelperTests
     }
 
     [Test]
-    [TestCase("Image 10 portrait.png")] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase("Homer.gif")] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase("Image_11.heic")] // Error on BitmapFrame.Create(stream)
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
+    [TestCase(FileNames.HOMER_GIF)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
+    [TestCase(FileNames.IMAGE_11_HEIC)] // Error on BitmapFrame.Create(stream)
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -115,10 +117,10 @@ public class ExifHelperTests
     }
 
     [Test]
-    [TestCase("Image_11.heic", 1)]
-    [TestCase("Image_11_90.heic", 6)]
-    [TestCase("Image_11_180.heic", 3)]
-    [TestCase("Image_11_270.heic", 8)]
+    [TestCase(FileNames.IMAGE_11_HEIC, 1)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 6)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 3)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 8)]
     public void GetHeicExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -207,10 +209,10 @@ public class ExifHelperTests
     }
 
     [Test]
-    [TestCase("Image 1.jpg")]
-    [TestCase("Image 8.jpeg")]
-    [TestCase("Image 10 portrait.png")]
-    [TestCase("Homer.gif")]
+    [TestCase(FileNames.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_8_JPEG)]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)]
+    [TestCase(FileNames.HOMER_GIF)]
     public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -224,7 +226,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidGDIPlusImage_InvalidImageData_ReturnsFalse()
     {
-        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] invalidImageData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidGDIPlusImage(invalidImageData);
@@ -245,7 +247,7 @@ public class ExifHelperTests
     [Test]
     public void IsValidHeic_ValidImageData_ReturnsTrue()
     {
-        string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] validHeicData = File.ReadAllBytes(filePath);
 
         bool result = ExifHelper.IsValidHeic(validHeicData);

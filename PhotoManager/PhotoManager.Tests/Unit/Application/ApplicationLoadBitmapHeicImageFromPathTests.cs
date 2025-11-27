@@ -1,4 +1,9 @@
-﻿namespace PhotoManager.Tests.Unit.Application;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+
+namespace PhotoManager.Tests.Unit.Application;
 
 [TestFixture]
 public class ApplicationLoadBitmapHeicImageFromPathTests
@@ -6,16 +11,15 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -51,18 +55,18 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    [TestCase(Rotation.Rotate0, 3024, 4032)]
-    [TestCase(Rotation.Rotate90, 3024, 4032)]
-    [TestCase(Rotation.Rotate180, 3024, 4032)]
-    [TestCase(Rotation.Rotate270, 3024, 4032)]
-    // [TestCase(null, 3024, 4032)]
+    [TestCase(Rotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(Rotation.Rotate90, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(Rotation.Rotate270, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    // [TestCase(null, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(Rotation rotation, int expectedWidth, int expectedHeight)
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
-            string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+            string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
 
             BitmapImage image = _application!.LoadBitmapHeicImageFromPath(filePath, rotation);
 
@@ -83,9 +87,9 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    [TestCase("Image_11_90.heic", Rotation.Rotate90, 4032, 3024)]
-    [TestCase("Image_11_180.heic", Rotation.Rotate180, 3024, 4032)]
-    [TestCase("Image_11_270.heic", Rotation.Rotate270, 4032, 3024)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, PixelWidthAsset.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, PixelWidthAsset.IMAGE_11_180_DEG_HEIC, PixelHeightAsset.IMAGE_11_180_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC, PixelHeightAsset.IMAGE_11_270_DEG_HEIC)]
     public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName, Rotation rotation, int expectedWidth, int expectedHeight)
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
@@ -143,7 +147,7 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
 
         try
         {
-            string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.heic");
+            string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_HEIC);
             const Rotation rotation = Rotation.Rotate90;
 
             BitmapImage image = _application!.LoadBitmapHeicImageFromPath(filePath, rotation);
@@ -167,7 +171,7 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
 
         try
         {
-            string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
+            string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
             const Rotation rotation = (Rotation)999;
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => _application!.LoadBitmapHeicImageFromPath(filePath, rotation));

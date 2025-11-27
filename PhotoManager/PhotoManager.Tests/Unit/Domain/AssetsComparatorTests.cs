@@ -1,4 +1,12 @@
-﻿namespace PhotoManager.Tests.Unit.Domain;
+﻿using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Unit.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
+
+namespace PhotoManager.Tests.Unit.Domain;
 
 [TestFixture]
 public class AssetsComparatorTests
@@ -26,17 +34,17 @@ public class AssetsComparatorTests
         _asset1 = new()
         {
             FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            Folder = new() { Id = Guid.Empty, Path = "" },
+            FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = 1920, Height = 1080 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
-            FileProperties = new() { Size = 363888 },
+            FileProperties = new() { Size = FileSize.IMAGE_1_JPG },
             ThumbnailCreationDateTime = _oldDateTime1,
-            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -46,17 +54,17 @@ public class AssetsComparatorTests
         _asset2 = new()
         {
             FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            Folder = new() { Id = Guid.Empty, Path = "" },
+            FileName = FileNames.IMAGE_9_PNG,
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 700 },
-                Thumbnail = new() { Width = 147, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
-            FileProperties = new() { Size = 4602393 },
+            FileProperties = new() { Size = FileSize.IMAGE_9_PNG },
             ThumbnailCreationDateTime = _oldDateTime2,
-            Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -65,18 +73,18 @@ public class AssetsComparatorTests
         };
         _asset3 = new()
         {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Homer.gif",
+            FolderId = Guid.Empty,
+            Folder = new() { Id = Guid.Empty, Path = "" },
+            FileName = FileNames.HOMER_GIF,
             Pixel = new()
             {
-                Asset = new() { Width = 320, Height = 320 },
-                Thumbnail = new() { Width = 150, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
             },
-            FileProperties = new() { Size = 64123 },
+            FileProperties = new() { Size = FileSize.HOMER_GIF },
             ThumbnailCreationDateTime = _oldDateTime1,
             ImageRotation = Rotation.Rotate0,
-            Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
+            Hash = Hashes.HOMER_GIF,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -85,18 +93,18 @@ public class AssetsComparatorTests
         };
         _asset4 = new()
         {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FolderId = Guid.Empty,
+            Folder = new() { Id = Guid.Empty, Path = "" },
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
-            FileProperties = new() { Size = 1411940 },
+            FileProperties = new() { Size = FileSize.IMAGE_11_HEIC },
             ThumbnailCreationDateTime = _oldDateTime2,
             ImageRotation = Rotation.Rotate0,
-            Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -113,7 +121,7 @@ public class AssetsComparatorTests
         [
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file6.jpg",
                 Pixel = new()
@@ -125,7 +133,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file7.png",
                 Pixel = new()
@@ -137,7 +145,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file8.gif",
                 Pixel = new()
@@ -149,7 +157,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file9.heic",
                 Pixel = new()
@@ -164,7 +172,7 @@ public class AssetsComparatorTests
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
 
         Assert.That(newFileNames, Is.Not.Empty);
-        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
+        Assert.That(newFileNames, Is.EquivalentTo(["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"]));
     }
 
     [Test]
@@ -187,7 +195,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file4.heic",
                 Pixel = new()
@@ -199,7 +207,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file6.jpg",
                 Pixel = new()
@@ -211,7 +219,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file7.png",
                 Pixel = new()
@@ -223,7 +231,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file8.gif",
                 Pixel = new()
@@ -235,7 +243,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file9.heic",
                 Pixel = new()
@@ -250,7 +258,7 @@ public class AssetsComparatorTests
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
 
         Assert.That(newFileNames, Is.Not.Empty);
-        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file2.png", "file3.gif", "file5.mp4" }));
+        Assert.That(newFileNames, Is.EquivalentTo(["file2.png", "file3.gif", "file5.mp4"]));
     }
 
     [Test]
@@ -261,7 +269,7 @@ public class AssetsComparatorTests
         [
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file1.jpg",
                 Pixel = new()
@@ -273,7 +281,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file2.png",
                 Pixel = new()
@@ -285,7 +293,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file3.gif",
                 Pixel = new()
@@ -297,7 +305,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file4.heic",
                 Pixel = new()
@@ -309,7 +317,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file5.mp4",
                 Pixel = new()
@@ -346,7 +354,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file2.png",
                 Pixel = new()
@@ -358,7 +366,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file3.gif",
                 Pixel = new()
@@ -370,7 +378,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file4.heic",
                 Pixel = new()
@@ -382,7 +390,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file5.mp4",
                 Pixel = new()
@@ -419,7 +427,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file2.png",
                 Pixel = new()
@@ -431,7 +439,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file3.gif",
                 Pixel = new()
@@ -443,7 +451,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file4.heic",
                 Pixel = new()
@@ -455,7 +463,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file5.mp4",
                 Pixel = new()
@@ -481,7 +489,7 @@ public class AssetsComparatorTests
         string[] newFileNames = _assetsComparator!.GetNewFileNames(fileNames, cataloguedAssets);
 
         Assert.That(newFileNames, Is.Not.Empty);
-        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
+        Assert.That(newFileNames, Is.EquivalentTo(["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"]));
     }
 
     [Test]
@@ -504,7 +512,7 @@ public class AssetsComparatorTests
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(newFileNames, Is.Not.Empty);
-        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
+        Assert.That(newFileNames, Is.EquivalentTo(["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"]));
     }
 
     [Test]
@@ -516,7 +524,7 @@ public class AssetsComparatorTests
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(newFileNames, Is.Not.Empty);
-        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file2.png", "file3.gif", "file5.mp4" }));
+        Assert.That(newFileNames, Is.EquivalentTo(["file2.png", "file3.gif", "file5.mp4"]));
     }
 
     [Test]
@@ -561,7 +569,7 @@ public class AssetsComparatorTests
         string[] newFileNames = _assetsComparator!.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(newFileNames, Is.Not.Empty);
-        Assert.That(newFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
+        Assert.That(newFileNames, Is.EquivalentTo(["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"]));
     }
 
     [Test]
@@ -704,7 +712,7 @@ public class AssetsComparatorTests
         [
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file6.jpg",
                 Pixel = new()
@@ -716,7 +724,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file7.png",
                 Pixel = new()
@@ -728,7 +736,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file8.gif",
                 Pixel = new()
@@ -740,7 +748,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file9.heic",
                 Pixel = new()
@@ -755,7 +763,7 @@ public class AssetsComparatorTests
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic" }));
+        Assert.That(deletedFileNames, Is.EquivalentTo(["file6.jpg", "file7.png", "file8.gif", "file9.heic"]));
     }
 
     [Test]
@@ -778,7 +786,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file6.jpg",
                 Pixel = new()
@@ -790,7 +798,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file7.png",
                 Pixel = new()
@@ -802,7 +810,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file8.gif",
                 Pixel = new()
@@ -814,7 +822,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file9.heic",
                 Pixel = new()
@@ -829,7 +837,7 @@ public class AssetsComparatorTests
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic" }));
+        Assert.That(deletedFileNames, Is.EquivalentTo(["file6.jpg", "file7.png", "file8.gif", "file9.heic"]));
     }
 
     [Test]
@@ -852,7 +860,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file2.png",
                 Pixel = new()
@@ -864,7 +872,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file3.gif",
                 Pixel = new()
@@ -876,7 +884,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file4.heic",
                 Pixel = new()
@@ -888,7 +896,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file5.mp4",
                 Pixel = new()
@@ -925,7 +933,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file2.png",
                 Pixel = new()
@@ -937,7 +945,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file3.gif",
                 Pixel = new()
@@ -949,7 +957,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file4.heic",
                 Pixel = new()
@@ -961,7 +969,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file5.mp4",
                 Pixel = new()
@@ -976,7 +984,8 @@ public class AssetsComparatorTests
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNames(fileNames, cataloguedAssets);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
+        Assert.That(deletedFileNames, Is.EquivalentTo(["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"
+        ]));
     }
 
     [Test]
@@ -999,7 +1008,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file2.png",
                 Pixel = new()
@@ -1011,7 +1020,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file3.gif",
                 Pixel = new()
@@ -1023,7 +1032,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file4.heic",
                 Pixel = new()
@@ -1035,7 +1044,7 @@ public class AssetsComparatorTests
             },
             new()
             {
-                FolderId = Guid.Empty, // Initialised later
+                FolderId = Guid.Empty,
                 Folder = new() { Id = Guid.Empty, Path = "" },
                 FileName = "file5.mp4",
                 Pixel = new()
@@ -1083,7 +1092,8 @@ public class AssetsComparatorTests
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4" }));
+        Assert.That(deletedFileNames, Is.EquivalentTo(["file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"
+        ]));
     }
 
     [Test]
@@ -1095,7 +1105,8 @@ public class AssetsComparatorTests
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4" }));
+        Assert.That(deletedFileNames, Is.EquivalentTo(["file6.jpg", "file7.png", "file8.gif", "file9.heic", "file10.mp4"
+        ]));
     }
 
     [Test]
@@ -1118,7 +1129,8 @@ public class AssetsComparatorTests
         string[] deletedFileNames = _assetsComparator!.GetDeletedFileNamesToSync(sourceFileNames, destinationFileNames);
 
         Assert.That(deletedFileNames, Is.Not.Empty);
-        Assert.That(deletedFileNames, Is.EquivalentTo(new[] { "file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4" }));
+        Assert.That(deletedFileNames, Is.EquivalentTo(["file1.jpg", "file2.png", "file3.gif", "file4.heic", "file5.mp4"
+        ]));
     }
 
     [Test]

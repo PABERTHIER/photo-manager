@@ -1,4 +1,14 @@
-﻿namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+
+namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
 
 [TestFixture]
 public class CatalogAssetsServiceTests
@@ -8,9 +18,6 @@ public class CatalogAssetsServiceTests
     private string? _databasePath;
     private string? _databaseBackupPath;
     private string? _defaultAssetsDirectory;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
-    private const string DATABASE_BACKUP_END_PATH = "v1.0_Backups";
 
     private CatalogAssetsService? _catalogAssetsService;
     private BlobStorage? _blobStorage;
@@ -44,11 +51,11 @@ public class CatalogAssetsServiceTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
-        _databaseBackupPath = Path.Combine(_databaseDirectory, DATABASE_BACKUP_END_PATH);
-        _defaultAssetsDirectory = Path.Combine(_dataDirectory, "Path");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
+        _databaseBackupPath = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
+        _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
@@ -65,21 +72,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -90,21 +97,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -115,21 +122,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -140,21 +147,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -165,21 +172,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate_copied.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_COPIED_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_COPIED_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_COPIED_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_COPIED_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_COPIED_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_COPIED_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_COPIED_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -190,21 +197,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -215,21 +222,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Homer.gif",
+            FileName = FileNames.HOMER_GIF,
             Pixel = new()
             {
-                Asset = new() { Width = 320, Height = 320 },
-                Thumbnail = new() { Width = 150, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.HOMER_GIF, Height = PixelHeightAsset.HOMER_GIF },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_GIF, Height = ThumbnailHeightAsset.HOMER_GIF }
             },
             FileProperties = new()
             {
-                Size = 64123,
+                Size = FileSize.HOMER_GIF,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1",
+            Hash = Hashes.HOMER_GIF,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -240,21 +247,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Homer.jpg",
+            FileName = FileNames.HOMER_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 320, Height = 180 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.HOMER_JPG, Height = PixelHeightAsset.HOMER_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_JPG, Height = ThumbnailHeightAsset.HOMER_JPG }
             },
             FileProperties = new()
             {
-                Size = 6599,
+                Size = FileSize.HOMER_JPG,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
+            Hash = Hashes.HOMER_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -265,21 +272,21 @@ public class CatalogAssetsServiceTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "HomerDuplicated.jpg",
+            FileName = FileNames.HOMER_DUPLICATED_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 320, Height = 180 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.HOMER_DUPLICATED_JPG, Height = PixelHeightAsset.HOMER_DUPLICATED_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_DUPLICATED_JPG, Height = ThumbnailHeightAsset.HOMER_DUPLICATED_JPG }
             },
             FileProperties = new()
             {
-                Size = 6599,
+                Size = FileSize.HOMER_DUPLICATED_JPG,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
+            Hash = Hashes.HOMER_DUPLICATED_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -316,16 +323,16 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExists_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -459,7 +466,7 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExists_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -467,18 +474,18 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
-            string videoPath2 = Path.Combine(_dataDirectory!, "Homer1s.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(assetsDirectory, "Homer1s.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_1_S_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -652,7 +659,7 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsImageAndVideosAndAnalyseVideosIsFalseAndRootCatalogFolderExists_SyncTheAssetsButNotTheVideo()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -660,18 +667,18 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
-            string videoPath2 = Path.Combine(_dataDirectory!, "Homer1s.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string videoPath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_1_S_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(assetsDirectory, "Homer1s.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_1_S_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -757,7 +764,7 @@ public class CatalogAssetsServiceTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!]} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
@@ -829,14 +836,14 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCatalogBatchSizeIsSmaller_SyncTheFirstAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureCatalogAssetService(2, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
 
             List<string> assetPaths = [imagePath1, imagePath2];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE];
@@ -968,8 +975,8 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneCorruptedImage_SyncTheAssetsButNotTheCorruptedImage(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -977,11 +984,11 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -1124,16 +1131,16 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndCallbackIsNull_SyncTheAssetsWithoutEvent(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -1250,16 +1257,16 @@ public class CatalogAssetsServiceTests
     [TestCase(false, 0)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndIsCancellationRequestedOrCatalogBatchSizeIsEqualTo0_StopsTheSync(bool canceled, int catalogBatchSize)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureCatalogAssetService(catalogBatchSize, assetsDirectory, 200, 150, false, false, false, false);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
 
@@ -1347,17 +1354,17 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdated_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -1606,7 +1613,7 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdated_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -1614,16 +1621,16 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -1903,7 +1910,7 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsUpdatedAndAnalyseVideosIsFalse_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -1911,16 +1918,16 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -2005,7 +2012,7 @@ public class CatalogAssetsServiceTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!]} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
@@ -2169,7 +2176,7 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndCatalogBatchSizeIsSmaller_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -2177,11 +2184,11 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
 
@@ -2420,8 +2427,8 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneCorruptedImageIsUpdated_SyncTheAssetsAndRemovesTheCorruptedImage(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, "Image 1_Temp.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imagePath1ToCopyTemp = Path.Combine(assetsDirectory, FileNames.IMAGE_1_TEMP_JPG);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -2429,11 +2436,11 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -2688,17 +2695,17 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsUpdatedAndBackupIsDeleted_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -2952,17 +2959,17 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -3211,8 +3218,8 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeleted_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -3220,15 +3227,15 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -3462,7 +3469,7 @@ public class CatalogAssetsServiceTests
 
             foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges,folders.Count, foldersInRepository, assetsDirectory, ref increment);
+            CatalogAssetsAsyncAsserts.CheckCatalogChangesInspectingFolder(catalogChanges, folders.Count, foldersInRepository, assetsDirectory, ref increment);
 
             for (int i = 0; i < folderToAssetsMapping[folder!].Count; i++)
             {
@@ -3510,8 +3517,8 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneVideoIsDeletedAndAnalyseVideosIsFalse_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -3519,15 +3526,15 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -3612,7 +3619,7 @@ public class CatalogAssetsServiceTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!]} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
@@ -3780,17 +3787,17 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedThenAdded_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -4137,8 +4144,8 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndCatalogBatchSizeIsSmaller_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
         ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -4146,9 +4153,9 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string imagePath2ToCopy = Path.Combine(assetsDirectory, "Homer.gif");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string imagePath2ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_GIF);
 
             File.Copy(imagePath1, imagePath1ToCopy);
 
@@ -4390,17 +4397,17 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageIsDeletedAndBackupIsDeleted_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -4655,17 +4662,17 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneImageDeletedAndIsCancellationRequested_SyncTheAssetsAndRemovesDeletedOne(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, destinationFilePathToCopy, imagePath2, imagePath3, imagePath4];
@@ -4918,8 +4925,8 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeleted_SyncTheAssetsAndRemovesDeletedOnes(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
-        string tempDirectory = Path.Combine(assetsDirectory, "TempFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+        string tempDirectory = Path.Combine(assetsDirectory, Directories.TEMP_FOLDER);
         string destinationFilePathToCopy = Path.Combine(tempDirectory, _asset1Temp!.FileName);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
@@ -4928,10 +4935,10 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(tempDirectory);
 
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
             File.Copy(imagePath1, destinationFilePathToCopy);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4, destinationFilePathToCopy];
@@ -5235,8 +5242,8 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndOneFolderIsDeletedAndAndCatalogBatchSizeIsSmaller_SyncTheAssetsAndDoesNotRemoveAllDeletedOnes(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string tempDirectory = Path.Combine(assetsDirectory, "FolderToDelete");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string tempDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_TO_DELETE);
 
         ConfigureCatalogAssetService(1, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -5245,8 +5252,8 @@ public class CatalogAssetsServiceTests
             Directory.CreateDirectory(assetsDirectory);
             Directory.CreateDirectory(tempDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
             string destinationFilePathToCopy1 = Path.Combine(tempDirectory, _asset2Temp!.FileName);
             string destinationFilePathToCopy2 = Path.Combine(tempDirectory, _asset2!.FileName);
             File.Copy(imagePath1, destinationFilePathToCopy1);
@@ -5655,9 +5662,9 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssets()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
-        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
+        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -5665,30 +5672,30 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
-            string subDirDirectory = Path.Combine(assetsDirectory, "FolderSubDir");
-            string subSubDirDirectory = Path.Combine(subDirDirectory, "FolderSubSubDir");
+            string imageUpdatedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_UPDATED);
+            string subDirDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_SUB_DIR);
+            string subSubDirDirectory = Path.Combine(subDirDirectory, Directories.FOLDER_SUB_SUB_DIR);
 
             Directory.CreateDirectory(imageDeletedDirectory);
             Directory.CreateDirectory(imageUpdatedDirectory);
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image_11.heic");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
-            string imagePath3 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath4 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image_11.heic");
-            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, "Image 1.jpg");
-            string imagePath4ToCopy = Path.Combine(subDirDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, "HomerDuplicated.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath4ToCopy = Path.Combine(subDirDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, FileNames.HOMER_DUPLICATED_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
-            string firstFramePath2 = Path.Combine(firstFrameVideosDirectory, "HomerDuplicated.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
+            string firstFramePath2 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_DUPLICATED_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -5944,7 +5951,7 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-            
+
             // Second Sync
 
             File.Delete(imagePath2ToCopy);
@@ -6152,9 +6159,9 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsImageAndSameVideosAndRootCatalogFolderExistsAndSubDirAndUpdateAndDelete_SyncTheAssetsButNotTheVideoInSubdirectory()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
-        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
+        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -6162,29 +6169,29 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
-            string subDirDirectory = Path.Combine(assetsDirectory, "FolderSubDir");
-            string subSubDirDirectory = Path.Combine(subDirDirectory, "FolderSubSubDir");
+            string imageUpdatedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_UPDATED);
+            string subDirDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_SUB_DIR);
+            string subSubDirDirectory = Path.Combine(subDirDirectory, Directories.FOLDER_SUB_SUB_DIR);
 
             Directory.CreateDirectory(imageDeletedDirectory);
             Directory.CreateDirectory(imageUpdatedDirectory);
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image_11.heic");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
-            string imagePath3 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath4 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image_11.heic");
-            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, "Image 1.jpg");
-            string imagePath4ToCopy = Path.Combine(subDirDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, "Homer.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath4ToCopy = Path.Combine(subDirDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, FileNames.HOMER_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -6430,7 +6437,7 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-            
+
             // Second Sync
 
             File.Delete(imagePath2ToCopy);
@@ -6631,9 +6638,9 @@ public class CatalogAssetsServiceTests
     [Test]
     public async Task CatalogAssetsAsync_AssetsImageAndVideosAndRootCatalogFolderExistsAndSubDirAfterOutputVideoAndUpdateAndDelete_SyncTheAssetsButTheVideoInSubdirectoryInTheSecondSync()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
-        string imageDeletedDirectory = Path.Combine(assetsDirectory, "FolderImageDeleted");
-        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, "Image 9.png");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
+        string imageDeletedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_DELETED);
+        string imagePath2ToCopy = Path.Combine(imageDeletedDirectory, FileNames.IMAGE_9_PNG);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, true);
 
@@ -6641,30 +6648,30 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imageUpdatedDirectory = Path.Combine(assetsDirectory, "FolderImageUpdated");
-            string subDirDirectory = Path.Combine(assetsDirectory, "ZFolderSubDir");
-            string subSubDirDirectory = Path.Combine(subDirDirectory, "FolderSubSubDir");
+            string imageUpdatedDirectory = Path.Combine(assetsDirectory, Directories.FOLDER_IMAGE_UPDATED);
+            string subDirDirectory = Path.Combine(assetsDirectory, Directories.Z_FOLDER_SUB_DIR);
+            string subSubDirDirectory = Path.Combine(subDirDirectory, Directories.FOLDER_SUB_SUB_DIR);
 
             Directory.CreateDirectory(imageDeletedDirectory);
             Directory.CreateDirectory(imageUpdatedDirectory);
             Directory.CreateDirectory(subDirDirectory);
             Directory.CreateDirectory(subSubDirDirectory);
 
-            string imagePath1 = Path.Combine(_dataDirectory!, "Image_11.heic");
-            string imagePath2 = Path.Combine(_dataDirectory!, "Image 9.png");
-            string imagePath3 = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePath4 = Path.Combine(_dataDirectory!, "Homer.gif");
-            string videoPath1 = Path.Combine(_dataDirectory!, "Homer.mp4");
+            string imagePath1 = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+            string imagePath2 = Path.Combine(_dataDirectory!, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePath4 = Path.Combine(_dataDirectory!, FileNames.HOMER_GIF);
+            string videoPath1 = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
 
-            string imagePath1ToCopy = Path.Combine(assetsDirectory, "Image_11.heic");
-            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, "Image 1.jpg");
-            string imagePath4ToCopy = Path.Combine(subDirDirectory, "Homer.gif");
-            string videoPath1ToCopy = Path.Combine(assetsDirectory, "Homer.mp4");
-            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, "HomerDuplicated.mp4");
+            string imagePath1ToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
+            string imagePath3ToCopy = Path.Combine(imageUpdatedDirectory, FileNames.IMAGE_1_JPG);
+            string imagePath4ToCopy = Path.Combine(subDirDirectory, FileNames.HOMER_GIF);
+            string videoPath1ToCopy = Path.Combine(assetsDirectory, FileNames.HOMER_MP4);
+            string videoPath2ToCopy = Path.Combine(subSubDirDirectory, FileNames.HOMER_DUPLICATED_MP4);
 
             string firstFrameVideosDirectory = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
-            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, "Homer.jpg");
-            string firstFramePath2 = Path.Combine(firstFrameVideosDirectory, "HomerDuplicated.jpg");
+            string firstFramePath1 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_JPG);
+            string firstFramePath2 = Path.Combine(firstFrameVideosDirectory, FileNames.HOMER_DUPLICATED_JPG);
 
             File.Copy(imagePath1, imagePath1ToCopy);
             File.Copy(imagePath2, imagePath2ToCopy);
@@ -6912,7 +6919,7 @@ public class CatalogAssetsServiceTests
             CatalogAssetsAsyncAsserts.CheckCatalogChangesFolderInspected(catalogChanges, assetsDirectory, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesBackup(catalogChanges, CatalogAssetsAsyncAsserts.CREATING_BACKUP_MESSAGE, ref increment);
             CatalogAssetsAsyncAsserts.CheckCatalogChangesEnd(catalogChanges, ref increment);
-            
+
             // Second Sync
 
             File.Delete(imagePath2ToCopy);
@@ -7291,7 +7298,7 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_RootCatalogFolderPointsToAFile_DoesNotSyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Image 1.jpg");
+        string assetsDirectory = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
@@ -7470,16 +7477,16 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndSameContent_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -7694,17 +7701,17 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsAndOneNewAsset_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -7950,7 +7957,7 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsAndRootCatalogFolderExistsAndBackupExistsOnDifferentDateAndOneNewAsset_SyncTheAssets(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
         string destinationFilePathToCopy = Path.Combine(assetsDirectory, _asset1Temp!.FileName);
         string backupFileName = DateTime.Now.Date.ToString("yyyyMMdd") + ".zip";
         string backupFilePath = Path.Combine(_databaseBackupPath!, backupFileName);
@@ -7959,10 +7966,10 @@ public class CatalogAssetsServiceTests
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
@@ -8251,7 +8258,7 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task CatalogAssetsAsync_AssetsImageAndRootCatalogFolderExistsAndAccessToFolderIsDenied_LogsError(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempAssetsDirectory");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_ASSETS_DIRECTORY);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
         LoggingAssertsService loggingAssertsService = new();
@@ -8260,8 +8267,8 @@ public class CatalogAssetsServiceTests
         {
             Directory.CreateDirectory(assetsDirectory);
 
-            string imagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
-            string imagePathToCopy = Path.Combine(assetsDirectory, "Image 1.jpg");
+            string imagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
+            string imagePathToCopy = Path.Combine(assetsDirectory, FileNames.IMAGE_1_JPG);
 
             File.Copy(imagePath, imagePathToCopy);
 
@@ -8350,16 +8357,16 @@ public class CatalogAssetsServiceTests
     [TestCase(true)]
     public async Task Dispose_AssetsAndRootCatalogFolderExists_DoesNotUpdateCataloguedAssetsByPath(bool analyseVideos)
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureCatalogAssetService(100, assetsDirectory, 200, 150, false, false, false, analyseVideos);
 
         try
         {
-            string imagePath1 = Path.Combine(assetsDirectory, "Image 1_duplicate.jpg");
-            string imagePath2 = Path.Combine(assetsDirectory, "Image 9.png");
-            string imagePath3 = Path.Combine(assetsDirectory, "Image 9_duplicate.png");
-            string imagePath4 = Path.Combine(assetsDirectory, "Image_11.heic");
+            string imagePath1 = Path.Combine(assetsDirectory, FileNames.IMAGE_1_DUPLICATE_JPG);
+            string imagePath2 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_PNG);
+            string imagePath3 = Path.Combine(assetsDirectory, FileNames.IMAGE_9_DUPLICATE_PNG);
+            string imagePath4 = Path.Combine(assetsDirectory, FileNames.IMAGE_11_HEIC);
 
             List<string> assetPaths = [imagePath1, imagePath2, imagePath3, imagePath4];
             List<int> assetsImageByteSize = [ASSET1_IMAGE_BYTE_SIZE, ASSET2_IMAGE_BYTE_SIZE, ASSET3_IMAGE_BYTE_SIZE, ASSET4_IMAGE_BYTE_SIZE];
