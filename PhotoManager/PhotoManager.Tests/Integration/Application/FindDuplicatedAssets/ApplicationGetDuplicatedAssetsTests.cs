@@ -566,72 +566,59 @@ public class ApplicationGetDuplicatedAssetsTests
 
             const string pHash4First = PHashes._1336_1_K_JPG;
             const string pHash4Second = PHashes._1336_2_K_JPG;
-            const string pHash4Third = PHashes._1336_THUMBNAIL_JPG;
-
-            const string pHash5First = PHashes.IMAGE_1336_MINI_JPG;
-            const string pHash5Second = PHashes.IMAGE_1336_SHIT_QUALITY_JPG;
 
             await _application!.CatalogAssetsAsync(_ => {});
 
             List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssets, Has.Count.EqualTo(5));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(duplicatedAssets, Has.Count.EqualTo(4));
 
-            List<Asset> firstDuplicatedAssetsSet = duplicatedAssets[0];
-            List<Asset> secondDuplicatedAssetsSet = duplicatedAssets[1];
-            List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets[2];
-            List<Asset> fourthDuplicatedAssetsSet = duplicatedAssets[3];
-            List<Asset> fifthDuplicatedAssetsSet = duplicatedAssets[4];
+                List<Asset> firstDuplicatedAssetsSet = duplicatedAssets[0];
+                List<Asset> secondDuplicatedAssetsSet = duplicatedAssets[1];
+                List<Asset> thirdDuplicatedAssetsSet = duplicatedAssets[2];
+                List<Asset> fourthDuplicatedAssetsSet = duplicatedAssets[3];
 
-            Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
-            Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
-            Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
-            Assert.That(fourthDuplicatedAssetsSet, Has.Count.EqualTo(3));
-            Assert.That(fifthDuplicatedAssetsSet, Has.Count.EqualTo(2));
+                Assert.That(firstDuplicatedAssetsSet, Has.Count.EqualTo(2));
+                Assert.That(secondDuplicatedAssetsSet, Has.Count.EqualTo(2));
+                Assert.That(thirdDuplicatedAssetsSet, Has.Count.EqualTo(4));
+                Assert.That(fourthDuplicatedAssetsSet, Has.Count.EqualTo(2));
 
-            Assert.That(firstDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
-            Assert.That(firstDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)));
-            Assert.That(firstDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash1));
-            Assert.That(firstDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames.IMAGE_1_DUPLICATE_JPG));
-            Assert.That(firstDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_1_DUPLICATE_JPG)));
-            Assert.That(firstDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash1));
+                Assert.That(firstDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
+                Assert.That(firstDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesNewFolder1Directory, FileNames.IMAGE_1_JPG)));
+                Assert.That(firstDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash1));
+                Assert.That(firstDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames.IMAGE_1_DUPLICATE_JPG));
+                Assert.That(firstDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_1_DUPLICATE_JPG)));
+                Assert.That(firstDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash1));
 
-            Assert.That(secondDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames.IMAGE_9_PNG));
-            Assert.That(secondDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)));
-            Assert.That(secondDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash2));
-            Assert.That(secondDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames.IMAGE_9_DUPLICATE_PNG));
-            Assert.That(secondDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_DUPLICATE_PNG)));
-            Assert.That(secondDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash2));
+                Assert.That(secondDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames.IMAGE_9_PNG));
+                Assert.That(secondDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_PNG)));
+                Assert.That(secondDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash2));
+                Assert.That(secondDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames.IMAGE_9_DUPLICATE_PNG));
+                Assert.That(secondDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesNewFolder2Directory, FileNames.IMAGE_9_DUPLICATE_PNG)));
+                Assert.That(secondDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash2));
 
-            Assert.That(thirdDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames._1336_JPG));
-            Assert.That(thirdDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)));
-            Assert.That(thirdDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash3));
-            Assert.That(thirdDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames._1336_ORIGINAL_JPG));
-            Assert.That(thirdDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesPartDirectory, FileNames._1336_ORIGINAL_JPG)));
-            Assert.That(thirdDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash3));
-            Assert.That(thirdDuplicatedAssetsSet[2].FileName, Is.EqualTo(FileNames.IMAGE_1336_4_K_ORIGINAL_JPG));
-            Assert.That(thirdDuplicatedAssetsSet[2].FullPath, Is.EqualTo(Path.Combine(duplicatesResolutionDirectory, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG)));
-            Assert.That(thirdDuplicatedAssetsSet[2].Hash, Is.EqualTo(pHash3));
-            Assert.That(thirdDuplicatedAssetsSet[3].FileName, Is.EqualTo(FileNames.IMAGE_1336_ORIGINAL_JPG));
-            Assert.That(thirdDuplicatedAssetsSet[3].FullPath, Is.EqualTo(Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_ORIGINAL_JPG)));
-            Assert.That(thirdDuplicatedAssetsSet[3].Hash, Is.EqualTo(pHash3));
+                Assert.That(thirdDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames._1336_JPG));
+                Assert.That(thirdDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesNotDuplicateSample1Directory, FileNames._1336_JPG)));
+                Assert.That(thirdDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash3));
+                Assert.That(thirdDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames._1336_ORIGINAL_JPG));
+                Assert.That(thirdDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesPartDirectory, FileNames._1336_ORIGINAL_JPG)));
+                Assert.That(thirdDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash3));
+                Assert.That(thirdDuplicatedAssetsSet[2].FileName, Is.EqualTo(FileNames.IMAGE_1336_4_K_ORIGINAL_JPG));
+                Assert.That(thirdDuplicatedAssetsSet[2].FullPath, Is.EqualTo(Path.Combine(duplicatesResolutionDirectory, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG)));
+                Assert.That(thirdDuplicatedAssetsSet[2].Hash, Is.EqualTo(pHash3));
+                Assert.That(thirdDuplicatedAssetsSet[3].FileName, Is.EqualTo(FileNames.IMAGE_1336_ORIGINAL_JPG));
+                Assert.That(thirdDuplicatedAssetsSet[3].FullPath, Is.EqualTo(Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_ORIGINAL_JPG)));
+                Assert.That(thirdDuplicatedAssetsSet[3].Hash, Is.EqualTo(pHash3));
 
-            Assert.That(fourthDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames._1336_1_K_JPG));
-            Assert.That(fourthDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesResolutionDirectory, FileNames._1336_1_K_JPG)));
-            Assert.That(fourthDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash4First));
-            Assert.That(fourthDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames._1336_2_K_JPG));
-            Assert.That(fourthDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesResolutionDirectory, FileNames._1336_2_K_JPG)));
-            Assert.That(fourthDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash4Second));
-            Assert.That(fourthDuplicatedAssetsSet[2].FileName, Is.EqualTo(FileNames._1336_THUMBNAIL_JPG));
-            Assert.That(fourthDuplicatedAssetsSet[2].FullPath, Is.EqualTo(Path.Combine(duplicatesResolutionDirectory, FileNames._1336_THUMBNAIL_JPG)));
-            Assert.That(fourthDuplicatedAssetsSet[2].Hash, Is.EqualTo(pHash4Third));
-
-            Assert.That(fifthDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames.IMAGE_1336_MINI_JPG));
-            Assert.That(fifthDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_MINI_JPG)));
-            Assert.That(fifthDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash5First));
-            Assert.That(fifthDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames.IMAGE_1336_SHIT_QUALITY_JPG));
-            Assert.That(fifthDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesThumbnailDirectory, FileNames.IMAGE_1336_SHIT_QUALITY_JPG)));
-            Assert.That(fifthDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash5Second));
+                Assert.That(fourthDuplicatedAssetsSet[0].FileName, Is.EqualTo(FileNames._1336_1_K_JPG));
+                Assert.That(fourthDuplicatedAssetsSet[0].FullPath, Is.EqualTo(Path.Combine(duplicatesResolutionDirectory, FileNames._1336_1_K_JPG)));
+                Assert.That(fourthDuplicatedAssetsSet[0].Hash, Is.EqualTo(pHash4First));
+                Assert.That(fourthDuplicatedAssetsSet[1].FileName, Is.EqualTo(FileNames._1336_2_K_JPG));
+                Assert.That(fourthDuplicatedAssetsSet[1].FullPath, Is.EqualTo(Path.Combine(duplicatesResolutionDirectory, FileNames._1336_2_K_JPG)));
+                Assert.That(fourthDuplicatedAssetsSet[1].Hash, Is.EqualTo(pHash4Second));
+            }
         }
         finally
         {

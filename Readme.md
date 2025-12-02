@@ -75,8 +75,8 @@ The aim is to let you configure it as you need.
 
 **The `Hash` part is about settings of hash (for basic usages, you will not need to modify the settings):** :woman_technologist:
 
-- `PHashThreshold = 40`: The value of the threshold (used when `UsingPHash` is true).
-- `UsingDHash = false`: Enable it to hash in DHash (Difference Hash). This hashing method returns "0" for Gif or some heic files.
+- `PHashThreshold = 10`: The value of the threshold (used when `UsingPHash` is true).
+- `UsingDHash = false`: Enable it to hash in DHash (Difference Hash). This hashing method returns "00000000000000" for some pictures.
 - `UsingMD5Hash = false`: Enable it to hash in MD5.
 - `UsingPHash = false`: Enable it to hash in PHash (Perceptual Hash). It can detect duplicates between rotated assets (improve detection), thumbnails, images part and same images with differents resolutions.
 Performances are decreased with PHash by 6 times (for ex: 0.17s for 140 pictures with SHA512 and 1.11s with PHash).
@@ -91,14 +91,14 @@ The HashingService works as follows:
 About `DetectThumbnails`, you will need to set `UsingPHash` to true as well because:
 Between Original and Thumbnail:
 
-- PHash the hamming distance is 36/210 (the most accurate).
-- DHash the hamming distance is 16/17.
+- PHash the hamming distance is 10/210 (the most accurate).
+- DHash the hamming distance is 5/14.
 - MD5Hash the hamming distance is 32/32.
 - SHA512 the hamming distance is 118/128.
 
 Moreover, there is a parameter that you can adjust following the need, it is `PHashThreshold`.
 The max advised is less than 90 (for example 68 can detect false positives).
-The default value is `40`, because it can detect a Thumbnail and an original with low quality as duplicates.
+The default value is `10`, because it can detect a Thumbnail and an original with low quality as duplicates.
 But 5 or 6 is often used as a default value in image comparison libraries.
 If the hamming distance is lower or equal to the `PHashThreshold` value, then it is a duplicate.
 The lower the value of `PHashThreshold`, the more precise it is.

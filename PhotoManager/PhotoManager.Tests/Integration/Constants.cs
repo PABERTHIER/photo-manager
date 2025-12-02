@@ -320,10 +320,10 @@ public static class Constants
         public const int _1336_TOP_PART_JPG = 200;
         public const int _1336_TOP_RIGHT_PART_JPG = 200;
         public const int _1337_JPG = 200;
-        public const int _1349_JPG = 112;
-        public const int _1350_JPG = 112;
-        public const int _1413_JPG = 112;
-        public const int _1414_JPG = 112;
+        public const int _1349_JPG = 200;
+        public const int _1350_JPG = 200;
+        public const int _1413_JPG = 200;
+        public const int _1414_JPG = 200;
         public const int _1415_JPG = 112;
 
         public const int NON_EXISTENT_FILE_JPG = 0;
@@ -436,13 +436,67 @@ public static class Constants
         public const long _1336_TOP_PART_JPG = 737269;
         public const long _1336_TOP_RIGHT_PART_JPG = 383508;
         public const long _1337_JPG = 4003090;
-        public const long _1349_JPG = 2247285;
-        public const long _1350_JPG = 2247285;
-        public const long _1413_JPG = 2247285;
-        public const long _1414_JPG = 2247285;
-        public const long _1415_JPG = 2247285;
+        public const long _1349_JPG = 2670045;
+        public const long _1350_JPG = 2959497;
+        public const long _1413_JPG = 3633142;
+        public const long _1414_JPG = 3700191;
+        public const long _1415_JPG = 2264917;
 
         public const long NON_EXISTENT_IMAGE_JPG = 0;
+    }
+
+    public static class ImageByteSizes
+    {
+        public const int HOMER_GIF = 8594;
+        public const int HOMER_JPG = 4819;
+        public const int HOMER_DUPLICATED_JPG = 4819;
+        public const int IMAGE_1_JPG = 2100;
+        public const int IMAGE_1_90_DEG_JPG = 1737;
+        public const int IMAGE_1_180_DEG_JPG = 2102;
+        public const int IMAGE_1_270_DEG_JPG = 1716;
+        public const int IMAGE_1_DUPLICATE_JPG = 2100;
+        public const int IMAGE_1_DUPLICATE_COPIED_JPG = 2100;
+        public const int IMAGE_2_JPG = 2109;
+        public const int IMAGE_2_DUPLICATED_JPG = 2109;
+        public const int IMAGE_3_JPG = 2111;
+        public const int IMAGE_4_JPG = 2108;
+        public const int IMAGE_5_JPG = 2107;
+        public const int IMAGE_6_JPG = 2110;
+        public const int IMAGE_7_JPG = 2105;
+        public const int IMAGE_8_JPEG = 2115;
+        public const int IMAGE_9_PNG = 10583;
+        public const int IMAGE_9_DUPLICATE_PNG = 10583;
+        public const int IMAGE_10_PORTRAIT_PNG = 5852;
+        public const int IMAGE_11_HEIC = 5851;
+        public const int IMAGE_11_90_DEG_HEIC = 5921;
+        public const int IMAGE_11_180_DEG_HEIC = 5713;
+        public const int IMAGE_11_270_DEG_HEIC = 6070;
+        public const int IMAGE_WITH_UPPERCASE_NAME_JPG = 3019;
+        public const int _1336_ORIGINAL_JPG = 10753;
+        public const int _1336_1_K_JPG = 10312;
+        public const int _1336_2_K_JPG = 10226;
+        public const int _1336_3_K_JPG = 10576;
+        public const int IMAGE_1336_4_K_ORIGINAL_JPG = 10753;
+        public const int _1336_8_K_JPG = 10836;
+        public const int _1336_THUMBNAIL_JPG = 10880;
+        public const int IMAGE_1336_ORIGINAL_JPG = 10753;
+        public const int IMAGE_1336_MINI_JPG = 4769;
+        public const int IMAGE_1336_SHIT_QUALITY_JPG = 11304;
+        public const int IMAGE_1336_SMALL_JPG = 10592;
+        public const int _1336_BOTTOM_LEFT_PART_JPG = 13128;
+        public const int _1336_BOTTOM_PART_JPG = 7563;
+        public const int _1336_BOTTOM_RIGHT_PART_JPG = 13254;
+        public const int _1336_LEFT_PART_JPG = 5817;
+        public const int _1336_RIGHT_PART_JPG = 5911;
+        public const int _1336_TOP_LEFT_PART_JPG = 5752;
+        public const int _1336_TOP_PART_JPG = 4147;
+        public const int _1336_TOP_RIGHT_PART_JPG = 6045;
+        public const int _1337_JPG = 8467;
+        public const int _1349_JPG = 7834;
+        public const int _1350_JPG = 8921;
+        public const int _1413_JPG = 8733;
+        public const int _1414_JPG = 8567;
+        public const int _1415_JPG = 5055;
     }
 
     public static class ModificationDate
@@ -463,7 +517,11 @@ public static class Constants
         public const string IMAGE_1_DUPLICATE_COPIED_JPG = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
         public const string IMAGE_2_JPG = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078";
         public const string IMAGE_2_DUPLICATED_JPG = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078";
-        public const string IMAGE_3_JPG = "c92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88";
+        public const string IMAGE_3_JPG = "a0918addfe12765fc9a2e437b452a6bf44561a97a568c9c58ffaa6b22b94a9934a6d760739c7c1b70e2dc83f6686e34ee13f520a5e9e33380a6b88be4f866ab0";
+        public const string IMAGE_4_JPG = "73cbdcfc710f5310b275c22519116b1c1e108a1540bf3c43ae539116d1026d3f55277a83785a798f37701cf1fe757d5c0f56cc6019e1b574d578f9f2db45aa4f";
+        public const string IMAGE_5_JPG = "d372752a168f353d8360915f7d157d81a077581e4a391c446cb5897902ce6b5627025befa3fea2672167f1d44c2fb8b1008ab262c7bdb6f26ab974434084e609";
+        public const string IMAGE_6_JPG = "495f3967cd1255f09b630f9c9a9660373aeefedc1a1c4937034865fc3f1e09e6fa637027e8d9f7ab19ce7f0725b826fbf4d45f0bbeea747ab4b701a506960b35";
+        public const string IMAGE_7_JPG = "e2e5b1008e4ee77111e955083c5dc6be2f7c870e5a6457f02108e3b83041dc5efc1e1d8d901ddb55baa7ca482dd44fa79ad71539c6b2f75ffc494c5617352bdc";
         public const string IMAGE_8_JPEG = "156f81ceb3db1bfdf27618efe4b89575f17d4708053c1a9ce6c5dfb7f36a6b958a5c3f45147728de28cf538345336e7b81d01b3f5908d4677ce76e1661e97ac3";
         public const string IMAGE_9_PNG = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
         public const string IMAGE_9_DUPLICATE_PNG = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20";
@@ -507,57 +565,57 @@ public static class Constants
     
     public static class DHashes
     {
-        public const string HOMER_GIF = "0";
-        public const string HOMER_JPG = "0";
-        public const string IMAGE_1_JPG = "23831507941108244";
-        public const string IMAGE_1_90_DEG_JPG = "23831507941108244";
-        public const string IMAGE_1_180_DEG_JPG = "23831507941108244";
-        public const string IMAGE_1_270_DEG_JPG = "23831507941108244";
-        public const string IMAGE_1_DUPLICATE_JPG = "23831507941108244";
-        public const string IMAGE_2_JPG = "23831507941108244";
-        public const string IMAGE_2_DUPLICATED_JPG = "23831507941108244";
-        public const string IMAGE_3_JPG = "23831507941108244";
-        public const string IMAGE_4_JPG = "23831507941108244";
-        public const string IMAGE_5_JPG = "23831507941108244";
-        public const string IMAGE_6_JPG = "23831507941108244";
-        public const string IMAGE_7_JPG = "23831507941108244";
-        public const string IMAGE_8_JPEG = "23831507941108244";
-        public const string IMAGE_9_PNG = "9346989754624";
-        public const string IMAGE_9_DUPLICATE_PNG = "9346989754624";
-        public const string IMAGE_10_PORTRAIT_PNG = "36116814863094786";
-        public const string IMAGE_11_HEIC = "0";
-        public const string IMAGE_11_90_DEG_HEIC = "14766675108600273";
-        public const string IMAGE_11_180_DEG_HEIC = "53334510583489094";
-        public const string IMAGE_11_270_DEG_HEIC = "0";
-        public const string IMAGE_WITH_UPPERCASE_NAME_JPG = "23831507941108244";
-        public const string _1336_JPG = "1090783378";
-        public const string _1336_ORIGINAL_JPG = "1090783378";
-        public const string _1336_1_K_JPG = "1144041857089536"; // OLD 1144041865478144
-        public const string _1336_2_K_JPG = "3951120804249760";
-        public const string _1336_3_K_JPG = "54473113164973580";
-        public const string IMAGE_1336_4_K_ORIGINAL_JPG = "1090783378";
-        public const string _1336_8_K_JPG = "272696329"; // OLD 276890633
-        public const string _1336_THUMBNAIL_JPG = "4227650"; // OLD 8421922
-        public const string IMAGE_1336_ORIGINAL_JPG = "1090783378";
-        public const string IMAGE_1336_MINI_JPG = "61348232627230616";
-        public const string IMAGE_1336_SHIT_QUALITY_JPG = "0";
-        public const string IMAGE_1336_SMALL_JPG = "0";
-        public const string _1336_BOTTOM_LEFT_PART_JPG = "27162885008392837";
-        public const string _1336_BOTTOM_PART_JPG = "27162885008392837";
-        public const string _1336_BOTTOM_RIGHT_PART_JPG = "62467497692214892";
-        public const string _1336_LEFT_PART_JPG = "9078668064344340"; // OLD 9079767575972116
-        public const string _1336_RIGHT_PART_JPG = "6879373740749024"; // OLD 6879371593265376
-        public const string _1336_TOP_LEFT_PART_JPG = "4574570757752994"; // OLD 4574570757752993
-        public const string _1336_TOP_PART_JPG = "9078668064344340"; // OLD 9079767575972116
-        public const string _1336_TOP_RIGHT_PART_JPG = "6879373740749024"; // OLD 6879371593265376
-        public const string _1337_JPG = "0";
-        public const string _1349_JPG = "281474976727300"; // OLD 69788202038198207
-        public const string _1350_JPG = "54606147637805507"; // OLD 58456436619323367
-        public const string _1413_JPG = "62923405895713543"; // OLD 62941001906964359
-        public const string _1414_JPG = "58209080565762203"; // OLD 58526839426719643
-        public const string _1415_JPG = "9254484650103734"; // OLD 29520682973338550
+        public const string HOMER_GIF = "00000000000000";
+        public const string HOMER_JPG = "00000000000000";
+        public const string IMAGE_1_JPG = "54aaa1554aaa14";
+        public const string IMAGE_1_90_DEG_JPG = "54aaa1554aaa14";
+        public const string IMAGE_1_180_DEG_JPG = "54aaa1554aaa14";
+        public const string IMAGE_1_270_DEG_JPG = "54aaa1554aaa14";
+        public const string IMAGE_1_DUPLICATE_JPG = "54aaa1554aaa14";
+        public const string IMAGE_2_JPG = "54aaa1554aaa14";
+        public const string IMAGE_2_DUPLICATED_JPG = "54aaa1554aaa14";
+        public const string IMAGE_3_JPG = "54aaa1554aaa14";
+        public const string IMAGE_4_JPG = "54aaa1554aaa14";
+        public const string IMAGE_5_JPG = "54aaa1554aaa14";
+        public const string IMAGE_6_JPG = "54aaa1554aaa14";
+        public const string IMAGE_7_JPG = "54aaa1554aaa14";
+        public const string IMAGE_8_JPEG = "54aaa1554aaa14";
+        public const string IMAGE_9_PNG = "00088044010900";
+        public const string IMAGE_9_DUPLICATE_PNG = "00088044010900";
+        public const string IMAGE_10_PORTRAIT_PNG = "80500d40555402";
+        public const string IMAGE_11_HEIC = "00000000000000";
+        public const string IMAGE_11_90_DEG_HEIC = "347636785c99d1";
+        public const string IMAGE_11_180_DEG_HEIC = "bd7b746d992246";
+        public const string IMAGE_11_270_DEG_HEIC = "00000000000000";
+        public const string IMAGE_WITH_UPPERCASE_NAME_JPG = "54aaa1554aaa14";
+        public const string _1336_JPG = "00000041040892";
+        public const string _1336_ORIGINAL_JPG = "00000041040892";
+        public const string _1336_1_K_JPG = "04108000800000";
+        public const string _1336_2_K_JPG = "0e0986000080a0";
+        public const string _1336_3_K_JPG = "c187020002060c";
+        public const string IMAGE_1336_4_K_ORIGINAL_JPG = "00000041040892";
+        public const string _1336_8_K_JPG = "00000010410409";
+        public const string _1336_THUMBNAIL_JPG = "00000000408242";
+        public const string IMAGE_1336_ORIGINAL_JPG = "00000041040892";
+        public const string IMAGE_1336_MINI_JPG = "d9f3e47d581798";
+        public const string IMAGE_1336_SHIT_QUALITY_JPG = "00000000000000";
+        public const string IMAGE_1336_SMALL_JPG = "00000000000000";
+        public const string _1336_BOTTOM_LEFT_PART_JPG = "60808000000285";
+        public const string _1336_BOTTOM_PART_JPG = "60808000000285";
+        public const string _1336_BOTTOM_RIGHT_PART_JPG = "ddeddbb1f3b66c";
+        public const string _1336_LEFT_PART_JPG = "20410021024914";
+        public const string _1336_RIGHT_PART_JPG = "1870c1041830e0";
+        public const string _1336_TOP_LEFT_PART_JPG = "10408c410408a2";
+        public const string _1336_TOP_PART_JPG = "20410021024914";
+        public const string _1336_TOP_RIGHT_PART_JPG = "1870c1041830e0";
+        public const string _1337_JPG = "00000000000000";
+        public const string _1349_JPG = "01000000004104";
+        public const string _1350_JPG = "c20000808101c3";
+        public const string _1413_JPG = "df8c811878c307";
+        public const string _1414_JPG = "ceccd9b1d3089b";
+        public const string _1415_JPG = "20e0e79e2613b6";
 
-        public const int LENGTH = 17; // The DHash is a 17-character number
+        public const int LENGTH = 14; // The DHash is a 14-hex digits
     }
 
     public static class MD5Hashes
@@ -570,6 +628,11 @@ public static class Constants
         public const string IMAGE_1_DUPLICATE_JPG = "a886f237e1cf6da03fb793588fd79b64";
         public const string IMAGE_2_JPG = "27007861db67443498b6aa0d00808b41";
         public const string IMAGE_2_DUPLICATED_JPG = "27007861db67443498b6aa0d00808b41";
+        public const string IMAGE_3_JPG = "adb03c1eda4dc85e7e67ba0b69c10b74";
+        public const string IMAGE_4_JPG = "e243d9680908721b4ba66d59f62aac5b";
+        public const string IMAGE_5_JPG = "8b3a1061da05bad5463ea53c387f952b";
+        public const string IMAGE_6_JPG = "84203a93ca05b45de6bd6ef5bbf184c9";
+        public const string IMAGE_7_JPG = "148817a75c57bc5ae960df3354e04327";
         public const string IMAGE_8_JPEG = "4194e88c247b5bbc7a1c6294cc795466";
         public const string IMAGE_9_PNG = "05d29088572bd5a5970fc370c0ca8751";
         public const string IMAGE_9_DUPLICATE_PNG = "05d29088572bd5a5970fc370c0ca8751";
@@ -621,11 +684,11 @@ public static class Constants
         public const string IMAGE_1_DUPLICATE_JPG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add4f8456d8d85a8b4e062ee062ee062d57afbaa849d28fc2b8dc1262ee062ee062ee0";
         public const string IMAGE_2_JPG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add3d8456a8d85d8b4df62ee062ee062e57afba2849d18fc388dc1662ee062ee062ee0";
         public const string IMAGE_2_DUPLICATED_JPG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add3d8456a8d85d8b4df62ee062ee062e57afba2849d18fc388dc1662ee062ee062ee0";
-        public const string IMAGE_3_JPG = "afb9e849d08fc428dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc428dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc428dc1a62da1619b362ee0afb9e849d08fc428dc1a62da1619b362ee0";
-        public const string IMAGE_4_JPG = "afb9b849cf8fc488dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afb9b849cf8fc488dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afb9b849cf8fc488dc1b62da1619b462ee0afb9b849cf8fc488dc1b62da1619b462ee0";
-        public const string IMAGE_5_JPG = "afb9e849d08fc458dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc458dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc458dc1a62da1619b362ee0afb9e849d08fc458dc1a62da1619b362ee0";
-        public const string IMAGE_6_JPG = "afb93849ce8fc508dc1d62da2619b462ee062ee062ee062ee062ee062ee062ee062ee0afb93849ce8fc508dc1d62da2619b462ee062ee062ee062ee062ee062ee062ee062ee0afb93849ce8fc508dc1d62da2619b462ee0afb93849ce8fc508dc1d62da2619b462ee0";
-        public const string IMAGE_7_JPG = "afbac849d38fc408dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afbac849d38fc408dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afbac849d38fc408dc1b62da1619b462ee0afbac849d38fc408dc1b62da1619b462ee0";
+        public const string IMAGE_3_JPG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add34845688d8638b4e062ee062ee062ee0afb9e849d08fc428dc1a62ee062ee062ee0";
+        public const string IMAGE_4_JPG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add2d845678d8648b4df62ee062ee062ee0afb9b849cf8fc488dc1b62ee062ee062ee0";
+        public const string IMAGE_5_JPG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add35845688d8668b4e162ee062ee062ee0afb9e849d08fc458dc1a62ee062ee062ee0";
+        public const string IMAGE_6_JPG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add1c845638d8638b4dc62ee062ee062ee0afb93849ce8fc508dc1d62ee062ee062ee0";
+        public const string IMAGE_7_JPG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add538456e8d8738b4eb62ee062ee062d43afbac849d38fc408dc1b62ee062ee062ee0";
         public const string IMAGE_8_JPEG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0add078455f8d8688b4db62ee062ee062ee0afb8a849cc8fc608dc2362ee062ee062ee0";
         public const string IMAGE_9_PNG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0adc32845338d8e28b4a762ee062ee062ee0afb2d849b98fd038dc1062ee062ee062ee0";
         public const string IMAGE_9_DUPLICATE_PNG = "a505b8264162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a58f7827fa62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0adc32845338d8e28b4a762ee062ee062ee0afb2d849b98fd038dc1062ee062ee062ee0";
@@ -655,12 +718,12 @@ public static class Constants
         public const string _1336_TOP_LEFT_PART_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a860983dff890f188d7761cef62ee061d32ade578542a8bf548bb8b6261a62ee062685";
         public const string _1336_TOP_PART_JPG = "a23edaa75562ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a2c89ab88d62ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a4309ad6ef88013881ba61a8088da262ee0a9d838286c8b5668b5f3625668cbfa62ee0";
         public const string _1336_TOP_RIGHT_PART_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a90b183f0189676896d662ee062ee061e28ae3968548a8c4158c2f562b5262ee06270e";
-        public const string _1337_JPG = "aba21844698994389c3061fba8c26061fa362ee062ee062ee062ee062ee062ee062ee0aba21844698994389c3061fba8c26061fa362ee062ee062ee062ee062ee062ee062ee0aba21844698994389c3061fba8c26061fa3aba21844698994389c3061fba8c26061fa3";
-        public const string _1349_JPG = "ab6ba84445890c1895e961dea8b85961f1662ee062ee062ee062ee062ee062ee062ee0ab6ba84445890c1895e961dea8b85961f1662ee062ee062ee062ee062ee062ee062ee0ab6ba84445890c1895e961dea8b85961f16ab6ba84445890c1895e961dea8b85961f16";
-        public const string _1350_JPG = "abc9584a4e88a8388f3e61c818b47a61e5862ee062ee062ee062ee062ee062ee062ee0abc9584a4e88a8388f3e61c818b47a61e5862ee062ee062ee062ee062ee062ee062ee0abc9584a4e88a8388f3e61c818b47a61e58abc9584a4e88a8388f3e61c818b47a61e58";
-        public const string _1413_JPG = "a66038379386f52862528d84e87e738cd2962ee062ee062ee062ee062ee062ee062ee0a66038379386f52862528d84e87e738cd2962ee062ee062ee062ee062ee062ee062ee0a66038379386f52862528d84e87e738cd29a66038379386f52862528d84e87e738cd29";
-        public const string _1414_JPG = "a610d836af86c76860278de5287c4d8c6fc62ee062ee062ee062ee062ee062ee062ee0a610d836af86c76860278de5287c4d8c6fc62ee062ee062ee062ee062ee062ee062ee0a610d836af86c76860278de5287c4d8c6fca610d836af86c76860278de5287c4d8c6fc";
-        public const string _1415_JPG = "a74048491d84b8c84917893a186db68b25562ee062ee062ee062ee062ee062ee062ee0a74048491d84b8c84917893a186db68b25562ee062ee062ee062ee062ee062ee062ee0a74048491d84b8c84917893a186db68b255a74048491d84b8c84917893a186db68b255";
+        public const string _1337_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a46fb824c38613386f8562ee062ee08d912aba21844698994389c3062ee062ee061fa3";
+        public const string _1349_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a45a48230087223877b48eca362ee062ee0ab6ba84445890c1895e961dea62ee062ee0";
+        public const string _1350_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a53dd82ae985d8b863678c4e662ee08d657abc9584a4e88a8388f3e61c8162ee061e58";
+        public const string _1413_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0b3ae3a6c078366e82a5e62ee062ee062ee0a66038379386f52862528d84e62ee062ee0";
+        public const string _1414_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0b420fa61b5834ce8279562ee062ee062ee0a610d836af86c76860278de5262ee062ee0";
+        public const string _1415_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0db53884cb781b71ad09d82dea841d762ee0a74048491d84b8c84917893a186db662ee0";
 
         public const int LENGTH = 210; // The PHash is a 210-character hexadecimal string
     }

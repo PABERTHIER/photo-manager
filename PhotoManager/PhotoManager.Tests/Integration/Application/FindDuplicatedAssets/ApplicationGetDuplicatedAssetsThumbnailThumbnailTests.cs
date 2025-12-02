@@ -331,16 +331,14 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
         }
     }
 
-    // The hamming distance cannot be computed for this hashing method because it has not the same length
     [Test]
-    [Category("Thumbnail folder, DHash")] // The DHash is a 17-character number
-    [TestCase(3)]
-    [TestCase(5)]
-    [TestCase(9)]
-    [TestCase(11)]
-    [TestCase(14)]
-    [TestCase(17)]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailDHashDifferentThresholdValues(int thresholdToMock)
+    [Category("Thumbnail folder, DHash")] // The DHash is a 14-hex digits
+    [TestCase(3, 1, new[] { FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG })]
+    [TestCase(5, 1, new[] { FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG })]
+    [TestCase(9, 1, new[] { FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG })]
+    [TestCase(11, 1, new[] { FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG })]
+    [TestCase(14, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailDHashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName)
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
@@ -366,9 +364,15 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
             _assetRepository.AddAsset(_asset4, assetData);
             _assetRepository.AddAsset(_asset5, assetData);
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _application!.GetDuplicatedAssets());
+            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
-            Assert.That(exception?.Message, Is.EqualTo("Invalid arguments for hamming distance calculation."));
+            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+            if (expected > 0)
+            {
+                IList<string> assetsNameList = [..assetsName];
+                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            }
         }
         finally
         {
@@ -376,24 +380,24 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
         }
     }
 
-    // The hamming distance is about 36/74 between these hashes, except for the last picture which is a completely different one
+    // The hamming distance is about 10/74 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("Thumbnail folder, PHash")] // The PHash is a 210-character hexadecimal string
-    [TestCase(10, 0, new string[] { })]
-    [TestCase(20, 0, new string[] { })]
-    [TestCase(30, 0, new string[] { })]
-    [TestCase(40, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG })]
-    [TestCase(50, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG })]
-    [TestCase(60, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG })]
-    [TestCase(80, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG })]
-    [TestCase(90, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG })]
-    [TestCase(100, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG })]
-    [TestCase(120, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase(140, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase(160, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase(180, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase(210, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailPHashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName)
+    [TestCase(10, 0, new string[] { }, new string[] { })]
+    [TestCase(20, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG }, new string[] { })]
+    [TestCase(30, 2, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG }, new[] { FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG })]
+    [TestCase(40, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG }, new string[] { })]
+    [TestCase(50, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG }, new string[] { })]
+    [TestCase(60, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG }, new string[] { })]
+    [TestCase(80, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    [TestCase(90, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    [TestCase(100, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    [TestCase(120, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    [TestCase(140, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    [TestCase(160, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    [TestCase(180, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    [TestCase(210, 1, new[] { FileNames.IMAGE_1336_MINI_JPG, FileNames.IMAGE_1336_ORIGINAL_JPG, FileNames.IMAGE_1336_SHIT_QUALITY_JPG, FileNames.IMAGE_1336_SMALL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ThumbnailPHashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName1, string[] assetsName2)
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
@@ -425,8 +429,13 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = [..assetsName];
-                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+                IList<string> assetsNameList1 = [..assetsName1];
+                Assert.That(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            }
+            if (expected > 1)
+            {
+                IList<string> assetsNameList2 = [..assetsName2];
+                Assert.That(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)), Is.True);
             }
         }
         finally

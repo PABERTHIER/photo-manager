@@ -90,17 +90,26 @@ public class BitmapHelperTests
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
 
+    // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
-    public void LoadBitmapOriginalImage_InvalidImageFormat_ThrowsNotSupportedException()
+    public void LoadBitmapOriginalImage_HeicImageFormat_ReturnsBitmapImageWithIncorrectData()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
-        const Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate0;
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapOriginalImage(buffer, rotation));
+        BitmapImage image = BitmapHelper.LoadBitmapOriginalImage(buffer, rotation);
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Not.Null);
+        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+        Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+        Assert.That(image.DecodePixelWidth, Is.EqualTo(0)); // We should have the width value
+        Assert.That(image.DecodePixelHeight, Is.EqualTo(0)); // We should have the height value
     }
 
     [Test]
@@ -201,17 +210,26 @@ public class BitmapHelperTests
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
 
+    // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage")]
-    public void LoadBitmapThumbnailImage_InvalidImageFormat_ThrowsNotSupportedException()
+    public void LoadBitmapThumbnailImage_HeicImageFormat_ReturnsBitmapImage()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
-        const Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate0;
+        const int width = 100;
+        const int height = 100;
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height);
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Not.Null);
+        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.PixelWidth, Is.EqualTo(width));
+        Assert.That(image.PixelHeight, Is.EqualTo(height));
+        Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
+        Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
     }
 
     [Test]
@@ -530,16 +548,25 @@ public class BitmapHelperTests
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
 
+    // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
-    public void LoadBitmapImageFromPath_InvalidImageFormat_ThrowsArgumentException()
+    public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-        const Rotation rotation = Rotation.Rotate90;
+        const Rotation rotation = Rotation.Rotate0;
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapImageFromPath(filePath, rotation));
+        BitmapImage image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Null);
+        Assert.That(image.Rotation, Is.EqualTo(rotation));
+        Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+        Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
     }
 
     [Test]
@@ -711,16 +738,25 @@ public class BitmapHelperTests
         Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
+    // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
     [Category("From AssetRepository")]
-    public void LoadBitmapThumbnailImageAssetRepository_InvalidImageFormat_ThrowsNotSupportedException()
+    public void LoadBitmapThumbnailImageAssetRepository_HeicImageFormat_ReturnsBitmapImage()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
+        const int width = 100;
+        const int height = 100;
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => BitmapHelper.LoadBitmapThumbnailImage(buffer, 100, 100));
+        BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height);
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.StreamSource, Is.Not.Null);
+        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+        Assert.That(image.PixelWidth, Is.EqualTo(width));
+        Assert.That(image.PixelHeight, Is.EqualTo(height));
+        Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
+        Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
     }
 
     [Test]

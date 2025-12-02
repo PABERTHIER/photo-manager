@@ -22,6 +22,7 @@ public class ApplicationLoadBitmapImageFromPathTests
     private Asset? _asset1;
     private Asset? _asset2;
     private Asset? _asset3;
+    private Asset? _asset4;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -105,6 +106,31 @@ public class ApplicationLoadBitmapImageFromPathTests
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
+        _asset4 = new()
+        {
+            FolderId = Guid.Empty,
+            Folder = new() { Id = Guid.Empty, Path = "" },
+            FileName = FileNames.IMAGE_11_HEIC,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+            },
+            FileProperties = new()
+            {
+                Size = FileSize.IMAGE_11_HEIC,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = Rotation.Rotate0,
+            Hash = Hashes.IMAGE_11_HEIC,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -157,10 +183,7 @@ public class ApplicationLoadBitmapImageFromPathTests
             BitmapImage image1 = _application!.LoadBitmapImageFromPath(assets[0].FullPath, assets[0].ImageRotation);
             BitmapImage image2 = _application!.LoadBitmapImageFromPath(assets[1].FullPath, assets[1].ImageRotation);
             BitmapImage image3 = _application!.LoadBitmapImageFromPath(assets[2].FullPath, assets[2].ImageRotation);
-
-            NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _application!.LoadBitmapImageFromPath(assets[3].FullPath, assets[3].ImageRotation));
-
-            Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+            BitmapImage image4 = _application!.LoadBitmapImageFromPath(assets[3].FullPath, assets[3].ImageRotation);
 
             Assert.That(image1, Is.Not.Null);
             Assert.That(image1.StreamSource, Is.Null);
@@ -191,6 +214,16 @@ public class ApplicationLoadBitmapImageFromPathTests
             Assert.That(image3.PixelHeight, Is.EqualTo(_asset3.Pixel.Asset.Height));
             Assert.That(image3.DecodePixelWidth, Is.EqualTo(0));
             Assert.That(image3.DecodePixelHeight, Is.EqualTo(0));
+
+            Assert.That(image4, Is.Not.Null);
+            Assert.That(image4.StreamSource, Is.Null);
+            Assert.That(image4.Rotation, Is.EqualTo(_asset4!.ImageRotation));
+            Assert.That(image4.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+            Assert.That(image4.Height, Is.EqualTo(5376)); // Wrong height
+            Assert.That(image4.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
+            Assert.That(image4.PixelHeight, Is.EqualTo(_asset4.Pixel.Asset.Height));
+            Assert.That(image4.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(image4.DecodePixelHeight, Is.EqualTo(0));
         }
         finally
         {

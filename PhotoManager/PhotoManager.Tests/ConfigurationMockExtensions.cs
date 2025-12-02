@@ -27,7 +27,7 @@ public static class ConfigurationMockExtensions
              .MockGetValue(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES, "false")
              .MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT, "150")
              .MockGetValue(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH, "200")
-             .MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, "40")
+             .MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, "10")
              .MockGetValue(UserConfigurationKeys.USING_DHASH, "false")
              .MockGetValue(UserConfigurationKeys.USING_MD5_HASH, "false")
              .MockGetValue(UserConfigurationKeys.USING_PHASH, "false")

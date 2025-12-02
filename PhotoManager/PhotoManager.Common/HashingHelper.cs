@@ -37,7 +37,7 @@ public static class HashingHelper
         return phash;
     }
 
-    // For Gif or some heic file it returns "0"
+    // For Gif or some heic file it returns "00000000000000"
     public static string CalculateDHash(string? filePath)
     {
         bool isHeicFile = filePath?.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) ?? false;
@@ -61,7 +61,7 @@ public static class HashingHelper
             }
         }
 
-        return hash.ToString();
+        return hash.ToString("x14"); // Always 14 hex chars (lowercase)
     }
 
     public static string CalculateMD5Hash(byte[] imageBytes)
@@ -72,7 +72,7 @@ public static class HashingHelper
         return md5Hash;
     }
 
-    //The best use is for PHash method, the more accurate
+    // The best use is for PHash method, the most accurate
     public static int CalculateHammingDistance(string hash1, string hash2)
     {
         if (hash1 == null || hash2 == null || hash1.Length != hash2.Length)

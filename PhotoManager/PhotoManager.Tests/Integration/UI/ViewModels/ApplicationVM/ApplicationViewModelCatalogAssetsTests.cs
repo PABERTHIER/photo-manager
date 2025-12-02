@@ -6,6 +6,7 @@ using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
 using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
@@ -41,16 +42,16 @@ public class ApplicationViewModelCatalogAssetsTests
     private Asset? _asset4Temp;
     private Asset? _asset5Temp;
 
-    private const int ASSET1_IMAGE_BYTE_SIZE = 2097;
-    private const int ASSET2_IMAGE_BYTE_SIZE = 11002;
-    private const int ASSET3_IMAGE_BYTE_SIZE = 11002;
-    private const int ASSET4_IMAGE_BYTE_SIZE = 5831;
+    private const int ASSET1_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_DUPLICATE_JPG;
+    private const int ASSET2_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_9_PNG;
+    private const int ASSET3_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_9_DUPLICATE_PNG;
+    private const int ASSET4_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_11_HEIC;
 
-    private const int ASSET1_TEMP_IMAGE_BYTE_SIZE = 2097;
-    private const int ASSET2_TEMP_IMAGE_BYTE_SIZE = 2097;
-    private const int ASSET3_TEMP_IMAGE_BYTE_SIZE = 8594;
-    private const int ASSET4_TEMP_IMAGE_BYTE_SIZE = 4779;
-    private const int ASSET5_TEMP_IMAGE_BYTE_SIZE = 4779;
+    private const int ASSET1_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_DUPLICATE_COPIED_JPG;
+    private const int ASSET2_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_JPG;
+    private const int ASSET3_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.HOMER_GIF;
+    private const int ASSET4_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.HOMER_JPG;
+    private const int ASSET5_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.HOMER_DUPLICATED_JPG;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
