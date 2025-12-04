@@ -65,7 +65,7 @@ jobs:
 
       # Step 8: Run tests and generate code coverage report
       - name: 🔨 Test with Coverage
-        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ExifHelperTests | FullyQualifiedName~BitmapHelperTests | FullyQualifiedName~ApplicationLoadBitmapImageFromPathTests"
+        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ExifHelperTests | FullyQualifiedName~BitmapHelperTests | FullyQualifiedName~ApplicationLoadBitmapImageFromPathTests)"
 
       # Step 9: List Test Results Directory
       - name: 📂 List Test Results Directory
