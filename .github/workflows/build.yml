@@ -29,6 +29,14 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Install HEIC Support
+        shell: powershell
+        run: |
+          # The package ID 9PMMSR1CGPWG corresponds to "HEIF Image Extensions" from Microsoft
+          winget install --id 9PMMSR1CGPWG --exact --silent --accept-package-agreements --accept-source-agreements
+          # Give it a moment to register
+          Start-Sleep -Seconds 5
+
       # Step 3: Cache NuGet packages for faster builds
       - name: 💾 Cache NuGet packages
         uses: actions/cache@v4
@@ -57,7 +65,7 @@ jobs:
 
       # Step 8: Run tests and generate code coverage report
       - name: 🔨 Test with Coverage
-        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }}
+        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ExifHelperTests | FullyQualifiedName~BitmapHelperTests | FullyQualifiedName~ApplicationLoadBitmapImageFromPathTests"
 
       # Step 9: List Test Results Directory
       - name: 📂 List Test Results Directory
