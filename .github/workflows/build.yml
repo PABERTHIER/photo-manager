@@ -37,8 +37,32 @@ jobs:
           winget install --id 9PMMSR1CGPWG --exact --silent --accept-package-agreements --accept-source-agreements
           
           Write-Host "Installing HEVC Video Extensions..."
+          # Download HEVC codec from Microsoft Store via store.rg-adguard.net
           # The package ID 9N4WGH0Z6VHQ corresponds to "HEVC Video Extensions" from Microsoft
-          winget install --id 9N4WGH0Z6VHQ --exact --silent --accept-package-agreements --accept-source-agreements
+          $body = @{
+              type = 'url'
+              url = 'https://www.microsoft.com/store/productId/9N4WGH0Z6VHQ'
+              ring = 'Retail'
+              lang = 'en-US'
+          }
+          
+          $response = Invoke-WebRequest -Uri "https://store.rg-adguard.net/api/GetFiles" -Method POST -ContentType "application/x-www-form-urlencoded" -Body $body -UseBasicParsing
+          
+          # Parse the response to find the x64 .appx file
+          $links = $response.Links | Where-Object { $_.href -match '\.appx$' -and $_.href -match 'x64' -and $_.href -notmatch '~' } | Select-Object -First 1
+          
+          if ($links) {
+              $downloadUrl = $links.href
+              Write-Host "Downloading from: $downloadUrl"
+              Invoke-WebRequest -Uri $downloadUrl -OutFile "hevc.appx" -UseBasicParsing
+              
+              Write-Host "Installing HEVC codec..."
+              Add-AppxPackage -Path "hevc.appx"
+              Write-Host "HEVC codec installed successfully"
+          } else {
+              Write-Host "Failed to find HEVC download link"
+              exit 1
+          }
           
           # Give codecs time to register
           Write-Host "Waiting for codecs to register..."
