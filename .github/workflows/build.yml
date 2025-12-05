@@ -29,7 +29,8 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Install HEIC and HEVC Support
+      # Step 2A: Install HEIC/HEVC Support
+      - name: 🛠️ Install HEIC/HEVC Support
         shell: powershell
         run: |
           Write-Host "Installing HEIF Image Extensions..."
@@ -41,9 +42,10 @@ jobs:
           # The package ID 9N4WGH0Z6VHQ corresponds to "HEVC Video Extensions from Device Manufacturer" from Microsoft
           Add-AppxPackage -Path "${{ github.workspace }}/.github/codecs/hevc.AppxBundle"
           
-          # Give codec time to register
-          Write-Host "Waiting for codec to register..."
+          # Give codecs time to register
+          Write-Host "Waiting for codecs to register..."
           Start-Sleep -Seconds 5
+          Write-Host "Codecs installed successfully!"
 
       # Step 3: Cache NuGet packages for faster builds
       - name: 💾 Cache NuGet packages
@@ -73,7 +75,7 @@ jobs:
 
       # Step 8: Run tests and generate code coverage report
       - name: 🔨 Test with Coverage
-        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }} --filter "(FullyQualifiedName~ExifHelperTests | FullyQualifiedName~BitmapHelperTests | FullyQualifiedName~ApplicationLoadBitmapImageFromPathTests)"
+        run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/ --logger "trx;LogFileName=test-results.trx" ${{ env.PROJECT_NAME }}"
 
       # Step 9: List Test Results Directory
       - name: 📂 List Test Results Directory
