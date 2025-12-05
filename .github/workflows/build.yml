@@ -29,13 +29,20 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Install HEIC Support
+      - name: Install HEIC and HEVC Support
         shell: powershell
         run: |
+          Write-Host "Installing HEIF Image Extensions..."
           # The package ID 9PMMSR1CGPWG corresponds to "HEIF Image Extensions" from Microsoft
           winget install --id 9PMMSR1CGPWG --exact --silent --accept-package-agreements --accept-source-agreements
-          # Give it a moment to register
-          Start-Sleep -Seconds 5
+          
+          Write-Host "Installing HEVC Video Extensions..."
+          # The package ID 9N4WGH0Z6VHQ corresponds to "HEVC Video Extensions" from Microsoft
+          winget install --id 9N4WGH0Z6VHQ --exact --silent --accept-package-agreements --accept-source-agreements
+          
+          # Give codecs time to register
+          Write-Host "Waiting for codecs to register..."
+          Start-Sleep -Seconds 10
 
       # Step 3: Cache NuGet packages for faster builds
       - name: 💾 Cache NuGet packages

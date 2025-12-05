@@ -101,15 +101,18 @@ public class BitmapHelperTests
 
         BitmapImage image = BitmapHelper.LoadBitmapOriginalImage(buffer, rotation);
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
-        Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
-        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0)); // We should have the width value
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0)); // We should have the height value
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Not.Null);
+            Assert.That(image.Rotation, Is.EqualTo(rotation));
+            Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+            Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+            Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+            Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(0)); // We should have the width value
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(0)); // We should have the height value
+        }
     }
 
     [Test]
@@ -223,13 +226,16 @@ public class BitmapHelperTests
 
         BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, rotation, width, height);
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.PixelWidth, Is.EqualTo(width));
-        Assert.That(image.PixelHeight, Is.EqualTo(height));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Not.Null);
+            Assert.That(image.Rotation, Is.EqualTo(rotation));
+            Assert.That(image.PixelWidth, Is.EqualTo(width));
+            Assert.That(image.PixelHeight, Is.EqualTo(height));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+        }
     }
 
     [Test]
@@ -558,15 +564,18 @@ public class BitmapHelperTests
 
         BitmapImage image = BitmapHelper.LoadBitmapImageFromPath(filePath, rotation);
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
-        Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
-        Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-        Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Null);
+            Assert.That(image.Rotation, Is.EqualTo(rotation));
+            Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+            Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+            Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+            Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        }
     }
 
     [Test]
@@ -582,15 +591,18 @@ public class BitmapHelperTests
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation);
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-        Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
-        Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Not.Null);
+            Assert.That(image.Rotation, Is.EqualTo(rotation));
+            Assert.That(image.Width, Is.EqualTo(expectedWidth));
+            Assert.That(image.Height, Is.EqualTo(expectedHeight));
+            Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
+            Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        }
     }
 
     [Test]
@@ -604,15 +616,18 @@ public class BitmapHelperTests
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation);
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.Width, Is.EqualTo(expectedWidth));
-        Assert.That(image.Height, Is.EqualTo(expectedHeight));
-        Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
-        Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Not.Null);
+            Assert.That(image.Rotation, Is.EqualTo(rotation));
+            Assert.That(image.Width, Is.EqualTo(expectedWidth));
+            Assert.That(image.Height, Is.EqualTo(expectedHeight));
+            Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
+            Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        }
     }
 
     [Test]
@@ -624,11 +639,14 @@ public class BitmapHelperTests
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath!, rotation);
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Null);
+            Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        }
     }
 
     [Test]
@@ -640,11 +658,14 @@ public class BitmapHelperTests
 
         BitmapImage image = BitmapHelper.LoadBitmapHeicImageFromPath(filePath, rotation);
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Null);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Null);
+            Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        }
     }
 
     [Test]
@@ -750,13 +771,16 @@ public class BitmapHelperTests
 
         BitmapImage image = BitmapHelper.LoadBitmapThumbnailImage(buffer, width, height);
 
-        Assert.That(image, Is.Not.Null);
-        Assert.That(image.StreamSource, Is.Not.Null);
-        Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.PixelWidth, Is.EqualTo(width));
-        Assert.That(image.PixelHeight, Is.EqualTo(height));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Not.Null);
+            Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
+            Assert.That(image.PixelWidth, Is.EqualTo(width));
+            Assert.That(image.PixelHeight, Is.EqualTo(height));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(width));
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(height));
+        }
     }
 
     [Test]
