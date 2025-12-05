@@ -167,15 +167,18 @@ public class ApplicationLoadBitmapImageFromPathTests
 
             BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.StreamSource, Is.Null);
-            Assert.That(image.Rotation, Is.EqualTo(rotation));
-            Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
-            Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
-            Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
-            Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.StreamSource, Is.Null);
+                Assert.That(image.Rotation, Is.EqualTo(rotation));
+                Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+                Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+                Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+                Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+                Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+                Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            }
         }
         finally
         {
