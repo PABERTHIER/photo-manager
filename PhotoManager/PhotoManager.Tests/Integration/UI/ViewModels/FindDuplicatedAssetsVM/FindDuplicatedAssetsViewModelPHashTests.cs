@@ -980,65 +980,57 @@ public class FindDuplicatedAssetsViewModelPHashTests
 
             List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(7));
-            Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(14));
-            Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(8));
-            Assert.That(duplicatedAssetsSets[2], Has.Count.EqualTo(4));
-            Assert.That(duplicatedAssetsSets[3], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[4], Has.Count.EqualTo(4));
-            Assert.That(duplicatedAssetsSets[5], Has.Count.EqualTo(3));
-            Assert.That(duplicatedAssetsSets[6], Has.Count.EqualTo(2));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(8));
+                Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(6));
+                Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(2));
+                Assert.That(duplicatedAssetsSets[2], Has.Count.EqualTo(2));
+                Assert.That(duplicatedAssetsSets[3], Has.Count.EqualTo(2));
+                Assert.That(duplicatedAssetsSets[4], Has.Count.EqualTo(3));
+                Assert.That(duplicatedAssetsSets[5], Has.Count.EqualTo(2));
+                Assert.That(duplicatedAssetsSets[6], Has.Count.EqualTo(4));
+                Assert.That(duplicatedAssetsSets[7], Has.Count.EqualTo(2));
 
-            // First set
-            Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset2.FileName));
-            Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset3.FileName));
-            Assert.That(duplicatedAssetsSets[0][3].FileName, Is.EqualTo(_asset4.FileName));
-            Assert.That(duplicatedAssetsSets[0][4].FileName, Is.EqualTo(_asset5.FileName));
-            Assert.That(duplicatedAssetsSets[0][5].FileName, Is.EqualTo(_asset6.FileName));
-            Assert.That(duplicatedAssetsSets[0][6].FileName, Is.EqualTo(_asset7.FileName));
-            Assert.That(duplicatedAssetsSets[0][7].FileName, Is.EqualTo(_asset8.FileName));
-            Assert.That(duplicatedAssetsSets[0][8].FileName, Is.EqualTo(_asset9.FileName));
-            Assert.That(duplicatedAssetsSets[0][9].FileName, Is.EqualTo(_asset10.FileName));
-            Assert.That(duplicatedAssetsSets[0][10].FileName, Is.EqualTo(_asset11.FileName));
-            Assert.That(duplicatedAssetsSets[0][11].FileName, Is.EqualTo(_asset12.FileName));
-            Assert.That(duplicatedAssetsSets[0][12].FileName, Is.EqualTo(_asset19.FileName));
-            Assert.That(duplicatedAssetsSets[0][13].FileName, Is.EqualTo(_asset20.FileName));
+                // First set
+                Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1.FileName));
+                Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset2.FileName));
+                Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset3.FileName));
+                Assert.That(duplicatedAssetsSets[0][3].FileName, Is.EqualTo(_asset4.FileName));
+                Assert.That(duplicatedAssetsSets[0][4].FileName, Is.EqualTo(_asset19.FileName));
+                Assert.That(duplicatedAssetsSets[0][5].FileName, Is.EqualTo(_asset20.FileName));
 
-            // Second set
-            Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset14.FileName));
-            Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset5.FileName));
-            Assert.That(duplicatedAssetsSets[1][2].FileName, Is.EqualTo(_asset6.FileName));
-            Assert.That(duplicatedAssetsSets[1][3].FileName, Is.EqualTo(_asset7.FileName));
-            Assert.That(duplicatedAssetsSets[1][4].FileName, Is.EqualTo(_asset9.FileName));
-            Assert.That(duplicatedAssetsSets[1][5].FileName, Is.EqualTo(_asset13.FileName));
-            Assert.That(duplicatedAssetsSets[1][6].FileName, Is.EqualTo(_asset21.FileName));
-            Assert.That(duplicatedAssetsSets[1][7].FileName, Is.EqualTo(_asset22.FileName));
+                // Second set
+                Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset5.FileName));
+                Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset6.FileName));
 
-            // Third set
-            Assert.That(duplicatedAssetsSets[2][0].FileName, Is.EqualTo(_asset15.FileName));
-            Assert.That(duplicatedAssetsSets[2][1].FileName, Is.EqualTo(_asset16.FileName));
-            Assert.That(duplicatedAssetsSets[2][2].FileName, Is.EqualTo(_asset18.FileName));
-            Assert.That(duplicatedAssetsSets[2][3].FileName, Is.EqualTo(_asset23.FileName));
+                // Third set
+                Assert.That(duplicatedAssetsSets[2][0].FileName, Is.EqualTo(_asset7.FileName));
+                Assert.That(duplicatedAssetsSets[2][1].FileName, Is.EqualTo(_asset9.FileName));
 
-            // Fourth set
-            Assert.That(duplicatedAssetsSets[3][0].FileName, Is.EqualTo(_asset17.FileName));
-            Assert.That(duplicatedAssetsSets[3][1].FileName, Is.EqualTo(_asset18.FileName));
+                // Fourth set
+                Assert.That(duplicatedAssetsSets[3][0].FileName, Is.EqualTo(_asset8.FileName));
+                Assert.That(duplicatedAssetsSets[3][1].FileName, Is.EqualTo(_asset10.FileName));
 
-            // Fifth set
-            Assert.That(duplicatedAssetsSets[4][0].FileName, Is.EqualTo(_asset24.FileName));
-            Assert.That(duplicatedAssetsSets[4][1].FileName, Is.EqualTo(_asset25.FileName));
-            Assert.That(duplicatedAssetsSets[4][2].FileName, Is.EqualTo(_asset28.FileName));
-            Assert.That(duplicatedAssetsSets[4][3].FileName, Is.EqualTo(_asset31.FileName));
+                // Fifth set
+                Assert.That(duplicatedAssetsSets[4][0].FileName, Is.EqualTo(_asset13.FileName));
+                Assert.That(duplicatedAssetsSets[4][1].FileName, Is.EqualTo(_asset21.FileName));
+                Assert.That(duplicatedAssetsSets[4][2].FileName, Is.EqualTo(_asset22.FileName));
 
-            // Sixth set
-            Assert.That(duplicatedAssetsSets[5][0].FileName, Is.EqualTo(_asset26.FileName));
-            Assert.That(duplicatedAssetsSets[5][1].FileName, Is.EqualTo(_asset27.FileName));
-            Assert.That(duplicatedAssetsSets[5][2].FileName, Is.EqualTo(_asset29.FileName));
+                // Sixth set
+                Assert.That(duplicatedAssetsSets[5][0].FileName, Is.EqualTo(_asset15.FileName));
+                Assert.That(duplicatedAssetsSets[5][1].FileName, Is.EqualTo(_asset23.FileName));
 
-            // Seventh set
-            Assert.That(duplicatedAssetsSets[6][0].FileName, Is.EqualTo(_asset30.FileName));
-            Assert.That(duplicatedAssetsSets[6][1].FileName, Is.EqualTo(_asset32.FileName));
+                // Seventh set
+                Assert.That(duplicatedAssetsSets[6][0].FileName, Is.EqualTo(_asset24.FileName));
+                Assert.That(duplicatedAssetsSets[6][1].FileName, Is.EqualTo(_asset25.FileName));
+                Assert.That(duplicatedAssetsSets[6][2].FileName, Is.EqualTo(_asset28.FileName));
+                Assert.That(duplicatedAssetsSets[6][3].FileName, Is.EqualTo(_asset31.FileName));
+
+                // Eighth set
+                Assert.That(duplicatedAssetsSets[7][0].FileName, Is.EqualTo(_asset26.FileName));
+                Assert.That(duplicatedAssetsSets[7][1].FileName, Is.EqualTo(_asset27.FileName));
+            }
 
             Folder? folder1 = _assetRepository!.GetFolderByPath(rootDirectory);
             Folder? folder2 = _assetRepository!.GetFolderByPath(directoryNewFolder1);
@@ -1102,6 +1094,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             DuplicatedSetViewModel duplicatedAssetSet5 = [];
             DuplicatedSetViewModel duplicatedAssetSet6 = [];
             DuplicatedSetViewModel duplicatedAssetSet7 = [];
+            DuplicatedSetViewModel duplicatedAssetSet8 = [];
 
             // First set
             DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
@@ -1134,240 +1127,143 @@ public class FindDuplicatedAssetsViewModelPHashTests
 
             DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
             {
-                Asset = _asset5,
+                Asset = _asset19,
                 ParentViewModel = duplicatedAssetSet1
             };
             duplicatedAssetSet1.Add(duplicatedAssetViewModel5);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel6 = new()
             {
-                Asset = _asset6,
+                Asset = _asset20,
                 ParentViewModel = duplicatedAssetSet1
             };
             duplicatedAssetSet1.Add(duplicatedAssetViewModel6);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel7 = new()
-            {
-                Asset = _asset7,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel7);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel8 = new()
-            {
-                Asset = _asset8,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel8);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel9 = new()
-            {
-                Asset = _asset9,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel9);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel10 = new()
-            {
-                Asset = _asset10,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel10);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel11 = new()
-            {
-                Asset = _asset11,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel11);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel12 = new()
-            {
-                Asset = _asset12,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel12);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel13 = new()
-            {
-                Asset = _asset19,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel13);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel14 = new()
-            {
-                Asset = _asset20,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel14);
-
             // Second set
-            DuplicatedAssetViewModel duplicatedAssetViewModel15 = new()
-            {
-                Asset = _asset14,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel15);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel16 = new()
+            DuplicatedAssetViewModel duplicatedAssetViewModel7 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = duplicatedAssetSet2
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel16);
+            duplicatedAssetSet2.Add(duplicatedAssetViewModel7);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel17 = new()
+            DuplicatedAssetViewModel duplicatedAssetViewModel8 = new()
             {
                 Asset = _asset6,
                 ParentViewModel = duplicatedAssetSet2
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel17);
+            duplicatedAssetSet2.Add(duplicatedAssetViewModel8);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel18 = new()
+            // Third set
+            DuplicatedAssetViewModel duplicatedAssetViewModel9 = new()
             {
                 Asset = _asset7,
-                ParentViewModel = duplicatedAssetSet2
+                ParentViewModel = duplicatedAssetSet3
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel18);
+            duplicatedAssetSet3.Add(duplicatedAssetViewModel9);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel10 = new()
+            {
+                Asset = _asset9,
+                ParentViewModel = duplicatedAssetSet3
+            };
+            duplicatedAssetSet3.Add(duplicatedAssetViewModel10);
+
+            // Fourth set
+            DuplicatedAssetViewModel duplicatedAssetViewModel11 = new()
+            {
+                Asset = _asset8,
+                ParentViewModel = duplicatedAssetSet4
+            };
+            duplicatedAssetSet4.Add(duplicatedAssetViewModel11);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel12 = new()
+            {
+                Asset = _asset10,
+                ParentViewModel = duplicatedAssetSet4
+            };
+            duplicatedAssetSet4.Add(duplicatedAssetViewModel12);
+
+            // Fifth set
+            DuplicatedAssetViewModel duplicatedAssetViewModel13 = new()
+            {
+                Asset = _asset13,
+                ParentViewModel = duplicatedAssetSet5
+            };
+            duplicatedAssetSet5.Add(duplicatedAssetViewModel13);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel14 = new()
+            {
+                Asset = _asset21,
+                ParentViewModel = duplicatedAssetSet5
+            };
+            duplicatedAssetSet5.Add(duplicatedAssetViewModel14);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel15 = new()
+            {
+                Asset = _asset22,
+                ParentViewModel = duplicatedAssetSet5
+            };
+            duplicatedAssetSet5.Add(duplicatedAssetViewModel15);
+
+            // Sixth set
+            DuplicatedAssetViewModel duplicatedAssetViewModel16 = new()
+            {
+                Asset = _asset15,
+                ParentViewModel = duplicatedAssetSet6
+            };
+            duplicatedAssetSet6.Add(duplicatedAssetViewModel16);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel17 = new()
+            {
+                Asset = _asset23,
+                ParentViewModel = duplicatedAssetSet6
+            };
+            duplicatedAssetSet6.Add(duplicatedAssetViewModel17);
+
+            // Seventh set
+            DuplicatedAssetViewModel duplicatedAssetViewModel18 = new()
+            {
+                Asset = _asset24,
+                ParentViewModel = duplicatedAssetSet7
+            };
+            duplicatedAssetSet7.Add(duplicatedAssetViewModel18);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel19 = new()
             {
-                Asset = _asset9,
-                ParentViewModel = duplicatedAssetSet2
+                Asset = _asset25,
+                ParentViewModel = duplicatedAssetSet7
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel19);
+            duplicatedAssetSet7.Add(duplicatedAssetViewModel19);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel20 = new()
             {
-                Asset = _asset13,
-                ParentViewModel = duplicatedAssetSet2
+                Asset = _asset28,
+                ParentViewModel = duplicatedAssetSet7
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel20);
+            duplicatedAssetSet7.Add(duplicatedAssetViewModel20);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel21 = new()
             {
-                Asset = _asset21,
-                ParentViewModel = duplicatedAssetSet2
+                Asset = _asset31,
+                ParentViewModel = duplicatedAssetSet7
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel21);
+            duplicatedAssetSet7.Add(duplicatedAssetViewModel21);
 
+            // Eighth set
             DuplicatedAssetViewModel duplicatedAssetViewModel22 = new()
             {
-                Asset = _asset22,
-                ParentViewModel = duplicatedAssetSet2
+                Asset = _asset26,
+                ParentViewModel = duplicatedAssetSet8
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel22);
+            duplicatedAssetSet8.Add(duplicatedAssetViewModel22);
 
-            // Third set
             DuplicatedAssetViewModel duplicatedAssetViewModel23 = new()
             {
-                Asset = _asset15,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel23);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel24 = new()
-            {
-                Asset = _asset16,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel24);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel25 = new()
-            {
-                Asset = _asset18,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel25);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel26 = new()
-            {
-                Asset = _asset23,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel26);
-
-            // Fourth set
-            DuplicatedAssetViewModel duplicatedAssetViewModel27 = new()
-            {
-                Asset = _asset17,
-                ParentViewModel = duplicatedAssetSet4
-            };
-            duplicatedAssetSet4.Add(duplicatedAssetViewModel27);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel28 = new()
-            {
-                Asset = _asset18,
-                ParentViewModel = duplicatedAssetSet4
-            };
-            duplicatedAssetSet4.Add(duplicatedAssetViewModel28);
-
-            // Fifth set
-            DuplicatedAssetViewModel duplicatedAssetViewModel29 = new()
-            {
-                Asset = _asset24,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel29);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel30 = new()
-            {
-                Asset = _asset25,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel30);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel31 = new()
-            {
-                Asset = _asset28,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel31);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel32 = new()
-            {
-                Asset = _asset31,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel32);
-
-            // Sixth set
-            DuplicatedAssetViewModel duplicatedAssetViewModel33 = new()
-            {
-                Asset = _asset26,
-                ParentViewModel = duplicatedAssetSet6
-            };
-            duplicatedAssetSet6.Add(duplicatedAssetViewModel33);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel34 = new()
-            {
                 Asset = _asset27,
-                ParentViewModel = duplicatedAssetSet6
+                ParentViewModel = duplicatedAssetSet8
             };
-            duplicatedAssetSet6.Add(duplicatedAssetViewModel34);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel35 = new()
-            {
-                Asset = _asset29,
-                ParentViewModel = duplicatedAssetSet6
-            };
-            duplicatedAssetSet6.Add(duplicatedAssetViewModel35);
-
-            // Seventh set
-            DuplicatedAssetViewModel duplicatedAssetViewModel36 = new()
-            {
-                Asset = _asset30,
-                ParentViewModel = duplicatedAssetSet7
-            };
-            duplicatedAssetSet7.Add(duplicatedAssetViewModel36);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel37 = new()
-            {
-                Asset = _asset32,
-                ParentViewModel = duplicatedAssetSet7
-            };
-            duplicatedAssetSet7.Add(duplicatedAssetViewModel37);
+            duplicatedAssetSet8.Add(duplicatedAssetViewModel23);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [
@@ -1377,188 +1273,192 @@ public class FindDuplicatedAssetsViewModelPHashTests
                 duplicatedAssetSet4,
                 duplicatedAssetSet5,
                 duplicatedAssetSet6,
-                duplicatedAssetSet7
+                duplicatedAssetSet7,
+                duplicatedAssetSet8
             ];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
+            using (Assert.EnterMultipleScope())
+            {
+                CheckAfterChanges(
+                    _findDuplicatedAssetsViewModel!,
+                    expectedDuplicatedAssetsSets,
+                    0,
+                    0,
+                    duplicatedAssetSet1,
+                    duplicatedAssetViewModel1);
 
-            Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(149));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[23], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[29], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[30], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[32], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[35], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[36], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[38], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[39], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[43], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[44], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[46], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[47], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[49], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[52], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[55], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[56], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[58], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[59], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[61], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[62], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[63], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[64], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[65], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[66], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[67], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[68], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[69], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[70], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[71], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[72], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[73], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[74], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[75], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[76], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[77], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[78], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[79], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[80], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[81], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[82], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[83], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[84], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[85], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[86], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[87], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[88], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[89], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[90], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[91], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[92], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[93], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[94], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[95], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[96], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[97], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[98], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[99], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[100], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[101], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[102], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[103], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[104], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[105], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[106], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[107], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[108], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[109], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[110], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[111], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[112], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[113], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[114], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[115], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[116], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[117], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[118], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[119], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[120], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[121], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[122], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[123], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[124], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[125], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[126], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[127], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[128], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[129], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[130], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[131], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[132], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[133], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[134], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[135], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[136], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[137], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[138], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[139], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[140], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[141], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[142], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[143], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[144], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[145], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[146], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[147], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[148], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(149));
+                // CatalogAssets + NotifyCatalogChange
+                Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[23], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[29], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[30], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[32], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[35], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[36], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[38], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[39], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[43], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[44], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[46], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[47], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[49], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[52], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[55], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[56], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[58], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[59], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[61], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[62], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[63], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[64], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[65], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[66], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[67], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[68], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[69], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[70], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[71], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[72], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[73], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[74], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[75], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[76], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[77], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[78], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[79], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[80], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[81], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[82], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[83], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[84], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[85], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[86], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[87], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[88], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[89], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[90], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[91], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[92], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[93], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[94], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[95], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[96], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[97], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[98], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[99], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[100], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[101], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[102], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[103], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[104], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[105], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[106], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[107], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[108], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[109], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[110], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[111], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[112], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[113], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[114], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[115], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[116], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[117], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[118], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[119], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[120], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[121], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[122], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[123], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[124], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[125], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[126], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[127], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[128], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[129], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[130], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[131], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[132], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[133], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[134], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[135], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[136], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[137], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[138], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[139], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[140], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[141], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[142], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[143], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[144], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[145], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[146], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[147], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[148], Is.EqualTo("StatusMessage"));
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(5));
+                // SetDuplicates
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
-            Assert.That(messagesInformationSent, Is.Empty);
+                Assert.That(messagesInformationSent, Is.Empty);
 
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
+                CheckInstance(
+                    findDuplicatedAssetsViewModelInstances,
+                    expectedDuplicatedAssetsSets,
+                    0,
+                    0,
+                    duplicatedAssetSet1,
+                    duplicatedAssetViewModel1);
+            }
         }
         finally
         {

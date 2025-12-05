@@ -24,7 +24,7 @@ public class ConfigurationMockExtensionsTests
         Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES), Is.EqualTo(false));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT), Is.EqualTo(150));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH), Is.EqualTo(200));
-        Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.PHASH_THRESHOLD), Is.EqualTo(40));
+        Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.PHASH_THRESHOLD), Is.EqualTo(10));
         Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_DHASH), Is.EqualTo(false));
         Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_MD5_HASH), Is.EqualTo(false));
         Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_PHASH), Is.EqualTo(false));

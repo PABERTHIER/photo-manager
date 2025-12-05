@@ -154,19 +154,31 @@ public class ApplicationLoadBitmapImageFromPathTests
         }
     }
 
+    // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
-    public void LoadBitmapImageFromPath_InvalidImageFormat_ThrowsNotSupportedException()
+    public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
             string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-            const Rotation rotation = Rotation.Rotate90;
+            const Rotation rotation = Rotation.Rotate0;
 
-            NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _application!.LoadBitmapImageFromPath(filePath, rotation));
+            BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
-            Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.StreamSource, Is.Null);
+                Assert.That(image.Rotation, Is.EqualTo(rotation));
+                Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+                Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+                Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+                Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+                Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+                Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            }
         }
         finally
         {

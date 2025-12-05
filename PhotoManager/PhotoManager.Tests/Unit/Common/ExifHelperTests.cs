@@ -28,6 +28,11 @@ public class ExifHelperTests
     [TestCase(FileNames.IMAGE_1_180_DEG_JPG, 3)]
     [TestCase(FileNames.IMAGE_1_270_DEG_JPG, 8)]
     [TestCase(FileNames.IMAGE_8_JPEG, 1)]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, 1)]
+    [TestCase(FileNames.IMAGE_11_HEIC, 1)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, 1)] // HEIC files typically store the sensor orientation metadata without rotating the actual pixel data
     public void GetExifOrientation_ValidImageBuffer_ReturnsOrientationValue(string fileName, int expectedOrientation)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -42,9 +47,7 @@ public class ExifHelperTests
     }
 
     [Test]
-    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
     [TestCase(FileNames.HOMER_GIF)] // Error on bitmapMetadata.GetQuery("System.Photo.Orientation")
-    [TestCase(FileNames.IMAGE_11_HEIC)] // Error on BitmapFrame.Create(stream)
     public void GetExifOrientation_FormatImageNotHandledBuffer_ReturnsCorruptedImageOrientation(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -213,6 +216,7 @@ public class ExifHelperTests
     [TestCase(FileNames.IMAGE_8_JPEG)]
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)]
     [TestCase(FileNames.HOMER_GIF)]
+    [TestCase(FileNames.IMAGE_11_HEIC)]
     public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -221,17 +225,6 @@ public class ExifHelperTests
         bool result = ExifHelper.IsValidGDIPlusImage(validImageData);
 
         Assert.That(result, Is.True);
-    }
-
-    [Test]
-    public void IsValidGDIPlusImage_InvalidImageData_ReturnsFalse()
-    {
-        string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
-        byte[] invalidImageData = File.ReadAllBytes(filePath);
-
-        bool result = ExifHelper.IsValidGDIPlusImage(invalidImageData);
-
-        Assert.That(result, Is.False);
     }
 
     [Test]

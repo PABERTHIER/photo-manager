@@ -396,9 +396,17 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             _applicationViewModel!.GoToAsset(_applicationViewModel.ObservableAssets[3]);
 
-            NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
+            BitmapImage image4 = _applicationViewModel!.LoadBitmapImageFromPath();
 
-            Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+            Assert.That(image4, Is.Not.Null);
+            Assert.That(image4.StreamSource, Is.Null);
+            Assert.That(image4.Rotation, Is.EqualTo(_asset4!.ImageRotation));
+            Assert.That(image4.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+            Assert.That(image4.Height, Is.EqualTo(5376)); // Wrong height
+            Assert.That(image4.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
+            Assert.That(image4.PixelHeight, Is.EqualTo(_asset4.Pixel.Asset.Height));
+            Assert.That(image4.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(image4.DecodePixelHeight, Is.EqualTo(0));
 
             CheckAfterChanges(
                 _applicationViewModel!,

@@ -484,16 +484,14 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         }
     }
 
-    // The hamming distance is about 14 between these hashes (for some, 0)
     [Test]
-    [Category("Part folder, DHash")] // The DHash is a 17-character number
-    [TestCase("3", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG })]
-    [TestCase("5", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG })]
-    [TestCase("9", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG })]
-    [TestCase("11", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG })]
-    [TestCase("14", 2, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { })]
-    [TestCase("17", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3)
+    [Category("Part folder, DHash")] // The DHash is a 14-hex digits
+    [TestCase("3", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { })]
+    [TestCase("5", 4, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG })]
+    [TestCase("9", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { })]
+    [TestCase("11", 2, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { }, new string[] { })]
+    [TestCase("14", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_PartDHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2, string[] assetsName3, string[] assetsName4)
     {
         try
         {
@@ -550,6 +548,11 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
                 IList<string> assetsNameList3 = [..assetsName3];
                 Assert.That(assetsNameList3.SequenceEqual(duplicatedAssets[2].Select(y => y.FileName)), Is.True);
             }
+            if (expected > 3)
+            {
+                IList<string> assetsNameList4 = [..assetsName4];
+                Assert.That(assetsNameList4.SequenceEqual(duplicatedAssets[3].Select(y => y.FileName)), Is.True);
+            }
         }
         finally
         {
@@ -557,18 +560,18 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         }
     }
 
-    // The hamming distance is about 80/100 between these hashes, except for the last picture which is a completely different one
+    // The hamming distance is about 40/60 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("Part folder, PHash")] // The PHash is a 210-character hexadecimal string
     [TestCase("10", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("20", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("30", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("40", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("50", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("60", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("80", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG }, new string[] { }, new string[] { })]
-    [TestCase("90", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG }, new string[] { }, new string[] { })]
-    [TestCase("100", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new[] { FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_RIGHT_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG })]
+    [TestCase("40", 1, new[] { FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new string[] { }, new string[] { })]
+    [TestCase("50", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new[] { FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
+    [TestCase("60", 3, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG }, new[] { FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_TOP_PART_JPG }, new[] { FileNames._1336_LEFT_PART_JPG, FileNames._1336_RIGHT_PART_JPG })]
+    [TestCase("80", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
+    [TestCase("90", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
+    [TestCase("100", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
     [TestCase("120", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
     [TestCase("140", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
     [TestCase("160", 1, new[] { FileNames._1336_BOTTOM_LEFT_PART_JPG, FileNames._1336_BOTTOM_PART_JPG, FileNames._1336_BOTTOM_RIGHT_PART_JPG, FileNames._1336_LEFT_PART_JPG, FileNames._1336_ORIGINAL_JPG, FileNames._1336_RIGHT_PART_JPG, FileNames._1336_TOP_LEFT_PART_JPG, FileNames._1336_TOP_PART_JPG, FileNames._1336_TOP_RIGHT_PART_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]

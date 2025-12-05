@@ -150,7 +150,7 @@ public class UserConfigurationServiceTests
     {
         ushort pHashThreshold = _userConfigurationService!.HashSettings.PHashThreshold;
 
-        Assert.That(pHashThreshold, Is.EqualTo(40));
+        Assert.That(pHashThreshold, Is.EqualTo(10));
     }
 
     [Test]

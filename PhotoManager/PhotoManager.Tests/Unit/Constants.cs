@@ -192,17 +192,17 @@ public static class Constants
     
     public static class DHashes
     {
-        public const string HOMER_GIF = "0";
-        public const string IMAGE_1_JPG = "23831507941108244";
-        public const string IMAGE_1_90_DEG_JPG = "23831507941108244";
-        public const string IMAGE_1_180_DEG_JPG = "23831507941108244";
-        public const string IMAGE_1_270_DEG_JPG = "23831507941108244";
-        public const string IMAGE_8_JPEG = "23831507941108244";
-        public const string IMAGE_10_PORTRAIT_PNG = "36116814863094786";
-        public const string IMAGE_11_HEIC = "0";
-        public const string IMAGE_11_90_DEG_HEIC = "14766675108600273";
+        public const string HOMER_GIF = "00000000000000";
+        public const string IMAGE_1_JPG = "54aaa1554aaa14";
+        public const string IMAGE_1_90_DEG_JPG = "54aaa1554aaa14";
+        public const string IMAGE_1_180_DEG_JPG = "54aaa1554aaa14";
+        public const string IMAGE_1_270_DEG_JPG = "54aaa1554aaa14";
+        public const string IMAGE_8_JPEG = "54aaa1554aaa14";
+        public const string IMAGE_10_PORTRAIT_PNG = "80500d40555402";
+        public const string IMAGE_11_HEIC = "00000000000000";
+        public const string IMAGE_11_90_DEG_HEIC = "347636785c99d1";
 
-        public const int LENGTH = 17; // The DHash is a 17-character number
+        public const int LENGTH = 14; // The DHash is a 14-hex digits
     }
 
     public static class MD5Hashes

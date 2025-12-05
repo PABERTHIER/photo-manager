@@ -424,16 +424,14 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         }
     }
 
-    // The hamming distance cannot be computed for this hashing method because it has not the same length
     [Test]
-    [Category("NotDuplicate folder, DHash")] // The DHash is a 17-character number
-    [TestCase("3")]
-    [TestCase("5")]
-    [TestCase("9")]
-    [TestCase("11")]
-    [TestCase("14")]
-    [TestCase("17")]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample1DHashDifferentThresholdValues(string thresholdToMock)
+    [Category("NotDuplicate folder, DHash")] // The DHash is a 14-hex digits
+    [TestCase("3", 0, new string[] { })]
+    [TestCase("5", 0, new string[] { })]
+    [TestCase("9", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG })]
+    [TestCase("11", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG })]
+    [TestCase("14", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames.IMAGE_1_JPG })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample1DHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
@@ -457,9 +455,15 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
             _assetRepository.AddAsset(_asset2, assetData);
             _assetRepository.AddAsset(_asset8, assetData);
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => findDuplicatedAssetsService.GetDuplicatedAssets());
+            List<List<Asset>> duplicatedAssets = findDuplicatedAssetsService.GetDuplicatedAssets();
 
-            Assert.That(exception?.Message, Is.EqualTo("Invalid arguments for hamming distance calculation."));
+            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+            if (expected > 0)
+            {
+                IList<string> assetsNameList = [..assetsName];
+                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            }
         }
         finally
         {
@@ -467,15 +471,13 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         }
     }
 
-    // The hamming distance is about 15 between these hashes
     [Test]
-    [Category("NotDuplicate folder, DHash")] // The DHash is a 17-character number
+    [Category("NotDuplicate folder, DHash")] // The DHash is a 14-hex digits
     [TestCase("3", 0, new string[] { })]
     [TestCase("5", 0, new string[] { })]
-    [TestCase("9", 0, new string[] { })]
-    [TestCase("11", 0, new string[] { })]
-    [TestCase("14", 1, new[] { FileNames._1349_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("17", 1, new[] { FileNames._1349_JPG, FileNames._1350_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("9", 1, new[] { FileNames._1349_JPG, FileNames._1350_JPG })]
+    [TestCase("11", 1, new[] { FileNames._1349_JPG, FileNames._1350_JPG })]
+    [TestCase("14", 1, new[] { FileNames._1349_JPG, FileNames._1350_JPG, FileNames.IMAGE_1_JPG })]
     public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample2DHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
     {
         try
@@ -516,16 +518,14 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         }
     }
 
-    // The hamming distance is about 15 between these hashes
     [Test]
-    [Category("NotDuplicate folder, DHash")] // The DHash is a 17-character number
-    [TestCase("3", 0, new string[] { }, new string[] { })]
-    [TestCase("5", 0, new string[] { }, new string[] { })]
-    [TestCase("9", 0, new string[] { }, new string[] { })]
-    [TestCase("11", 0, new string[] { }, new string[] { })]
-    [TestCase("14", 2, new[] { FileNames._1413_JPG, FileNames.IMAGE_1_JPG }, new[] { FileNames._1415_JPG, FileNames.IMAGE_1_JPG })] // Weird result
-    [TestCase("17", 1, new[] { FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample3DHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1, string[] assetsName2)
+    [Category("NotDuplicate folder, DHash")] // The DHash is a 14-hex digits
+    [TestCase("3", 0, new string[] { })]
+    [TestCase("5", 0, new string[] { })]
+    [TestCase("9", 0, new string[] { })]
+    [TestCase("11", 0, new string[] { })]
+    [TestCase("14", 1, new[] { FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_NotDuplicateSample3DHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
     {
         try
         {
@@ -557,13 +557,8 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList1 = [..assetsName1];
-                Assert.That(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
-            }
-            if (expected > 1)
-            {
-                IList<string> assetsNameList2 = [..assetsName2];
-                Assert.That(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)), Is.True);
+                IList<string> assetsNameList = [..assetsName];
+                Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
         finally
@@ -572,19 +567,19 @@ public class FindDuplicatedAssetsServiceThumbnailNotDuplicatesTests
         }
     }
 
-    // The hamming distance is about 76/88 between these hashes, except for the last picture which is a completely different one
+    // The hamming distance is about 10/78 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("NotDuplicate folder, PHash")] // The PHash is a 210-character hexadecimal string
     [TestCase("10", 0, new string[] { }, new string[] { }, new string[] { })]
     [TestCase("20", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("30", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("40", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("50", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("60", 0, new string[] { }, new string[] { }, new string[] { })]
-    [TestCase("80", 3, new[] { FileNames._1336_JPG, FileNames._1349_JPG }, new[] { FileNames._1337_JPG, FileNames._1349_JPG }, new[] { FileNames._1413_JPG, FileNames._1414_JPG })]  // Weird result
-    [TestCase("90", 2, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG }, new[] { FileNames._1413_JPG, FileNames._1414_JPG }, new string[] { })]  // Weird result
-    [TestCase("100", 2, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG }, new[] { FileNames._1413_JPG, FileNames._1414_JPG }, new string[] { })]  // Weird result
-    [TestCase("120", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
+    [TestCase("30", 1, new[] { FileNames._1413_JPG, FileNames._1414_JPG }, new string[] { }, new string[] { })]
+    [TestCase("40", 3, new[] { FileNames._1336_JPG, FileNames._1350_JPG }, new[] { FileNames._1337_JPG, FileNames._1350_JPG  }, new[] { FileNames._1413_JPG, FileNames._1414_JPG })]
+    [TestCase("50", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG }, new string[] { }, new string[] { })]
+    [TestCase("60", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG }, new string[] { }, new string[] { })]
+    [TestCase("80", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] {  }, new string[] {  })]
+    [TestCase("90", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] {  }, new string[] {  })]
+    [TestCase("100", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] {  }, new string[] {  })]
+    [TestCase("120", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] {  }, new string[] {  })]
     [TestCase("140", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
     [TestCase("160", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]
     [TestCase("180", 1, new[] { FileNames._1336_JPG, FileNames._1337_JPG, FileNames._1349_JPG, FileNames._1350_JPG, FileNames._1413_JPG, FileNames._1414_JPG, FileNames._1415_JPG, FileNames.IMAGE_1_JPG }, new string[] { }, new string[] { })]

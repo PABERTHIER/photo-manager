@@ -399,16 +399,14 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         }
     }
 
-    // The hamming distance cannot be computed for this hashing method because it has not the same length
     [Test]
-    [Category("Resolution folder, DHash")] // The DHash is a 17-character number
-    [TestCase(3)]
-    [TestCase(5)]
-    [TestCase(9)]
-    [TestCase(11)]
-    [TestCase(14)]
-    [TestCase(17)]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(int thresholdToMock)
+    [Category("Resolution folder, DHash")] // The DHash is a 14-hex digits
+    [TestCase(3, 0, new string[] { }, new string[] { })]
+    [TestCase(5, 0, new string[] { }, new string[] { })]
+    [TestCase(9, 2, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new[] { FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase(11, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new string[] { })]
+    [TestCase(14, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName1,  string[] assetsName2)
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
@@ -438,9 +436,20 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
             _assetRepository.AddAsset(_asset6, assetData);
             _assetRepository.AddAsset(_asset7, assetData);
 
-            ArgumentException? exception = Assert.Throws<ArgumentException>(() => _application!.GetDuplicatedAssets());
+            List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
-            Assert.That(exception?.Message, Is.EqualTo("Invalid arguments for hamming distance calculation."));
+            Assert.That(duplicatedAssets, Has.Count.EqualTo(expected));
+
+            if (expected > 0)
+            {
+                IList<string> assetsNameList1 = [..assetsName1];
+                Assert.That(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
+            }
+            if (expected > 1)
+            {
+                IList<string> assetsNameList2 = [..assetsName2];
+                Assert.That(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)), Is.True);
+            }
         }
         finally
         {
@@ -448,18 +457,18 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         }
     }
 
-    // The hamming distance is about 36/74 between these hashes, except for the last picture which is a completely different one
+    // The hamming distance is about 10/74 between these hashes, except for the last picture which is a completely different one
     [Test]
     [Category("Resolution folder, PHash")] // The PHash is a 210-character hexadecimal string
-    [TestCase(10, 0, new string[] { })]
-    [TestCase(20, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG })]
-    [TestCase(30, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG })]
-    [TestCase(40, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase(50, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase(60, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase(80, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase(90, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase(100, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase(10, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG })]
+    [TestCase(20, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase(30, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase(40, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase(50, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase(60, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase(80, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase(90, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase(100, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
     [TestCase(120, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
     [TestCase(140, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
     [TestCase(160, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]

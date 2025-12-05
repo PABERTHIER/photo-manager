@@ -345,8 +345,9 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
         }
     }
 
+    // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
-    public void LoadBitmapImageFromPath_InvalidImageFormat_ThrowsNotSupportedException()
+    public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -362,7 +363,7 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             const string fileName = FileNames.IMAGE_11_HEIC;
             string filePath = Path.Combine(_dataDirectory!, fileName);
-            const Rotation rotation = Rotation.Rotate90;
+            const Rotation rotation = Rotation.Rotate0;
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
 
@@ -406,9 +407,17 @@ public class ApplicationViewModelLoadBitmapImageFromPathTests
 
             _applicationViewModel!.NotifyCatalogChange(catalogChangeCallbackEventArgs);
 
-            NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _applicationViewModel!.LoadBitmapImageFromPath());
+            BitmapImage image = _applicationViewModel!.LoadBitmapImageFromPath();
 
-            Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+            Assert.That(image, Is.Not.Null);
+            Assert.That(image.StreamSource, Is.Null);
+            Assert.That(image.Rotation, Is.EqualTo(rotation));
+            Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+            Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+            Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+            Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
 
             string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 

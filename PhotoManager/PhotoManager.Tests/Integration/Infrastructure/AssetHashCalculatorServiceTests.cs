@@ -239,16 +239,16 @@ public class AssetHashCalculatorServiceTests
     }
 
     [Test]
-    public void CalculateHash_PHashAndImagePathIsInvalid_ThrowsMagickBlobErrorException()
+    public void CalculateHash_PHashAndImagePathIsInvalid_ThrowsMagickMissingDelegateErrorException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
 
         byte[]? imageBytes = null;
 
-        MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
+        MagickMissingDelegateErrorException? exception = Assert.Throws<MagickMissingDelegateErrorException>(() => assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
 
-        Assert.That(exception?.Message, Does.StartWith($"unable to open image '{_dataDirectory!}': Permission denied @ error/blob.c/OpenBlob/"));
+        Assert.That(exception?.Message, Does.StartWith($"no decode delegate for this image format `{_dataDirectory!}' @ error/constitute.c/ReadImage/"));
     }
 
     [Test]
@@ -304,7 +304,7 @@ public class AssetHashCalculatorServiceTests
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
-        Assert.That(hash, Has.Length.EqualTo(1));
+        Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
@@ -345,7 +345,7 @@ public class AssetHashCalculatorServiceTests
         string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
-        Assert.That(hash, Has.Length.EqualTo(1));
+        Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
@@ -386,7 +386,7 @@ public class AssetHashCalculatorServiceTests
         string hash = assetHashCalculatorService.CalculateHash(imageBytes!, filePath);
 
         Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
-        Assert.That(hash, Has.Length.EqualTo(1));
+        Assert.That(hash, Has.Length.EqualTo(DHashes.LENGTH));
         Assert.That(hash, Is.EqualTo(expectedHash));
     }
 
