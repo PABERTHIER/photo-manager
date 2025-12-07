@@ -123,7 +123,7 @@ public static class Constants
         public const string _1336_1_K_JPG = "1336_1K.JPG";
         public const string _1336_2_K_JPG = "1336_2K.JPG";
         public const string _1336_3_K_JPG = "1336_3K.JPG";
-        public const string IMAGE_1336_4_K_ORIGINAL_JPG = "1336_4K_Original.JPG"; // TODO: Rename const by removing the image term
+        public const string _1336_4_K_ORIGINAL_JPG = "1336_4K_Original.JPG";
         public const string _1336_8_K_JPG = "1336_8K.JPG";
         public const string _1336_THUMBNAIL_JPG = "1336_Thumbnail.JPG";
         public const string IMAGE_1336_ORIGINAL_JPG = "Image_1336_Original.JPG";
@@ -188,7 +188,7 @@ public static class Constants
         public const int _1336_1_K_JPG = 1024;
         public const int _1336_2_K_JPG = 2048;
         public const int _1336_3_K_JPG = 2880;
-        public const int IMAGE_1336_4_K_ORIGINAL_JPG = 4032;
+        public const int _1336_4_K_ORIGINAL_JPG = 4032;
         public const int _1336_8_K_JPG = 7680;
         public const int _1336_THUMBNAIL_JPG = 202;
         public const int IMAGE_1336_ORIGINAL_JPG = 4032;
@@ -246,7 +246,7 @@ public static class Constants
         public const int _1336_1_K_JPG = 768;
         public const int _1336_2_K_JPG = 1536;
         public const int _1336_3_K_JPG = 2160;
-        public const int IMAGE_1336_4_K_ORIGINAL_JPG = 3024;
+        public const int _1336_4_K_ORIGINAL_JPG = 3024;
         public const int _1336_8_K_JPG = 5760;
         public const int _1336_THUMBNAIL_JPG = 152;
         public const int IMAGE_1336_ORIGINAL_JPG = 3024;
@@ -304,7 +304,7 @@ public static class Constants
         public const int _1336_1_K_JPG = 200;
         public const int _1336_2_K_JPG = 200;
         public const int _1336_3_K_JPG = 200;
-        public const int IMAGE_1336_4_K_ORIGINAL_JPG = 200;
+        public const int _1336_4_K_ORIGINAL_JPG = 200;
         public const int _1336_8_K_JPG = 200;
         public const int _1336_THUMBNAIL_JPG = 200;
         public const int IMAGE_1336_ORIGINAL_JPG = 200;
@@ -362,7 +362,7 @@ public static class Constants
         public const int _1336_1_K_JPG = 150;
         public const int _1336_2_K_JPG = 150;
         public const int _1336_3_K_JPG = 150;
-        public const int IMAGE_1336_4_K_ORIGINAL_JPG = 150;
+        public const int _1336_4_K_ORIGINAL_JPG = 150;
         public const int _1336_8_K_JPG = 150;
         public const int _1336_THUMBNAIL_JPG = 150;
         public const int IMAGE_1336_ORIGINAL_JPG = 150;
@@ -420,7 +420,7 @@ public static class Constants
         public const long _1336_1_K_JPG = 311067;
         public const long _1336_2_K_JPG = 1154116;
         public const long _1336_3_K_JPG = 2098339;
-        public const long IMAGE_1336_4_K_ORIGINAL_JPG = 4526710;
+        public const long _1336_4_K_ORIGINAL_JPG = 4526710;
         public const long _1336_8_K_JPG = 8855421;
         public const long _1336_THUMBNAIL_JPG = 19472;
         public const long IMAGE_1336_ORIGINAL_JPG = 4526710;
@@ -476,7 +476,7 @@ public static class Constants
         public const int _1336_1_K_JPG = 10312;
         public const int _1336_2_K_JPG = 10226;
         public const int _1336_3_K_JPG = 10576;
-        public const int IMAGE_1336_4_K_ORIGINAL_JPG = 10753;
+        public const int _1336_4_K_ORIGINAL_JPG = 10753;
         public const int _1336_8_K_JPG = 10836;
         public const int _1336_THUMBNAIL_JPG = 10880;
         public const int IMAGE_1336_ORIGINAL_JPG = 10753;
@@ -536,7 +536,7 @@ public static class Constants
         public const string _1336_1_K_JPG = "4dcbbf63585dc9fff056a0370ee33efc3d7c57b556bce917f89c5012fbacbc1ee2929f7d3a11ee2f8af426b183212d67167d87e48b80707ab5a1fb4e766d2544";
         public const string _1336_2_K_JPG = "76a8f0b611fdd32b73bff92a186449a7e4bf0b84d618fe8b9666bbf2b022ff6bf259a4a98be42db7d9043ff3c3ff20ae720c5067966c40d16ad3fc67769f514b";
         public const string _1336_3_K_JPG = "98044e6674187219ab629c901dfdf5a72f2535104d83cd167d1bdd9039ded91b7a585b74c5c89860f2e0fab85af9e2181265cba48b908028a42b8ec042265f03";
-        public const string IMAGE_1336_4_K_ORIGINAL_JPG = "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa";
+        public const string _1336_4_K_ORIGINAL_JPG = "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa";
         public const string _1336_8_K_JPG = "18289324fb22b8b337b1f4a7d627c605056e04fd308699bc831af0579cbc2d6a5959811dbecce09b26f82c341ea82d02d5c99c1580f50c24106d19c88bd6eba2";
         public const string _1336_THUMBNAIL_JPG = "0bbabdb2fe28d4ef53b78a917eb89938fe564d758ebb9cb011e5a675dbee0a8e92bc38b8fe0762e279d48e95e7d17f1bb392fd96e8db7006e9e0bb60c5d2ed31";
         public const string IMAGE_1336_ORIGINAL_JPG = "fb0bb3887c28d022113c5c52a65f9da14eab0806842f902b618806dedeb7c53da1ed26ae5bcaf9a358e81efead71c4807ea38054e44f426857f8bf2c1fd1c7aa";
@@ -593,7 +593,7 @@ public static class Constants
         public const string _1336_1_K_JPG = "04108000800000";
         public const string _1336_2_K_JPG = "0e0986000080a0";
         public const string _1336_3_K_JPG = "c187020002060c";
-        public const string IMAGE_1336_4_K_ORIGINAL_JPG = "00000041040892";
+        public const string _1336_4_K_ORIGINAL_JPG = "00000041040892";
         public const string _1336_8_K_JPG = "00000010410409";
         public const string _1336_THUMBNAIL_JPG = "00000000408242";
         public const string IMAGE_1336_ORIGINAL_JPG = "00000041040892";
@@ -647,7 +647,7 @@ public static class Constants
         public const string _1336_1_K_JPG = "80bbaf9483ef57ae043863fa954615c6";
         public const string _1336_2_K_JPG = "83355feec0abe189e3b3f1bcff375151";
         public const string _1336_3_K_JPG = "02433546c8d0b8a9b76f861077924f85";
-        public const string IMAGE_1336_4_K_ORIGINAL_JPG = "bed3d05d409001724e5f6095c2acaa95";
+        public const string _1336_4_K_ORIGINAL_JPG = "bed3d05d409001724e5f6095c2acaa95";
         public const string _1336_8_K_JPG = "961b08d1e4b7d9ed07fd9c5b83d23edb";
         public const string _1336_THUMBNAIL_JPG = "dd33165a8c3329683ca1ce2bb90ed1b2";
         public const string IMAGE_1336_ORIGINAL_JPG = "bed3d05d409001724e5f6095c2acaa95";
@@ -703,7 +703,7 @@ public static class Constants
         public const string _1336_1_K_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a560c827bc8927a86d5d8f1ff62ee08f485abf0a846dd8aef48929a61f4562ee061f62";
         public const string _1336_2_K_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a560e827bd8927486d5e8f1f962ee08f487abf0b846dd8aef18929961f4562ee061f62";
         public const string _1336_3_K_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a54f1827778922e86d108f17062ee08f3ddabe7a846b68aeb78925961f3a62ee061f54";
-        public const string IMAGE_1336_4_K_ORIGINAL_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a572f82804892c286dad8f28562ee08f53dabf9e847058af2e892da61f5062ee061f71";
+        public const string _1336_4_K_ORIGINAL_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a572f82804892c286dad8f28562ee08f53dabf9e847058af2e892da61f5062ee061f71";
         public const string _1336_8_K_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a56c6827ec8928a86d8e8f24b62ee08f4deabf6a846f88af0c892c361f4d62ee061f6a";
         public const string _1336_THUMBNAIL_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a5617827be8925d86d628f21562ee08f458abf0f846de8aeee8929b61f4762ee061f60";
         public const string IMAGE_1336_ORIGINAL_JPG = "a640c83f2862ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a6ca8840e162ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee062ee0a572f82804892c286dad8f28562ee08f53dabf9e847058af2e892da61f5062ee061f71";

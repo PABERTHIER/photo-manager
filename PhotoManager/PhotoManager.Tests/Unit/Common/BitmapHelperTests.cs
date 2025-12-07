@@ -18,11 +18,11 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage")]
-    [TestCase(Rotation.Rotate0, 1280, 720)]
-    [TestCase(Rotation.Rotate90, 720, 1280)]
-    [TestCase(Rotation.Rotate180, 1280, 720)]
-    [TestCase(Rotation.Rotate270, 720, 1280)]
-    // [TestCase(null, 1280, 720)]
+    [TestCase(Rotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
+    // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedPixelWidth, int expectedPixelHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
@@ -488,11 +488,11 @@ public class BitmapHelperTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode")]
-    [TestCase(Rotation.Rotate0, 1280, 720)]
-    [TestCase(Rotation.Rotate90, 720, 1280)]
-    [TestCase(Rotation.Rotate180, 1280, 720)]
-    [TestCase(Rotation.Rotate270, 720, 1280)]
-    // [TestCase(null, 1280, 720)]
+    [TestCase(Rotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
+    // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
@@ -687,7 +687,7 @@ public class BitmapHelperTests
     [TestCase(100, 10000, 100, 10000)]
     [TestCase(0, 10000, 17777, 10000)]
     [TestCase(100, 0, 100, 56)]
-    [TestCase(0, 0, 1280, 720)]
+    [TestCase(0, 0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(-100, 100, 100, 100)]
     [TestCase(100, -100, 100, 100)]
     [TestCase(-100, -100, 100, 100)]
@@ -695,7 +695,7 @@ public class BitmapHelperTests
     [TestCase(100, 1000000, 100, 1000000)]
     // [TestCase(100, null, 100, 56)]
     // [TestCase(null, 100, 177, 100)]
-    // [TestCase(null, null, 1280, 720)]
+    // [TestCase(null, null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapThumbnailImageAssetRepository_ValidBufferAndWidthAndHeight_ReturnsBitmapImage(int width, int height, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
@@ -784,11 +784,11 @@ public class BitmapHelperTests
     }
 
     [Test]
-    [TestCase(FileNames.IMAGE_1_JPG, 1280, 720)]
-    [TestCase(FileNames.IMAGE_8_JPEG, 1280, 720)]
-    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, 720, 1280)]
-    [TestCase(FileNames.HOMER_GIF, 320, 320)]
-    [TestCase(FileNames.IMAGE_11_HEIC, 3024, 4032)]
+    [TestCase(FileNames.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(FileNames.IMAGE_8_JPEG, PixelWidthAsset.IMAGE_8_JPEG, PixelHeightAsset.IMAGE_8_JPEG)]
+    [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG, PixelWidthAsset.IMAGE_10_PORTRAIT_PNG, PixelHeightAsset.IMAGE_10_PORTRAIT_PNG)]
+    [TestCase(FileNames.HOMER_GIF, PixelWidthAsset.HOMER_GIF, PixelHeightAsset.HOMER_GIF)]
+    [TestCase(FileNames.IMAGE_11_HEIC, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, PixelWidthAsset.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC)]
     public void LoadBitmapFromPath_ValidImagePath_ReturnsNonNullBitmap(string fileName, int expectedWidth, int expectedHeight)
     {

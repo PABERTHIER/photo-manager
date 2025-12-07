@@ -166,7 +166,7 @@ public class StorageServiceTests
     [TestCase(100, 10000, 100, 10000)]
     [TestCase(0, 10000, 17777, 10000)]
     [TestCase(100, 0, 100, 56)]
-    [TestCase(0, 0, 1280, 720)]
+    [TestCase(0, 0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(-100, 100, 100, 100)]
     [TestCase(100, -100, 100, 100)]
     [TestCase(-100, -100, 100, 100)]
@@ -174,7 +174,7 @@ public class StorageServiceTests
     [TestCase(100, 1000000, 100, 1000000)]
     // [TestCase(100, null, 100, 56)]
     // [TestCase(null, 100, 177, 100)]
-    // [TestCase(null, null, 1280, 720)]
+    // [TestCase(null, null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapThumbnailImageAssetRepository_ValidBufferAndWidthAndHeight_ReturnsBitmapImage(int width, int height, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);

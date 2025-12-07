@@ -220,7 +220,7 @@ public class ApplicationViewModelChangeAppModeTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory} - Image 4.jpg - image 4 of 5 - sorted by file name ascending";
+            string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory} - {_asset4.FileName} - image 4 of 5 - sorted by file name ascending";
             const int expectedViewerPosition = 3;
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5 ];

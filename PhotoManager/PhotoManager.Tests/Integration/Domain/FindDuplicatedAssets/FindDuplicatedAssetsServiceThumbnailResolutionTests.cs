@@ -36,28 +36,28 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     private const string ASSET1_K_HASH = Hashes._1336_1_K_JPG;
     private const string ASSET2_K_HASH = Hashes._1336_2_K_JPG;
     private const string ASSET3_K_HASH = Hashes._1336_3_K_JPG;
-    private const string ASSET4_K_ORIGINAL_HASH = Hashes.IMAGE_1336_4_K_ORIGINAL_JPG;
+    private const string ASSET4_K_ORIGINAL_HASH = Hashes._1336_4_K_ORIGINAL_JPG;
     private const string ASSET8_K_HASH = Hashes._1336_8_K_JPG;
     private const string ASSET_THUMBNAIL_HASH = Hashes._1336_THUMBNAIL_JPG;
 
     private const string ASSET1_K_MD5_HASH = MD5Hashes._1336_1_K_JPG;
     private const string ASSET2_K_MD5_HASH = MD5Hashes._1336_2_K_JPG;
     private const string ASSET3_K_MD5_HASH = MD5Hashes._1336_3_K_JPG;
-    private const string ASSET4_K_ORIGINAL_MD5_HASH = MD5Hashes.IMAGE_1336_4_K_ORIGINAL_JPG;
+    private const string ASSET4_K_ORIGINAL_MD5_HASH = MD5Hashes._1336_4_K_ORIGINAL_JPG;
     private const string ASSET8_K_MD5_HASH = MD5Hashes._1336_8_K_JPG;
     private const string ASSET_THUMBNAIL_MD5_HASH = MD5Hashes._1336_THUMBNAIL_JPG;
 
     private const string ASSET1_K_D_HASH = DHashes._1336_1_K_JPG;
     private const string ASSET2_K_D_HASH = DHashes._1336_2_K_JPG;
     private const string ASSET3_K_D_HASH = DHashes._1336_3_K_JPG;
-    private const string ASSET4_K_ORIGINAL_D_HASH = DHashes.IMAGE_1336_4_K_ORIGINAL_JPG;
+    private const string ASSET4_K_ORIGINAL_D_HASH = DHashes._1336_4_K_ORIGINAL_JPG;
     private const string ASSET8_K_D_HASH = DHashes._1336_8_K_JPG;
     private const string ASSET_THUMBNAIL_D_HASH = DHashes._1336_THUMBNAIL_JPG;
 
     private const string ASSET1_K_P_HASH = PHashes._1336_1_K_JPG;
     private const string ASSET2_K_P_HASH = PHashes._1336_2_K_JPG;
     private const string ASSET3_K_P_HASH = PHashes._1336_3_K_JPG;
-    private const string ASSET4_K_ORIGINAL_P_HASH = PHashes.IMAGE_1336_4_K_ORIGINAL_JPG;
+    private const string ASSET4_K_ORIGINAL_P_HASH = PHashes._1336_4_K_ORIGINAL_JPG;
     private const string ASSET8_K_P_HASH = PHashes._1336_8_K_JPG;
     private const string ASSET_THUMBNAIL_P_HASH = PHashes._1336_THUMBNAIL_JPG;
 
@@ -169,16 +169,16 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
         {
             FolderId = new Guid("fb379e47-0fe4-4ba9-9ff3-cbd779dca559"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1336_4_K_ORIGINAL_JPG,
+            FileName = FileNames._1336_4_K_ORIGINAL_JPG,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset.IMAGE_1336_4_K_ORIGINAL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_4_K_ORIGINAL_JPG }
+                Asset = new() { Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = FileSize.IMAGE_1336_4_K_ORIGINAL_JPG,
+                Size = FileSize._1336_4_K_ORIGINAL_JPG,
                 Creation = DateTime.Now,
                 Modification = ModificationDate.Default
             },
@@ -276,7 +276,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     [TestCase("80", 0, new string[] { })]
     [TestCase("100", 0, new string[] { })]
     [TestCase("110", 0, new string[] { })]
-    [TestCase("128", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("128", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
     public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionBasicHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
     {
         try
@@ -333,7 +333,7 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     [TestCase("15", 0, new string[] { })]
     [TestCase("20", 0, new string[] { })]
     [TestCase("25", 0, new string[] { })]
-    [TestCase("32", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("32", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
     public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionMD5HashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
     {
         try
@@ -386,9 +386,9 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     [Category("Resolution folder, DHash")] // The DHash is a 14-hex digits
     [TestCase("3", 0, new string[] { }, new string[] { })]
     [TestCase("5", 0, new string[] { }, new string[] { })]
-    [TestCase("9", 2, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new[] { FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("11", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new string[] { })]
-    [TestCase("14", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
+    [TestCase("9", 2, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new[] { FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase("11", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new string[] { })]
+    [TestCase("14", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
     public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName1,  string[] assetsName2)
     {
         try
@@ -447,18 +447,18 @@ public class FindDuplicatedAssetsServiceThumbnailResolutionTests
     [Category("Resolution folder, PHash")] // The PHash is a 210-character hexadecimal string
     [TestCase("10", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG })]
     [TestCase("20", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("30", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("40", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("50", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("60", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
-    [TestCase("80", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("90", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("100", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("120", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("140", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("160", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("180", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
-    [TestCase("210", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames.IMAGE_1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("30", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase("40", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase("50", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase("60", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
+    [TestCase("80", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("90", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("100", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("120", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("140", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("160", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("180", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
+    [TestCase("210", 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG })]
     public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionPHashDifferentThresholdValues(string thresholdToMock, int expected, string[] assetsName)
     {
         try

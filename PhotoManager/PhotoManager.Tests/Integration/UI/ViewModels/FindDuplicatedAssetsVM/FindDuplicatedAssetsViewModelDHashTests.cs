@@ -885,21 +885,21 @@ public class FindDuplicatedAssetsViewModelDHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1336_4_K_ORIGINAL_JPG,
+            FileName = FileNames._1336_4_K_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset.IMAGE_1336_4_K_ORIGINAL_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_4_K_ORIGINAL_JPG }
+                Asset = new() { Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = FileSize.IMAGE_1336_4_K_ORIGINAL_JPG,
+                Size = FileSize._1336_4_K_ORIGINAL_JPG,
                 Creation = actualDate,
                 Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = DHashes.IMAGE_1336_4_K_ORIGINAL_JPG,
+            Hash = DHashes._1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {

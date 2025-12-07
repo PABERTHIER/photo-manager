@@ -60,7 +60,7 @@ public class BackupStorageTests
     [Test]
     public void GetBackupFilesPaths_PathDoesNotExist_ThrowsDirectoryNotFoundException()
     {
-        string backupDirectory = Path.Combine(_dataDirectory!, "NonExistentFolder");
+        string backupDirectory = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 
         DirectoryNotFoundException? exception = Assert.Throws<DirectoryNotFoundException>(() => _backupStorage!.GetBackupFilesPaths(backupDirectory));
 
