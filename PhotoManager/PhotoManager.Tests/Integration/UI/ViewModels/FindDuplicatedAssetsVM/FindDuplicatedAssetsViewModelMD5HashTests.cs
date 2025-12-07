@@ -1,5 +1,14 @@
 ﻿using PhotoManager.UI.Models;
 using System.ComponentModel;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using MD5Hashes = PhotoManager.Tests.Integration.Constants.MD5Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.FindDuplicatedAssetsVM;
 
@@ -9,8 +18,6 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
     private ApplicationViewModel? _applicationViewModel;
@@ -36,9 +43,9 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -50,21 +57,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "a886f237e1cf6da03fb793588fd79b64",
+            Hash = MD5Hashes.IMAGE_1_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -76,21 +83,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 2 duplicated.jpg",
+            FileName = FileNames.IMAGE_2_DUPLICATED_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_DUPLICATED_JPG, Height = PixelHeightAsset.IMAGE_2_DUPLICATED_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, Height = ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG }
             },
             FileProperties = new()
             {
-                Size = 30197,
+                Size = FileSize.IMAGE_2_DUPLICATED_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "27007861db67443498b6aa0d00808b41",
+            Hash = MD5Hashes.IMAGE_2_DUPLICATED_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -102,21 +109,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 2.jpg",
+            FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
             },
             FileProperties = new()
             {
-                Size = 30197,
+                Size = FileSize.IMAGE_2_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "27007861db67443498b6aa0d00808b41",
+            Hash = MD5Hashes.IMAGE_2_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -128,21 +135,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "05d29088572bd5a5970fc370c0ca8751",
+            Hash = MD5Hashes.IMAGE_9_PNG,
             ImageData = new(),
             Metadata = new()
             {
@@ -154,21 +161,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "d9aa281b55316e10c767877dee265732",
+            Hash = MD5Hashes.IMAGE_11_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -180,21 +187,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "a886f237e1cf6da03fb793588fd79b64",
+            Hash = MD5Hashes.IMAGE_1_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -206,21 +213,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "a886f237e1cf6da03fb793588fd79b64",
+            Hash = MD5Hashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -232,21 +239,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "05d29088572bd5a5970fc370c0ca8751",
+            Hash = MD5Hashes.IMAGE_9_PNG,
             ImageData = null,
             Metadata = new()
             {
@@ -258,21 +265,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "05d29088572bd5a5970fc370c0ca8751",
+            Hash = MD5Hashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = null,
             Metadata = new()
             {
@@ -284,21 +291,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "d9aa281b55316e10c767877dee265732",
+            Hash = MD5Hashes.IMAGE_11_HEIC,
             ImageData = null,
             Metadata = new()
             {
@@ -310,21 +317,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336.JPG",
+            FileName = FileNames._1336_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_JPG, Height = PixelHeightAsset._1336_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_JPG, Height = ThumbnailHeightAsset._1336_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize._1336_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bed3d05d409001724e5f6095c2acaa95",
+            Hash = MD5Hashes._1336_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -336,21 +343,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_Original.JPG",
+            FileName = FileNames._1336_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_ORIGINAL_JPG, Height = PixelHeightAsset._1336_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize._1336_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bed3d05d409001724e5f6095c2acaa95",
+            Hash = MD5Hashes._1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -362,21 +369,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_4K_Original.JPG",
+            FileName = FileNames._1336_4_K_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize._1336_4_K_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bed3d05d409001724e5f6095c2acaa95",
+            Hash = MD5Hashes._1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -388,21 +395,21 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_1336_Original.JPG",
+            FileName = FileNames.IMAGE_1336_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG, Height = PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize.IMAGE_1336_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bed3d05d409001724e5f6095c2acaa95",
+            Hash = MD5Hashes.IMAGE_1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -450,13 +457,13 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
     public async Task SetDuplicates_CataloguedAssetsAndMD5HashTypeAndAllDuplicatesSets_SetsDuplicates()
     {
         string rootDirectory = Path.Combine(_dataDirectory!);
-        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
-        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, "NewFolder1");
-        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, "NewFolder2");
-        string directorySample1 = Path.Combine(duplicatesDirectory, "NotDuplicate", "Sample1");
-        string directoryPart = Path.Combine(duplicatesDirectory, "Part");
-        string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
-        string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
+        string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
+        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
+        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
+        string directorySample1 = Path.Combine(duplicatesDirectory, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string directoryPart = Path.Combine(duplicatesDirectory, Directories.PART);
+        string directoryResolution = Path.Combine(duplicatesDirectory, Directories.RESOLUTION);
+        string directoryThumbnail = Path.Combine(duplicatesDirectory, Directories.THUMBNAIL);
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, 200, 150, false, true, false, true);
 

@@ -1,4 +1,14 @@
-﻿namespace PhotoManager.Tests.Integration.Application;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+
+namespace PhotoManager.Tests.Integration.Application;
 
 [TestFixture]
 public class ApplicationLoadBitmapImageFromPathTests
@@ -6,41 +16,40 @@ public class ApplicationLoadBitmapImageFromPathTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
 
     private Asset? _asset1;
     private Asset? _asset2;
     private Asset? _asset3;
+    private Asset? _asset4;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _asset1 = new()
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -51,21 +60,21 @@ public class ApplicationLoadBitmapImageFromPathTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -76,21 +85,46 @@ public class ApplicationLoadBitmapImageFromPathTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" },
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
+            Metadata = new()
+            {
+                Corrupted = new() { IsTrue = false, Message = null },
+                Rotated = new() { IsTrue = false, Message = null }
+            }
+        };
+        _asset4 = new()
+        {
+            FolderId = Guid.Empty,
+            Folder = new() { Id = Guid.Empty, Path = "" },
+            FileName = FileNames.IMAGE_11_HEIC,
+            Pixel = new()
+            {
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
+            },
+            FileProperties = new()
+            {
+                Size = FileSize.IMAGE_11_HEIC,
+                Creation = DateTime.Now,
+                Modification = ModificationDate.Default
+            },
+            ThumbnailCreationDateTime = DateTime.Now,
+            ImageRotation = Rotation.Rotate0,
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -134,7 +168,7 @@ public class ApplicationLoadBitmapImageFromPathTests
     [Test]
     public async Task LoadBitmapImageFromPath_CataloguedAssets_ReturnsBitmapImage()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates", "NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -149,40 +183,50 @@ public class ApplicationLoadBitmapImageFromPathTests
             BitmapImage image1 = _application!.LoadBitmapImageFromPath(assets[0].FullPath, assets[0].ImageRotation);
             BitmapImage image2 = _application!.LoadBitmapImageFromPath(assets[1].FullPath, assets[1].ImageRotation);
             BitmapImage image3 = _application!.LoadBitmapImageFromPath(assets[2].FullPath, assets[2].ImageRotation);
+            BitmapImage image4 = _application!.LoadBitmapImageFromPath(assets[3].FullPath, assets[3].ImageRotation);
 
-            NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _application!.LoadBitmapImageFromPath(assets[3].FullPath, assets[3].ImageRotation));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image1, Is.Not.Null);
+                Assert.That(image1.StreamSource, Is.Null);
+                Assert.That(image1.Rotation, Is.EqualTo(_asset1!.ImageRotation));
+                Assert.That(image1.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
+                Assert.That(image1.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
+                Assert.That(image1.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
+                Assert.That(image1.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
+                Assert.That(image1.DecodePixelWidth, Is.EqualTo(0));
+                Assert.That(image1.DecodePixelHeight, Is.EqualTo(0));
 
-            Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+                Assert.That(image2, Is.Not.Null);
+                Assert.That(image2.StreamSource, Is.Null);
+                Assert.That(image2.Rotation, Is.EqualTo(_asset2!.ImageRotation));
+                Assert.That((int)image2.Width, Is.EqualTo(_asset2.Pixel.Asset.Width));
+                Assert.That((int)image2.Height, Is.EqualTo(_asset2.Pixel.Asset.Height));
+                Assert.That(image2.PixelWidth, Is.EqualTo(_asset2.Pixel.Asset.Width));
+                Assert.That(image2.PixelHeight, Is.EqualTo(_asset2.Pixel.Asset.Height));
+                Assert.That(image2.DecodePixelWidth, Is.EqualTo(0));
+                Assert.That(image2.DecodePixelHeight, Is.EqualTo(0));
 
-            Assert.That(image1, Is.Not.Null);
-            Assert.That(image1.StreamSource, Is.Null);
-            Assert.That(image1.Rotation, Is.EqualTo(_asset1!.ImageRotation));
-            Assert.That(image1.Width, Is.EqualTo(_asset1.Pixel.Asset.Width));
-            Assert.That(image1.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
-            Assert.That(image1.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
-            Assert.That(image1.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
-            Assert.That(image1.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image1.DecodePixelHeight, Is.EqualTo(0));
+                Assert.That(image3, Is.Not.Null);
+                Assert.That(image3.StreamSource, Is.Null);
+                Assert.That(image3.Rotation, Is.EqualTo(_asset3!.ImageRotation));
+                Assert.That((int)image3.Width, Is.EqualTo(_asset3.Pixel.Asset.Width));
+                Assert.That((int)image3.Height, Is.EqualTo(_asset3.Pixel.Asset.Height));
+                Assert.That(image3.PixelWidth, Is.EqualTo(_asset3.Pixel.Asset.Width));
+                Assert.That(image3.PixelHeight, Is.EqualTo(_asset3.Pixel.Asset.Height));
+                Assert.That(image3.DecodePixelWidth, Is.EqualTo(0));
+                Assert.That(image3.DecodePixelHeight, Is.EqualTo(0));
 
-            Assert.That(image2, Is.Not.Null);
-            Assert.That(image2.StreamSource, Is.Null);
-            Assert.That(image2.Rotation, Is.EqualTo(_asset2!.ImageRotation));
-            Assert.That((int)image2.Width, Is.EqualTo(_asset2.Pixel.Asset.Width));
-            Assert.That((int)image2.Height, Is.EqualTo(_asset2.Pixel.Asset.Height));
-            Assert.That(image2.PixelWidth, Is.EqualTo(_asset2.Pixel.Asset.Width));
-            Assert.That(image2.PixelHeight, Is.EqualTo(_asset2.Pixel.Asset.Height));
-            Assert.That(image2.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image2.DecodePixelHeight, Is.EqualTo(0));
-
-            Assert.That(image3, Is.Not.Null);
-            Assert.That(image3.StreamSource, Is.Null);
-            Assert.That(image3.Rotation, Is.EqualTo(_asset3!.ImageRotation));
-            Assert.That((int)image3.Width, Is.EqualTo(_asset3.Pixel.Asset.Width));
-            Assert.That((int)image3.Height, Is.EqualTo(_asset3.Pixel.Asset.Height));
-            Assert.That(image3.PixelWidth, Is.EqualTo(_asset3.Pixel.Asset.Width));
-            Assert.That(image3.PixelHeight, Is.EqualTo(_asset3.Pixel.Asset.Height));
-            Assert.That(image3.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image3.DecodePixelHeight, Is.EqualTo(0));
+                Assert.That(image4, Is.Not.Null);
+                Assert.That(image4.StreamSource, Is.Null);
+                Assert.That(image4.Rotation, Is.EqualTo(_asset4!.ImageRotation));
+                Assert.That(image4.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+                Assert.That(image4.Height, Is.EqualTo(5376)); // Wrong height
+                Assert.That(image4.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
+                Assert.That(image4.PixelHeight, Is.EqualTo(_asset4.Pixel.Asset.Height));
+                Assert.That(image4.DecodePixelWidth, Is.EqualTo(0));
+                Assert.That(image4.DecodePixelHeight, Is.EqualTo(0));
+            }
         }
         finally
         {

@@ -1,4 +1,5 @@
 ﻿using Reactive = System.Reactive;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -8,7 +9,6 @@ public class AssetRepositoryGetFoldersTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
@@ -17,9 +17,9 @@ public class AssetRepositoryGetFoldersTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -44,8 +44,8 @@ public class AssetRepositoryGetFoldersTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
@@ -96,8 +96,8 @@ public class AssetRepositoryGetFoldersTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);

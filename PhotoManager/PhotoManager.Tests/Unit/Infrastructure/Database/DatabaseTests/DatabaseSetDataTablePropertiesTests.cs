@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseSetDataTablePropertiesTests
@@ -12,7 +14,7 @@ public class DatabaseSetDataTablePropertiesTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -30,7 +32,7 @@ public class DatabaseSetDataTablePropertiesTests
     [Test]
     public void SetDataTableProperties_FolderType_SetsDataTableProperties()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         DataTableProperties properties = new()
         {
             TableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName,
@@ -57,14 +59,14 @@ public class DatabaseSetDataTablePropertiesTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
     [Test]
     public void SetDataTableProperties_AssetType_SetsDataTableProperties()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         DataTableProperties properties = new()
         {
             TableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName,
@@ -91,14 +93,14 @@ public class DatabaseSetDataTablePropertiesTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
     [Test]
     public void SetDataTableProperties_SyncAssetsDirectoriesDefinitionType_SetsDataTableProperties()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         DataTableProperties properties = new()
         {
             TableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
@@ -125,14 +127,14 @@ public class DatabaseSetDataTablePropertiesTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
     [Test]
     public void SetDataTableProperties_RecentTargetPathsType_SetsDataTableProperties()
     {
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         DataTableProperties properties = new()
         {
             TableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName,
@@ -159,7 +161,7 @@ public class DatabaseSetDataTablePropertiesTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 

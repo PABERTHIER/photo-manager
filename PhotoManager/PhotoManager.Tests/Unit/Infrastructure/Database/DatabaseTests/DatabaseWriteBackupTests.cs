@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseWriteBackupTests
@@ -11,7 +13,7 @@ public class DatabaseWriteBackupTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -31,8 +33,8 @@ public class DatabaseWriteBackupTests
         DateTime backupDate = DateTime.Now;
         string backupName = backupDate.ToString("yyyyMMdd") + ".zip";
 
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(_dataDirectory!, "DatabaseTests_Backups", backupName);
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
+        string filePath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS, backupName);
 
         try
         {
@@ -50,7 +52,7 @@ public class DatabaseWriteBackupTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -60,8 +62,8 @@ public class DatabaseWriteBackupTests
         DateTime backupDate = DateTime.Now;
         string backupName = backupDate.ToString("yyyyMMdd") + ".zip";
 
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
-        string filePath = Path.Combine(_dataDirectory!, "DatabaseTests_Backups", backupName);
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
+        string filePath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS, backupName);
 
         try
         {
@@ -81,7 +83,7 @@ public class DatabaseWriteBackupTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 }

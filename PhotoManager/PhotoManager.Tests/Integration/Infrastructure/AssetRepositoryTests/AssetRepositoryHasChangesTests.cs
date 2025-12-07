@@ -1,4 +1,5 @@
 ﻿using Reactive = System.Reactive;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -8,7 +9,6 @@ public class AssetRepositoryHasChangesTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
@@ -17,9 +17,9 @@ public class AssetRepositoryHasChangesTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -65,7 +65,7 @@ public class AssetRepositoryHasChangesTests
         {
             Assert.That(_assetRepository!.HasChanges(), Is.False);
 
-            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
 
             _assetRepository!.AddFolder(folderPath1);
 
@@ -90,7 +90,7 @@ public class AssetRepositoryHasChangesTests
         {
             Assert.That(_assetRepository!.HasChanges(), Is.False);
 
-            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
 
             _assetRepository!.AddFolder(folderPath1);
 

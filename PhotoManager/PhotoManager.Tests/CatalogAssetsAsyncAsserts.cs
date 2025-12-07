@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using Tables = PhotoManager.Tests.Integration.Constants.Tables;
 
 namespace PhotoManager.Tests;
 
@@ -15,10 +16,10 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(blobFiles, Is.Empty);
         Assert.That(tableFiles, Is.Empty);
 
-        Assert.That(File.Exists(Path.Combine(tablesPath, "assets.db")), Is.False);
-        Assert.That(File.Exists(Path.Combine(tablesPath, "folders.db")), Is.False);
-        Assert.That(File.Exists(Path.Combine(tablesPath, "syncassetsdirectoriesdefinitions.db")), Is.False);
-        Assert.That(File.Exists(Path.Combine(tablesPath, "recenttargetpaths.db")), Is.False);
+        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.ASSETS_DB)), Is.False);
+        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.FOLDERS_DB)), Is.False);
+        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.False);
+        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB)), Is.False);
     }
 
     public static void CheckBlobsAndTablesAfterSaveCatalog(
@@ -45,7 +46,7 @@ public static class CatalogAssetsAsyncAsserts
 
             Assert.That(File.Exists(blobFilePath), Is.True);
 
-            List<Asset> assetsFromRepositoryByFolder = assetsFromRepository.Where(x => x.FolderId == folder.Id).ToList();
+            List<Asset> assetsFromRepositoryByFolder = [..assetsFromRepository.Where(x => x.FolderId == folder.Id)];
 
             Dictionary<string, byte[]>? dataRead = blobStorage.ReadFromBinaryFile(blobFilePath);
             Assert.That(dataRead, Is.Not.Null);
@@ -60,10 +61,10 @@ public static class CatalogAssetsAsyncAsserts
         }
 
         Assert.That(tableFiles, Has.Length.EqualTo(4));
-        Assert.That(File.Exists(Path.Combine(tablesPath, "assets.db")), Is.True);
-        Assert.That(File.Exists(Path.Combine(tablesPath, "folders.db")), Is.True);
-        Assert.That(File.Exists(Path.Combine(tablesPath, "syncassetsdirectoriesdefinitions.db")), Is.True);
-        Assert.That(File.Exists(Path.Combine(tablesPath, "recenttargetpaths.db")), Is.True);
+        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.ASSETS_DB)), Is.True);
+        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.FOLDERS_DB)), Is.True);
+        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
+        Assert.That(File.Exists(Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
 
         List<Asset> assetsFromDatabase = database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
         List<Folder> foldersFromDatabase = database.ReadObjectList(userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
@@ -89,7 +90,7 @@ public static class CatalogAssetsAsyncAsserts
         Dictionary<Guid, Folder> foldersById = folders.ToDictionary(f => f.Id, f => f);
         Dictionary<Guid, Folder> foldersFromDatabaseById = foldersFromDatabase.ToDictionary(f => f.Id, f => f);
 
-        foreach ((Guid folderId, Folder? expectedFolder) in foldersById)
+        foreach ((Guid folderId, Folder expectedFolder) in foldersById)
         {
             Folder actualFolder = foldersFromDatabaseById[folderId];
 
@@ -118,10 +119,10 @@ public static class CatalogAssetsAsyncAsserts
         if (hasEmptyTables)
         {
             Assert.That(tableFiles, Has.Length.EqualTo(4));
-            Assert.That(File.Exists(Path.Combine(tablesPath, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(tablesPath, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(tablesPath, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(tablesPath, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(tablesPath, Tables.ASSETS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(tablesPath, Tables.FOLDERS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
         }
         else
         {
@@ -596,10 +597,10 @@ public static class CatalogAssetsAsyncAsserts
         }
 
         // Delete all tables in Tables directory
-        string assetsTablePath = Path.Combine(tablesPath, "assets.db");
-        string foldersTablePath = Path.Combine(tablesPath, "folders.db");
-        string syncAssetsDirectoriesDefinitionsTablePath = Path.Combine(tablesPath, "syncassetsdirectoriesdefinitions.db");
-        string recentTargetPathsTablePath = Path.Combine(tablesPath, "recenttargetpaths.db");
+        string assetsTablePath = Path.Combine(tablesPath, Tables.ASSETS_DB);
+        string foldersTablePath = Path.Combine(tablesPath, Tables.FOLDERS_DB);
+        string syncAssetsDirectoriesDefinitionsTablePath = Path.Combine(tablesPath, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB);
+        string recentTargetPathsTablePath = Path.Combine(tablesPath, Tables.RECENT_TARGET_PATHS_DB);
 
         File.Delete(assetsTablePath);
         File.Delete(foldersTablePath);

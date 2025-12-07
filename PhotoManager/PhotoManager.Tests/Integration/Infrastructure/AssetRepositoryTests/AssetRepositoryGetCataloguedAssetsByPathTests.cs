@@ -1,4 +1,13 @@
 ﻿using Reactive = System.Reactive;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -8,8 +17,6 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private AssetRepository? _assetRepository;
     private Mock<IStorageService>? _storageServiceMock;
@@ -20,9 +27,9 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -42,21 +49,21 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = 1920, Height = 1080 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 363888,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -73,8 +80,8 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             _assetRepository!.AddFolder(folderPath2);
@@ -112,8 +119,8 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
 
@@ -146,7 +153,7 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
             string? folderPath2 = null;
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
@@ -180,8 +187,8 @@ public class AssetRepositoryGetCataloguedAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "TestFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "TestFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             _assetRepository!.AddFolder(folderPath2);

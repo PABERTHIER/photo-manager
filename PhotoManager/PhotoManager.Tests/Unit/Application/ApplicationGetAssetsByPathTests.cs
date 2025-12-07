@@ -1,4 +1,13 @@
-﻿namespace PhotoManager.Tests.Unit.Application;
+﻿using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Unit.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Unit.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
+
+namespace PhotoManager.Tests.Unit.Application;
 
 [TestFixture]
 public class ApplicationGetAssetsByPathTests
@@ -17,21 +26,21 @@ public class ApplicationGetAssetsByPathTests
             {
                 FolderId = folderId,
                 Folder = folder,
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 FileProperties = new()
                 {
-                    Size = 29857,
+                    Size = FileSize.IMAGE_1_JPG,
                     Creation = DateTime.Now,
-                    Modification = new (2024, 06, 07, 08, 54, 37)
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = Rotation.Rotate0,
-                Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+                Hash = Hashes.IMAGE_1_JPG,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -42,21 +51,21 @@ public class ApplicationGetAssetsByPathTests
             {
                 FolderId = folderId,
                 Folder = folder,
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 FileProperties = new()
                 {
-                    Size = 29857,
+                    Size = FileSize.IMAGE_2_JPG,
                     Creation = DateTime.Now,
-                    Modification = new (2024, 06, 07, 08, 54, 37)
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = Rotation.Rotate0,
-                Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078",
+                Hash = Hashes.IMAGE_2_JPG,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -109,21 +118,21 @@ public class ApplicationGetAssetsByPathTests
             {
                 FolderId = folderId,
                 Folder = folder,
-                FileName = "Image 1.jpg",
+                FileName = FileNames.IMAGE_1_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 FileProperties = new()
                 {
-                    Size = 29857,
+                    Size = FileSize.IMAGE_1_JPG,
                     Creation = DateTime.Now,
-                    Modification = new (2024, 06, 07, 08, 54, 37)
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = Rotation.Rotate0,
-                Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+                Hash = Hashes.IMAGE_1_JPG,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -134,21 +143,21 @@ public class ApplicationGetAssetsByPathTests
             {
                 FolderId = folderId,
                 Folder = folder,
-                FileName = "Image 2.jpg",
+                FileName = FileNames.IMAGE_2_JPG,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
                 },
                 FileProperties = new()
                 {
-                    Size = 29857,
+                    Size = FileSize.IMAGE_2_JPG,
                     Creation = DateTime.Now,
-                    Modification = new (2024, 06, 07, 08, 54, 37)
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = Rotation.Rotate0,
-                Hash = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078",
+                Hash = Hashes.IMAGE_2_JPG,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
