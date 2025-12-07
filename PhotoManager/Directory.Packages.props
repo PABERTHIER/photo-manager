@@ -10,7 +10,7 @@
     </PackageVersion>
     <PackageVersion Include="FFMpegCore" Version="5.2.0" />
     <PackageVersion Include="log4net" Version="2.0.15" />
-    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="13.6.0" />
+    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.9.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.4" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.4" />

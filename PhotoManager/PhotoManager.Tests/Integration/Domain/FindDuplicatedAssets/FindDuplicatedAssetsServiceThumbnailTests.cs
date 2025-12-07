@@ -1,4 +1,15 @@
-﻿namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+
+namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 
 [TestFixture]
 public class FindDuplicatedAssetsServiceThumbnailTests
@@ -6,8 +17,6 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
     private AssetRepository? _assetRepository;
@@ -24,9 +33,9 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -50,21 +59,21 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         {
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = 1920, Height = 1080 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 363888,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -75,21 +84,21 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
             {
-                Asset = new() { Width = 6000, Height = 6120 },
-                Thumbnail = new() { Width = 147, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 4602393,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -100,21 +109,20 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
-            ImageRotation = Rotation.Rotate0,
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1920, Height = 1080 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 363888,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -125,21 +133,21 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
             {
-                Asset = new() { Width = 6000, Height = 6120 },
-                Thumbnail = new() { Width = 147, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 4602393,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
+            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -150,21 +158,21 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         {
             FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
-            ImageRotation = Rotation.Rotate0,
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 2247285,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "a92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
+            ImageRotation = Rotation.Rotate0,
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
@@ -178,15 +186,15 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     {
         try
         {
-            string sourcePath1 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
-            string sourcePath2 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+            string sourcePath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            string sourcePath2 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = sourcePath1 };
             Folder folder2 = new() { Id = Guid.NewGuid(), Path = sourcePath2 };
 
-            const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
-            const string hash3 = "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056";
+            const string hash1 = PHashes.IMAGE_1_JPG;
+            const string hash2 = PHashes.IMAGE_9_PNG;
+            const string hash3 = PHashes.IMAGE_11_HEIC;
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
             _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
@@ -241,9 +249,9 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     {
         try
         {
-            const string hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960";
+            const string hash = Hashes.IMAGE_9_PNG;
 
-            string sourcePath = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+            string sourcePath = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
             Folder folder = new() { Id = Guid.NewGuid(), Path = sourcePath };
 
@@ -289,19 +297,19 @@ public class FindDuplicatedAssetsServiceThumbnailTests
             Directory.Delete(_databaseDirectory!, true);
         }
     }
-    
+
     [Test]
     public void GetDuplicatesBetweenOriginalAndThumbnail_DuplicatesButOneFileDoesNotExist_ReturnsEmptyList()
     {
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_1}");
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
             Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
-            const string hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
+            const string hash = PHashes.IMAGE_1_JPG;
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
             _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
@@ -326,15 +334,15 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     {
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
 
             Folder folder1 = new() { Id = Guid.NewGuid(), Path = folderPath1 };
             Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath2 };
 
-            const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
-            const string hash3 = "a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf6205662ee062ee062ee062ee062ee062ee062ee0a926f84a9188106894a161cc28d7cf62056a926f84a9188106894a161cc28d7cf62056";
+            const string hash1 = PHashes.IMAGE_1_JPG;
+            const string hash2 = PHashes.IMAGE_9_PNG;
+            const string hash3 = PHashes.IMAGE_11_HEIC;
 
             _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
             _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
@@ -381,12 +389,12 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     {
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
             Folder folder = new() { Id = Guid.NewGuid(), Path = folderPath };
 
-            const string hash1 = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0";
-            const string hash2 = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0";
+            const string hash1 = PHashes.IMAGE_1_JPG;
+            const string hash2 = PHashes.IMAGE_9_PNG;
 
             _asset1 = _asset1!.WithFolder(folder).WithHash(hash1);
             _asset2 = _asset2!.WithFolder(folder).WithHash(hash2);

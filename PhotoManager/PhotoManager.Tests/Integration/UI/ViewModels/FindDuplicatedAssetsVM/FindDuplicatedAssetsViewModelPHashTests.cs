@@ -1,5 +1,14 @@
 ﻿using PhotoManager.UI.Models;
 using System.ComponentModel;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.FindDuplicatedAssetsVM;
 
@@ -9,8 +18,6 @@ public class FindDuplicatedAssetsViewModelPHashTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private FindDuplicatedAssetsViewModel? _findDuplicatedAssetsViewModel;
     private ApplicationViewModel? _applicationViewModel;
@@ -54,9 +61,9 @@ public class FindDuplicatedAssetsViewModelPHashTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -68,21 +75,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -94,21 +101,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_180_deg.jpg",
+            FileName = FileNames.IMAGE_1_180_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_180_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_180_DEG_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_180_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_180_DEG_JPG }
             },
             FileProperties = new()
             {
-                Size = 31535,
+                Size = FileSize.IMAGE_1_180_DEG_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate180,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_180_DEG_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -120,21 +127,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_270_deg.jpg",
+            FileName = FileNames.IMAGE_1_270_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 720, Height = 1280 },
-                Thumbnail = new() { Width = 84, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_270_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_270_DEG_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_270_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_270_DEG_JPG }
             },
             FileProperties = new()
             {
-                Size = 31535,
+                Size = FileSize.IMAGE_1_270_DEG_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate270,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_270_DEG_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -146,21 +153,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_90_deg.jpg",
+            FileName = FileNames.IMAGE_1_90_DEG_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 720, Height = 1280 },
-                Thumbnail = new() { Width = 84, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_90_DEG_JPG, Height = PixelHeightAsset.IMAGE_1_90_DEG_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_90_DEG_JPG, Height = ThumbnailHeightAsset.IMAGE_1_90_DEG_JPG }
             },
             FileProperties = new()
             {
-                Size = 31535,
+                Size = FileSize.IMAGE_1_90_DEG_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate90,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_90_DEG_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -172,21 +179,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 2 duplicated.jpg",
+            FileName = FileNames.IMAGE_2_DUPLICATED_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_DUPLICATED_JPG, Height = PixelHeightAsset.IMAGE_2_DUPLICATED_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_DUPLICATED_JPG, Height = ThumbnailHeightAsset.IMAGE_2_DUPLICATED_JPG }
             },
             FileProperties = new()
             {
-                Size = 30197,
+                Size = FileSize.IMAGE_2_DUPLICATED_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afba2849d18fc388dc1662da0619b362ee062ee062ee062ee062ee062ee062ee062ee0afba2849d18fc388dc1662da0619b362ee062ee062ee062ee062ee062ee062ee062ee0afba2849d18fc388dc1662da0619b362ee0afba2849d18fc388dc1662da0619b362ee0",
+            Hash = PHashes.IMAGE_2_DUPLICATED_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -198,21 +205,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 2.jpg",
+            FileName = FileNames.IMAGE_2_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_2_JPG, Height = PixelHeightAsset.IMAGE_2_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_2_JPG, Height = ThumbnailHeightAsset.IMAGE_2_JPG }
             },
             FileProperties = new()
             {
-                Size = 30197,
+                Size = FileSize.IMAGE_2_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afba2849d18fc388dc1662da0619b362ee062ee062ee062ee062ee062ee062ee062ee0afba2849d18fc388dc1662da0619b362ee062ee062ee062ee062ee062ee062ee062ee0afba2849d18fc388dc1662da0619b362ee0afba2849d18fc388dc1662da0619b362ee0",
+            Hash = PHashes.IMAGE_2_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -224,21 +231,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 3.jpg",
+            FileName = FileNames.IMAGE_3_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_3_JPG, Height = PixelHeightAsset.IMAGE_3_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_3_JPG, Height = ThumbnailHeightAsset.IMAGE_3_JPG }
             },
             FileProperties = new()
             {
-                Size = 30276,
+                Size = FileSize.IMAGE_3_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb9e849d08fc428dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc428dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc428dc1a62da1619b362ee0afb9e849d08fc428dc1a62da1619b362ee0",
+            Hash = PHashes.IMAGE_3_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -250,21 +257,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 4.jpg",
+            FileName = FileNames.IMAGE_4_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_4_JPG, Height = PixelHeightAsset.IMAGE_4_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_4_JPG, Height = ThumbnailHeightAsset.IMAGE_4_JPG }
             },
             FileProperties = new()
             {
-                Size = 30115,
+                Size = FileSize.IMAGE_4_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb9b849cf8fc488dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afb9b849cf8fc488dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afb9b849cf8fc488dc1b62da1619b462ee0afb9b849cf8fc488dc1b62da1619b462ee0",
+            Hash = PHashes.IMAGE_4_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -276,21 +283,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 5.jpg",
+            FileName = FileNames.IMAGE_5_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_5_JPG, Height = PixelHeightAsset.IMAGE_5_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_5_JPG, Height = ThumbnailHeightAsset.IMAGE_5_JPG }
             },
             FileProperties = new()
             {
-                Size = 30117,
+                Size = FileSize.IMAGE_5_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb9e849d08fc458dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc458dc1a62da1619b362ee062ee062ee062ee062ee062ee062ee062ee0afb9e849d08fc458dc1a62da1619b362ee0afb9e849d08fc458dc1a62da1619b362ee0",
+            Hash = PHashes.IMAGE_5_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -302,21 +309,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 6.jpg",
+            FileName = FileNames.IMAGE_6_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_6_JPG, Height = PixelHeightAsset.IMAGE_6_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_6_JPG, Height = ThumbnailHeightAsset.IMAGE_6_JPG }
             },
             FileProperties = new()
             {
-                Size = 30366,
+                Size = FileSize.IMAGE_6_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb93849ce8fc508dc1d62da2619b462ee062ee062ee062ee062ee062ee062ee062ee0afb93849ce8fc508dc1d62da2619b462ee062ee062ee062ee062ee062ee062ee062ee0afb93849ce8fc508dc1d62da2619b462ee0afb93849ce8fc508dc1d62da2619b462ee0",
+            Hash = PHashes.IMAGE_6_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -328,21 +335,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 7.jpg",
+            FileName = FileNames.IMAGE_7_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_7_JPG, Height = PixelHeightAsset.IMAGE_7_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_7_JPG, Height = ThumbnailHeightAsset.IMAGE_7_JPG }
             },
             FileProperties = new()
             {
-                Size = 29974,
+                Size = FileSize.IMAGE_7_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afbac849d38fc408dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afbac849d38fc408dc1b62da1619b462ee062ee062ee062ee062ee062ee062ee062ee0afbac849d38fc408dc1b62da1619b462ee0afbac849d38fc408dc1b62da1619b462ee0",
+            Hash = PHashes.IMAGE_7_JPG,
             ImageData = new(),
             Metadata = new()
             {
@@ -354,21 +361,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 8.jpeg",
+            FileName = FileNames.IMAGE_8_JPEG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_8_JPEG, Height = PixelHeightAsset.IMAGE_8_JPEG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_8_JPEG, Height = ThumbnailHeightAsset.IMAGE_8_JPEG }
             },
             FileProperties = new()
             {
-                Size = 30514,
+                Size = FileSize.IMAGE_8_JPEG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee062ee062ee062ee062ee062ee062ee062ee0afb8a849cc8fc608dc2362da4619b462ee0afb8a849cc8fc608dc2362da4619b462ee0",
+            Hash = PHashes.IMAGE_8_JPEG,
             ImageData = new(),
             Metadata = new()
             {
@@ -380,21 +387,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee0afb2d849b98fd038dc1062da9619b162ee0",
+            Hash = PHashes.IMAGE_9_PNG,
             ImageData = new(),
             Metadata = new()
             {
@@ -406,21 +413,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 10 portrait.png",
+            FileName = FileNames.IMAGE_10_PORTRAIT_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 720, Height = 1280 },
-                Thumbnail = new() { Width = 84, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_10_PORTRAIT_PNG, Height = PixelHeightAsset.IMAGE_10_PORTRAIT_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_10_PORTRAIT_PNG, Height = ThumbnailHeightAsset.IMAGE_10_PORTRAIT_PNG }
             },
             FileProperties = new()
             {
-                Size = 153318,
+                Size = FileSize.IMAGE_10_PORTRAIT_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee062ee062ee062ee062ee062ee062ee062ee0afaff849b08fd348dc1f62dae619b262ee0afaff849b08fd348dc1f62dae619b262ee0",
+            Hash = PHashes.IMAGE_10_PORTRAIT_PNG,
             ImageData = new(),
             Metadata = new()
             {
@@ -432,21 +439,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d63662071a928c84a96881408945461cb98d63662071",
+            Hash = PHashes.IMAGE_11_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -458,21 +465,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11_180.heic",
+            FileName = FileNames.IMAGE_11_180_DEG_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_180_DEG_HEIC, Height = PixelHeightAsset.IMAGE_11_180_DEG_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1423616,
+                Size = FileSize.IMAGE_11_180_DEG_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate180,
-            Hash = "a928e84a97881448945561cb98d6386206f62ee062ee062ee062ee062ee062ee062ee0a928e84a97881448945561cb98d6386206f62ee062ee062ee062ee062ee062ee062ee0a928e84a97881448945561cb98d6386206fa928e84a97881448945561cb98d6386206f",
+            Hash = PHashes.IMAGE_11_180_DEG_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -484,21 +491,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11_270.heic",
+            FileName = FileNames.IMAGE_11_270_DEG_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_270_DEG_HEIC, Height = PixelHeightAsset.IMAGE_11_270_DEG_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1423616,
+                Size = FileSize.IMAGE_11_270_DEG_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate270,
-            Hash = "a929184a99881458946061cbb8d6606206962ee062ee062ee062ee062ee062ee062ee0a929184a99881458946061cbb8d6606206962ee062ee062ee062ee062ee062ee062ee0a929184a99881458946061cbb8d66062069a929184a99881458946061cbb8d66062069",
+            Hash = PHashes.IMAGE_11_270_DEG_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -510,21 +517,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11_90.heic",
+            FileName = FileNames.IMAGE_11_90_DEG_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_90_DEG_HEIC, Height = PixelHeightAsset.IMAGE_11_90_DEG_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_90_DEG_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate90,
-            Hash = "a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206a62ee062ee062ee062ee062ee062ee062ee0a928f84a98881418945f61cbb8d6606206aa928f84a98881418945f61cbb8d6606206a",
+            Hash = PHashes.IMAGE_11_90_DEG_HEIC,
             ImageData = new(),
             Metadata = new()
             {
@@ -536,21 +543,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -562,21 +569,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee062ee062ee062ee062ee062ee062ee062ee0afbaa849d28fc2b8dc1262d9e619b362ee0afbaa849d28fc2b8dc1262d9e619b362ee0",
+            Hash = PHashes.IMAGE_1_DUPLICATE_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -588,21 +595,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee0afb2d849b98fd038dc1062da9619b162ee0",
+            Hash = PHashes.IMAGE_9_PNG,
             ImageData = null,
             Metadata = new()
             {
@@ -614,21 +621,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee062ee062ee062ee062ee062ee062ee062ee0afb2d849b98fd038dc1062da9619b162ee0afb2d849b98fd038dc1062da9619b162ee0",
+            Hash = PHashes.IMAGE_9_DUPLICATE_PNG,
             ImageData = null,
             Metadata = new()
             {
@@ -640,21 +647,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d6366207162ee062ee062ee062ee062ee062ee062ee0a928c84a96881408945461cb98d63662071a928c84a96881408945461cb98d63662071",
+            Hash = PHashes.IMAGE_11_HEIC,
             ImageData = null,
             Metadata = new()
             {
@@ -666,21 +673,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336.JPG",
+            FileName = FileNames._1336_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_JPG, Height = PixelHeightAsset._1336_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_JPG, Height = ThumbnailHeightAsset._1336_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize._1336_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f71abf9e847058af2e892da61f508b70361f71",
+            Hash = PHashes._1336_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -692,21 +699,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_Original.JPG",
+            FileName = FileNames._1336_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_ORIGINAL_JPG, Height = PixelHeightAsset._1336_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize._1336_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f71abf9e847058af2e892da61f508b70361f71",
+            Hash = PHashes._1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -718,21 +725,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_1K.JPG",
+            FileName = FileNames._1336_1_K_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1024, Height = 768 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_1_K_JPG, Height = PixelHeightAsset._1336_1_K_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_1_K_JPG, Height = ThumbnailHeightAsset._1336_1_K_JPG }
             },
             FileProperties = new()
             {
-                Size = 311067,
+                Size = FileSize._1336_1_K_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf0a846dd8aef48929a61f458b6af61f6262ee062ee062ee062ee062ee062ee062ee0abf0a846dd8aef48929a61f458b6af61f6262ee062ee062ee062ee062ee062ee062ee0abf0a846dd8aef48929a61f458b6af61f62abf0a846dd8aef48929a61f458b6af61f62",
+            Hash = PHashes._1336_1_K_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -744,21 +751,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_2K.JPG",
+            FileName = FileNames._1336_2_K_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 2048, Height = 1536 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_2_K_JPG, Height = PixelHeightAsset._1336_2_K_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_2_K_JPG, Height = ThumbnailHeightAsset._1336_2_K_JPG }
             },
             FileProperties = new()
             {
-                Size = 1154116,
+                Size = FileSize._1336_2_K_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf0b846dd8aef18929961f458b6af61f6262ee062ee062ee062ee062ee062ee062ee0abf0b846dd8aef18929961f458b6af61f6262ee062ee062ee062ee062ee062ee062ee0abf0b846dd8aef18929961f458b6af61f62abf0b846dd8aef18929961f458b6af61f62",
+            Hash = PHashes._1336_2_K_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -770,21 +777,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_4K_Original.JPG",
+            FileName = FileNames._1336_4_K_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_4_K_ORIGINAL_JPG, Height = PixelHeightAsset._1336_4_K_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_4_K_ORIGINAL_JPG, Height = ThumbnailHeightAsset._1336_4_K_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize._1336_4_K_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f71abf9e847058af2e892da61f508b70361f71",
+            Hash = PHashes._1336_4_K_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -796,21 +803,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "1336_Thumbnail.JPG",
+            FileName = FileNames._1336_THUMBNAIL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 202, Height = 152 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset._1336_THUMBNAIL_JPG, Height = PixelHeightAsset._1336_THUMBNAIL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset._1336_THUMBNAIL_JPG, Height = ThumbnailHeightAsset._1336_THUMBNAIL_JPG }
             },
             FileProperties = new()
             {
-                Size = 19472,
+                Size = FileSize._1336_THUMBNAIL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf0f846de8aeee8929b61f478b6b061f6062ee062ee062ee062ee062ee062ee062ee0abf0f846de8aeee8929b61f478b6b061f6062ee062ee062ee062ee062ee062ee062ee0abf0f846de8aeee8929b61f478b6b061f60abf0f846de8aeee8929b61f478b6b061f60",
+            Hash = PHashes._1336_THUMBNAIL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -822,21 +829,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_1336_Mini.JPG",
+            FileName = FileNames.IMAGE_1336_MINI_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 43, Height = 32 },
-                Thumbnail = new() { Width = 200, Height = 149 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_MINI_JPG, Height = PixelHeightAsset.IMAGE_1336_MINI_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_MINI_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_MINI_JPG }
             },
             FileProperties = new()
             {
-                Size = 1586,
+                Size = FileSize.IMAGE_1336_MINI_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abd4f8464c8af0d8926261f378b61d61f6362ee062ee062ee062ee062ee062ee062ee0abd4f8464c8af0d8926261f378b61d61f6362ee062ee062ee062ee062ee062ee062ee0abd4f8464c8af0d8926261f378b61d61f63abd4f8464c8af0d8926261f378b61d61f63",
+            Hash = PHashes.IMAGE_1336_MINI_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -848,21 +855,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_1336_Original.JPG",
+            FileName = FileNames.IMAGE_1336_ORIGINAL_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_ORIGINAL_JPG, Height = PixelHeightAsset.IMAGE_1336_ORIGINAL_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_ORIGINAL_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_ORIGINAL_JPG }
             },
             FileProperties = new()
             {
-                Size = 4526710,
+                Size = FileSize.IMAGE_1336_ORIGINAL_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f7162ee062ee062ee062ee062ee062ee062ee0abf9e847058af2e892da61f508b70361f71abf9e847058af2e892da61f508b70361f71",
+            Hash = PHashes.IMAGE_1336_ORIGINAL_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -874,21 +881,21 @@ public class FindDuplicatedAssetsViewModelPHashTests
         {
             FolderId = Guid.Empty,
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_1336_ShitQuality.JPG",
+            FileName = FileNames.IMAGE_1336_SHIT_QUALITY_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 4032, Height = 3024 },
-                Thumbnail = new() { Width = 200, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, Height = PixelHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1336_SHIT_QUALITY_JPG, Height = ThumbnailHeightAsset.IMAGE_1336_SHIT_QUALITY_JPG }
             },
             FileProperties = new()
             {
-                Size = 370819,
+                Size = FileSize.IMAGE_1336_SHIT_QUALITY_JPG,
                 Creation = actualDate,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = actualDate,
             ImageRotation = Rotation.Rotate0,
-            Hash = "abd4c846458af188927261f388b63261f6962ee062ee062ee062ee062ee062ee062ee0abd4c846458af188927261f388b63261f6962ee062ee062ee062ee062ee062ee062ee0abd4c846458af188927261f388b63261f69abd4c846458af188927261f388b63261f69",
+            Hash = PHashes.IMAGE_1336_SHIT_QUALITY_JPG,
             ImageData = null,
             Metadata = new()
             {
@@ -946,13 +953,13 @@ public class FindDuplicatedAssetsViewModelPHashTests
     public async Task SetDuplicates_CataloguedAssetsAndPHashTypeAndAllDuplicatesSetsAndDetectThumbnailsIsTrue_SetsDuplicates()
     {
         string rootDirectory = Path.Combine(_dataDirectory!);
-        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
-        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, "NewFolder1");
-        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, "NewFolder2");
-        string directorySample1 = Path.Combine(duplicatesDirectory, "NotDuplicate", "Sample1");
-        string directoryPart = Path.Combine(duplicatesDirectory, "Part");
-        string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
-        string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
+        string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
+        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
+        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
+        string directorySample1 = Path.Combine(duplicatesDirectory, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string directoryPart = Path.Combine(duplicatesDirectory, Directories.PART);
+        string directoryResolution = Path.Combine(duplicatesDirectory, Directories.RESOLUTION);
+        string directoryThumbnail = Path.Combine(duplicatesDirectory, Directories.THUMBNAIL);
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, 200, 150, false, false, true, true, true);
 
@@ -973,65 +980,57 @@ public class FindDuplicatedAssetsViewModelPHashTests
 
             List<List<Asset>> duplicatedAssetsSets = _application!.GetDuplicatedAssets();
 
-            Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(7));
-            Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(14));
-            Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(8));
-            Assert.That(duplicatedAssetsSets[2], Has.Count.EqualTo(4));
-            Assert.That(duplicatedAssetsSets[3], Has.Count.EqualTo(2));
-            Assert.That(duplicatedAssetsSets[4], Has.Count.EqualTo(4));
-            Assert.That(duplicatedAssetsSets[5], Has.Count.EqualTo(3));
-            Assert.That(duplicatedAssetsSets[6], Has.Count.EqualTo(2));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(duplicatedAssetsSets, Has.Count.EqualTo(8));
+                Assert.That(duplicatedAssetsSets[0], Has.Count.EqualTo(6));
+                Assert.That(duplicatedAssetsSets[1], Has.Count.EqualTo(2));
+                Assert.That(duplicatedAssetsSets[2], Has.Count.EqualTo(2));
+                Assert.That(duplicatedAssetsSets[3], Has.Count.EqualTo(2));
+                Assert.That(duplicatedAssetsSets[4], Has.Count.EqualTo(3));
+                Assert.That(duplicatedAssetsSets[5], Has.Count.EqualTo(2));
+                Assert.That(duplicatedAssetsSets[6], Has.Count.EqualTo(4));
+                Assert.That(duplicatedAssetsSets[7], Has.Count.EqualTo(2));
 
-            // First set
-            Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset2.FileName));
-            Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset3.FileName));
-            Assert.That(duplicatedAssetsSets[0][3].FileName, Is.EqualTo(_asset4.FileName));
-            Assert.That(duplicatedAssetsSets[0][4].FileName, Is.EqualTo(_asset5.FileName));
-            Assert.That(duplicatedAssetsSets[0][5].FileName, Is.EqualTo(_asset6.FileName));
-            Assert.That(duplicatedAssetsSets[0][6].FileName, Is.EqualTo(_asset7.FileName));
-            Assert.That(duplicatedAssetsSets[0][7].FileName, Is.EqualTo(_asset8.FileName));
-            Assert.That(duplicatedAssetsSets[0][8].FileName, Is.EqualTo(_asset9.FileName));
-            Assert.That(duplicatedAssetsSets[0][9].FileName, Is.EqualTo(_asset10.FileName));
-            Assert.That(duplicatedAssetsSets[0][10].FileName, Is.EqualTo(_asset11.FileName));
-            Assert.That(duplicatedAssetsSets[0][11].FileName, Is.EqualTo(_asset12.FileName));
-            Assert.That(duplicatedAssetsSets[0][12].FileName, Is.EqualTo(_asset19.FileName));
-            Assert.That(duplicatedAssetsSets[0][13].FileName, Is.EqualTo(_asset20.FileName));
+                // First set
+                Assert.That(duplicatedAssetsSets[0][0].FileName, Is.EqualTo(_asset1.FileName));
+                Assert.That(duplicatedAssetsSets[0][1].FileName, Is.EqualTo(_asset2.FileName));
+                Assert.That(duplicatedAssetsSets[0][2].FileName, Is.EqualTo(_asset3.FileName));
+                Assert.That(duplicatedAssetsSets[0][3].FileName, Is.EqualTo(_asset4.FileName));
+                Assert.That(duplicatedAssetsSets[0][4].FileName, Is.EqualTo(_asset19.FileName));
+                Assert.That(duplicatedAssetsSets[0][5].FileName, Is.EqualTo(_asset20.FileName));
 
-            // Second set
-            Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset14.FileName));
-            Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset5.FileName));
-            Assert.That(duplicatedAssetsSets[1][2].FileName, Is.EqualTo(_asset6.FileName));
-            Assert.That(duplicatedAssetsSets[1][3].FileName, Is.EqualTo(_asset7.FileName));
-            Assert.That(duplicatedAssetsSets[1][4].FileName, Is.EqualTo(_asset9.FileName));
-            Assert.That(duplicatedAssetsSets[1][5].FileName, Is.EqualTo(_asset13.FileName));
-            Assert.That(duplicatedAssetsSets[1][6].FileName, Is.EqualTo(_asset21.FileName));
-            Assert.That(duplicatedAssetsSets[1][7].FileName, Is.EqualTo(_asset22.FileName));
+                // Second set
+                Assert.That(duplicatedAssetsSets[1][0].FileName, Is.EqualTo(_asset5.FileName));
+                Assert.That(duplicatedAssetsSets[1][1].FileName, Is.EqualTo(_asset6.FileName));
 
-            // Third set
-            Assert.That(duplicatedAssetsSets[2][0].FileName, Is.EqualTo(_asset15.FileName));
-            Assert.That(duplicatedAssetsSets[2][1].FileName, Is.EqualTo(_asset16.FileName));
-            Assert.That(duplicatedAssetsSets[2][2].FileName, Is.EqualTo(_asset18.FileName));
-            Assert.That(duplicatedAssetsSets[2][3].FileName, Is.EqualTo(_asset23.FileName));
+                // Third set
+                Assert.That(duplicatedAssetsSets[2][0].FileName, Is.EqualTo(_asset7.FileName));
+                Assert.That(duplicatedAssetsSets[2][1].FileName, Is.EqualTo(_asset9.FileName));
 
-            // Fourth set
-            Assert.That(duplicatedAssetsSets[3][0].FileName, Is.EqualTo(_asset17.FileName));
-            Assert.That(duplicatedAssetsSets[3][1].FileName, Is.EqualTo(_asset18.FileName));
+                // Fourth set
+                Assert.That(duplicatedAssetsSets[3][0].FileName, Is.EqualTo(_asset8.FileName));
+                Assert.That(duplicatedAssetsSets[3][1].FileName, Is.EqualTo(_asset10.FileName));
 
-            // Fifth set
-            Assert.That(duplicatedAssetsSets[4][0].FileName, Is.EqualTo(_asset24.FileName));
-            Assert.That(duplicatedAssetsSets[4][1].FileName, Is.EqualTo(_asset25.FileName));
-            Assert.That(duplicatedAssetsSets[4][2].FileName, Is.EqualTo(_asset28.FileName));
-            Assert.That(duplicatedAssetsSets[4][3].FileName, Is.EqualTo(_asset31.FileName));
+                // Fifth set
+                Assert.That(duplicatedAssetsSets[4][0].FileName, Is.EqualTo(_asset13.FileName));
+                Assert.That(duplicatedAssetsSets[4][1].FileName, Is.EqualTo(_asset21.FileName));
+                Assert.That(duplicatedAssetsSets[4][2].FileName, Is.EqualTo(_asset22.FileName));
 
-            // Sixth set
-            Assert.That(duplicatedAssetsSets[5][0].FileName, Is.EqualTo(_asset26.FileName));
-            Assert.That(duplicatedAssetsSets[5][1].FileName, Is.EqualTo(_asset27.FileName));
-            Assert.That(duplicatedAssetsSets[5][2].FileName, Is.EqualTo(_asset29.FileName));
+                // Sixth set
+                Assert.That(duplicatedAssetsSets[5][0].FileName, Is.EqualTo(_asset15.FileName));
+                Assert.That(duplicatedAssetsSets[5][1].FileName, Is.EqualTo(_asset23.FileName));
 
-            // Seventh set
-            Assert.That(duplicatedAssetsSets[6][0].FileName, Is.EqualTo(_asset30.FileName));
-            Assert.That(duplicatedAssetsSets[6][1].FileName, Is.EqualTo(_asset32.FileName));
+                // Seventh set
+                Assert.That(duplicatedAssetsSets[6][0].FileName, Is.EqualTo(_asset24.FileName));
+                Assert.That(duplicatedAssetsSets[6][1].FileName, Is.EqualTo(_asset25.FileName));
+                Assert.That(duplicatedAssetsSets[6][2].FileName, Is.EqualTo(_asset28.FileName));
+                Assert.That(duplicatedAssetsSets[6][3].FileName, Is.EqualTo(_asset31.FileName));
+
+                // Eighth set
+                Assert.That(duplicatedAssetsSets[7][0].FileName, Is.EqualTo(_asset26.FileName));
+                Assert.That(duplicatedAssetsSets[7][1].FileName, Is.EqualTo(_asset27.FileName));
+            }
 
             Folder? folder1 = _assetRepository!.GetFolderByPath(rootDirectory);
             Folder? folder2 = _assetRepository!.GetFolderByPath(directoryNewFolder1);
@@ -1095,6 +1094,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
             DuplicatedSetViewModel duplicatedAssetSet5 = [];
             DuplicatedSetViewModel duplicatedAssetSet6 = [];
             DuplicatedSetViewModel duplicatedAssetSet7 = [];
+            DuplicatedSetViewModel duplicatedAssetSet8 = [];
 
             // First set
             DuplicatedAssetViewModel duplicatedAssetViewModel1 = new()
@@ -1127,240 +1127,143 @@ public class FindDuplicatedAssetsViewModelPHashTests
 
             DuplicatedAssetViewModel duplicatedAssetViewModel5 = new()
             {
-                Asset = _asset5,
+                Asset = _asset19,
                 ParentViewModel = duplicatedAssetSet1
             };
             duplicatedAssetSet1.Add(duplicatedAssetViewModel5);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel6 = new()
             {
-                Asset = _asset6,
+                Asset = _asset20,
                 ParentViewModel = duplicatedAssetSet1
             };
             duplicatedAssetSet1.Add(duplicatedAssetViewModel6);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel7 = new()
-            {
-                Asset = _asset7,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel7);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel8 = new()
-            {
-                Asset = _asset8,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel8);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel9 = new()
-            {
-                Asset = _asset9,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel9);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel10 = new()
-            {
-                Asset = _asset10,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel10);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel11 = new()
-            {
-                Asset = _asset11,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel11);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel12 = new()
-            {
-                Asset = _asset12,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel12);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel13 = new()
-            {
-                Asset = _asset19,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel13);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel14 = new()
-            {
-                Asset = _asset20,
-                ParentViewModel = duplicatedAssetSet1
-            };
-            duplicatedAssetSet1.Add(duplicatedAssetViewModel14);
-
             // Second set
-            DuplicatedAssetViewModel duplicatedAssetViewModel15 = new()
-            {
-                Asset = _asset14,
-                ParentViewModel = duplicatedAssetSet2
-            };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel15);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel16 = new()
+            DuplicatedAssetViewModel duplicatedAssetViewModel7 = new()
             {
                 Asset = _asset5,
                 ParentViewModel = duplicatedAssetSet2
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel16);
+            duplicatedAssetSet2.Add(duplicatedAssetViewModel7);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel17 = new()
+            DuplicatedAssetViewModel duplicatedAssetViewModel8 = new()
             {
                 Asset = _asset6,
                 ParentViewModel = duplicatedAssetSet2
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel17);
+            duplicatedAssetSet2.Add(duplicatedAssetViewModel8);
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel18 = new()
+            // Third set
+            DuplicatedAssetViewModel duplicatedAssetViewModel9 = new()
             {
                 Asset = _asset7,
-                ParentViewModel = duplicatedAssetSet2
+                ParentViewModel = duplicatedAssetSet3
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel18);
+            duplicatedAssetSet3.Add(duplicatedAssetViewModel9);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel10 = new()
+            {
+                Asset = _asset9,
+                ParentViewModel = duplicatedAssetSet3
+            };
+            duplicatedAssetSet3.Add(duplicatedAssetViewModel10);
+
+            // Fourth set
+            DuplicatedAssetViewModel duplicatedAssetViewModel11 = new()
+            {
+                Asset = _asset8,
+                ParentViewModel = duplicatedAssetSet4
+            };
+            duplicatedAssetSet4.Add(duplicatedAssetViewModel11);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel12 = new()
+            {
+                Asset = _asset10,
+                ParentViewModel = duplicatedAssetSet4
+            };
+            duplicatedAssetSet4.Add(duplicatedAssetViewModel12);
+
+            // Fifth set
+            DuplicatedAssetViewModel duplicatedAssetViewModel13 = new()
+            {
+                Asset = _asset13,
+                ParentViewModel = duplicatedAssetSet5
+            };
+            duplicatedAssetSet5.Add(duplicatedAssetViewModel13);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel14 = new()
+            {
+                Asset = _asset21,
+                ParentViewModel = duplicatedAssetSet5
+            };
+            duplicatedAssetSet5.Add(duplicatedAssetViewModel14);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel15 = new()
+            {
+                Asset = _asset22,
+                ParentViewModel = duplicatedAssetSet5
+            };
+            duplicatedAssetSet5.Add(duplicatedAssetViewModel15);
+
+            // Sixth set
+            DuplicatedAssetViewModel duplicatedAssetViewModel16 = new()
+            {
+                Asset = _asset15,
+                ParentViewModel = duplicatedAssetSet6
+            };
+            duplicatedAssetSet6.Add(duplicatedAssetViewModel16);
+
+            DuplicatedAssetViewModel duplicatedAssetViewModel17 = new()
+            {
+                Asset = _asset23,
+                ParentViewModel = duplicatedAssetSet6
+            };
+            duplicatedAssetSet6.Add(duplicatedAssetViewModel17);
+
+            // Seventh set
+            DuplicatedAssetViewModel duplicatedAssetViewModel18 = new()
+            {
+                Asset = _asset24,
+                ParentViewModel = duplicatedAssetSet7
+            };
+            duplicatedAssetSet7.Add(duplicatedAssetViewModel18);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel19 = new()
             {
-                Asset = _asset9,
-                ParentViewModel = duplicatedAssetSet2
+                Asset = _asset25,
+                ParentViewModel = duplicatedAssetSet7
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel19);
+            duplicatedAssetSet7.Add(duplicatedAssetViewModel19);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel20 = new()
             {
-                Asset = _asset13,
-                ParentViewModel = duplicatedAssetSet2
+                Asset = _asset28,
+                ParentViewModel = duplicatedAssetSet7
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel20);
+            duplicatedAssetSet7.Add(duplicatedAssetViewModel20);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel21 = new()
             {
-                Asset = _asset21,
-                ParentViewModel = duplicatedAssetSet2
+                Asset = _asset31,
+                ParentViewModel = duplicatedAssetSet7
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel21);
+            duplicatedAssetSet7.Add(duplicatedAssetViewModel21);
 
+            // Eighth set
             DuplicatedAssetViewModel duplicatedAssetViewModel22 = new()
             {
-                Asset = _asset22,
-                ParentViewModel = duplicatedAssetSet2
+                Asset = _asset26,
+                ParentViewModel = duplicatedAssetSet8
             };
-            duplicatedAssetSet2.Add(duplicatedAssetViewModel22);
+            duplicatedAssetSet8.Add(duplicatedAssetViewModel22);
 
-            // Third set
             DuplicatedAssetViewModel duplicatedAssetViewModel23 = new()
             {
-                Asset = _asset15,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel23);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel24 = new()
-            {
-                Asset = _asset16,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel24);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel25 = new()
-            {
-                Asset = _asset18,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel25);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel26 = new()
-            {
-                Asset = _asset23,
-                ParentViewModel = duplicatedAssetSet3
-            };
-            duplicatedAssetSet3.Add(duplicatedAssetViewModel26);
-
-            // Fourth set
-            DuplicatedAssetViewModel duplicatedAssetViewModel27 = new()
-            {
-                Asset = _asset17,
-                ParentViewModel = duplicatedAssetSet4
-            };
-            duplicatedAssetSet4.Add(duplicatedAssetViewModel27);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel28 = new()
-            {
-                Asset = _asset18,
-                ParentViewModel = duplicatedAssetSet4
-            };
-            duplicatedAssetSet4.Add(duplicatedAssetViewModel28);
-
-            // Fifth set
-            DuplicatedAssetViewModel duplicatedAssetViewModel29 = new()
-            {
-                Asset = _asset24,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel29);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel30 = new()
-            {
-                Asset = _asset25,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel30);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel31 = new()
-            {
-                Asset = _asset28,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel31);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel32 = new()
-            {
-                Asset = _asset31,
-                ParentViewModel = duplicatedAssetSet5
-            };
-            duplicatedAssetSet5.Add(duplicatedAssetViewModel32);
-
-            // Sixth set
-            DuplicatedAssetViewModel duplicatedAssetViewModel33 = new()
-            {
-                Asset = _asset26,
-                ParentViewModel = duplicatedAssetSet6
-            };
-            duplicatedAssetSet6.Add(duplicatedAssetViewModel33);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel34 = new()
-            {
                 Asset = _asset27,
-                ParentViewModel = duplicatedAssetSet6
+                ParentViewModel = duplicatedAssetSet8
             };
-            duplicatedAssetSet6.Add(duplicatedAssetViewModel34);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel35 = new()
-            {
-                Asset = _asset29,
-                ParentViewModel = duplicatedAssetSet6
-            };
-            duplicatedAssetSet6.Add(duplicatedAssetViewModel35);
-
-            // Seventh set
-            DuplicatedAssetViewModel duplicatedAssetViewModel36 = new()
-            {
-                Asset = _asset30,
-                ParentViewModel = duplicatedAssetSet7
-            };
-            duplicatedAssetSet7.Add(duplicatedAssetViewModel36);
-
-            DuplicatedAssetViewModel duplicatedAssetViewModel37 = new()
-            {
-                Asset = _asset32,
-                ParentViewModel = duplicatedAssetSet7
-            };
-            duplicatedAssetSet7.Add(duplicatedAssetViewModel37);
+            duplicatedAssetSet8.Add(duplicatedAssetViewModel23);
 
             List<DuplicatedSetViewModel> expectedDuplicatedAssetsSets =
             [
@@ -1370,188 +1273,192 @@ public class FindDuplicatedAssetsViewModelPHashTests
                 duplicatedAssetSet4,
                 duplicatedAssetSet5,
                 duplicatedAssetSet6,
-                duplicatedAssetSet7
+                duplicatedAssetSet7,
+                duplicatedAssetSet8
             ];
 
             _findDuplicatedAssetsViewModel!.SetDuplicates(duplicatedAssetsSets);
 
-            CheckAfterChanges(
-                _findDuplicatedAssetsViewModel!,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
+            using (Assert.EnterMultipleScope())
+            {
+                CheckAfterChanges(
+                    _findDuplicatedAssetsViewModel!,
+                    expectedDuplicatedAssetsSets,
+                    0,
+                    0,
+                    duplicatedAssetSet1,
+                    duplicatedAssetViewModel1);
 
-            Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(149));
-            // CatalogAssets + NotifyCatalogChange
-            Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[23], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[29], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[30], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[32], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[35], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[36], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[38], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[39], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[43], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[44], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[46], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[47], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[49], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[52], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[55], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[56], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[58], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[59], Is.EqualTo("ObservableAssets"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[61], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[62], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[63], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[64], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[65], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[66], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[67], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[68], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[69], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[70], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[71], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[72], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[73], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[74], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[75], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[76], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[77], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[78], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[79], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[80], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[81], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[82], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[83], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[84], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[85], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[86], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[87], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[88], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[89], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[90], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[91], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[92], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[93], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[94], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[95], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[96], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[97], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[98], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[99], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[100], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[101], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[102], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[103], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[104], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[105], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[106], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[107], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[108], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[109], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[110], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[111], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[112], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[113], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[114], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[115], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[116], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[117], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[118], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[119], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[120], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[121], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[122], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[123], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[124], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[125], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[126], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[127], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[128], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[129], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[130], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[131], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[132], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[133], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[134], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[135], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[136], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[137], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[138], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[139], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[140], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[141], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[142], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[143], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[144], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[145], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[146], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[147], Is.EqualTo("StatusMessage"));
-            Assert.That(notifyApplicationVmPropertyChangedEvents[148], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents, Has.Count.EqualTo(149));
+                // CatalogAssets + NotifyCatalogChange
+                Assert.That(notifyApplicationVmPropertyChangedEvents[0], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[1], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[2], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[3], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[4], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[5], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[6], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[7], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[8], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[9], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[10], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[11], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[12], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[13], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[14], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[15], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[16], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[17], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[18], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[19], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[20], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[21], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[22], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[23], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[24], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[25], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[26], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[27], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[28], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[29], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[30], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[31], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[32], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[33], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[34], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[35], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[36], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[37], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[38], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[39], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[40], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[41], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[42], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[43], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[44], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[45], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[46], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[47], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[48], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[49], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[50], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[51], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[52], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[53], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[54], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[55], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[56], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[57], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[58], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[59], Is.EqualTo("ObservableAssets"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[60], Is.EqualTo("AppTitle"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[61], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[62], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[63], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[64], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[65], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[66], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[67], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[68], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[69], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[70], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[71], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[72], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[73], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[74], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[75], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[76], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[77], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[78], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[79], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[80], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[81], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[82], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[83], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[84], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[85], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[86], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[87], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[88], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[89], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[90], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[91], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[92], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[93], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[94], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[95], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[96], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[97], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[98], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[99], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[100], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[101], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[102], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[103], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[104], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[105], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[106], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[107], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[108], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[109], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[110], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[111], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[112], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[113], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[114], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[115], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[116], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[117], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[118], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[119], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[120], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[121], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[122], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[123], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[124], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[125], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[126], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[127], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[128], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[129], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[130], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[131], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[132], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[133], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[134], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[135], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[136], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[137], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[138], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[139], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[140], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[141], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[142], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[143], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[144], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[145], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[146], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[147], Is.EqualTo("StatusMessage"));
+                Assert.That(notifyApplicationVmPropertyChangedEvents[148], Is.EqualTo("StatusMessage"));
 
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(5));
-            // SetDuplicates
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
-            Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents, Has.Count.EqualTo(5));
+                // SetDuplicates
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[0], Is.EqualTo("DuplicatedAssetSets"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[1], Is.EqualTo("DuplicatedAssetSetsPosition"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[2], Is.EqualTo("CurrentDuplicatedAssetSet"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[3], Is.EqualTo("DuplicatedAssetPosition"));
+                Assert.That(notifyFindDuplicatedAssetsVmPropertyChangedEvents[4], Is.EqualTo("CurrentDuplicatedAsset"));
 
-            Assert.That(messagesInformationSent, Is.Empty);
+                Assert.That(messagesInformationSent, Is.Empty);
 
-            CheckInstance(
-                findDuplicatedAssetsViewModelInstances,
-                expectedDuplicatedAssetsSets,
-                0,
-                0,
-                duplicatedAssetSet1,
-                duplicatedAssetViewModel1);
+                CheckInstance(
+                    findDuplicatedAssetsViewModelInstances,
+                    expectedDuplicatedAssetsSets,
+                    0,
+                    0,
+                    duplicatedAssetSet1,
+                    duplicatedAssetViewModel1);
+            }
         }
         finally
         {
@@ -1564,13 +1471,13 @@ public class FindDuplicatedAssetsViewModelPHashTests
     public async Task SetDuplicates_CataloguedAssetsAndPHashTypeAndAllDuplicatesSetsAndDetectThumbnailsIsFalse_SetsDuplicates()
     {
         string rootDirectory = Path.Combine(_dataDirectory!);
-        string duplicatesDirectory = Path.Combine(rootDirectory, "Duplicates");
-        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, "NewFolder1");
-        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, "NewFolder2");
-        string directorySample1 = Path.Combine(duplicatesDirectory, "NotDuplicate", "Sample1");
-        string directoryPart = Path.Combine(duplicatesDirectory, "Part");
-        string directoryResolution = Path.Combine(duplicatesDirectory, "Resolution");
-        string directoryThumbnail = Path.Combine(duplicatesDirectory, "Thumbnail");
+        string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
+        string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
+        string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
+        string directorySample1 = Path.Combine(duplicatesDirectory, Directories.NOT_DUPLICATE, Directories.SAMPLE_1);
+        string directoryPart = Path.Combine(duplicatesDirectory, Directories.PART);
+        string directoryResolution = Path.Combine(duplicatesDirectory, Directories.RESOLUTION);
+        string directoryThumbnail = Path.Combine(duplicatesDirectory, Directories.THUMBNAIL);
 
         ConfigureFindDuplicatedAssetsViewModel(100, rootDirectory, 200, 150, false, false, true, false, true);
 

@@ -34,8 +34,8 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
     }
 
     // Between Original and Thumbnail:
-    // PHash the hammingDistance is 36/210 => the more accurate
-    // DHash the hammingDistance is 16/17
+    // PHash the hammingDistance is 10/210 => the most accurate
+    // DHash the hammingDistance is 5/14
     // MD5Hash the hammingDistance is 32/32
     // SHA512 the hammingDistance is 118/128
     private List<List<Asset>> GetDuplicatesBetweenOriginalAndThumbnail(List<Asset> assets, ushort threshold)

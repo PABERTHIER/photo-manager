@@ -3,6 +3,15 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Unit.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Unit.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 
@@ -12,8 +21,6 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private ApplicationViewModel? _applicationViewModel;
     private AssetRepository? _assetRepository;
@@ -21,9 +28,9 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplicationViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -60,11 +67,11 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    [TestCase(Rotation.Rotate0, 3024, 4032)]
-    [TestCase(Rotation.Rotate90, 3024, 4032)]
-    [TestCase(Rotation.Rotate180, 3024, 4032)]
-    [TestCase(Rotation.Rotate270, 3024, 4032)]
-    // [TestCase(null, 3024, 4032)]
+    [TestCase(Rotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(Rotation.Rotate90, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(Rotation.Rotate270, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
+    // [TestCase(null, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(Rotation rotation, int expectedWidth, int expectedHeight)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
@@ -79,7 +86,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            const string fileName = "Image_11.heic";
+            const string fileName = FileNames.IMAGE_11_HEIC;
             string filePath = Path.Combine(_dataDirectory!, fileName);
 
             Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
@@ -92,17 +99,17 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 Pixel = new()
                 {
                     Asset = new() { Width = expectedWidth, Height = expectedHeight },
-                    Thumbnail = new() { Width = 112, Height = 150 }
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
                 },
                 FileProperties = new()
                 {
-                    Size = 1411940,
+                    Size = FileSize.IMAGE_11_HEIC,
                     Creation = DateTime.Now,
-                    Modification = _expectedFileModificationDateTime
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = rotation,
-                Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+                Hash = Hashes.IMAGE_11_HEIC,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -158,10 +165,18 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
     }
 
     [Test]
-    [TestCase("Image_11_90.heic", Rotation.Rotate90, 4032, 3024)]
-    [TestCase("Image_11_180.heic", Rotation.Rotate180, 3024, 4032)]
-    [TestCase("Image_11_270.heic", Rotation.Rotate270, 4032, 3024)]
-    public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName, Rotation rotation, int expectedWidth, int expectedHeight)
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, PixelWidthAsset.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_90_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_90_DEG_HEIC, FileSize.IMAGE_11_90_DEG_HEIC, Hashes.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, PixelWidthAsset.IMAGE_11_180_DEG_HEIC, PixelHeightAsset.IMAGE_11_180_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_180_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_180_DEG_HEIC, FileSize.IMAGE_11_180_DEG_HEIC, Hashes.IMAGE_11_180_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC, PixelHeightAsset.IMAGE_11_270_DEG_HEIC, ThumbnailWidthAsset.IMAGE_11_270_DEG_HEIC, ThumbnailHeightAsset.IMAGE_11_270_DEG_HEIC, FileSize.IMAGE_11_270_DEG_HEIC, Hashes.IMAGE_11_270_DEG_HEIC)]
+    public void LoadBitmapHeicImageFromPath_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(
+        string fileName,
+        Rotation rotation,
+        int expectedWidth,
+        int expectedHeight,
+        int expectedThumbnailPixelWidth,
+        int expectedThumbnailPixelHeight,
+        long expectedFileSize,
+        string expectedHash)
     {
         ConfigureApplicationViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -187,17 +202,17 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 Pixel = new()
                 {
                     Asset = new() { Width = expectedWidth, Height = expectedHeight },
-                    Thumbnail = new() { Width = 112, Height = 150 }
+                    Thumbnail = new() { Width = expectedThumbnailPixelWidth, Height = expectedThumbnailPixelHeight }
                 },
                 FileProperties = new()
                 {
-                    Size = 1411940,
+                    Size = expectedFileSize,
                     Creation = DateTime.Now,
-                    Modification = _expectedFileModificationDateTime
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = rotation,
-                Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+                Hash = expectedHash,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -267,7 +282,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            const string fileName = "ImageDoesNotExist.heic";
+            const string fileName = FileNames.NON_EXISTENT_IMAGE_HEIC;
             string filePath = Path.Combine(_dataDirectory!, fileName);
             const Rotation rotation = Rotation.Rotate90;
 
@@ -280,18 +295,18 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 FileName = fileName,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1000, Height = 1000 },
-                    Thumbnail = new() { Width = 112, Height = 150 }
+                    Asset = new() { Width = PixelWidthAsset.NON_EXISTENT_IMAGE_HEIC, Height = PixelHeightAsset.NON_EXISTENT_IMAGE_HEIC },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.NON_EXISTENT_IMAGE_HEIC, Height = ThumbnailHeightAsset.NON_EXISTENT_IMAGE_HEIC }
                 },
                 FileProperties = new()
                 {
-                    Size = 1411940,
+                    Size = FileSize.NON_EXISTENT_IMAGE_HEIC,
                     Creation = DateTime.Now,
-                    Modification = _expectedFileModificationDateTime
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = rotation,
-                Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+                Hash = Hashes.NON_EXISTENT_IMAGE_HEIC,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -357,7 +372,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            const string fileName = "Image_11.heic";
+            const string fileName = FileNames.IMAGE_11_HEIC;
             string filePath = Path.Combine(_dataDirectory!, fileName);
             const Rotation rotation = (Rotation)999;
 
@@ -370,18 +385,18 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 FileName = fileName,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 3024, Height = 4032 },
-                    Thumbnail = new() { Width = 112, Height = 150 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
                 },
                 FileProperties = new()
                 {
-                    Size = 1411940,
+                    Size = FileSize.IMAGE_11_HEIC,
                     Creation = DateTime.Now,
-                    Modification = _expectedFileModificationDateTime
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = rotation,
-                Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+                Hash = Hashes.IMAGE_11_HEIC,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -477,7 +492,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Assert.That(_applicationViewModel!.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedRootDirectory} - image 0 of 0 - sorted by file name ascending"));
         Assert.That(_applicationViewModel!.StatusMessage, Is.EqualTo(string.Empty));
         Assert.That(_applicationViewModel!.CurrentAsset, Is.Null);
         Assert.That(_applicationViewModel!.MoveAssetsLastSelectedFolder, Is.Null);
@@ -485,7 +500,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Assert.That(_applicationViewModel!.CanGoToNextAsset, Is.False);
         Assert.That(_applicationViewModel!.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(_applicationViewModel!.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(_applicationViewModel!.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void CheckAfterChanges(
@@ -511,7 +526,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Assert.That(applicationViewModelInstance.ExecutionTimeWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.TotalFilesCountWording, Is.EqualTo(string.Empty));
         Assert.That(applicationViewModelInstance.AppTitle,
-            Is.EqualTo($"PhotoManager v1.0.0 - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
+            Is.EqualTo($"PhotoManager {Constants.VERSION} - {expectedLastDirectoryInspected} - image 1 of {expectedAppTitleAssetsCount} - sorted by file name ascending"));
         Assert.That(applicationViewModelInstance.StatusMessage, Is.EqualTo(expectedStatusMessage));
 
         if (expectedCurrentAsset != null)
@@ -528,7 +543,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Assert.That(applicationViewModelInstance.CanGoToNextAsset, Is.EqualTo(expectedCanGoToNextAsset));
         Assert.That(applicationViewModelInstance.AboutInformation.Product, Is.EqualTo("PhotoManager"));
         Assert.That(applicationViewModelInstance.AboutInformation.Author, Is.EqualTo("Toto"));
-        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo("v1.0.0"));
+        Assert.That(applicationViewModelInstance.AboutInformation.Version, Is.EqualTo(Constants.VERSION));
     }
 
     private static void CheckInstance(

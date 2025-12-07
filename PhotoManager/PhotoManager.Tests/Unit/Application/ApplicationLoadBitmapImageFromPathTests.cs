@@ -1,4 +1,9 @@
-﻿namespace PhotoManager.Tests.Unit.Application;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+
+namespace PhotoManager.Tests.Unit.Application;
 
 [TestFixture]
 public class ApplicationLoadBitmapImageFromPathTests
@@ -6,16 +11,15 @@ public class ApplicationLoadBitmapImageFromPathTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureApplication(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -51,18 +55,18 @@ public class ApplicationLoadBitmapImageFromPathTests
     }
 
     [Test]
-    [TestCase(Rotation.Rotate0, 1280, 720)]
-    [TestCase(Rotation.Rotate90, 720, 1280)]
-    [TestCase(Rotation.Rotate180, 1280, 720)]
-    [TestCase(Rotation.Rotate270, 720, 1280)]
-    // [TestCase(null, 1280, 720)]
+    [TestCase(Rotation.Rotate0, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate90, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
+    [TestCase(Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
+    // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith, int expectedHeight)
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
-            string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
             BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
@@ -89,7 +93,7 @@ public class ApplicationLoadBitmapImageFromPathTests
 
         try
         {
-            string filePath = Path.Combine(_dataDirectory!, "ImageDoesNotExist.jpg");
+            string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_JPG);
             const Rotation rotation = Rotation.Rotate90;
 
             BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
@@ -137,7 +141,7 @@ public class ApplicationLoadBitmapImageFromPathTests
 
         try
         {
-            string filePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
             const Rotation rotation = (Rotation)999;
 
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => _application!.LoadBitmapImageFromPath(filePath, rotation));
@@ -150,19 +154,31 @@ public class ApplicationLoadBitmapImageFromPathTests
         }
     }
 
+    // TODO: Migrate from MagickImage to BitmapImage ?
     [Test]
-    public void LoadBitmapImageFromPath_InvalidImageFormat_ThrowsNotSupportedException()
+    public void LoadBitmapImageFromPath_HeicImageFormat_ReturnsBitmapImage()
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, false, false);
 
         try
         {
-            string filePath = Path.Combine(_dataDirectory!, "Image_11.heic");
-            const Rotation rotation = Rotation.Rotate90;
+            string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
+            const Rotation rotation = Rotation.Rotate0;
 
-            NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _application!.LoadBitmapImageFromPath(filePath, rotation));
+            BitmapImage image = _application!.LoadBitmapImageFromPath(filePath, rotation);
 
-            Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(image, Is.Not.Null);
+                Assert.That(image.StreamSource, Is.Null);
+                Assert.That(image.Rotation, Is.EqualTo(rotation));
+                Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+                Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
+                Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
+                Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
+                Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
+                Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            }
         }
         finally
         {

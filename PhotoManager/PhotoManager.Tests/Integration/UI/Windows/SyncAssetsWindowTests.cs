@@ -1,6 +1,8 @@
 ﻿using PhotoManager.UI.ViewModels.Enums;
 using System.ComponentModel;
 using System.Windows;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 
 namespace PhotoManager.Tests.Integration.UI.Windows;
 
@@ -12,7 +14,6 @@ public class SyncAssetsWindowTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private const string DATABASE_END_PATH = "v1.0";
 
     private SyncAssetsViewModel? _syncAssetsViewModel;
     private MoveAssetsService? _moveAssetsService;
@@ -21,9 +22,9 @@ public class SyncAssetsWindowTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     private void ConfigureSyncAssetsViewModel(int catalogBatchSize, string assetsDirectory, int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -550,13 +551,13 @@ public class SyncAssetsWindowTests
     [Test]
     public async Task RunButton_FromRun_NotifiesAndSetsStepToViewResults()
     {
-        string sourceDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
-        string sourceSubDirectory1 = Path.Combine(sourceDirectory, "SubDirectory1");
-        string sourceSubDirectory2 = Path.Combine(sourceDirectory, "SubDirectory2");
-        string sourceToCopy = Path.Combine(_dataDirectory!, "Duplicates\\Part");
-        string destinationDirectory = Path.Combine(_dataDirectory!, "DestinationToSync");
-        string destinationSubDirectory1 = Path.Combine(destinationDirectory, "SubDirectory1");
-        string destinationSubDirectory2 = Path.Combine(destinationDirectory, "SubDirectory2");
+        string sourceDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
+        string sourceSubDirectory1 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_1);
+        string sourceSubDirectory2 = Path.Combine(sourceDirectory, Directories.SUB_DIRECTORY_2);
+        string sourceToCopy = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.PART}");
+        string destinationDirectory = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_SYNC);
+        string destinationSubDirectory1 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_1);
+        string destinationSubDirectory2 = Path.Combine(destinationDirectory, Directories.SUB_DIRECTORY_2);
 
         ConfigureSyncAssetsViewModel(100, _dataDirectory!, 200, 150, false, false, false, false);
 
@@ -570,12 +571,12 @@ public class SyncAssetsWindowTests
             Directory.CreateDirectory(sourceSubDirectory1);
             Directory.CreateDirectory(sourceSubDirectory2);
 
-            const string assetName1 = "Image 1_duplicate.jpg";
-            const string assetName2 = "Image 9.png";
-            const string assetName3 = "Image 9_duplicate.png";
-            const string assetName4 = "Image_11.heic";
-            const string assetName5 = "1336_BottomLeftPart.JPG";
-            const string assetName6 = "1336_TopRightPart.JPG";
+            const string assetName1 = FileNames.IMAGE_1_DUPLICATE_JPG;
+            const string assetName2 = FileNames.IMAGE_9_PNG;
+            const string assetName3 = FileNames.IMAGE_9_DUPLICATE_PNG;
+            const string assetName4 = FileNames.IMAGE_11_HEIC;
+            const string assetName5 = FileNames._1336_BOTTOM_LEFT_PART_JPG;
+            const string assetName6 = FileNames._1336_TOP_RIGHT_PART_JPG;
 
             string assetSourcePath1 = Path.Combine(sourceDirectory, assetName1);
             string assetSourcePath2 = Path.Combine(sourceDirectory, assetName2);

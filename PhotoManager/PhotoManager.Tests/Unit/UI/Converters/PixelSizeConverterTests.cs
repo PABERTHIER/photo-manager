@@ -13,8 +13,8 @@ public class PixelSizeConverterTests
         PixelSizeConverter pixelSizeConverter = new();
         Asset asset = new()
         {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+            FolderId = Guid.Empty,
+            Folder = new() { Id = Guid.Empty, Path = "" },
             FileName = "toto.jpg",
             Pixel = new()
             {

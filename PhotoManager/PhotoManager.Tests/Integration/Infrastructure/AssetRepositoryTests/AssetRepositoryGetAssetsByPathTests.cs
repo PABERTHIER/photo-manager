@@ -1,4 +1,13 @@
 ﻿using Reactive = System.Reactive;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -8,8 +17,6 @@ public class AssetRepositoryGetAssetsByPathTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
@@ -24,9 +31,9 @@ public class AssetRepositoryGetAssetsByPathTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
         _configurationRootMock = new Mock<IConfigurationRoot>();
         _configurationRootMock.GetDefaultMockConfig();
@@ -47,21 +54,21 @@ public class AssetRepositoryGetAssetsByPathTests
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
-            FileName = "Image 1.jpg",
+            FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
             {
-                Asset = new() { Width = 1920, Height = 1080 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
             },
             FileProperties = new()
             {
-                Size = 363888,
+                Size = FileSize.IMAGE_1_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
+            Hash = Hashes.IMAGE_1_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -72,21 +79,21 @@ public class AssetRepositoryGetAssetsByPathTests
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
             {
-                Asset = new() { Width = 6000, Height = 6120 },
-                Thumbnail = new() { Width = 147, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 4602393,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "f8d5cf6deda198be0f181dd7cabfe74cb14c43426c867f0ae855d9e844651e2d7ce4833c178912d5bc7be600cfdd18d5ba19f45988a0c6943b4476a90295e960",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -97,21 +104,21 @@ public class AssetRepositoryGetAssetsByPathTests
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
-            FileName = "Image_11.heic",
-            ImageRotation = Rotation.Rotate0,
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 2247285,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
-            Hash = "a92dd8dba1e47ee54dd166574e699ecaec57beb7be4bddded3735dceafe2eaacf21febd96b169eff511dc0c366e088902b4d5c661365e1fdc3dad12c1726df88",
+            ImageRotation = Rotation.Rotate0,
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = true, Message = "The asset is corrupted" },
@@ -128,8 +135,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 
@@ -217,7 +224,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder1");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -275,8 +282,8 @@ public class AssetRepositoryGetAssetsByPathTests
                 { _asset2!.FileName, assetData2 }
             };
 
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
@@ -339,8 +346,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
@@ -393,7 +400,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
             byte[] assetData = [1, 2, 3];
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -431,7 +438,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
             Guid folderId = Guid.NewGuid();
             Folder folder = new() { Id = folderId, Path = folderPath };
 
@@ -482,7 +489,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
             _testableAssetRepository!.AddFolder(folderPath);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -520,7 +527,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             byte[] assetData1 = [1, 2, 3];
@@ -573,7 +580,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -607,7 +614,7 @@ public class AssetRepositoryGetAssetsByPathTests
         try
         {
             string? directory = null;
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder1");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -664,7 +671,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, "NewFolder1");
+            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -728,8 +735,8 @@ public class AssetRepositoryGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, "NewFolder1");
-            string folderPath2 = Path.Combine(_dataDirectory!, "NewFolder2");
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
             Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
 

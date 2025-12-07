@@ -1,4 +1,14 @@
 ﻿using Reactive = System.Reactive;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
+using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
+using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using Tables = PhotoManager.Tests.Integration.Constants.Tables;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
 
 namespace PhotoManager.Tests.Integration.Application;
 
@@ -8,8 +18,6 @@ public class ApplicationLoadThumbnailTests
     private string? _dataDirectory;
     private string? _databaseDirectory;
     private string? _databasePath;
-    private readonly DateTime _expectedFileModificationDateTime = new (2024, 06, 07, 08, 54, 37);
-    private const string DATABASE_END_PATH = "v1.0";
 
     private PhotoManager.Application.Application? _application;
     private TestableAssetRepository? _testableAssetRepository;
@@ -26,9 +34,9 @@ public class ApplicationLoadThumbnailTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
-        _databaseDirectory = Path.Combine(_dataDirectory, "DatabaseTests");
-        _databasePath = Path.Combine(_databaseDirectory, DATABASE_END_PATH);
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
+        _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
+        _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
     }
 
     [SetUp]
@@ -38,21 +46,21 @@ public class ApplicationLoadThumbnailTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 1_duplicate.jpg",
+            FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_JPG }
             },
             FileProperties = new()
             {
-                Size = 29857,
+                Size = FileSize.IMAGE_1_DUPLICATE_JPG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+            Hash = Hashes.IMAGE_1_DUPLICATE_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -63,21 +71,21 @@ public class ApplicationLoadThumbnailTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9.png",
+            FileName = FileNames.IMAGE_9_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_PNG, Height = PixelHeightAsset.IMAGE_9_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_PNG, Height = ThumbnailHeightAsset.IMAGE_9_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -88,21 +96,21 @@ public class ApplicationLoadThumbnailTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image 9_duplicate.png",
+            FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
             {
-                Asset = new() { Width = 1280, Height = 720 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = PixelHeightAsset.IMAGE_9_DUPLICATE_PNG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_9_DUPLICATE_PNG, Height = ThumbnailHeightAsset.IMAGE_9_DUPLICATE_PNG }
             },
             FileProperties = new()
             {
-                Size = 126277,
+                Size = FileSize.IMAGE_9_DUPLICATE_PNG,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "bcc994c14aa314dbc2dfbf48ffd34fa628dadcd86cdb8efda113b94a9035f15956cf039f5858b74cd7f404e98f7e84d9821b39aaa6cbbdc73228fa74ad2a5c20",
+            Hash = Hashes.IMAGE_9_DUPLICATE_PNG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -113,21 +121,21 @@ public class ApplicationLoadThumbnailTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Image_11.heic",
+            FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {
-                Asset = new() { Width = 3024, Height = 4032 },
-                Thumbnail = new() { Width = 112, Height = 150 }
+                Asset = new() { Width = PixelWidthAsset.IMAGE_11_HEIC, Height = PixelHeightAsset.IMAGE_11_HEIC },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_11_HEIC, Height = ThumbnailHeightAsset.IMAGE_11_HEIC }
             },
             FileProperties = new()
             {
-                Size = 1411940,
+                Size = FileSize.IMAGE_11_HEIC,
                 Creation = DateTime.Now,
-                Modification = _expectedFileModificationDateTime
+                Modification = ModificationDate.Default
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "f52bd860f5ad7f81a92919e5fb5769d3e86778b2ade74832fbd3029435c85e59cb64b3c2ce425445a49917953e6e913c72b81e48976041a4439cb65e92baf18d",
+            Hash = Hashes.IMAGE_11_HEIC,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -138,21 +146,21 @@ public class ApplicationLoadThumbnailTests
         {
             FolderId = Guid.Empty, // Initialised later
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = "Homer.jpg",
+            FileName = FileNames.HOMER_JPG,
             Pixel = new()
             {
-                Asset = new() { Width = 320, Height = 180 },
-                Thumbnail = new() { Width = 200, Height = 112 }
+                Asset = new() { Width = PixelWidthAsset.HOMER_JPG, Height = PixelHeightAsset.HOMER_JPG },
+                Thumbnail = new() { Width = ThumbnailWidthAsset.HOMER_JPG, Height = ThumbnailHeightAsset.HOMER_JPG }
             },
             FileProperties = new()
             {
-                Size = 6599,
+                Size = FileSize.HOMER_JPG,
                 Creation = DateTime.Now,
                 Modification = DateTime.Now
             },
             ThumbnailCreationDateTime = DateTime.Now,
             ImageRotation = Rotation.Rotate0,
-            Hash = "59742f2cd31c0997be96f9e758799d975f5918f7732f351d66280a708681ea74ccbfa1b61a327835a3f1dbb5ea5f9989484764a10f56f7dd6f32f7b24e286d66",
+            Hash = Hashes.HOMER_JPG,
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -196,7 +204,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public async Task LoadThumbnail_CataloguedAssets_SetsBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -268,10 +276,10 @@ public class ApplicationLoadThumbnailTests
             // True because the catalog has been saved during the CatalogAssetsAsync
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.True);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
         }
         finally
         {
@@ -282,7 +290,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public async Task LoadThumbnail_CataloguedAssetFromVideo_SetsBitmapImageToTheAsset()
     {
-        string tempDirectory = Path.Combine(_dataDirectory!, "TempFolder");
+        string tempDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_FOLDER);
 
         ConfigureApplication(100, tempDirectory, 200, 150, false, false, false, true);
 
@@ -292,8 +300,8 @@ public class ApplicationLoadThumbnailTests
         {
             Directory.CreateDirectory(tempDirectory);
 
-            string videoSourcePath = Path.Combine(_dataDirectory!, "Homer.mp4");
-            string videoDestinationPath = Path.Combine(tempDirectory, "Homer.mp4");
+            string videoSourcePath = Path.Combine(_dataDirectory!, FileNames.HOMER_MP4);
+            string videoDestinationPath = Path.Combine(tempDirectory, FileNames.HOMER_MP4);
             File.Copy(videoSourcePath, videoDestinationPath);
 
             await _application!.CatalogAssetsAsync(_ => {});
@@ -330,10 +338,10 @@ public class ApplicationLoadThumbnailTests
             // True because the catalog has been saved during the CatalogAssetsAsync
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1Temp.Folder.ThumbnailsFilename)), Is.True);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
         }
         finally
         {
@@ -345,7 +353,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_ThumbnailExists_SetsBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -428,10 +436,10 @@ public class ApplicationLoadThumbnailTests
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.False);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(4));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -449,7 +457,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_AssetDoesNotExistButBinExists_SetsBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -461,7 +469,7 @@ public class ApplicationLoadThumbnailTests
             byte[] asset1Data = [1, 2, 3];
             byte[] asset2Data = [4, 5, 6];
 
-            const string fileName = "Image2.png";
+            const string fileName = FileNames.NON_EXISTENT_IMAGE_PNG;
             Dictionary<string, byte[]> blobToWrite = new()
             {
                 { _asset1!.FileName, asset1Data },
@@ -496,10 +504,10 @@ public class ApplicationLoadThumbnailTests
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -544,7 +552,7 @@ public class ApplicationLoadThumbnailTests
             byte[] asset1Data = [1, 2, 3];
             byte[] asset2Data = [4, 5, 6];
 
-            const string fileName = "Image2.png";
+            const string fileName = FileNames.NON_EXISTENT_IMAGE_PNG;
             Dictionary<string, byte[]> blobToWrite = new()
             {
                 { _asset1!.FileName, asset1Data },
@@ -573,10 +581,10 @@ public class ApplicationLoadThumbnailTests
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, userConfigurationService.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -590,7 +598,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_AssetDoesNotExistButBinNotContainingTheAssetExists_DoesNotSetBitmapImageToTheAssetAndWritesBlobAndDbFiles()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -623,10 +631,10 @@ public class ApplicationLoadThumbnailTests
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -640,7 +648,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FolderDoesNotExist_SetsBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -682,10 +690,10 @@ public class ApplicationLoadThumbnailTests
             Assert.That(thumbnails[assetsDirectory].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[assetsDirectory][_asset1.FileName], Is.EqualTo(assetData));
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.False);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -700,7 +708,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_AssetAndFolderDoNotExist_DoesNotSetBitmapImageToTheAsset()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "TempEmptyFolder");
+        string assetsDirectory = Path.Combine(_dataDirectory!, Directories.TEMP_EMPTY_FOLDER);
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -731,10 +739,10 @@ public class ApplicationLoadThumbnailTests
             Assert.That(thumbnails.ContainsKey(assetsDirectory), Is.True);
             Assert.That(thumbnails[assetsDirectory], Is.Empty);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -749,7 +757,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FolderPathIsNull_ThrowsArgumentNullException()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -785,7 +793,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_FileNameIsNull_ThrowsArgumentNullException()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -803,18 +811,18 @@ public class ApplicationLoadThumbnailTests
                 FileName = null!,
                 Pixel = new()
                 {
-                    Asset = new() { Width = 1280, Height = 720 },
-                    Thumbnail = new() { Width = 200, Height = 112 }
+                    Asset = new() { Width = PixelWidthAsset.IMAGE_1_JPG, Height = PixelHeightAsset.IMAGE_1_JPG },
+                    Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_JPG, Height = ThumbnailHeightAsset.IMAGE_1_JPG }
                 },
                 FileProperties = new()
                 {
-                    Size = 29857,
+                    Size = FileSize.IMAGE_1_JPG,
                     Creation = DateTime.Now,
-                    Modification = _expectedFileModificationDateTime
+                    Modification = ModificationDate.Default
                 },
                 ThumbnailCreationDateTime = DateTime.Now,
                 ImageRotation = Rotation.Rotate0,
-                Hash = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9",
+                Hash = Hashes.IMAGE_1_JPG,
                 Metadata = new()
                 {
                     Corrupted = new() { IsTrue = false, Message = null },
@@ -840,7 +848,7 @@ public class ApplicationLoadThumbnailTests
     [Test]
     public void LoadThumbnail_ConcurrentAccess_BitmapImageAreSetToEachAssetSafely()
     {
-        string assetsDirectory = Path.Combine(_dataDirectory!, "Duplicates\\NewFolder2");
+        string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
         ConfigureApplication(100, assetsDirectory, 200, 150, false, false, false, false);
 
@@ -926,10 +934,10 @@ public class ApplicationLoadThumbnailTests
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "assets.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "folders.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "syncassetsdirectoriesdefinitions.db")), Is.False);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, "recenttargetpaths.db")), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.False);
+            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.False);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(4));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

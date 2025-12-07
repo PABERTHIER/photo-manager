@@ -1,4 +1,7 @@
-﻿namespace PhotoManager.Tests.Integration.Common;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+
+namespace PhotoManager.Tests.Integration.Common;
 
 [TestFixture]
 public class VideoHelperTests
@@ -8,15 +11,15 @@ public class VideoHelperTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
     }
 
     [Test]
     public void GetFirstFramePath_ExistingFile_ReturnsPathAndLogsItAndExtractsFirstFrame()
     {
-        const string fileName = "Homer.mp4";
-        string destinationPath = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
-        
+        const string fileName = FileNames.HOMER_MP4;
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
+
         string expectedFirstFrameVideoName = Path.GetFileNameWithoutExtension(fileName) + ".jpg";
         string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
 
@@ -52,10 +55,10 @@ public class VideoHelperTests
     [Test]
     public void GetFirstFramePath_ExistingFileButButAnotherImageAlreadyExistsInTheOutputDirectory_ReturnsNullAndLogsItAndDoesNotExtractFirstFrame()
     {
-        const string videoFileName = "Homer.mp4";
-        const string expectedFirstFrameVideoName = "Homer.jpg";
+        const string videoFileName = FileNames.HOMER_MP4;
+        const string expectedFirstFrameVideoName = FileNames.HOMER_JPG;
 
-        string destinationPath = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
         LoggingAssertsService loggingAssertsService = new();
 
@@ -63,7 +66,7 @@ public class VideoHelperTests
         {
             Directory.CreateDirectory(destinationPath);
 
-            string sourceImagePath = Path.Combine(_dataDirectory!, "Image 1.jpg");
+            string sourceImagePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
             string expectedFirstFrameVideoPath = Path.Combine(destinationPath, expectedFirstFrameVideoName);
             File.Copy(sourceImagePath, expectedFirstFrameVideoPath);
             Assert.That(File.Exists(expectedFirstFrameVideoPath), Is.True);
@@ -92,8 +95,8 @@ public class VideoHelperTests
     [Test]
     public void GetFirstFramePath_ExistingFileButLessThanOneSecond_ReturnsNullAndLogsItAndDoesNotExtractFirstFrame()
     {
-        const string fileName = "Homer1s.mp4"; // Video that has less than 1 second
-        string destinationPath = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
+        const string fileName = FileNames.HOMER_1_S_MP4; // Video that has less than 1 second
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
         LoggingAssertsService loggingAssertsService = new();
 
@@ -123,8 +126,8 @@ public class VideoHelperTests
     [Test]
     public void GetFirstFramePath_NonExistingFile_ReturnsNullAndLogsItAndDoesNotExtractFirstFrame()
     {
-        const string fileName = "toto.mp4";
-        string destinationPath = Path.Combine(_dataDirectory!, "OutputVideoFirstFrame");
+        const string fileName = FileNames.NON_EXISTENT_VIDEO_MP4;
+        string destinationPath = Path.Combine(_dataDirectory!, Directories.OUTPUT_VIDEO_FIRST_FRAME);
 
         LoggingAssertsService loggingAssertsService = new();
 

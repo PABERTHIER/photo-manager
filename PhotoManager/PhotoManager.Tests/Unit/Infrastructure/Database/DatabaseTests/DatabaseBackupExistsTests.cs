@@ -1,4 +1,6 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseBackupExistsTests
@@ -11,7 +13,7 @@ public class DatabaseBackupExistsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -30,7 +32,7 @@ public class DatabaseBackupExistsTests
     {
         DateTime backupDate = DateTime.Now;
 
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
 
         try
         {
@@ -49,7 +51,7 @@ public class DatabaseBackupExistsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -58,7 +60,7 @@ public class DatabaseBackupExistsTests
     {
         DateTime backupDate = DateTime.Now;
 
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
 
         try
         {
@@ -75,7 +77,7 @@ public class DatabaseBackupExistsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 }

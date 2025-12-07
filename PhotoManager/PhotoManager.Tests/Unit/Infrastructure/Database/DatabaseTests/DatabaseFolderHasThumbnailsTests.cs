@@ -1,4 +1,7 @@
-﻿namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
+﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
+
+namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
 public class DatabaseFolderHasThumbnailsTests
@@ -11,7 +14,7 @@ public class DatabaseFolderHasThumbnailsTests
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestFiles");
+        _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
@@ -29,11 +32,11 @@ public class DatabaseFolderHasThumbnailsTests
     public void FolderHasThumbnails_BlobExists_ReturnsTrue()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
         Dictionary<string, byte[]> blobToWrite = new()
         {
-            { "Image1.jpg", new byte[] { 1, 2, 3 } },
-            { "Image2.png", new byte[] { 4, 5, 6 } }
+            { FileNames.IMAGE1_JPG, [1, 2, 3]},
+            { FileNames.IMAGE_2_PNG, [4, 5, 6]}
         };
 
         try
@@ -53,7 +56,7 @@ public class DatabaseFolderHasThumbnailsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 
@@ -61,7 +64,7 @@ public class DatabaseFolderHasThumbnailsTests
     public void FolderHasThumbnails_BlobDoesNotExist_ReturnsFalse()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
-        string directoryPath = Path.Combine(_dataDirectory!, "DatabaseTests");
+        string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
 
         try
         {
@@ -78,7 +81,7 @@ public class DatabaseFolderHasThumbnailsTests
         finally
         {
             Directory.Delete(directoryPath, true);
-            Directory.Delete(Path.Combine(_dataDirectory!, "DatabaseTests_Backups"), true);
+            Directory.Delete(Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS_BACKUPS), true);
         }
     }
 }

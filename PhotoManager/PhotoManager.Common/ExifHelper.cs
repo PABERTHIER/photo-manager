@@ -48,6 +48,10 @@ public static class ExifHelper
         return corruptedImageOrientation;
     }
 
+    // 1: Normal (0 deg rotation)
+    // 3: Upside-down (180 deg rotation)
+    // 6: Rotated 90 deg clockwise (270 deg counterclockwise)
+    // 8: Rotated 90 deg counterclockwise (270 deg clockwise)
     public static ushort GetHeicExifOrientation(byte[] buffer, ushort corruptedImageOrientation)
     {
         try
