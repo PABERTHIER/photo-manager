@@ -2741,7 +2741,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _syncAssetsViewModel!.GetProcessConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(1));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.EqualTo(null));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.Null);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 

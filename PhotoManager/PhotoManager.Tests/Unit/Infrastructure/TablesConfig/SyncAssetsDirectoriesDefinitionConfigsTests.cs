@@ -33,8 +33,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
         Assert.That(syncAssetsDirectoriesDefinition, Is.Not.Null);
         Assert.That(syncAssetsDirectoriesDefinition.SourceDirectory, Is.EqualTo("D:\\source\\newFolder"));
         Assert.That(syncAssetsDirectoriesDefinition.DestinationDirectory, Is.EqualTo("D:\\destination\\newFolder"));
-        Assert.That(syncAssetsDirectoriesDefinition.IncludeSubFolders, Is.EqualTo(false));
-        Assert.That(syncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.EqualTo(true));
+        Assert.That(syncAssetsDirectoriesDefinition.IncludeSubFolders, Is.False);
+        Assert.That(syncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.True);
     }
 
     [Test]
@@ -55,8 +55,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
         Assert.That(syncAssetsDirectoriesDefinition, Is.Not.Null);
         Assert.That(syncAssetsDirectoriesDefinition.SourceDirectory, Is.EqualTo("D:\\source\\newFolder"));
         Assert.That(syncAssetsDirectoriesDefinition.DestinationDirectory, Is.EqualTo("D:\\destination\\newFolder"));
-        Assert.That(syncAssetsDirectoriesDefinition.IncludeSubFolders, Is.EqualTo(false));
-        Assert.That(syncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.EqualTo(true));
+        Assert.That(syncAssetsDirectoriesDefinition.IncludeSubFolders, Is.False);
+        Assert.That(syncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.True);
     }
 
     [Test]
@@ -114,8 +114,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
 
         Assert.That(result[0], Is.EqualTo("D:\\source\\newFolder"));
         Assert.That(result[1], Is.EqualTo("D:\\destination\\newFolder"));
-        Assert.That(result[2], Is.EqualTo(true));
-        Assert.That(result[3], Is.EqualTo(false));
+        Assert.That(result[2], Is.True);
+        Assert.That(result[3], Is.False);
     }
 
     [Test]
@@ -136,8 +136,8 @@ public class SyncAssetsDirectoriesDefinitionConfigsTests
 
         Assert.That(result[0], Is.EqualTo("D:\\source\\newFolder"));
         Assert.That(result[1], Is.EqualTo("D:\\destination\\newFolder"));
-        Assert.That(result[2], Is.EqualTo(false));
-        Assert.That(result[3], Is.EqualTo(false));
+        Assert.That(result[2], Is.False);
+        Assert.That(result[3], Is.False);
     }
 
     [Test]
