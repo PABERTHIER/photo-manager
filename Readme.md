@@ -42,7 +42,7 @@ Even the database is stored in your computer.**
 Open the PhotoManager\PhotoManager.UI\appsettings.json and [configure it](#config-file-card_file_box).
 
 **Basic usage**: run the .exe file.
-**Advanced usage**: open the solution file `PhotoManager\PhotoManager.sln`, set `PhotoManager\PhotoManager.UI\PhotoManager.UI.csproj` as the project to launch and run it.
+**Advanced usage**: open the solution file `PhotoManager\PhotoManager.slnx`, set `PhotoManager\PhotoManager.UI\PhotoManager.UI.csproj` as the project to launch and run it.
 
 ## Installation instructions :man_teacher:
 

@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      PROJECT_NAME: PhotoManager/PhotoManager.sln
+      PROJECT_NAME: PhotoManager/PhotoManager.slnx
       DOTNET_VERSION: 10.0.x
 
     steps:
