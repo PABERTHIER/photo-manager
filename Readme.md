@@ -179,7 +179,7 @@ Improvements **WIP**.
 
 ## Technologies used :man_technologist:
 
-- [.NET 9.0][dotnet]
+- [.NET 10.0][dotnet]
 - [Windows Presentation Foundation][wpf]
 - [NUnit][nunit]
 - [Moq framework for .NET (v4.18.4)][moq]

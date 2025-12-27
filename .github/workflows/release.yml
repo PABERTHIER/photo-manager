@@ -14,7 +14,7 @@ jobs:
     env:
       PROJECT_NAME: PhotoManager/PhotoManager.sln
       ZIP_NAME: photo-manager-${{ github.ref_name }}.zip
-      DOTNET_VERSION: 9.0.x
+      DOTNET_VERSION: 10.0.x
 
     steps:
       # Step 1: Checkout the code
