@@ -39,7 +39,7 @@ public class VideoHelperTests
     [TestCase("mov", false)]
     [TestCase(".toto", false)]
     [TestCase(".", false)]
-    public void Should_Detect_When_AssetIsVideo(string fileExtension, bool expected)
+    public void IsVideoFile_FileIsVideoOrNot_ReturnsExpectedResult(string fileExtension, bool expected)
     {
         bool result = VideoHelper.IsVideoFile(fileExtension);
         Assert.That(result, Is.EqualTo(expected));
