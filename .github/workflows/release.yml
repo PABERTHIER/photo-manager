@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      PROJECT_NAME: PhotoManager/PhotoManager.sln
+      PROJECT_NAME: PhotoManager/PhotoManager.slnx
       ZIP_NAME: photo-manager-${{ github.ref_name }}.zip
       DOTNET_VERSION: 10.0.x
 
