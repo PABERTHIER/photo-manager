@@ -479,7 +479,7 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
             Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
             Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(null));
+            Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.Null);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

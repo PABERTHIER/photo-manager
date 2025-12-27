@@ -89,7 +89,7 @@ public class AssetConfigsTests
         Assert.That(asset.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
         Assert.That(asset.Metadata.Rotated.IsTrue, Is.False);
-        Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo(null));
+        Assert.That(asset.Metadata.Rotated.Message, Is.Null);
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class AssetConfigsTests
         Assert.That(asset.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
         Assert.That(asset.Metadata.Rotated.IsTrue, Is.False);
-        Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo(null));
+        Assert.That(asset.Metadata.Rotated.Message, Is.Null);
     }
 
     [Test]
@@ -198,9 +198,9 @@ public class AssetConfigsTests
         Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
         Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(result[9], Is.EqualTo("The asset is corrupted"));
-        Assert.That(result[10], Is.EqualTo(true));
-        Assert.That(result[11], Is.EqualTo(null));
-        Assert.That(result[12], Is.EqualTo(false));
+        Assert.That(result[10], Is.True);
+        Assert.That(result[11], Is.Null);
+        Assert.That(result[12], Is.False);
     }
 
     [Test]
@@ -241,9 +241,9 @@ public class AssetConfigsTests
         Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
         Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(result[9], Is.EqualTo("The asset is corrupted"));
-        Assert.That(result[10], Is.EqualTo(false));
-        Assert.That(result[11], Is.EqualTo(null));
-        Assert.That(result[12], Is.EqualTo(false));
+        Assert.That(result[10], Is.False);
+        Assert.That(result[11], Is.Null);
+        Assert.That(result[12], Is.False);
     }
 
     [Test]

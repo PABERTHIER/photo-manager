@@ -13,21 +13,21 @@ public class ConfigurationMockExtensionsTests
 
         IConfigurationRoot configuration = configurationRootMock.Object;
 
-        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.ANALYSE_VIDEOS), Is.EqualTo(false));
+        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.ANALYSE_VIDEOS), Is.False);
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.ASSET_CORRUPTED_MESSAGE), Is.EqualTo("The asset is corrupted"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.ASSET_ROTATED_MESSAGE), Is.EqualTo("The asset has been rotated"));
         Assert.That(configuration.GetValue<int>(UserConfigurationKeys.CATALOG_BATCH_SIZE), Is.EqualTo(100));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES), Is.EqualTo(5));
         Assert.That(configuration.GetValue<int>(UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION), Is.EqualTo(10000));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION), Is.EqualTo(1));
-        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.DETECT_THUMBNAILS), Is.EqualTo(false));
-        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES), Is.EqualTo(false));
+        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.DETECT_THUMBNAILS), Is.False);
+        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES), Is.False);
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAIL_MAX_HEIGHT), Is.EqualTo(150));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAIL_MAX_WIDTH), Is.EqualTo(200));
         Assert.That(configuration.GetValue<ushort>(UserConfigurationKeys.PHASH_THRESHOLD), Is.EqualTo(10));
-        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_DHASH), Is.EqualTo(false));
-        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_MD5_HASH), Is.EqualTo(false));
-        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_PHASH), Is.EqualTo(false));
+        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_DHASH), Is.False);
+        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_MD5_HASH), Is.False);
+        Assert.That(configuration.GetValue<bool>(UserConfigurationKeys.USING_PHASH), Is.False);
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY), Is.EqualTo("C:\\Path"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.BACKUP_PATH), Is.EqualTo("C:\\Path\\To\\Backup"));
         Assert.That(configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH), Is.EqualTo("C:\\Path\\To\\FolderExempted"));

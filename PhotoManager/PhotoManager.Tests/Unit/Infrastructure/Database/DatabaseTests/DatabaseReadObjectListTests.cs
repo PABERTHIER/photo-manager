@@ -483,9 +483,9 @@ public class DatabaseReadObjectListTests
         Assert.That(asset1.Pixel.Thumbnail.Height, Is.EqualTo(112));
         Assert.That(asset1.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 19, 11, 26, 09)));
         Assert.That(asset1.Hash, Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
-        Assert.That(asset1.Metadata.Corrupted.IsTrue, Is.EqualTo(false));
+        Assert.That(asset1.Metadata.Corrupted.IsTrue, Is.False);
         Assert.That(asset1.Metadata.Corrupted.Message, Is.EqualTo(""));
-        Assert.That(asset1.Metadata.Rotated.IsTrue, Is.EqualTo(false));
+        Assert.That(asset1.Metadata.Rotated.IsTrue, Is.False);
         Assert.That(asset1.Metadata.Rotated.Message, Is.EqualTo(""));
 
         Asset asset2 = assets[1];
@@ -498,9 +498,9 @@ public class DatabaseReadObjectListTests
         Assert.That(asset2.Pixel.Thumbnail.Height, Is.EqualTo(112));
         Assert.That(asset2.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 19, 11, 26, 09)));
         Assert.That(asset2.Hash, Is.EqualTo("0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124"));
-        Assert.That(asset2.Metadata.Corrupted.IsTrue, Is.EqualTo(true));
+        Assert.That(asset2.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset2.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
-        Assert.That(asset2.Metadata.Rotated.IsTrue, Is.EqualTo(true));
+        Assert.That(asset2.Metadata.Rotated.IsTrue, Is.True);
         Assert.That(asset2.Metadata.Rotated.Message, Is.EqualTo("The asset has been rotated"));
 
         Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(filePath));

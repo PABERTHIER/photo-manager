@@ -94,9 +94,9 @@ public class ObjectListStorageTests
         Assert.That(asset.Pixel.Thumbnail.Width, Is.EqualTo(113));
         Assert.That(asset.Pixel.Thumbnail.Height, Is.EqualTo(150));
         Assert.That(asset.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 25, 12, 01, 21)));
-        Assert.That(asset.Metadata.Corrupted.IsTrue, Is.EqualTo(false));
+        Assert.That(asset.Metadata.Corrupted.IsTrue, Is.False);
         Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo(string.Empty));
-        Assert.That(asset.Metadata.Rotated.IsTrue, Is.EqualTo(true));
+        Assert.That(asset.Metadata.Rotated.IsTrue, Is.True);
         Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo("The asset has been rotated"));
     }
 
@@ -121,14 +121,14 @@ public class ObjectListStorageTests
         SyncAssetsDirectoriesDefinition? firstSyncAssetsDirectoriesDefinition = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Toto\\Screenshots");
         Assert.That(firstSyncAssetsDirectoriesDefinition, Is.Not.Null);
         Assert.That(firstSyncAssetsDirectoriesDefinition!.DestinationDirectory, Is.EqualTo("C:\\Images\\Toto"));
-        Assert.That(firstSyncAssetsDirectoriesDefinition.IncludeSubFolders, Is.EqualTo(false));
-        Assert.That(firstSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.EqualTo(false));
+        Assert.That(firstSyncAssetsDirectoriesDefinition.IncludeSubFolders, Is.False);
+        Assert.That(firstSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.False);
 
         SyncAssetsDirectoriesDefinition? secondSyncAssetsDirectoriesDefinition = result.FirstOrDefault(x => x.SourceDirectory == "C:\\Tutu\\Screenshots");
         Assert.That(secondSyncAssetsDirectoriesDefinition, Is.Not.Null);
         Assert.That(secondSyncAssetsDirectoriesDefinition!.DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
-        Assert.That(secondSyncAssetsDirectoriesDefinition.IncludeSubFolders, Is.EqualTo(false));
-        Assert.That(secondSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.EqualTo(false));
+        Assert.That(secondSyncAssetsDirectoriesDefinition.IncludeSubFolders, Is.False);
+        Assert.That(secondSyncAssetsDirectoriesDefinition.DeleteAssetsNotInSource, Is.False);
     }
 
     [Test]
