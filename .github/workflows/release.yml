@@ -39,7 +39,7 @@ jobs:
 
       # Step 5: Publish the project
       - name: 📦 Publish
-        run: dotnet publish --no-build --configuration Release --output ./output -p:PublishSingleFile=false PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
+        run: dotnet publish --configuration Release --output ./output -p:PublishSingleFile=false PhotoManager/PhotoManager.UI/PhotoManager.UI.csproj
 
       # Step 6: Compress output into a ZIP file
       - name: 📂 Create ZIP File
