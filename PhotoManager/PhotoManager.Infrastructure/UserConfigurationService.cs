@@ -6,11 +6,11 @@ namespace PhotoManager.Infrastructure;
 
 public class UserConfigurationService : IUserConfigurationService
 {
-    public AssetSettings AssetSettings { get; private set; } = default!;
-    public HashSettings HashSettings { get; private set; } = default!;
-    public PathSettings PathSettings { get; private set; } = default!;
-    public ProjectSettings ProjectSettings { get; private set; } = default!;
-    public StorageSettings StorageSettings { get; private set; } = default!;
+    public AssetSettings AssetSettings { get; private set; } = null!;
+    public HashSettings HashSettings { get; private set; } = null!;
+    public PathSettings PathSettings { get; private set; } = null!;
+    public ProjectSettings ProjectSettings { get; private set; } = null!;
+    public StorageSettings StorageSettings { get; private set; } = null!;
 
     private readonly IConfigurationRoot _configuration;
 
@@ -46,7 +46,7 @@ public class UserConfigurationService : IUserConfigurationService
     {
         List<string> rootPaths = [PathSettings.AssetsDirectory];
 
-        return rootPaths.ToArray();
+        return [..rootPaths];
     }
 
     private void InitializeConfigValues()
@@ -103,7 +103,7 @@ public class UserConfigurationService : IUserConfigurationService
         string? folderNameTables = _configuration.GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME);
         FoldersNameSettings foldersNameSettings = new (folderNameBlobs!, folderNameTables!);
 
-        char? separator = _configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR)?.ToCharArray().First();
+        char? separator = _configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR)?.ToCharArray()[0];
         string? storageVersion = _configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION);
 
         string? assetsTableName = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_TABLE_NAME);
