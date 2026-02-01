@@ -1,0 +1,9 @@
+{
+    "dotnet.defaultSolution": "PhotoManager\\PhotoManager.slnx",
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.enableRoslynAnalyzers": true,
+    "csharp.format.enable": true,
+    "editor.formatOnSave": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true
+}
