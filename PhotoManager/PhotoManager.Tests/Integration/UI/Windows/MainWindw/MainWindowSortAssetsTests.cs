@@ -8,10 +8,10 @@ using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
@@ -29,10 +29,10 @@ public class MainWindowSortAssetsTests
     private AssetRepository? _assetRepository;
     private UserConfigurationService? _userConfigurationService;
 
-    private Asset _asset1;
-    private Asset _asset2;
-    private Asset _asset3;
-    private Asset _asset4;
+    private Asset? _asset1;
+    private Asset? _asset2;
+    private Asset? _asset3;
+    private Asset? _asset4;
 
     private Folder? _sourceFolder;
 
@@ -183,24 +183,24 @@ public class MainWindowSortAssetsTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (database, storageServiceMock.Object, _userConfigurationService);
-        StorageService storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(database, storageServiceMock.Object, _userConfigurationService);
+        StorageService storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, _userConfigurationService);
-        PhotoManager.Application.Application application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
-        _applicationViewModel = new (application);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, _userConfigurationService);
+        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        _applicationViewModel = new(application);
 
         _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
     }
@@ -229,10 +229,10 @@ public class MainWindowSortAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(assetsDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1 = _asset1.WithFolder(folder!);
-            _asset2 = _asset2.WithFolder(folder!);
-            _asset3 = _asset3.WithFolder(folder!);
-            _asset4 = _asset4.WithFolder(folder!);
+            _asset1 = _asset1!.WithFolder(folder!);
+            _asset2 = _asset2!.WithFolder(folder!);
+            _asset3 = _asset3!.WithFolder(folder!);
+            _asset4 = _asset4!.WithFolder(folder!);
 
             // SortAssetsByFileSize
             SortCriteria expectedSortCriteria = SortCriteria.FileSize;
@@ -806,7 +806,7 @@ public class MainWindowSortAssetsTests
         List<string> notifyPropertyChangedEvents = [];
         List<ApplicationViewModel> applicationViewModelInstances = [];
 
-        _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             applicationViewModelInstances.Add((ApplicationViewModel)sender!);
@@ -814,14 +814,14 @@ public class MainWindowSortAssetsTests
 
         List<Folder> folderAddedEvents = [];
 
-        _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        _applicationViewModel.FolderAdded += delegate (object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
         List<Folder> folderRemovedEvents = [];
 
-        _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        _applicationViewModel.FolderRemoved += delegate (object _, FolderRemovedEventArgs e)
         {
             folderRemovedEvents.Add(e.Folder);
         };
@@ -989,12 +989,12 @@ public class MainWindowSortAssetsTests
             expectedAsset.Folder.Path,
             expectedAsset.Folder);
         // Unlike below (Application, CatalogAssetsService), it is set here for assets in the current directory
-        Assert.That(asset.ImageData, expectedAsset.ImageData == null ? Is.Null : Is.Not.Null); 
+        Assert.That(asset.ImageData, expectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
     }
 
     private void MainWindowsInit()
     {
-        _folderNavigationViewModel = new (_applicationViewModel!, _sourceFolder!, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, _sourceFolder!, []);
 
         CancellationTokenSource cancellationTokenSource = new();
 

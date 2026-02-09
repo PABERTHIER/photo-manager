@@ -8,10 +8,10 @@ using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
@@ -30,8 +30,8 @@ public class MainWindowMoveAssetsTests
     private PhotoManager.Application.Application? _application;
     private AssetRepository? _assetRepository;
 
-    private Asset _asset1Temp;
-    private Asset _asset2Temp;
+    private Asset? _asset1Temp;
+    private Asset? _asset2Temp;
 
     private Folder? _sourceFolder;
     private Folder? _selectedFolder;
@@ -133,24 +133,24 @@ public class MainWindowMoveAssetsTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _applicationViewModel = new (_application);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new(_application);
 
         _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
     }
@@ -207,8 +207,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             _selectedFolder = _assetRepository!.GetFolderByPath(newDestinationDirectory);
             Assert.That(_selectedFolder, Is.Not.Null);
@@ -227,7 +227,7 @@ public class MainWindowMoveAssetsTests
                 _applicationViewModel!.ChangeAppMode();
             }
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
+            List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
             Asset[] expectedSelectedAssets = [observableAssets[0], observableAssets[1]];
 
@@ -445,8 +445,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             _selectedFolder = _assetRepository!.GetFolderByPath(newDestinationDirectory);
             Assert.That(_selectedFolder, Is.Not.Null);
@@ -465,7 +465,7 @@ public class MainWindowMoveAssetsTests
                 _applicationViewModel!.ChangeAppMode();
             }
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
+            List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
             Asset[] expectedSelectedAssets = [observableAssets[0], observableAssets[1]];
 
@@ -687,8 +687,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             _selectedFolder = _assetRepository!.GetFolderByPath(newDestinationDirectory);
             Assert.That(_selectedFolder, Is.Not.Null);
@@ -707,7 +707,7 @@ public class MainWindowMoveAssetsTests
                 _applicationViewModel!.ChangeAppMode();
             }
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
+            List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
@@ -936,8 +936,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             _selectedFolder = _assetRepository!.GetFolderByPath(newDestinationDirectory);
             Assert.That(_selectedFolder, Is.Not.Null);
@@ -956,7 +956,7 @@ public class MainWindowMoveAssetsTests
                 _applicationViewModel!.ChangeAppMode();
             }
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
+            List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
@@ -1200,8 +1200,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             _selectedFolder = _assetRepository!.GetFolderByPath(newDestinationDirectory);
             Assert.That(_selectedFolder, Is.Not.Null);
@@ -1220,7 +1220,7 @@ public class MainWindowMoveAssetsTests
                 _applicationViewModel!.ChangeAppMode();
             }
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
+            List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
             Asset[] expectedSelectedAssets = [observableAssets[0]];
 
@@ -1436,8 +1436,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             _selectedFolder = _assetRepository!.GetFolderByPath(newDestinationDirectory);
             Assert.That(_selectedFolder, Is.Not.Null);
@@ -1456,7 +1456,7 @@ public class MainWindowMoveAssetsTests
                 _applicationViewModel!.ChangeAppMode();
             }
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
+            List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
             Asset[] expectedSelectedAssets = [observableAssets[0]];
 
@@ -1673,8 +1673,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             _selectedFolder = _assetRepository!.GetFolderByPath(newDestinationDirectory);
             Assert.That(_selectedFolder, Is.Not.Null);
@@ -1693,7 +1693,7 @@ public class MainWindowMoveAssetsTests
                 _applicationViewModel!.ChangeAppMode();
             }
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
+            List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
@@ -1894,8 +1894,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             _selectedFolder = _assetRepository!.GetFolderByPath(newDestinationDirectory);
             Assert.That(_selectedFolder, Is.Not.Null);
@@ -1914,7 +1914,7 @@ public class MainWindowMoveAssetsTests
                 _applicationViewModel!.ChangeAppMode();
             }
 
-            List<Asset> observableAssets = [.._applicationViewModel!.ObservableAssets];
+            List<Asset> observableAssets = [.. _applicationViewModel!.ObservableAssets];
 
             Asset[] expectedSelectedAssets = [observableAssets[1]];
 
@@ -2113,8 +2113,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
@@ -2294,8 +2294,8 @@ public class MainWindowMoveAssetsTests
             Folder? folder = _assetRepository!.GetFolderByPath(destinationDirectory);
             Assert.That(folder, Is.Not.Null);
 
-            _asset1Temp = _asset1Temp.WithFolder(folder!);
-            _asset2Temp = _asset2Temp.WithFolder(folder!);
+            _asset1Temp = _asset1Temp!.WithFolder(folder!);
+            _asset2Temp = _asset2Temp!.WithFolder(folder!);
 
             Asset[] assetsInRepository = _assetRepository!.GetAssetsByPath(destinationDirectory);
             Assert.That(assetsInRepository, Is.Not.Empty);
@@ -2713,7 +2713,7 @@ public class MainWindowMoveAssetsTests
         List<string> notifyPropertyChangedEvents = [];
         List<ApplicationViewModel> applicationViewModelInstances = [];
 
-        _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             applicationViewModelInstances.Add((ApplicationViewModel)sender!);
@@ -2721,14 +2721,14 @@ public class MainWindowMoveAssetsTests
 
         List<Folder> folderAddedEvents = [];
 
-        _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        _applicationViewModel.FolderAdded += delegate (object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
         List<Folder> folderRemovedEvents = [];
 
-        _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        _applicationViewModel.FolderRemoved += delegate (object _, FolderRemovedEventArgs e)
         {
             folderRemovedEvents.Add(e.Folder);
         };
@@ -2881,7 +2881,7 @@ public class MainWindowMoveAssetsTests
             Assert.That(folderNavigationViewModelInstance.SourceFolder, Is.Null);
         }
 
-        
+
         if (expectedSelectedFolder != null)
         {
             Assert.That(folderNavigationViewModelInstance.SelectedFolder!.Id, Is.Not.EqualTo(Guid.Empty));
@@ -2985,7 +2985,7 @@ public class MainWindowMoveAssetsTests
             expectedAsset.Folder.Path,
             expectedAsset.Folder);
         // Unlike below (Application, CatalogAssetsService), it is set here for assets in the current directory
-        Assert.That(asset.ImageData, expectedAsset.ImageData == null ? Is.Null : Is.Not.Null); 
+        Assert.That(asset.ImageData, expectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
     }
 
     private static void AssertSelectedAssets(Asset[] expectedAssets, Asset[] selectedAssets)
@@ -3072,7 +3072,7 @@ public class MainWindowMoveAssetsTests
 
     private void MainWindowsInit()
     {
-        _mainFolderNavigationViewModel = new (_applicationViewModel!, _sourceFolder!, []);
+        _mainFolderNavigationViewModel = new(_applicationViewModel!, _sourceFolder!, []);
 
         CancellationTokenSource cancellationTokenSource = new();
 
@@ -3145,7 +3145,7 @@ public class MainWindowMoveAssetsTests
 
     private string Init(Asset[] assets)
     {
-        _folderNavigationViewModel = new (
+        _folderNavigationViewModel = new(
             _applicationViewModel!,
             assets[0].Folder,
             _application!.GetRecentTargetPaths());

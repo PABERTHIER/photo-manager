@@ -130,7 +130,7 @@ public partial class FindDuplicatedAssetsWindow
 
     private void DeleteAssets(List<DuplicatedAssetViewModel> assetsToDelete)
     {
-        DeleteDuplicatedAssets?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
+        DeleteDuplicatedAssets?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);
 
         ViewModel.CollapseAssets(assetsToDelete);
     }

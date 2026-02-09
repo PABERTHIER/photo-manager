@@ -39,7 +39,7 @@ public class FolderNavigationViewModel(
 
     public bool HasConfirmed { get; set; }
 
-    public ObservableCollection<string> RecentTargetPaths { get; private set; } = [..recentTargetPaths];
+    public ObservableCollection<string> RecentTargetPaths { get; private set; } = [.. recentTargetPaths];
 
     public string? TargetPath
     {

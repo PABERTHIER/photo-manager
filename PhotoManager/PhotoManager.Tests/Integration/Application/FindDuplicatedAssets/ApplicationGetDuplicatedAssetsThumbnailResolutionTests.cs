@@ -1,15 +1,15 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
-using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
 using MD5Hashes = PhotoManager.Tests.Integration.Constants.MD5Hashes;
-using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Application.FindDuplicatedAssets;
 
@@ -269,23 +269,23 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.PHASH_THRESHOLD, pHashThreshold.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.DETECT_THUMBNAILS, detectThumbnails.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
-        StorageService storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, _userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, _userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
     }
 
     // The hamming distance is about 117 between these hashes
@@ -334,7 +334,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = [..assetsName];
+                IList<string> assetsNameList = [.. assetsName];
                 Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
@@ -389,7 +389,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = [..assetsName];
+                IList<string> assetsNameList = [.. assetsName];
                 Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }
@@ -406,7 +406,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
     [TestCase(9, 2, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new[] { FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG })]
     [TestCase(11, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG }, new string[] { })]
     [TestCase(14, 1, new[] { FileNames._1336_1_K_JPG, FileNames._1336_2_K_JPG, FileNames._1336_3_K_JPG, FileNames._1336_4_K_ORIGINAL_JPG, FileNames._1336_8_K_JPG, FileNames._1336_THUMBNAIL_JPG, FileNames.IMAGE_1_JPG }, new string[] { })]
-    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName1,  string[] assetsName2)
+    public void GetDuplicatesBetweenOriginalAndThumbnail_ResolutionDHashDifferentThresholdValues(int thresholdToMock, int expected, string[] assetsName1, string[] assetsName2)
     {
         ConfigureApplication(100, _dataDirectory!, 200, 150, false, false, true, thresholdToMock, true);
 
@@ -442,12 +442,12 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList1 = [..assetsName1];
+                IList<string> assetsNameList1 = [.. assetsName1];
                 Assert.That(assetsNameList1.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
             if (expected > 1)
             {
-                IList<string> assetsNameList2 = [..assetsName2];
+                IList<string> assetsNameList2 = [.. assetsName2];
                 Assert.That(assetsNameList2.SequenceEqual(duplicatedAssets[1].Select(y => y.FileName)), Is.True);
             }
         }
@@ -510,7 +510,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailResolutionTests
 
             if (expected > 0)
             {
-                IList<string> assetsNameList = [..assetsName];
+                IList<string> assetsNameList = [.. assetsName];
                 Assert.That(assetsNameList.SequenceEqual(duplicatedAssets[0].Select(y => y.FileName)), Is.True);
             }
         }

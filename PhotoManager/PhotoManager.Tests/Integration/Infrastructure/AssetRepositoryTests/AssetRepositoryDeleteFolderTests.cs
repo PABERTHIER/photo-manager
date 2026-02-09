@@ -1,13 +1,13 @@
-﻿using Reactive = System.Reactive;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using Reactive = System.Reactive;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -43,9 +43,9 @@ public class AssetRepositoryDeleteFolderTests
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new (_configurationRootMock!.Object);
-        _testableAssetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _userConfigurationService = new(_configurationRootMock!.Object);
+        _testableAssetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
 
         _asset1 = new()
         {

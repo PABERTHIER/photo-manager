@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace PhotoManager.Domain;
 
-public sealed class CatalogAssetsService: ICatalogAssetsService, IDisposable
+public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 {
     private readonly IAssetRepository _assetRepository;
     private readonly IStorageService _storageService;

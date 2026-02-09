@@ -8,14 +8,14 @@ public class LongAssetComparerTests
 {
     private string? _dataDirectory;
 
-    private Asset _asset1;
-    private Asset _asset2;
-    private Asset _asset3;
-    private Asset _asset4;
-    private Asset _asset5;
-    private Asset _asset6;
-    private Asset _asset7;
-    private Asset _asset8;
+    private Asset? _asset1;
+    private Asset? _asset2;
+    private Asset? _asset3;
+    private Asset? _asset4;
+    private Asset? _asset5;
+    private Asset? _asset6;
+    private Asset? _asset7;
+    private Asset? _asset8;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -27,7 +27,7 @@ public class LongAssetComparerTests
         _asset1 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId , Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = "Image 1.jpg",
             Pixel = new()
             {
@@ -46,7 +46,7 @@ public class LongAssetComparerTests
         _asset2 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId , Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = "image 1.jpg",
             Pixel = new()
             {
@@ -65,7 +65,7 @@ public class LongAssetComparerTests
         _asset3 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId , Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = "Image_1.jpg",
             Pixel = new()
             {
@@ -84,7 +84,7 @@ public class LongAssetComparerTests
         _asset4 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId , Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = "IMAGE 1.jpg",
             Pixel = new()
             {
@@ -103,7 +103,7 @@ public class LongAssetComparerTests
         _asset5 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId , Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = "Image1.jpg",
             Pixel = new()
             {
@@ -122,7 +122,7 @@ public class LongAssetComparerTests
         _asset6 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId , Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = "Image 1_duplicate.jpg",
             Pixel = new()
             {
@@ -141,7 +141,7 @@ public class LongAssetComparerTests
         _asset7 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId , Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = "Image 10.jpg",
             Pixel = new()
             {
@@ -160,7 +160,7 @@ public class LongAssetComparerTests
         _asset8 = new()
         {
             FolderId = folderId,
-            Folder = new() { Id = folderId , Path = _dataDirectory },
+            Folder = new() { Id = folderId, Path = _dataDirectory },
             FileName = "picture.png",
             Pixel = new()
             {
@@ -181,163 +181,163 @@ public class LongAssetComparerTests
     [Test]
     public void Compare_AscendingIsTrueAndFileSize_ReturnsExpectedResults()
     {
-        LongAssetComparer comparer = new (true, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(true, asset => asset.FileProperties.Size);
 
-        CompareAssets(_asset1, _asset1, comparer, 0);
-        CompareAssets(_asset1, _asset2, comparer, -1);
-        CompareAssets(_asset1, _asset3, comparer, -1);
-        CompareAssets(_asset1, _asset4, comparer, -1);
-        CompareAssets(_asset1, _asset5, comparer, -1);
-        CompareAssets(_asset1, _asset6, comparer, -1);
-        CompareAssets(_asset1, _asset7, comparer, -1);
-        CompareAssets(_asset1, _asset8, comparer, -1);
+        CompareAssets(_asset1!, _asset1!, comparer, 0);
+        CompareAssets(_asset1!, _asset2!, comparer, -1);
+        CompareAssets(_asset1!, _asset3!, comparer, -1);
+        CompareAssets(_asset1!, _asset4!, comparer, -1);
+        CompareAssets(_asset1!, _asset5!, comparer, -1);
+        CompareAssets(_asset1!, _asset6!, comparer, -1);
+        CompareAssets(_asset1!, _asset7!, comparer, -1);
+        CompareAssets(_asset1!, _asset8!, comparer, -1);
 
-        CompareAssets(_asset2, _asset1, comparer, 1);
-        CompareAssets(_asset2, _asset2, comparer, 0);
-        CompareAssets(_asset2, _asset3, comparer, -1);
-        CompareAssets(_asset2, _asset4, comparer, -1);
-        CompareAssets(_asset2, _asset5, comparer, -1);
-        CompareAssets(_asset2, _asset6, comparer, 1);
-        CompareAssets(_asset2, _asset7, comparer, -1);
-        CompareAssets(_asset2, _asset8, comparer, -1);
+        CompareAssets(_asset2!, _asset1!, comparer, 1);
+        CompareAssets(_asset2!, _asset2!, comparer, 0);
+        CompareAssets(_asset2!, _asset3!, comparer, -1);
+        CompareAssets(_asset2!, _asset4!, comparer, -1);
+        CompareAssets(_asset2!, _asset5!, comparer, -1);
+        CompareAssets(_asset2!, _asset6!, comparer, 1);
+        CompareAssets(_asset2!, _asset7!, comparer, -1);
+        CompareAssets(_asset2!, _asset8!, comparer, -1);
 
-        CompareAssets(_asset3, _asset1, comparer, 1);
-        CompareAssets(_asset3, _asset2, comparer, 1);
-        CompareAssets(_asset3, _asset3, comparer, 0);
-        CompareAssets(_asset3, _asset4, comparer, -1);
-        CompareAssets(_asset3, _asset5, comparer, -1);
-        CompareAssets(_asset3, _asset6, comparer, 1);
-        CompareAssets(_asset3, _asset7, comparer, -1);
-        CompareAssets(_asset3, _asset8, comparer, -1);
+        CompareAssets(_asset3!, _asset1!, comparer, 1);
+        CompareAssets(_asset3!, _asset2!, comparer, 1);
+        CompareAssets(_asset3!, _asset3!, comparer, 0);
+        CompareAssets(_asset3!, _asset4!, comparer, -1);
+        CompareAssets(_asset3!, _asset5!, comparer, -1);
+        CompareAssets(_asset3!, _asset6!, comparer, 1);
+        CompareAssets(_asset3!, _asset7!, comparer, -1);
+        CompareAssets(_asset3!, _asset8!, comparer, -1);
 
-        CompareAssets(_asset4, _asset1, comparer, 1);
-        CompareAssets(_asset4, _asset2, comparer, 1);
-        CompareAssets(_asset4, _asset3, comparer, 1);
-        CompareAssets(_asset4, _asset4, comparer, 0);
-        CompareAssets(_asset4, _asset5, comparer, -1);
-        CompareAssets(_asset4, _asset6, comparer, 1);
-        CompareAssets(_asset4, _asset7, comparer, -1);
-        CompareAssets(_asset4, _asset8, comparer, -1);
+        CompareAssets(_asset4!, _asset1!, comparer, 1);
+        CompareAssets(_asset4!, _asset2!, comparer, 1);
+        CompareAssets(_asset4!, _asset3!, comparer, 1);
+        CompareAssets(_asset4!, _asset4!, comparer, 0);
+        CompareAssets(_asset4!, _asset5!, comparer, -1);
+        CompareAssets(_asset4!, _asset6!, comparer, 1);
+        CompareAssets(_asset4!, _asset7!, comparer, -1);
+        CompareAssets(_asset4!, _asset8!, comparer, -1);
 
-        CompareAssets(_asset5, _asset1, comparer, 1);
-        CompareAssets(_asset5, _asset2, comparer, 1);
-        CompareAssets(_asset5, _asset3, comparer, 1);
-        CompareAssets(_asset5, _asset4, comparer, 1);
-        CompareAssets(_asset5, _asset5, comparer, 0);
-        CompareAssets(_asset5, _asset6, comparer, 1);
-        CompareAssets(_asset5, _asset7, comparer, -1);
-        CompareAssets(_asset5, _asset8, comparer, -1);
+        CompareAssets(_asset5!, _asset1!, comparer, 1);
+        CompareAssets(_asset5!, _asset2!, comparer, 1);
+        CompareAssets(_asset5!, _asset3!, comparer, 1);
+        CompareAssets(_asset5!, _asset4!, comparer, 1);
+        CompareAssets(_asset5!, _asset5!, comparer, 0);
+        CompareAssets(_asset5!, _asset6!, comparer, 1);
+        CompareAssets(_asset5!, _asset7!, comparer, -1);
+        CompareAssets(_asset5!, _asset8!, comparer, -1);
 
-        CompareAssets(_asset6, _asset1, comparer, 1);
-        CompareAssets(_asset6, _asset2, comparer, -1);
-        CompareAssets(_asset6, _asset3, comparer, -1);
-        CompareAssets(_asset6, _asset4, comparer, -1);
-        CompareAssets(_asset6, _asset5, comparer, -1);
-        CompareAssets(_asset6, _asset6, comparer, 0);
-        CompareAssets(_asset6, _asset7, comparer, -1);
-        CompareAssets(_asset6, _asset8, comparer, -1);
+        CompareAssets(_asset6!, _asset1!, comparer, 1);
+        CompareAssets(_asset6!, _asset2!, comparer, -1);
+        CompareAssets(_asset6!, _asset3!, comparer, -1);
+        CompareAssets(_asset6!, _asset4!, comparer, -1);
+        CompareAssets(_asset6!, _asset5!, comparer, -1);
+        CompareAssets(_asset6!, _asset6!, comparer, 0);
+        CompareAssets(_asset6!, _asset7!, comparer, -1);
+        CompareAssets(_asset6!, _asset8!, comparer, -1);
 
-        CompareAssets(_asset7, _asset1, comparer, 1);
-        CompareAssets(_asset7, _asset2, comparer, 1);
-        CompareAssets(_asset7, _asset3, comparer, 1);
-        CompareAssets(_asset7, _asset4, comparer, 1);
-        CompareAssets(_asset7, _asset5, comparer, 1);
-        CompareAssets(_asset7, _asset6, comparer, 1);
-        CompareAssets(_asset7, _asset7, comparer, 0);
-        CompareAssets(_asset7, _asset8, comparer, -1);
+        CompareAssets(_asset7!, _asset1!, comparer, 1);
+        CompareAssets(_asset7!, _asset2!, comparer, 1);
+        CompareAssets(_asset7!, _asset3!, comparer, 1);
+        CompareAssets(_asset7!, _asset4!, comparer, 1);
+        CompareAssets(_asset7!, _asset5!, comparer, 1);
+        CompareAssets(_asset7!, _asset6!, comparer, 1);
+        CompareAssets(_asset7!, _asset7!, comparer, 0);
+        CompareAssets(_asset7!, _asset8!, comparer, -1);
 
-        CompareAssets(_asset8, _asset1, comparer, 1);
-        CompareAssets(_asset8, _asset2, comparer, 1);
-        CompareAssets(_asset8, _asset3, comparer, 1);
-        CompareAssets(_asset8, _asset4, comparer, 1);
-        CompareAssets(_asset8, _asset5, comparer, 1);
-        CompareAssets(_asset8, _asset6, comparer, 1);
-        CompareAssets(_asset8, _asset7, comparer, 1);
-        CompareAssets(_asset8, _asset8, comparer, 0);
+        CompareAssets(_asset8!, _asset1!, comparer, 1);
+        CompareAssets(_asset8!, _asset2!, comparer, 1);
+        CompareAssets(_asset8!, _asset3!, comparer, 1);
+        CompareAssets(_asset8!, _asset4!, comparer, 1);
+        CompareAssets(_asset8!, _asset5!, comparer, 1);
+        CompareAssets(_asset8!, _asset6!, comparer, 1);
+        CompareAssets(_asset8!, _asset7!, comparer, 1);
+        CompareAssets(_asset8!, _asset8!, comparer, 0);
     }
 
     [Test]
     public void Compare_AscendingIsFalseAndFileSize_ReturnsExpectedResults()
     {
-        LongAssetComparer comparer = new (false, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(false, asset => asset.FileProperties.Size);
 
-        CompareAssets(_asset1, _asset1, comparer, 0);
-        CompareAssets(_asset1, _asset2, comparer, 1);
-        CompareAssets(_asset1, _asset3, comparer, 1);
-        CompareAssets(_asset1, _asset4, comparer, 1);
-        CompareAssets(_asset1, _asset5, comparer, 1);
-        CompareAssets(_asset1, _asset6, comparer, 1);
-        CompareAssets(_asset1, _asset7, comparer, 1);
-        CompareAssets(_asset1, _asset8, comparer, 1);
+        CompareAssets(_asset1!, _asset1!, comparer, 0);
+        CompareAssets(_asset1!, _asset2!, comparer, 1);
+        CompareAssets(_asset1!, _asset3!, comparer, 1);
+        CompareAssets(_asset1!, _asset4!, comparer, 1);
+        CompareAssets(_asset1!, _asset5!, comparer, 1);
+        CompareAssets(_asset1!, _asset6!, comparer, 1);
+        CompareAssets(_asset1!, _asset7!, comparer, 1);
+        CompareAssets(_asset1!, _asset8!, comparer, 1);
 
-        CompareAssets(_asset2, _asset1, comparer, -1);
-        CompareAssets(_asset2, _asset2, comparer, 0);
-        CompareAssets(_asset2, _asset3, comparer, 1);
-        CompareAssets(_asset2, _asset4, comparer, 1);
-        CompareAssets(_asset2, _asset5, comparer, 1);
-        CompareAssets(_asset2, _asset6, comparer, -1);
-        CompareAssets(_asset2, _asset7, comparer, 1);
-        CompareAssets(_asset2, _asset8, comparer, 1);
+        CompareAssets(_asset2!, _asset1!, comparer, -1);
+        CompareAssets(_asset2!, _asset2!, comparer, 0);
+        CompareAssets(_asset2!, _asset3!, comparer, 1);
+        CompareAssets(_asset2!, _asset4!, comparer, 1);
+        CompareAssets(_asset2!, _asset5!, comparer, 1);
+        CompareAssets(_asset2!, _asset6!, comparer, -1);
+        CompareAssets(_asset2!, _asset7!, comparer, 1);
+        CompareAssets(_asset2!, _asset8!, comparer, 1);
 
-        CompareAssets(_asset3, _asset1, comparer, -1);
-        CompareAssets(_asset3, _asset2, comparer, -1);
-        CompareAssets(_asset3, _asset3, comparer, 0);
-        CompareAssets(_asset3, _asset4, comparer, 1);
-        CompareAssets(_asset3, _asset5, comparer, 1);
-        CompareAssets(_asset3, _asset6, comparer, -1);
-        CompareAssets(_asset3, _asset7, comparer, 1);
-        CompareAssets(_asset3, _asset8, comparer, 1);
+        CompareAssets(_asset3!, _asset1!, comparer, -1);
+        CompareAssets(_asset3!, _asset2!, comparer, -1);
+        CompareAssets(_asset3!, _asset3!, comparer, 0);
+        CompareAssets(_asset3!, _asset4!, comparer, 1);
+        CompareAssets(_asset3!, _asset5!, comparer, 1);
+        CompareAssets(_asset3!, _asset6!, comparer, -1);
+        CompareAssets(_asset3!, _asset7!, comparer, 1);
+        CompareAssets(_asset3!, _asset8!, comparer, 1);
 
-        CompareAssets(_asset4, _asset1, comparer, -1);
-        CompareAssets(_asset4, _asset2, comparer, -1);
-        CompareAssets(_asset4, _asset3, comparer, -1);
-        CompareAssets(_asset4, _asset4, comparer, 0);
-        CompareAssets(_asset4, _asset5, comparer, 1);
-        CompareAssets(_asset4, _asset6, comparer, -1);
-        CompareAssets(_asset4, _asset7, comparer, 1);
-        CompareAssets(_asset4, _asset8, comparer, 1);
+        CompareAssets(_asset4!, _asset1!, comparer, -1);
+        CompareAssets(_asset4!, _asset2!, comparer, -1);
+        CompareAssets(_asset4!, _asset3!, comparer, -1);
+        CompareAssets(_asset4!, _asset4!, comparer, 0);
+        CompareAssets(_asset4!, _asset5!, comparer, 1);
+        CompareAssets(_asset4!, _asset6!, comparer, -1);
+        CompareAssets(_asset4!, _asset7!, comparer, 1);
+        CompareAssets(_asset4!, _asset8!, comparer, 1);
 
-        CompareAssets(_asset5, _asset1, comparer, -1);
-        CompareAssets(_asset5, _asset2, comparer, -1);
-        CompareAssets(_asset5, _asset3, comparer, -1);
-        CompareAssets(_asset5, _asset4, comparer, -1);
-        CompareAssets(_asset5, _asset5, comparer, 0);
-        CompareAssets(_asset5, _asset6, comparer, -1);
-        CompareAssets(_asset5, _asset7, comparer, 1);
-        CompareAssets(_asset5, _asset8, comparer, 1);
+        CompareAssets(_asset5!, _asset1!, comparer, -1);
+        CompareAssets(_asset5!, _asset2!, comparer, -1);
+        CompareAssets(_asset5!, _asset3!, comparer, -1);
+        CompareAssets(_asset5!, _asset4!, comparer, -1);
+        CompareAssets(_asset5!, _asset5!, comparer, 0);
+        CompareAssets(_asset5!, _asset6!, comparer, -1);
+        CompareAssets(_asset5!, _asset7!, comparer, 1);
+        CompareAssets(_asset5!, _asset8!, comparer, 1);
 
-        CompareAssets(_asset6, _asset1, comparer, -1);
-        CompareAssets(_asset6, _asset2, comparer, 1);
-        CompareAssets(_asset6, _asset3, comparer, 1);
-        CompareAssets(_asset6, _asset4, comparer, 1);
-        CompareAssets(_asset6, _asset5, comparer, 1);
-        CompareAssets(_asset6, _asset6, comparer, 0);
-        CompareAssets(_asset6, _asset7, comparer, 1);
-        CompareAssets(_asset6, _asset8, comparer, 1);
+        CompareAssets(_asset6!, _asset1!, comparer, -1);
+        CompareAssets(_asset6!, _asset2!, comparer, 1);
+        CompareAssets(_asset6!, _asset3!, comparer, 1);
+        CompareAssets(_asset6!, _asset4!, comparer, 1);
+        CompareAssets(_asset6!, _asset5!, comparer, 1);
+        CompareAssets(_asset6!, _asset6!, comparer, 0);
+        CompareAssets(_asset6!, _asset7!, comparer, 1);
+        CompareAssets(_asset6!, _asset8!, comparer, 1);
 
-        CompareAssets(_asset7, _asset1, comparer, -1);
-        CompareAssets(_asset7, _asset2, comparer, -1);
-        CompareAssets(_asset7, _asset3, comparer, -1);
-        CompareAssets(_asset7, _asset4, comparer, -1);
-        CompareAssets(_asset7, _asset5, comparer, -1);
-        CompareAssets(_asset7, _asset6, comparer, -1);
-        CompareAssets(_asset7, _asset7, comparer, 0);
-        CompareAssets(_asset7, _asset8, comparer, 1);
+        CompareAssets(_asset7!, _asset1!, comparer, -1);
+        CompareAssets(_asset7!, _asset2!, comparer, -1);
+        CompareAssets(_asset7!, _asset3!, comparer, -1);
+        CompareAssets(_asset7!, _asset4!, comparer, -1);
+        CompareAssets(_asset7!, _asset5!, comparer, -1);
+        CompareAssets(_asset7!, _asset6!, comparer, -1);
+        CompareAssets(_asset7!, _asset7!, comparer, 0);
+        CompareAssets(_asset7!, _asset8!, comparer, 1);
 
-        CompareAssets(_asset8, _asset1, comparer, -1);
-        CompareAssets(_asset8, _asset2, comparer, -1);
-        CompareAssets(_asset8, _asset3, comparer, -1);
-        CompareAssets(_asset8, _asset4, comparer, -1);
-        CompareAssets(_asset8, _asset5, comparer, -1);
-        CompareAssets(_asset8, _asset6, comparer, -1);
-        CompareAssets(_asset8, _asset7, comparer, -1);
-        CompareAssets(_asset8, _asset8, comparer, 0);
+        CompareAssets(_asset8!, _asset1!, comparer, -1);
+        CompareAssets(_asset8!, _asset2!, comparer, -1);
+        CompareAssets(_asset8!, _asset3!, comparer, -1);
+        CompareAssets(_asset8!, _asset4!, comparer, -1);
+        CompareAssets(_asset8!, _asset5!, comparer, -1);
+        CompareAssets(_asset8!, _asset6!, comparer, -1);
+        CompareAssets(_asset8!, _asset7!, comparer, -1);
+        CompareAssets(_asset8!, _asset8!, comparer, 0);
     }
 
     [Test]
     public void Compare_AscendingIsTrueAndFirstLongIsGreater_ReturnsPositiveNumber()
     {
-        LongAssetComparer comparer = new (true, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(true, asset => asset.FileProperties.Size);
 
         int result = comparer.Compare(_asset2, _asset1);
 
@@ -347,7 +347,7 @@ public class LongAssetComparerTests
     [Test]
     public void Compare_AscendingIsTrueAndFirstLongIsSmaller_ReturnsNegativeNumber()
     {
-        LongAssetComparer comparer = new (true, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(true, asset => asset.FileProperties.Size);
 
         int result = comparer.Compare(_asset1, _asset2);
 
@@ -357,7 +357,7 @@ public class LongAssetComparerTests
     [Test]
     public void Compare_AscendingIsTrueAndLongsAreEqualButStringsAreNotEqual_ReturnsNegativeNumber()
     {
-        LongAssetComparer comparer = new (true, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(true, asset => asset.FileProperties.Size);
 
         int result = comparer.Compare(_asset1, _asset6);
 
@@ -367,7 +367,7 @@ public class LongAssetComparerTests
     [Test]
     public void Compare_AscendingIsFalseAndFirstLongIsGreater_ReturnsNegativeNumber()
     {
-        LongAssetComparer comparer = new (false, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(false, asset => asset.FileProperties.Size);
 
         int result = comparer.Compare(_asset2, _asset1);
 
@@ -377,7 +377,7 @@ public class LongAssetComparerTests
     [Test]
     public void Compare_AscendingIsFalseAndFirstLongIsSmaller_ReturnsPositiveNumber()
     {
-        LongAssetComparer comparer = new (false, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(false, asset => asset.FileProperties.Size);
 
         int result = comparer.Compare(_asset1, _asset2);
 
@@ -387,7 +387,7 @@ public class LongAssetComparerTests
     [Test]
     public void Compare_AscendingIsFalseAndLongsAreEqualButStringsAreNotEqual_ReturnsPositiveNumber()
     {
-        LongAssetComparer comparer = new (false, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(false, asset => asset.FileProperties.Size);
 
         int result = comparer.Compare(_asset1, _asset6);
 
@@ -399,7 +399,7 @@ public class LongAssetComparerTests
     [TestCase(false)]
     public void Compare_FirstAssetIsNull_ThrowsArgumentNullException(bool ascending)
     {
-        LongAssetComparer comparer = new (ascending, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(ascending, asset => asset.FileProperties.Size);
 
         Asset? asset1 = null;
 
@@ -414,7 +414,7 @@ public class LongAssetComparerTests
     [TestCase(false)]
     public void Compare_SecondAssetIsNull_ThrowsArgumentNullException(bool ascending)
     {
-        LongAssetComparer comparer = new (ascending, asset => asset.FileProperties.Size);
+        LongAssetComparer comparer = new(ascending, asset => asset.FileProperties.Size);
 
         Asset? asset2 = null;
 

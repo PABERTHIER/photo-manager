@@ -167,7 +167,7 @@ public class Database : IDatabase
             deletedBackupFilePaths.Add(filesPaths[i]);
         }
 
-        Diagnostics = new Diagnostics { LastDeletedBackupFilePaths = deletedBackupFilePaths.ToArray() };
+        Diagnostics = new Diagnostics { LastDeletedBackupFilePaths = [.. deletedBackupFilePaths] };
     }
 
     private void InitializeDirectory()

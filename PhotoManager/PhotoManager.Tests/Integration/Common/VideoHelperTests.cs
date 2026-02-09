@@ -76,7 +76,7 @@ public class VideoHelperTests
 
             string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, videoFileName, destinationPath);
 
-            Exception exception = new ($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, videoFileName)}, Message: Output file already exists and overwrite is disabled");
+            Exception exception = new($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, videoFileName)}, Message: Output file already exists and overwrite is disabled");
             Exception[] expectedExceptions = [exception];
             Type typeOfService = typeof(VideoHelper);
 
@@ -107,7 +107,7 @@ public class VideoHelperTests
 
             string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath);
 
-            Exception exception = new ($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}, Message: FFmpeg failed to generate the first frame file due to its format or content.");
+            Exception exception = new($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}, Message: FFmpeg failed to generate the first frame file due to its format or content.");
             Exception[] expectedExceptions = [exception];
             Type typeOfService = typeof(VideoHelper);
 
@@ -138,7 +138,7 @@ public class VideoHelperTests
 
             string? firstFrameVideoPath = VideoHelper.GetFirstFramePath(_dataDirectory!, fileName, destinationPath);
 
-            Exception exception = new ($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}, Message: Input file not found");
+            Exception exception = new($"Failed to extract the first frame for: {Path.Combine(_dataDirectory!, fileName)}, Message: Input file not found");
             Exception[] expectedExceptions = [exception];
             Type typeOfService = typeof(VideoHelper);
 

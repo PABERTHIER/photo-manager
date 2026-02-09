@@ -7,7 +7,7 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
     public List<T> ReadObjectList<T>(string dataFilePath, Func<string[], T> mapObjectFromCsvFields, Diagnostics diagnostics)
     {
         List<T> list = [];
-        
+
         if (File.Exists(dataFilePath))
         {
             string csv = File.ReadAllText(dataFilePath);
@@ -30,7 +30,7 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
     {
         List<T> list = [];
 
-        using (StringReader reader = new (csv))
+        using (StringReader reader = new(csv))
         {
             string? line = reader.ReadLine();
 

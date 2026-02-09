@@ -5,10 +5,10 @@ using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels;
 
@@ -22,8 +22,8 @@ public class DuplicatedSetViewModelTests
     private DuplicatedSetViewModel? _duplicatedSetViewModel;
     private AssetRepository? _assetRepository;
 
-    private Asset _asset2;
-    private Asset _asset3;
+    private Asset? _asset2;
+    private Asset? _asset3;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -39,14 +39,14 @@ public class DuplicatedSetViewModelTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
 
         DateTime actualDate = DateTime.Now;
 
@@ -113,7 +113,7 @@ public class DuplicatedSetViewModelTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _asset3 = _asset3.WithFolder(folder);
+            _asset3 = _asset3!.WithFolder(folder);
 
             _duplicatedSetViewModel = [];
 
@@ -122,7 +122,7 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
@@ -130,7 +130,7 @@ public class DuplicatedSetViewModelTests
 
             CheckBeforeChanges(
                 [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-                _asset2.FileName,
+                _asset2!.FileName,
                 2,
                 Visibility.Visible);
 
@@ -202,7 +202,7 @@ public class DuplicatedSetViewModelTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _asset3 = _asset3.WithFolder(folder);
+            _asset3 = _asset3!.WithFolder(folder);
 
             _duplicatedSetViewModel = [];
 
@@ -211,7 +211,7 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
@@ -219,7 +219,7 @@ public class DuplicatedSetViewModelTests
 
             CheckBeforeChanges(
                 [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-                _asset2.FileName,
+                _asset2!.FileName,
                 2,
                 Visibility.Visible);
 
@@ -269,7 +269,7 @@ public class DuplicatedSetViewModelTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _asset3 = _asset3.WithFolder(folder);
+            _asset3 = _asset3!.WithFolder(folder);
 
             _duplicatedSetViewModel = [];
 
@@ -278,7 +278,7 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
@@ -286,7 +286,7 @@ public class DuplicatedSetViewModelTests
 
             CheckBeforeChanges(
                 [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-                _asset2.FileName,
+                _asset2!.FileName,
                 2,
                 Visibility.Visible);
 
@@ -336,7 +336,7 @@ public class DuplicatedSetViewModelTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _asset3 = _asset3.WithFolder(folder);
+            _asset3 = _asset3!.WithFolder(folder);
 
             _duplicatedSetViewModel = [];
 
@@ -345,7 +345,7 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
             DuplicatedAssetViewModel duplicatedAssetViewModel2 = new() { Asset = _asset3, ParentViewModel = _duplicatedSetViewModel };
@@ -353,7 +353,7 @@ public class DuplicatedSetViewModelTests
 
             CheckBeforeChanges(
                 [duplicatedAssetViewModel1, duplicatedAssetViewModel2],
-                _asset2.FileName,
+                _asset2!.FileName,
                 2,
                 Visibility.Visible);
 
@@ -403,7 +403,7 @@ public class DuplicatedSetViewModelTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _asset3 = _asset3.WithFolder(folder);
+            _asset3 = _asset3!.WithFolder(folder);
 
             _duplicatedSetViewModel = [];
 
@@ -412,12 +412,12 @@ public class DuplicatedSetViewModelTests
                 List<DuplicatedSetViewModel> duplicatedSetViewModelInstances
             ) = NotifyPropertyChangedEvents();
 
-            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2, ParentViewModel = _duplicatedSetViewModel };
+            DuplicatedAssetViewModel duplicatedAssetViewModel1 = new() { Asset = _asset2!, ParentViewModel = _duplicatedSetViewModel };
             _duplicatedSetViewModel.Add(duplicatedAssetViewModel1);
 
             CheckBeforeChanges(
                 [duplicatedAssetViewModel1],
-                _asset2.FileName,
+                _asset2!.FileName,
                 1,
                 Visibility.Collapsed);
 
@@ -456,7 +456,7 @@ public class DuplicatedSetViewModelTests
         {
             Folder folder = _assetRepository!.AddFolder(assetsDirectory);
 
-            _asset3 = _asset3.WithFolder(folder);
+            _asset3 = _asset3!.WithFolder(folder);
 
             _duplicatedSetViewModel = [];
 
@@ -492,7 +492,7 @@ public class DuplicatedSetViewModelTests
         List<string> notifyPropertyChangedEvents = [];
         List<DuplicatedSetViewModel> duplicatedSetViewModelInstances = [];
 
-        _duplicatedSetViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _duplicatedSetViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             duplicatedSetViewModelInstances.Add((DuplicatedSetViewModel)sender!);

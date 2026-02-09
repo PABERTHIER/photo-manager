@@ -26,8 +26,8 @@ public partial class MainWindow
 
     private readonly IApplication _application;
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private Task _backgroundWorkTask = new (() => {});
-    private Task _catalogTask = new (() => {});
+    private Task _backgroundWorkTask = new(() => { });
+    private Task _catalogTask = new(() => { });
 
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
     {
@@ -36,7 +36,7 @@ public partial class MainWindow
             InitializeComponent();
             DataContext = viewModel;
 
-            FolderNavigationViewModel folderNavigationViewModel = new (
+            FolderNavigationViewModel folderNavigationViewModel = new(
                 ViewModel,
                 new() { Id = Guid.NewGuid(), Path = ViewModel.CurrentFolderPath },
                 application.GetRecentTargetPaths());
@@ -158,9 +158,9 @@ public partial class MainWindow
 
             if (assetsSets.Count > 0)
             {
-                FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModel = new (_application);
+                FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModel = new(_application);
                 findDuplicatedAssetsViewModel.SetDuplicates(assetsSets);
-                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new (findDuplicatedAssetsViewModel);
+                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new(findDuplicatedAssetsViewModel);
 
                 findDuplicatedAssetsWindow.GetExemptedFolderPath += GetExemptedFolderPath;
                 findDuplicatedAssetsWindow.DeleteDuplicatedAssets += DeleteDuplicatedAssets;
@@ -183,8 +183,8 @@ public partial class MainWindow
     {
         try
         {
-            SyncAssetsViewModel syncAssetsViewModel = new (_application);
-            SyncAssetsWindow syncAssetsWindow = new (syncAssetsViewModel);
+            SyncAssetsViewModel syncAssetsViewModel = new(_application);
+            SyncAssetsWindow syncAssetsWindow = new(syncAssetsViewModel);
             syncAssetsWindow.ShowDialog();
         }
         catch (Exception ex)
@@ -197,7 +197,7 @@ public partial class MainWindow
     {
         try
         {
-            AboutWindow aboutWindow = new (ViewModel.AboutInformation);
+            AboutWindow aboutWindow = new(ViewModel.AboutInformation);
             aboutWindow.ShowDialog();
         }
         catch (Exception ex)

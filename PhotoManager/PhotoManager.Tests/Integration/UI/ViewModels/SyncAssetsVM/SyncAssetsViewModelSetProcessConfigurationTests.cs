@@ -37,7 +37,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         _syncAssetsDirectoriesDefinitionsTableName = userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
 
@@ -45,18 +45,18 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        AssetRepository assetRepository = new (_database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        AssetRepository assetRepository = new(_database, storageServiceMock.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _syncAssetsViewModel = new (application);
+        CatalogAssetsService catalogAssetsService = new(assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, storageService, userConfigurationService);
+        PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _syncAssetsViewModel = new(application);
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
             // Different source and destination
             syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "C:\\Valid2\\Path" });
             syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "\\Server\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path"});
+            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path" });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = "\\Server\\Valid1\\Path",
@@ -735,7 +735,7 @@ public class SyncAssetsViewModelSetProcessConfigurationTests
         List<string> notifyPropertyChangedEvents = [];
         List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
 
-        _syncAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _syncAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             syncAssetsViewModelInstances.Add((SyncAssetsViewModel)sender!);

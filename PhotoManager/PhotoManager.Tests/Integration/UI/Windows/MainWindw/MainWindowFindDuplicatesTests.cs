@@ -8,10 +8,10 @@ using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.UI.Windows.MainWindw;
 
@@ -41,11 +41,11 @@ public class MainWindowFindDuplicatesTests
     private delegate void EventTriggeredHandler(object sender);
     private delegate void EventTriggeredWithAssetsHandler(object sender, Asset[] assets);
 
-    private Asset _asset1;
-    private Asset _asset2;
-    private Asset _asset3;
-    private Asset _asset4;
-    private Asset _asset1Temp;
+    private Asset? _asset1;
+    private Asset? _asset2;
+    private Asset? _asset3;
+    private Asset? _asset4;
+    private Asset? _asset1Temp;
 
     private Folder? _sourceFolder;
 
@@ -231,24 +231,24 @@ public class MainWindowFindDuplicatesTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _applicationViewModel = new (_application);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new(_application);
 
         _sourceFolder = new() { Id = Guid.NewGuid(), Path = _applicationViewModel!.CurrentFolderPath };
     }
@@ -297,12 +297,12 @@ public class MainWindowFindDuplicatesTests
             Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
-            _asset1 = _asset1.WithFolder(folder!);
-            _asset2 = _asset2.WithFolder(folder!);
-            _asset3 = _asset3.WithFolder(folder!);
-            _asset4 = _asset4.WithFolder(folder!);
+            _asset1 = _asset1!.WithFolder(folder!);
+            _asset2 = _asset2!.WithFolder(folder!);
+            _asset3 = _asset3!.WithFolder(folder!);
+            _asset4 = _asset4!.WithFolder(folder!);
 
-            _asset1Temp = _asset1Temp.WithFolder(exemptedFolder!);
+            _asset1Temp = _asset1Temp!.WithFolder(exemptedFolder!);
 
             string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
@@ -457,10 +457,10 @@ public class MainWindowFindDuplicatesTests
             Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
-            _asset1 = _asset1.WithFolder(folder!);
-            _asset2 = _asset2.WithFolder(folder!);
-            _asset3 = _asset3.WithFolder(folder!);
-            _asset4 = _asset4.WithFolder(folder!);
+            _asset1 = _asset1!.WithFolder(folder!);
+            _asset2 = _asset2!.WithFolder(folder!);
+            _asset3 = _asset3!.WithFolder(folder!);
+            _asset4 = _asset4!.WithFolder(folder!);
 
             string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
@@ -604,10 +604,10 @@ public class MainWindowFindDuplicatesTests
             Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
-            _asset1 = _asset1.WithFolder(folder!);
-            _asset2 = _asset2.WithFolder(folder!);
-            _asset3 = _asset3.WithFolder(folder!);
-            _asset4 = _asset4.WithFolder(folder!);
+            _asset1 = _asset1!.WithFolder(folder!);
+            _asset2 = _asset2!.WithFolder(folder!);
+            _asset3 = _asset3!.WithFolder(folder!);
+            _asset4 = _asset4!.WithFolder(folder!);
 
             string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
@@ -753,10 +753,10 @@ public class MainWindowFindDuplicatesTests
             Folder? exemptedFolder = _assetRepository!.GetFolderByPath(exemptedFolderPath);
             Assert.That(exemptedFolder, Is.Not.Null);
 
-            _asset1 = _asset1.WithFolder(folder!);
-            _asset2 = _asset2.WithFolder(folder!);
-            _asset3 = _asset3.WithFolder(folder!);
-            _asset4 = _asset4.WithFolder(folder!);
+            _asset1 = _asset1!.WithFolder(folder!);
+            _asset2 = _asset2!.WithFolder(folder!);
+            _asset3 = _asset3!.WithFolder(folder!);
+            _asset4 = _asset4!.WithFolder(folder!);
 
             string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {assetsDirectory} - image 1 of 4 - sorted by file name ascending";
             Asset[] expectedAssets = [_asset1, _asset2, _asset3, _asset4];
@@ -909,7 +909,7 @@ public class MainWindowFindDuplicatesTests
 
             DuplicatedAssetViewModel duplicatedAssetViewModel = new()
             {
-                Asset = _asset2,
+                Asset = _asset2!,
                 ParentViewModel = duplicatedAssetSet
             };
             duplicatedAssetSet.Add(duplicatedAssetViewModel);
@@ -1076,7 +1076,7 @@ public class MainWindowFindDuplicatesTests
         List<string> notifyPropertyChangedEvents = [];
         List<ApplicationViewModel> applicationViewModelInstances = [];
 
-        _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             applicationViewModelInstances.Add((ApplicationViewModel)sender!);
@@ -1084,14 +1084,14 @@ public class MainWindowFindDuplicatesTests
 
         List<Folder> folderAddedEvents = [];
 
-        _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        _applicationViewModel.FolderAdded += delegate (object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
         List<Folder> folderRemovedEvents = [];
 
-        _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        _applicationViewModel.FolderRemoved += delegate (object _, FolderRemovedEventArgs e)
         {
             folderRemovedEvents.Add(e.Folder);
         };
@@ -1114,7 +1114,7 @@ public class MainWindowFindDuplicatesTests
             getExemptedFolderPathEvents.Add(string.Empty);
         };
 
-        DeleteDuplicatedAssetsEventTriggered += delegate(object _, Asset[] assets)
+        DeleteDuplicatedAssetsEventTriggered += delegate (object _, Asset[] assets)
         {
             deleteDuplicatedAssetsEvents.Add(assets);
         };
@@ -1377,12 +1377,12 @@ public class MainWindowFindDuplicatesTests
             expectedAsset.Folder.Path,
             expectedAsset.Folder);
         // Unlike below (Application, CatalogAssetsService), it is set here for assets in the current directory
-        Assert.That(asset.ImageData, expectedAsset.ImageData == null ? Is.Null : Is.Not.Null); 
+        Assert.That(asset.ImageData, expectedAsset.ImageData == null ? Is.Null : Is.Not.Null);
     }
 
     private void MainWindowsInit()
     {
-        _folderNavigationViewModel = new (_applicationViewModel!, _sourceFolder!, []);
+        _folderNavigationViewModel = new(_applicationViewModel!, _sourceFolder!, []);
 
         CancellationTokenSource cancellationTokenSource = new();
 
@@ -1407,7 +1407,7 @@ public class MainWindowFindDuplicatesTests
     {
         List<DuplicatedAssetViewModel> assetsToDelete = _findDuplicatedAssetsViewModel?.GetDuplicatedAssets(duplicatedAssetViewModel.Asset) ?? [];
 
-        DeleteDuplicatedAssetsEvent?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
+        DeleteDuplicatedAssetsEvent?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);
 
         _findDuplicatedAssetsViewModel?.CollapseAssets(assetsToDelete);
     }
@@ -1418,7 +1418,7 @@ public class MainWindowFindDuplicatesTests
 
         List<DuplicatedAssetViewModel> assetsToDelete = _findDuplicatedAssetsViewModel?.GetNotExemptedDuplicatedAssets(exemptedFolderPath) ?? [];
 
-        DeleteDuplicatedAssetsEvent?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
+        DeleteDuplicatedAssetsEvent?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);
 
         _findDuplicatedAssetsViewModel?.CollapseAssets(assetsToDelete);
     }
@@ -1429,7 +1429,7 @@ public class MainWindowFindDuplicatesTests
 
         if (assetsSets.Count > 0)
         {
-            _findDuplicatedAssetsViewModel = new (_application);
+            _findDuplicatedAssetsViewModel = new(_application);
             _findDuplicatedAssetsViewModel.SetDuplicates(assetsSets);
 
             GetExemptedFolderPathEvent += GetExemptedFolderPath;

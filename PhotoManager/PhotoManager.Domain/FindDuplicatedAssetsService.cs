@@ -17,11 +17,11 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
             return GetDuplicatesBetweenOriginalAndThumbnail(assets, userConfigurationService.HashSettings.PHashThreshold);
         }
 
-        List<IGrouping<string, Asset>> assetGroups = assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1).ToList();
+        List<IGrouping<string, Asset>> assetGroups = [.. assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1)];
 
         foreach (IGrouping<string, Asset> group in assetGroups)
         {
-            List<Asset> duplicatedSet = [..group];
+            List<Asset> duplicatedSet = [.. group];
             duplicatedSet.RemoveAll(asset => !storageService.FileExists(asset.FullPath));
 
             if (duplicatedSet.Count > 1)

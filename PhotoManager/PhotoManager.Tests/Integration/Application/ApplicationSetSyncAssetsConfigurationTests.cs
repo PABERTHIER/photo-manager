@@ -1,6 +1,6 @@
-﻿using Reactive = System.Reactive;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
+using Reactive = System.Reactive;
 using Tables = PhotoManager.Tests.Integration.Constants.Tables;
 
 namespace PhotoManager.Tests.Integration.Application;
@@ -39,23 +39,23 @@ public class ApplicationSetSyncAssetsConfigurationTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _testableAssetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
-        StorageService storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _testableAssetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
-        _application = new (_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, storageService, _userConfigurationService);
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
     }
 
     [Test]
@@ -86,7 +86,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
                 DeleteAssetsNotInSource = true
             });
 
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Has.Count.EqualTo(1));
@@ -199,7 +199,7 @@ public class ApplicationSetSyncAssetsConfigurationTests
             // Different source and destination
             syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "C:\\Valid2\\Path" });
             syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "\\Server\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path" });
-            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path"});
+            syncAssetsConfigurationToSave.Definitions.Add(new() { SourceDirectory = "C:\\Valid1\\Path", DestinationDirectory = "\\Server\\Valid2\\Path" });
             syncAssetsConfigurationToSave.Definitions.Add(new()
             {
                 SourceDirectory = "\\Server\\Valid1\\Path",

@@ -90,6 +90,6 @@ public partial class ThumbnailsUserControl
 
     private void ThumbnailsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        ViewModel.SelectedAssets = ThumbnailsListView.SelectedItems.Cast<Asset>().ToArray();
+        ViewModel.SelectedAssets = [.. ThumbnailsListView.SelectedItems.Cast<Asset>()];
     }
 }

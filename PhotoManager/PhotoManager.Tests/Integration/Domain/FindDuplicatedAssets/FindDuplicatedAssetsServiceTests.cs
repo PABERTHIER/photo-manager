@@ -3,10 +3,10 @@ using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Domain.FindDuplicatedAssets;
 
@@ -46,11 +46,11 @@ public class FindDuplicatedAssetsServiceTests
     [SetUp]
     public void SetUp()
     {
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new (userConfigurationService);
-        _findDuplicatedAssetsService = new (_assetRepository, _storageService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new(database, _storageServiceMock!.Object, userConfigurationService);
+        _storageService = new(userConfigurationService);
+        _findDuplicatedAssetsService = new(_assetRepository, _storageService, userConfigurationService);
 
         _asset1 = new()
         {

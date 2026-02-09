@@ -24,7 +24,7 @@ public class DatabaseWriteObjectListTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
 
         _csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"CorruptedMessage\";\"IsCorrupted\";\"RotatedMessage\";\"IsRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\";\"\";\"False\";\"\";\"False\"\r\n" +
@@ -50,7 +50,7 @@ public class DatabaseWriteObjectListTests
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
     [Test]

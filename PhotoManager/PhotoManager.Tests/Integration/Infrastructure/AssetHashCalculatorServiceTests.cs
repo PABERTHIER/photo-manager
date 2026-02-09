@@ -1,8 +1,8 @@
 ﻿using ImageMagick;
+using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
-using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
 using MD5Hashes = PhotoManager.Tests.Integration.Constants.MD5Hashes;
 using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
 
@@ -34,7 +34,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DefaultHashAndValidImageBytesAndFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -50,7 +50,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DefaultHashAndEmptyImageBytes_ReturnsSameHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[] imageBytes = [];
         string? filePath = null;
@@ -67,7 +67,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DefaultHashAndNullImageBytes_ThrowsArgumentNullException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string? filePath = null;
@@ -89,7 +89,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DefaultHashAndValidImageBytesAndNullFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -113,7 +113,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DefaultHashAndValidImageBytesAndInvalidFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -137,7 +137,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DefaultHashAndValidImageBytesAndDirectoryFilePath_ReturnsCorrectHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -164,7 +164,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_PHashAndValidImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -188,7 +188,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_PHashAndEmptyImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[] imageBytes = [];
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -212,7 +212,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_PHashAndNullImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -228,7 +228,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_PHashAndImageDoesNotExist_ThrowsMagickBlobErrorException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
@@ -242,7 +242,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_PHashAndImagePathIsInvalid_ThrowsMagickMissingDelegateErrorException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
 
@@ -255,7 +255,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_PHashAndImagePathIsNull_ThrowsArgumentNullException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string? filePath = null;
@@ -277,7 +277,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndValidImageBytesAndFilePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -296,7 +296,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_NonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -319,7 +319,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndEmptyImageBytesAndFilePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[] imageBytes = [];
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -337,7 +337,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndEmptyImageBytesAndNonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[] imageBytes = [];
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -360,7 +360,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndNullImageBytesAndFilePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -378,7 +378,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndNullImageBytesAndNonWorkingDHash_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, fileName);
@@ -394,7 +394,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndImageDoesNotExist_ThrowsArgumentException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
@@ -408,7 +408,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndImagePathIsInvalid_ThrowsArgumentException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
 
@@ -421,7 +421,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndImagePathIsNull_ThrowsArgumentNullException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, false);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string? filePath = null;
@@ -446,7 +446,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -462,7 +462,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateMD5Hash_MD5HashAndEmptyImageBytes_ReturnsSameMD5Hash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[] imageBytes = [];
         string? filePath = null;
@@ -479,7 +479,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateMD5Hash_MD5HashAndNullImageBytes_ThrowsArgumentNullException()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         byte[]? imageBytes = null;
         string? filePath = null;
@@ -501,7 +501,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndNullFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -525,7 +525,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndInvalidFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -549,7 +549,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateMD5Hash_MD5HashAndValidImageBytesAndDirectoryFilePath_ReturnsCorrectMD5Hash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, false, true);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -573,7 +573,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_AllHashesEnabledAndValidImageBytesAndFilePath_ReturnsCorrectPHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, true, true);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -595,7 +595,7 @@ public class AssetHashCalculatorServiceTests
     public void CalculateHash_DHashAndMd5HashEnabledAndValidImageBytesAndFilePath_ReturnsCorrectDHash(string fileName, string expectedHash)
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(false, true, true);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -616,6 +616,6 @@ public class AssetHashCalculatorServiceTests
             .MockGetValue(UserConfigurationKeys.USING_DHASH, usingDHash.ToString())
             .MockGetValue(UserConfigurationKeys.USING_MD5_HASH, usingMd5Hash.ToString());
 
-        return new (configurationRootMock.Object);
+        return new(configurationRootMock.Object);
     }
 }

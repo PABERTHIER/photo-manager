@@ -173,7 +173,7 @@ public class AssetConfigsTests
                 Thumbnail = new() { Width = 120, Height = 60 }
             },
             FileProperties = new() { Size = 1000 },
-            ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
+            ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {
@@ -216,7 +216,7 @@ public class AssetConfigsTests
                 Asset = new(),
                 Thumbnail = new()
             },
-            ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
+            ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {
@@ -261,7 +261,7 @@ public class AssetConfigsTests
                 Thumbnail = new() { Width = 120, Height = 60 }
             },
             FileProperties = new() { Size = 1000 },
-            ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
+            ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {

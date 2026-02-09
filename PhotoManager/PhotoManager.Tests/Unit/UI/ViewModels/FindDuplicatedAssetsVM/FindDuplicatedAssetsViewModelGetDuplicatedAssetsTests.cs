@@ -4,10 +4,10 @@ using System.Windows;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
-using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Unit.UI.ViewModels.FindDuplicatedAssetsVM;
 
@@ -22,12 +22,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
     private AssetRepository? _assetRepository;
     private UserConfigurationService? _userConfigurationService;
 
-    private Asset _asset1;
-    private Asset _asset2;
-    private Asset _asset3;
-    private Asset _asset4;
-    private Asset _asset5;
-    private Asset _asset6;
+    private Asset? _asset1;
+    private Asset? _asset2;
+    private Asset? _asset3;
+    private Asset? _asset4;
+    private Asset? _asset5;
+    private Asset? _asset6;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -55,10 +55,10 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             FileProperties = new()
             {
                 Size = 2020,
-                Creation = new (2010, 1, 1, 20, 20, 20, 20, 20),
-                Modification = new (2011, 1, 1, 20, 20, 20, 20, 20)
+                Creation = new(2010, 1, 1, 20, 20, 20, 20, 20),
+                Modification = new(2011, 1, 1, 20, 20, 20, 20, 20)
             },
-            ThumbnailCreationDateTime = new (2010, 1, 1, 20, 20, 20, 20, 20),
+            ThumbnailCreationDateTime = new(2010, 1, 1, 20, 20, 20, 20, 20),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -80,10 +80,10 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             FileProperties = new()
             {
                 Size = 2048,
-                Creation = new (2020, 6, 1),
-                Modification = new (2020, 7, 1)
+                Creation = new(2020, 6, 1),
+                Modification = new(2020, 7, 1)
             },
-            ThumbnailCreationDateTime = new (2020, 6, 1),
+            ThumbnailCreationDateTime = new(2020, 6, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -105,10 +105,10 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             FileProperties = new()
             {
                 Size = 2000,
-                Creation = new (2010, 1, 1),
-                Modification = new (2011, 1, 1)
+                Creation = new(2010, 1, 1),
+                Modification = new(2011, 1, 1)
             },
-            ThumbnailCreationDateTime = new (2010, 1, 1),
+            ThumbnailCreationDateTime = new(2010, 1, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -130,10 +130,10 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             FileProperties = new()
             {
                 Size = 2030,
-                Creation = new (2010, 8, 1),
-                Modification = new (2011, 9, 1)
+                Creation = new(2010, 8, 1),
+                Modification = new(2011, 9, 1)
             },
-            ThumbnailCreationDateTime = new (2010, 8, 1),
+            ThumbnailCreationDateTime = new(2010, 8, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -155,10 +155,10 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             FileProperties = new()
             {
                 Size = 2048,
-                Creation = new (2020, 6, 1),
-                Modification = new (2020, 7, 1)
+                Creation = new(2020, 6, 1),
+                Modification = new(2020, 7, 1)
             },
-            ThumbnailCreationDateTime = new (2020, 6, 1),
+            ThumbnailCreationDateTime = new(2020, 6, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -180,10 +180,10 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             FileProperties = new()
             {
                 Size = 2048,
-                Creation = new (2020, 6, 1),
-                Modification = new (2020, 7, 1)
+                Creation = new(2020, 6, 1),
+                Modification = new(2020, 7, 1)
             },
-            ThumbnailCreationDateTime = new (2020, 6, 1),
+            ThumbnailCreationDateTime = new(2020, 6, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -213,24 +213,24 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (database, storageServiceMock.Object, _userConfigurationService);
-        StorageService storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(database, storageServiceMock.Object, _userConfigurationService);
+        StorageService storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, _userConfigurationService);
-        PhotoManager.Application.Application application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
-        _findDuplicatedAssetsViewModel = new (application);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, _userConfigurationService);
+        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        _findDuplicatedAssetsViewModel = new(application);
     }
 
     [Test]
@@ -259,14 +259,14 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
             const string hash3 = Hashes.IMAGE_5_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+            _asset2 = _asset2!.WithFolder(folder3).WithHash(hash1);
 
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash2);
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
+            _asset6 = _asset6!.WithFolder(folder2).WithHash(hash2);
+            _asset3 = _asset3!.WithFolder(folder3).WithHash(hash2);
 
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash3);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash3);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash3);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
 
@@ -437,14 +437,14 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
             const string hash3 = Hashes.IMAGE_5_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+            _asset2 = _asset2!.WithFolder(folder3).WithHash(hash1);
 
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash2);
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
+            _asset6 = _asset6!.WithFolder(folder2).WithHash(hash2);
+            _asset3 = _asset3!.WithFolder(folder3).WithHash(hash2);
 
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash3);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash3);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash3);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
 
@@ -622,14 +622,14 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
             const string hash3 = Hashes.IMAGE_5_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+            _asset2 = _asset2!.WithFolder(folder3).WithHash(hash1);
 
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash2);
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
+            _asset6 = _asset6!.WithFolder(folder2).WithHash(hash2);
+            _asset3 = _asset3!.WithFolder(folder3).WithHash(hash2);
 
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash3);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash3);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash3);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash3);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset2], [_asset6, _asset3], [_asset4, _asset5]];
 
@@ -785,13 +785,13 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash1);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+            _asset2 = _asset2!.WithFolder(folder3).WithHash(hash1);
+            _asset6 = _asset6!.WithFolder(folder2).WithHash(hash1);
 
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash2);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+            _asset3 = _asset3!.WithFolder(folder3).WithHash(hash2);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset6], [_asset3, _asset4, _asset5]];
 
@@ -936,13 +936,13 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash1);
-            _asset6 = _asset6.WithFolder(folder2).WithHash(hash1);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+            _asset2 = _asset2!.WithFolder(folder3).WithHash(hash1);
+            _asset6 = _asset6!.WithFolder(folder2).WithHash(hash1);
 
-            _asset3 = _asset3.WithFolder(folder3).WithHash(hash2);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash2);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+            _asset3 = _asset3!.WithFolder(folder3).WithHash(hash2);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash2);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset6], [_asset3, _asset4, _asset5]];
 
@@ -1078,11 +1078,11 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset2 = _asset2!.WithFolder(folder3).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5]];
 
@@ -1196,11 +1196,11 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset2 = _asset2.WithFolder(folder3).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset2 = _asset2!.WithFolder(folder3).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset2, _asset3, _asset4, _asset5]];
 
@@ -1312,9 +1312,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
 
@@ -1408,9 +1408,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
 
@@ -1509,9 +1509,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
 
@@ -1610,9 +1610,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
 
@@ -1706,9 +1706,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
 
@@ -1807,9 +1807,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash);
+            _asset6 = _asset6!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset5, _asset6]];
 
@@ -1903,8 +1903,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3]];
 
@@ -1989,8 +1989,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3]];
 
@@ -2080,8 +2080,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3]];
 
@@ -2166,8 +2166,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3]];
 
@@ -2255,8 +2255,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset5 = _asset5.WithFolder(folder).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
+            _asset6 = _asset6!.WithFolder(folder).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset5, _asset6]];
 
@@ -2337,8 +2337,8 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset5 = _asset5.WithFolder(folder).WithHash(hash);
-            _asset6 = _asset6.WithFolder(folder).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
+            _asset6 = _asset6!.WithFolder(folder).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset5, _asset6]];
 
@@ -2421,9 +2421,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
 
@@ -2518,9 +2518,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
 
@@ -2617,9 +2617,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
 
@@ -2714,9 +2714,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4]];
 
@@ -2808,9 +2808,9 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             const string hash = Hashes.IMAGE_1_JPG;
 
-            _asset2 = _asset2.WithFolder(folder).WithHash(hash);
-            _asset4 = _asset4.WithFolder(folder).WithHash(hash);
-            _asset5 = _asset5.WithFolder(folder).WithHash(hash);
+            _asset2 = _asset2!.WithFolder(folder).WithHash(hash);
+            _asset4 = _asset4!.WithFolder(folder).WithHash(hash);
+            _asset5 = _asset5!.WithFolder(folder).WithHash(hash);
 
             List<List<Asset>> assetsSets = [[_asset2, _asset4, _asset5]];
 
@@ -2845,7 +2845,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             DuplicatedAssetViewModel unknownDuplicatedAssetViewModel = new()
             {
-                Asset = _asset1,
+                Asset = _asset1!,
                 ParentViewModel = unknownDuplicatedAssetSet
             };
             unknownDuplicatedAssetSet.Add(unknownDuplicatedAssetViewModel);
@@ -2906,7 +2906,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
             DuplicatedAssetViewModel duplicatedAssetViewModel = new()
             {
-                Asset = _asset1,
+                Asset = _asset1!,
                 ParentViewModel = duplicatedAssetSet
             };
             duplicatedAssetSet.Add(duplicatedAssetViewModel);
@@ -2964,12 +2964,12 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
 
-            _asset1 = _asset1.WithFolder(folder1).WithHash(hash1);
-            _asset3 = _asset3.WithFolder(folder2).WithHash(hash1);
-            _asset4 = _asset4.WithFolder(folder1).WithHash(hash1);
+            _asset1 = _asset1!.WithFolder(folder1).WithHash(hash1);
+            _asset3 = _asset3!.WithFolder(folder2).WithHash(hash1);
+            _asset4 = _asset4!.WithFolder(folder1).WithHash(hash1);
 
-            _asset2 = _asset2.WithFolder(folder2).WithHash(hash2);
-            _asset5 = _asset5.WithFolder(folder2).WithHash(hash2);
+            _asset2 = _asset2!.WithFolder(folder2).WithHash(hash2);
+            _asset5 = _asset5!.WithFolder(folder2).WithHash(hash2);
 
             List<List<Asset>> assetsSets = [[_asset1, _asset3, _asset4], [_asset2, _asset5]];
 
@@ -3107,7 +3107,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
         List<string> notifyPropertyChangedEvents = [];
         List<FindDuplicatedAssetsViewModel> findDuplicatedAssetsViewModelInstances = [];
 
-        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _findDuplicatedAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             findDuplicatedAssetsViewModelInstances.Add((FindDuplicatedAssetsViewModel)sender!);
@@ -3115,7 +3115,7 @@ public class FindDuplicatedAssetsViewModelGetDuplicatedAssetsTests
 
         List<MessageBoxInformationSentEventArgs> messagesInformationSent = [];
 
-        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate(object _, MessageBoxInformationSentEventArgs e)
+        _findDuplicatedAssetsViewModel!.MessageBoxInformationSent += delegate (object _, MessageBoxInformationSentEventArgs e)
         {
             messagesInformationSent.Add(e);
         };

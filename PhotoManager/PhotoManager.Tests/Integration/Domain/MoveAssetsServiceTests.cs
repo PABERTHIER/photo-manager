@@ -1,9 +1,9 @@
 ﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Domain;
 
@@ -41,13 +41,13 @@ public class MoveAssetsServiceTests
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
-        _storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        _assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
-        _moveAssetsService = new (_assetRepository, _storageService, _assetCreationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        _storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        _assetCreationService = new(_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
+        _moveAssetsService = new(_assetRepository, _storageService, _assetCreationService);
     }
 
     [Test]

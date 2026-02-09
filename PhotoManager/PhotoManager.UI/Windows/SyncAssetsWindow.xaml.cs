@@ -1,7 +1,7 @@
-﻿using PhotoManager.Domain;
+﻿using log4net;
+using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
-using log4net;
 using System;
 using System.Collections.ObjectModel;
 using System.Reflection;
@@ -40,7 +40,7 @@ namespace PhotoManager.UI.Windows
         private void Initialize()
         {
             SyncAssetsConfiguration configuration = ViewModel.GetProcessConfiguration();
-            ViewModel.Definitions = [..configuration.Definitions];
+            ViewModel.Definitions = [.. configuration.Definitions];
         }
 
         private void ContinueButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
