@@ -1,5 +1,5 @@
-﻿using Reactive = System.Reactive;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using Reactive = System.Reactive;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -31,9 +31,9 @@ public class AssetRepositoryWriteBackupTests
     [SetUp]
     public void SetUp()
     {
-        PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new(database, _storageServiceMock!.Object, userConfigurationService);
     }
 
     [Test]
@@ -74,9 +74,9 @@ public class AssetRepositoryWriteBackupTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.BACKUPS_TO_KEEP, "0"); // 0 backups, so that, the new created is directly deleted
 
-        PhotoManager.Infrastructure.Database.Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
-        AssetRepository assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
+        PhotoManager.Infrastructure.Database.Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        AssetRepository assetRepository = new(database, _storageServiceMock!.Object, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = assetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);

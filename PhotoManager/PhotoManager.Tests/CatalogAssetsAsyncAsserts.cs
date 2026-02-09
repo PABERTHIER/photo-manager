@@ -46,7 +46,7 @@ public static class CatalogAssetsAsyncAsserts
 
             Assert.That(File.Exists(blobFilePath), Is.True);
 
-            List<Asset> assetsFromRepositoryByFolder = [..assetsFromRepository.Where(x => x.FolderId == folder.Id)];
+            List<Asset> assetsFromRepositoryByFolder = [.. assetsFromRepository.Where(x => x.FolderId == folder.Id)];
 
             Dictionary<string, byte[]>? dataRead = blobStorage.ReadFromBinaryFile(blobFilePath);
             Assert.That(dataRead, Is.Not.Null);

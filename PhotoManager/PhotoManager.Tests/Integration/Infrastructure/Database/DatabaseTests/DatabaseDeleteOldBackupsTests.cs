@@ -18,13 +18,13 @@ public class DatabaseDeleteOldBackupsTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
     [Test]
@@ -47,11 +47,11 @@ public class DatabaseDeleteOldBackupsTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            bool backupCreated1 = _database!.WriteBackup(new (2023, 04, 04));
-            bool backupCreated2 = _database!.WriteBackup(new (2023, 03, 04));
-            bool backupCreated3 = _database!.WriteBackup(new (2023, 02, 04));
-            bool backupCreated4 = _database!.WriteBackup(new (2023, 01, 04));
-            bool backupCreated5 = _database!.WriteBackup(new (2023, 05, 04));
+            bool backupCreated1 = _database!.WriteBackup(new(2023, 04, 04));
+            bool backupCreated2 = _database!.WriteBackup(new(2023, 03, 04));
+            bool backupCreated3 = _database!.WriteBackup(new(2023, 02, 04));
+            bool backupCreated4 = _database!.WriteBackup(new(2023, 01, 04));
+            bool backupCreated5 = _database!.WriteBackup(new(2023, 05, 04));
 
             Assert.That(backupCreated1, Is.True);
             Assert.That(backupCreated2, Is.True);
@@ -97,9 +97,9 @@ public class DatabaseDeleteOldBackupsTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            bool backupCreated1 = _database!.WriteBackup(new (2023, 04, 04));
-            bool backupCreated2 = _database!.WriteBackup(new (2023, 03, 04));
-            bool backupCreated3 = _database!.WriteBackup(new (2023, 02, 04));
+            bool backupCreated1 = _database!.WriteBackup(new(2023, 04, 04));
+            bool backupCreated2 = _database!.WriteBackup(new(2023, 03, 04));
+            bool backupCreated3 = _database!.WriteBackup(new(2023, 02, 04));
 
             Assert.That(backupCreated1, Is.True);
             Assert.That(backupCreated2, Is.True);

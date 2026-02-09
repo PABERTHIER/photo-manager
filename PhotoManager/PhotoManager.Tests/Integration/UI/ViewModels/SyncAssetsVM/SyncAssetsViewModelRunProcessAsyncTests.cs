@@ -39,24 +39,24 @@ public class SyncAssetsViewModelRunProcessAsyncTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
-        _storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        _storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, _storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, _storageService, assetCreationService, userConfigurationService, assetsComparator);
-        _moveAssetsService = new (_assetRepository, _storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, _storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new (_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, userConfigurationService, _storageService);
-        _syncAssetsViewModel = new (application);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, _storageService, assetCreationService, userConfigurationService, assetsComparator);
+        _moveAssetsService = new(_assetRepository, _storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, _storageService, userConfigurationService);
+        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, userConfigurationService, _storageService);
+        _syncAssetsViewModel = new(application);
     }
 
     [Test]
@@ -2160,7 +2160,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
             Assert.That(fileNamesInDestination.Any(x => x == assetName3), Is.True);
             Assert.That(fileNamesInDestination.Any(x => x == assetName4), Is.True);
 
-            string [] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
+            string[] fileNamesInDestinationSubDirectory1 = _storageService!.GetFileNames(destinationSubDirectory1);
             Assert.That(fileNamesInDestinationSubDirectory1, Is.Empty);
 
             string[] fileNamesInDestinationSubDirectory2 = _storageService!.GetFileNames(destinationSubDirectory2);
@@ -3269,7 +3269,7 @@ public class SyncAssetsViewModelRunProcessAsyncTests
         List<string> notifyPropertyChangedEvents = [];
         List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
 
-        _syncAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _syncAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             syncAssetsViewModelInstances.Add((SyncAssetsViewModel)sender!);

@@ -2,10 +2,10 @@
 using FileSize = PhotoManager.Tests.Unit.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Unit.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Unit.Application;
 
@@ -85,7 +85,7 @@ public class ApplicationGetAssetsByPathTests
         Mock<IUserConfigurationService> userConfigurationServiceMock = new();
         Mock<IStorageService> storageServiceMock = new();
 
-        PhotoManager.Application.Application application = new (
+        PhotoManager.Application.Application application = new(
             assetRepositoryMock.Object,
             syncAssetsServiceMock.Object,
             catalogAssetsServiceMock.Object,
@@ -177,7 +177,7 @@ public class ApplicationGetAssetsByPathTests
         Mock<IUserConfigurationService> userConfigurationServiceMock = new();
         Mock<IStorageService> storageServiceMock = new();
 
-        PhotoManager.Application.Application application = new (
+        PhotoManager.Application.Application application = new(
             assetRepositoryMock.Object,
             syncAssetsServiceMock.Object,
             catalogAssetsServiceMock.Object,
@@ -218,7 +218,7 @@ public class ApplicationGetAssetsByPathTests
         Mock<IUserConfigurationService> userConfigurationServiceMock = new();
         Mock<IStorageService> storageServiceMock = new();
 
-        PhotoManager.Application.Application application = new (
+        PhotoManager.Application.Application application = new(
             assetRepositoryMock.Object,
             syncAssetsServiceMock.Object,
             catalogAssetsServiceMock.Object,

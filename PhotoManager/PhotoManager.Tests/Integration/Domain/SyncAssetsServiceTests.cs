@@ -37,15 +37,15 @@ public class SyncAssetsServiceTests
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
-        _storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        _storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        _moveAssetsService = new (_assetRepository, _storageService, assetCreationService);
-        _syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        _moveAssetsService = new(_assetRepository, _storageService, assetCreationService);
+        _syncAssetsService = new(_assetRepository, _storageService, assetsComparator, _moveAssetsService);
     }
 
     [Test]

@@ -39,23 +39,23 @@ public class ApplicationSyncAssetsAsyncTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
-        _storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        _storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, _storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        _moveAssetsService = new (_assetRepository, _storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, _storageService, _userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, _storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, _storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        _moveAssetsService = new(_assetRepository, _storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, _storageService, _userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, _storageService);
     }
 
     [Test]

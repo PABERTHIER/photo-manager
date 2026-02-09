@@ -1,7 +1,7 @@
 ﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
-using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 
 namespace PhotoManager.Tests.Unit.Infrastructure;
 
@@ -21,8 +21,8 @@ public class StorageServiceTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new (configurationRootMock.Object);
-        _storageService = new (_userConfigurationService);
+        _userConfigurationService = new(configurationRootMock.Object);
+        _storageService = new(_userConfigurationService);
     }
 
     [Test]

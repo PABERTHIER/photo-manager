@@ -10,7 +10,7 @@ public static class ImageHelper
         bool isHeic = invalidImagePath.EndsWith(".heic", StringComparison.OrdinalIgnoreCase);
 
         // Open the new file in binary mode
-        using (FileStream fileStream = new (invalidImagePath, FileMode.Open, FileAccess.ReadWrite))
+        using (FileStream fileStream = new(invalidImagePath, FileMode.Open, FileAccess.ReadWrite))
         {
             if (isHeic)
             {

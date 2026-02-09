@@ -164,14 +164,14 @@ public static class Constants
 
     public static class ModificationDate
     {
-        public static readonly DateTime Default = new (2024, 06, 07, 08, 54, 37);
+        public static readonly DateTime Default = new(2024, 06, 07, 08, 54, 37);
     }
 
     public static class Hashes
     {
         public const string HOMER_GIF = "c48b1f61f3a3a004f425d8493d30a50ae14408ed4c5354bf4d0ca40069f91951381a7df32ee7455a6edef0996c95571557a9993021331ff2dfbc3ccc7f0c8ff1";
-        public const string IMAGE_1_JPG =             "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
-        public const string IMAGE_1_90_DEG_JPG =             "0092081bd0a83e9253f4eb319b4cfab197a09ed3b28b5697c31f17bf2646638dec95bf28d4f454dda8ff3dcdaab33fa002774f13dfe6d7aee82f1a960e3e3aee";
+        public const string IMAGE_1_JPG = "1fafae17c3c5c38d1205449eebdb9f5976814a5e54ec5797270c8ec467fe6d6d1190255cbaac11d9057c4b2697d90bc7116a46ed90c5ffb71e32e569c3b47fb9";
+        public const string IMAGE_1_90_DEG_JPG = "0092081bd0a83e9253f4eb319b4cfab197a09ed3b28b5697c31f17bf2646638dec95bf28d4f454dda8ff3dcdaab33fa002774f13dfe6d7aee82f1a960e3e3aee";
         public const string IMAGE_1_180_DEG_JPG = "399383d82d4b7ed8233f714a1d14272b276b80505d7b3a2935b6ec962fd5cf280ccedb3e9380df1a11ee65e5f5fa66278dd2f407b7b6bdfa3093319164c446dd";
         public const string IMAGE_1_270_DEG_JPG = "43950e06cecd509509d868a2064a828aeb6ff6a9a30f296ec9a3621b269742e75dacb40300aa6927c4c8f0879268e1ab3d7eac228b38cade35cc9b7c6adf3449";
         public const string IMAGE_2_JPG = "0b6d010f85544871c307bb3a96028402f55fa29094908cdd0f74a8ec8d3fc3d4fbec995d98b89aafef3dcf5581c018fbb50481e33c7e45aef552d66c922f4078";
@@ -193,7 +193,7 @@ public static class Constants
 
         public const int LENGTH = 128; // SHA-512 generates a 128-character long hash in hexadecimal representation
     }
-    
+
     public static class DHashes
     {
         public const string HOMER_GIF = "00000000000000";

@@ -22,10 +22,10 @@ public static class HashingHelper
     // Performances are decreased by 6 times with CalculatePHash
     public static string? CalculatePHash(string filePath)
     {
-        MagickImage image = new (filePath);
+        MagickImage image = new(filePath);
 
         // Resize the image
-        MagickGeometry geometry = new (32, 32);
+        MagickGeometry geometry = new(32, 32);
         image.Resize(geometry);
 
         // Convert the image to grayscale
@@ -37,7 +37,7 @@ public static class HashingHelper
         return phash;
     }
 
-    // For Gif or some heic file it returns "00000000000000"
+    // For GIF or some heic file it returns "00000000000000"
     public static string CalculateDHash(string? filePath)
     {
         bool isHeicFile = filePath?.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) ?? false;

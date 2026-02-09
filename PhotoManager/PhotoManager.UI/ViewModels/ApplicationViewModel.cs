@@ -217,7 +217,7 @@ public class ApplicationViewModel : BaseViewModel
             }
         }
 
-        _observableAssets = [..filteredAssets];
+        _observableAssets = [.. filteredAssets];
 
         if (_observableAssets.Count == 0)
         {

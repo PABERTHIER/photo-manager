@@ -172,7 +172,7 @@ public partial class FolderNavigationControl
             item.Items.Clear();
 
             Folder[] folders = ViewModel.ApplicationViewModel.GetSubFolders((Folder)item.Tag);
-            folders = [..folders.OrderBy(f => f.Name)];
+            folders = [.. folders.OrderBy(f => f.Name)];
 
             foreach (Folder folder in folders)
             {

@@ -1,15 +1,15 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
-using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
 using MD5Hashes = PhotoManager.Tests.Integration.Constants.MD5Hashes;
-using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Application.FindDuplicatedAssets;
 
@@ -181,23 +181,23 @@ public class ApplicationGetDuplicatedAssetsTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
     }
 
     [Test]
@@ -221,7 +221,7 @@ public class ApplicationGetDuplicatedAssetsTests
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
             const string hash3 = Hashes._1336_JPG;
 
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
@@ -293,7 +293,7 @@ public class ApplicationGetDuplicatedAssetsTests
             const string dHash6 = DHashes._1336_LEFT_PART_JPG;
             const string dHash7 = DHashes._1336_RIGHT_PART_JPG;
 
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
@@ -403,7 +403,7 @@ public class ApplicationGetDuplicatedAssetsTests
             const string mD5Hash2 = MD5Hashes.IMAGE_9_PNG;
             const string mD5Hash3 = MD5Hashes._1336_JPG;
 
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
@@ -471,7 +471,7 @@ public class ApplicationGetDuplicatedAssetsTests
             const string pHash2 = PHashes.IMAGE_9_PNG;
             const string pHash3 = PHashes._1336_JPG;
 
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
@@ -532,23 +532,23 @@ public class ApplicationGetDuplicatedAssetsTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
         configurationRootMock.MockGetValue(UserConfigurationKeys.DETECT_THUMBNAILS, "true");
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
 
         try
         {
@@ -567,7 +567,7 @@ public class ApplicationGetDuplicatedAssetsTests
             const string pHash4First = PHashes._1336_1_K_JPG;
             const string pHash4Second = PHashes._1336_2_K_JPG;
 
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 
@@ -641,7 +641,7 @@ public class ApplicationGetDuplicatedAssetsTests
             string duplicatesResolutionDirectory = Path.Combine(duplicatesDirectory, Directories.RESOLUTION);
             string duplicatesThumbnailDirectory = Path.Combine(duplicatesDirectory, Directories.THUMBNAIL);
 
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             List<List<Asset>> duplicatedAssets = _application!.GetDuplicatedAssets();
 

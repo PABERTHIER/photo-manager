@@ -1,5 +1,5 @@
-﻿using Reactive = System.Reactive;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using Reactive = System.Reactive;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -32,9 +32,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
     }
 
     [Test]

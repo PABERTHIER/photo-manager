@@ -36,24 +36,24 @@ public class SyncAssetsViewModelTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        AssetRepository assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        AssetRepository assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _syncAssetsViewModel = new (application);
+        CatalogAssetsService catalogAssetsService = new(assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, storageService, userConfigurationService);
+        PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _syncAssetsViewModel = new(application);
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class SyncAssetsViewModelTests
             [
                 new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
                 new() { SourceDirectory = @"\\MyServer\Images", DestinationDirectory = @"C:\Images" },
-                new() 
+                new()
                 {
                     SourceDirectory = @"C:\Folder\Screenshots",
                     DestinationDirectory = @"C:\Images\Folder3",
@@ -114,7 +114,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(3));
 
@@ -161,7 +161,7 @@ public class SyncAssetsViewModelTests
             [
                 new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
                 new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
-                new() 
+                new()
                 {
                     SourceDirectory = @"C:\Folder\Screenshots",
                     DestinationDirectory = @"C:\Images\Folder3",
@@ -170,7 +170,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel!.Definitions, Has.Count.EqualTo(3));
 
@@ -215,7 +215,7 @@ public class SyncAssetsViewModelTests
 
             List<SyncAssetsDirectoriesDefinition> definitions = [];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel!.Definitions, Is.Empty);
 
@@ -326,7 +326,7 @@ public class SyncAssetsViewModelTests
 
             List<SyncAssetsDirectoriesDefinition> definitionsAfterThirdDeletion = [];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -429,7 +429,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -513,7 +513,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(2));
 
@@ -568,7 +568,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -641,7 +641,7 @@ public class SyncAssetsViewModelTests
                 new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -720,7 +720,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -793,7 +793,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -866,7 +866,7 @@ public class SyncAssetsViewModelTests
                 new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -939,7 +939,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -991,7 +991,7 @@ public class SyncAssetsViewModelTests
                 new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
@@ -1041,11 +1041,11 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveUpDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2"});
+            _syncAssetsViewModel!.MoveUpDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" });
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -1090,11 +1090,11 @@ public class SyncAssetsViewModelTests
 
             List<SyncAssetsDirectoriesDefinition> definitions = [];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
-            _syncAssetsViewModel!.MoveUpDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2"});
+            _syncAssetsViewModel!.MoveUpDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" });
 
             Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
@@ -1170,7 +1170,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -1243,7 +1243,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -1316,7 +1316,7 @@ public class SyncAssetsViewModelTests
                 new() { SourceDirectory = @"C:\Tutu\Screenshots", DestinationDirectory = @"C:\Images\Tutu" }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -1389,7 +1389,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -1462,7 +1462,7 @@ public class SyncAssetsViewModelTests
                 new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" },
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -1514,7 +1514,7 @@ public class SyncAssetsViewModelTests
                 new() { SourceDirectory = @"C:\Toto\Screenshots", DestinationDirectory = @"C:\Images\Screenshots" }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(1));
 
@@ -1564,11 +1564,11 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
-            _syncAssetsViewModel!.MoveDownDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2"});
+            _syncAssetsViewModel!.MoveDownDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" });
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -1613,11 +1613,11 @@ public class SyncAssetsViewModelTests
 
             List<SyncAssetsDirectoriesDefinition> definitions = [];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
-            _syncAssetsViewModel!.MoveDownDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2"});
+            _syncAssetsViewModel!.MoveDownDefinition(new() { SourceDirectory = @"C:\Toto\Screenshots1", DestinationDirectory = @"C:\Toto\Screenshots2" });
 
             Assert.That(_syncAssetsViewModel.Definitions, Is.Empty);
 
@@ -1693,7 +1693,7 @@ public class SyncAssetsViewModelTests
                 }
             ];
 
-            _syncAssetsViewModel!.Definitions = [..definitions];
+            _syncAssetsViewModel!.Definitions = [.. definitions];
 
             Assert.That(_syncAssetsViewModel.Definitions, Has.Count.EqualTo(3));
 
@@ -1734,7 +1734,7 @@ public class SyncAssetsViewModelTests
         List<string> notifyPropertyChangedEvents = [];
         List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
 
-        _syncAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _syncAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             syncAssetsViewModelInstances.Add((SyncAssetsViewModel)sender!);

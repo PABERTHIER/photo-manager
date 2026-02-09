@@ -32,23 +32,23 @@ public class AboutWindowTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.PROJECT_NAME, projectName);
         configurationRootMock.MockGetValue(UserConfigurationKeys.PROJECT_OWNER, projectOwner);
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        AssetRepository assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        AssetRepository assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, storageService, userConfigurationService);
-        _application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, storageService, userConfigurationService);
+        _application = new(assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class AboutWindowTests
     {
         ConfigureApplication(_dataDirectory!, expectedProjectName, expectedProjectOwner);
 
-        AssemblyName assemblyName = new ("TestAssemblyWithoutProductAttribute");
+        AssemblyName assemblyName = new("TestAssemblyWithoutProductAttribute");
         AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
         try

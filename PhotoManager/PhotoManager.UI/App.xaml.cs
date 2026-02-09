@@ -22,7 +22,7 @@ namespace PhotoManager.UI;
 public partial class App
 {
     private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-    private static readonly Mutex AppMutex = new (true, "PhotoManagerStartup");
+    private static readonly Mutex AppMutex = new(true, "PhotoManagerStartup");
 
     private readonly ServiceProvider _serviceProvider;
 

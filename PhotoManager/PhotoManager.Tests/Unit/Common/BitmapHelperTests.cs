@@ -1,7 +1,7 @@
 ﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
-using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 
 namespace PhotoManager.Tests.Unit.Common;
 
@@ -340,7 +340,7 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
-    
+
         BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
 
         Assert.That(image, Is.Not.Null);
@@ -840,7 +840,7 @@ public class BitmapHelperTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
 
@@ -918,7 +918,7 @@ public class BitmapHelperTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
 
@@ -996,7 +996,7 @@ public class BitmapHelperTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
 

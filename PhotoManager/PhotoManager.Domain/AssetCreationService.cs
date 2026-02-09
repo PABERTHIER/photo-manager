@@ -83,7 +83,7 @@ public class AssetCreationService(
             return null;
         }
 
-        ushort exifOrientation = userConfigurationService.AssetSettings.DefaultExifOrientation; // GetExifOrientation is not handled by Gif
+        ushort exifOrientation = userConfigurationService.AssetSettings.DefaultExifOrientation; // GetExifOrientation is not handled by GIF
         (Rotation rotation, bool isAssetCorrupted, bool isAssetRotated) = GetRotationAndCorruptionInfo(exifOrientation);
         BitmapImage originalImage = storageService.LoadBitmapOriginalImage(imageBytes, rotation);
         (int originalDecodeWidth, int originalDecodeHeight) = GetOriginalDecodeLengths(originalImage);
@@ -96,7 +96,7 @@ public class AssetCreationService(
             directoryName,
             imageBytes,
             rotation,
-            isAssetCorrupted, 
+            isAssetCorrupted,
             isAssetRotated,
             originalDecodeWidth,
             originalDecodeHeight,
@@ -221,7 +221,7 @@ public class AssetCreationService(
             Pixel = new()
             {
                 Asset = new() { Width = originalDecodeWidth, Height = originalDecodeHeight },
-                Thumbnail = new() { Width = thumbnailDecodeWidth, Height = thumbnailDecodeHeight}
+                Thumbnail = new() { Width = thumbnailDecodeWidth, Height = thumbnailDecodeHeight }
             },
             ImageRotation = rotation,
             ThumbnailCreationDateTime = DateTime.Now,

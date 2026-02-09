@@ -1,16 +1,16 @@
-﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
+using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
-using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
-using MD5Hashes = PhotoManager.Tests.Integration.Constants.MD5Hashes;
-using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
 using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
+using MD5Hashes = PhotoManager.Tests.Integration.Constants.MD5Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using PHashes = PhotoManager.Tests.Integration.Constants.PHashes;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Domain;
 
@@ -37,7 +37,7 @@ public class AssetCreationServiceTests
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
     private void ConfigureAssetCreationService(int thumbnailMaxWidth, int thumbnailMaxHeight, bool usingDHash, bool usingMD5Hash, bool usingPHash, bool analyseVideos)
@@ -52,11 +52,11 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
-        _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
-        StorageService storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        _assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        _userConfigurationService = new(configurationRootMock.Object);
+        _testableAssetRepository = new(_database!, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        _assetCreationService = new(_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
     }
 
     [Test]
@@ -1402,7 +1402,7 @@ public class AssetCreationServiceTests
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
 
-            FileNotFoundException fileNotFoundException = new ($"The file {Path.Combine(directoryName, assetName)} does not exist.");
+            FileNotFoundException fileNotFoundException = new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
             Type typeOfService = typeof(AssetCreationService);
 
@@ -1445,7 +1445,7 @@ public class AssetCreationServiceTests
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
 
-            FileNotFoundException fileNotFoundException = new ($"The file {Path.Combine(directoryName, assetName)} does not exist.");
+            FileNotFoundException fileNotFoundException = new($"The file {Path.Combine(directoryName, assetName)} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
             Type typeOfService = typeof(AssetCreationService);
 
@@ -1517,7 +1517,7 @@ public class AssetCreationServiceTests
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
 
-            FileNotFoundException fileNotFoundException = new ($"The file {imagePath} does not exist.");
+            FileNotFoundException fileNotFoundException = new($"The file {imagePath} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
             Type typeOfService = typeof(AssetCreationService);
 
@@ -1559,7 +1559,7 @@ public class AssetCreationServiceTests
             Assert.That(assetsFromRepository, Is.Empty);
             Assert.That(thumbnails, Is.Empty);
 
-            FileNotFoundException fileNotFoundException = new ($"The file {_dataDirectory} does not exist.");
+            FileNotFoundException fileNotFoundException = new($"The file {_dataDirectory} does not exist.");
             Exception[] expectedExceptions = [fileNotFoundException];
             Type typeOfService = typeof(AssetCreationService);
 
@@ -1686,11 +1686,11 @@ public class AssetCreationServiceTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, "true");
         configurationRootMock.MockGetValue(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME, "TempForVideo");
 
-        _userConfigurationService = new (configurationRootMock.Object);
-        _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
-        StorageService storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        _assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        _userConfigurationService = new(configurationRootMock.Object);
+        _testableAssetRepository = new(_database!, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        _assetCreationService = new(_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
 
         string firstFrameVideosPath = _userConfigurationService!.PathSettings.FirstFrameVideosPath;
 

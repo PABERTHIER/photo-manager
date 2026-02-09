@@ -18,7 +18,7 @@ public class SortableObservableCollectionTests
     {
         List<int> items = [3, 1, 2];
 
-        SortableObservableCollection<int> collection = [..items];
+        SortableObservableCollection<int> collection = [.. items];
 
         Assert.That(collection, Is.EqualTo(items));
     }
@@ -37,7 +37,7 @@ public class SortableObservableCollectionTests
 
         collection.Sort(Comparer<int>.Default);
 
-        Assert.That(collection, Is.EqualTo([1, 2, 3 ]));
+        Assert.That(collection, Is.EqualTo([1, 2, 3]));
         Assert.That(eventRaised, Is.True);
     }
 

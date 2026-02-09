@@ -2,10 +2,10 @@
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure;
 
@@ -26,8 +26,8 @@ public class StorageServiceTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
 
-        _userConfigurationService = new (configurationRootMock.Object);
-        _storageService = new (_userConfigurationService);
+        _userConfigurationService = new(configurationRootMock.Object);
+        _storageService = new(_userConfigurationService);
     }
 
     [Test]
@@ -244,7 +244,7 @@ public class StorageServiceTests
     [Test]
     public void GetExifOrientation_InvalidFormat_ReturnsCorruptedOrientationValue()
     {
-        Bitmap image = new (10, 10);
+        Bitmap image = new(10, 10);
 
         using (MemoryStream ms = new())
         {
@@ -317,7 +317,7 @@ public class StorageServiceTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetJpegBitmapImage(image);
 
@@ -395,7 +395,7 @@ public class StorageServiceTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetPngBitmapImage(image);
 
@@ -473,7 +473,7 @@ public class StorageServiceTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetGifBitmapImage(image);
 
@@ -1333,8 +1333,8 @@ public class StorageServiceTests
             configurationRootMock.GetDefaultMockConfig();
             configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
 
-            UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
-            StorageService storageService = new (userConfigurationService);
+            UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+            StorageService storageService = new(userConfigurationService);
 
             int totalFilesCount = storageService.GetTotalFilesCount();
             Assert.That(totalFilesCount, Is.EqualTo(0));

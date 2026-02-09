@@ -49,7 +49,7 @@ public class UserConfigurationServiceTests
     [Test]
     public void GetAboutInformation_WithAssemblyWithoutProductAttribute_ReturnsDefaultProduct()
     {
-        AssemblyName assemblyName = new ("TestAssemblyWithoutProductAttribute");
+        AssemblyName assemblyName = new("TestAssemblyWithoutProductAttribute");
         AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
         AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(assemblyBuilder);

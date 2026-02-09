@@ -1,5 +1,5 @@
-﻿using Reactive = System.Reactive;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+using Reactive = System.Reactive;
 
 namespace PhotoManager.Tests.Integration.Application;
 
@@ -35,23 +35,23 @@ public class ApplicationGetSubFoldersTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (database, _storageServiceMock!.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(database, _storageServiceMock!.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, storageService, userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class ApplicationGetSubFoldersTests
             string childFolderPath2 = Path.Combine(parentFolderPath3, Directories.SAMPLE_2);
             string childFolderPath3 = Path.Combine(parentFolderPath3, Directories.SAMPLE_3);
 
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             Folder? parentFolder1 = _assetRepository!.GetFolderByPath(parentFolderPath1);
             Folder? parentFolder2 = _assetRepository!.GetFolderByPath(parentFolderPath2);

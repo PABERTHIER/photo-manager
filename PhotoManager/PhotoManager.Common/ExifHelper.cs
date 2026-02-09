@@ -16,7 +16,7 @@ public static class ExifHelper
     {
         try
         {
-            using (MemoryStream stream = new (buffer))
+            using (MemoryStream stream = new(buffer))
             {
                 BitmapFrame bitmapFrame = BitmapFrame.Create(stream);
 
@@ -56,12 +56,12 @@ public static class ExifHelper
     {
         try
         {
-            using (MemoryStream stream = new (buffer))
+            using (MemoryStream stream = new(buffer))
             {
                 MagickReadSettings settings = new();
                 settings.SetDefine(MagickFormat.Heic, "preserve-orientation", true);
 
-                using (MagickImage image = new (stream, settings))
+                using (MagickImage image = new(stream, settings))
                 {
                     // image.Orientation contain the value from the exif data -> image.GetAttribute("exif:Orientation")
                     return GetMagickHeicOrientation(image.Orientation, corruptedImageOrientation);
@@ -106,7 +106,7 @@ public static class ExifHelper
     {
         try
         {
-            using (MemoryStream ms = new (imageData))
+            using (MemoryStream ms = new(imageData))
             {
                 BitmapFrame.Create(ms);
             }
@@ -124,7 +124,7 @@ public static class ExifHelper
     {
         try
         {
-            using (MemoryStream ms = new (imageData))
+            using (MemoryStream ms = new(imageData))
             {
                 using (new MagickImage(ms))
                 {

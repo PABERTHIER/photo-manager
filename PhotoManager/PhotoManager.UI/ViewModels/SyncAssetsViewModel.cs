@@ -50,6 +50,6 @@ public class SyncAssetsViewModel(IApplication application) : BaseProcessViewMode
     public override async Task RunProcessAsync(ProcessStatusChangedCallback callback)
     {
         List<SyncAssetsResult> results = await application.SyncAssetsAsync(callback);
-        Results = [..results];
+        Results = [.. results];
     }
 }

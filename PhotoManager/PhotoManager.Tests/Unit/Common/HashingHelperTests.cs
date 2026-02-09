@@ -1,8 +1,8 @@
 ﻿using ImageMagick;
+using DHashes = PhotoManager.Tests.Unit.Constants.DHashes;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
-using DHashes = PhotoManager.Tests.Unit.Constants.DHashes;
 using MD5Hashes = PhotoManager.Tests.Unit.Constants.MD5Hashes;
 using PHashes = PhotoManager.Tests.Unit.Constants.PHashes;
 

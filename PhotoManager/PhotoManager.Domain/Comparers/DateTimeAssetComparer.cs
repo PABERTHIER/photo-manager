@@ -4,7 +4,7 @@ public class DateTimeAssetComparer(bool ascending, Func<Asset, DateTime> dateTim
 {
     public int Compare(Asset? asset1, Asset? asset2)
     {
-        LongAssetComparer comparer = new (ascending, asset => dateTimeSelector(asset).Ticks / TimeSpan.TicksPerSecond);
+        LongAssetComparer comparer = new(ascending, asset => dateTimeSelector(asset).Ticks / TimeSpan.TicksPerSecond);
 
         return comparer.Compare(asset1, asset2);
     }

@@ -1,13 +1,13 @@
-﻿using Reactive = System.Reactive;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using Reactive = System.Reactive;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -44,9 +44,9 @@ public class AssetRepositoryAddAssetTests
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _testableAssetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _testableAssetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
 
         _asset1 = new()
         {
@@ -154,7 +154,7 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_FolderDoesNotExist_AssetIsAddedAndAssetsUpdatedIsUpdated()
+    public void AddAsset_FolderDoesNotExist_AssetIsAddedAndFolderIsAddedAndAssetsUpdatedIsUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -194,6 +194,11 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
             Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
             Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
+
+            Folder? folder = _testableAssetRepository!.GetFolderByPath(folderPath);
+            Assert.That(folder, Is.Not.Null);
+            Assert.That(folder.Path, Is.EqualTo(folderPath));
+            Assert.That(folder.Name, Is.EqualTo("NewFolder"));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -309,8 +314,8 @@ public class AssetRepositoryAddAssetTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
-        TestableAssetRepository testableAssetRepository = new (_database!, _storageServiceMock!.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        TestableAssetRepository testableAssetRepository = new(_database!, _storageServiceMock!.Object, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -344,7 +349,7 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_FolderAndThumbnailsDoNotExist_AssetIsAddedAndAssetsUpdatedIsUpdated()
+    public void AddAsset_FolderAndThumbnailsDoNotExist_AssetIsAddedAndFolderIsAddedAndAssetsUpdatedIsUpdated()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -374,6 +379,11 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails[_asset1!.Folder.Path], Has.Count.EqualTo(1));
             Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(assetData));
+
+            Folder? folderFromRepository = _testableAssetRepository!.GetFolderByPath(folderPath);
+            Assert.That(folderFromRepository, Is.Not.Null);
+            Assert.That(folderFromRepository.Path, Is.EqualTo(folderPath));
+            Assert.That(folderFromRepository.Name, Is.EqualTo("NewFolder"));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

@@ -1,13 +1,13 @@
-﻿using Reactive = System.Reactive;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using Reactive = System.Reactive;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -46,9 +46,9 @@ public class AssetRepositoryGetAssetsByPathTests
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        _testableAssetRepository = new (_database, _storageServiceMock!.Object, userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        _testableAssetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
 
         _asset1 = new()
         {
@@ -216,8 +216,8 @@ public class AssetRepositoryGetAssetsByPathTests
         storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
 
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        TestableAssetRepository testableAssetRepository = new (_database!, storageService.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        TestableAssetRepository testableAssetRepository = new(_database!, storageService.Object, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -663,8 +663,8 @@ public class AssetRepositoryGetAssetsByPathTests
         storageService.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageService.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
 
-        UserConfigurationService userConfigurationService = new (_configurationRootMock!.Object);
-        TestableAssetRepository testableAssetRepository = new (_database!, storageService.Object, userConfigurationService);
+        UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
+        TestableAssetRepository testableAssetRepository = new(_database!, storageService.Object, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);

@@ -8,7 +8,7 @@ public class StringAssetComparer(bool ascending, Func<Asset, string> stringSelec
         {
             throw new ArgumentNullException(asset1 == null ? nameof(asset1) : nameof(asset2));
         }
-        
+
         int result = string.Compare(stringSelector(asset1), stringSelector(asset2), StringComparison.Ordinal);
 
         return ascending ? result : -result;

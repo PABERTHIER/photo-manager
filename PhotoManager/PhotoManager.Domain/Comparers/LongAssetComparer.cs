@@ -8,12 +8,12 @@ public class LongAssetComparer(bool ascending, Func<Asset, long> longSelector) :
         {
             throw new ArgumentNullException(asset1 == null ? nameof(asset1) : nameof(asset2));
         }
-        
+
         int result = longSelector(asset1).CompareTo(longSelector(asset2));
 
         if (result == 0)
         {
-            StringAssetComparer comparer = new (ascending, asset => asset.FileName);
+            StringAssetComparer comparer = new(ascending, asset => asset.FileName);
             return comparer.Compare(asset1, asset2);
         }
 
