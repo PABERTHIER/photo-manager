@@ -1,7 +1,6 @@
 ﻿using log4net;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
-using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -88,13 +87,13 @@ public partial class ViewerUserControl
 
             BitmapImage source = isHeic ? ViewModel.LoadBitmapHeicImageFromPath() : ViewModel.LoadBitmapImageFromPath();
 
-            image.Source = source;
-            backgroundImage.Source = source;
+            Image.Source = source;
+            BackgroundImage.Source = source;
         }
         else
         {
-            image.Source = null;
-            backgroundImage.Source = null;
+            Image.Source = null;
+            BackgroundImage.Source = null;
         }
     }
 }

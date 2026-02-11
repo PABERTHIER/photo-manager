@@ -1,8 +1,6 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.UI.Models;
-using System;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;

@@ -3,8 +3,6 @@ using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels;
-using System;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,7 +37,7 @@ public partial class FolderNavigationControl
     {
         try
         {
-            foldersTreeView.Items.Clear();
+            FoldersTreeView.Items.Clear();
             Folder[] rootFolders = ViewModel.ApplicationViewModel.GetRootCatalogFolders();
 
             foreach (Folder folder in rootFolders)
@@ -52,7 +50,7 @@ public partial class FolderNavigationControl
 
                 item.Items.Add(_placeholderNode);
                 item.Expanded += Item_Expanded;
-                foldersTreeView.Items.Add(item);
+                FoldersTreeView.Items.Add(item);
             }
 
             GoToFolder(SelectedPath);
@@ -127,7 +125,7 @@ public partial class FolderNavigationControl
 
     private void GoToFolder(string folderFullPath)
     {
-        foreach (object? item in foldersTreeView.Items)
+        foreach (object? item in FoldersTreeView.Items)
         {
             TreeViewItem treeViewItem = (TreeViewItem)item;
 

@@ -23,7 +23,7 @@ public class VisibilityConverterTests
         object value = new SomeOtherType();
         object? parameter = null;
 
-        object result = visibilityConverter.Convert(value, typeof(Visibility), parameter!, CultureInfo.InvariantCulture);
+        object? result = visibilityConverter.Convert(value, typeof(Visibility), parameter!, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(Visibility.Visible));
     }
@@ -49,11 +49,7 @@ public class VisibilityConverterTests
         Assert.That(exception?.Message, Is.EqualTo("The method or operation is not implemented."));
     }
 
-    private class NamedObject
-    {
-    }
+    private class NamedObject;
 
-    private class SomeOtherType
-    {
-    }
+    private class SomeOtherType;
 }

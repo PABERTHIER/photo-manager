@@ -1,12 +1,11 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class SyncAssetsViewModel(IApplication application) : BaseProcessViewModel<SyncAssetsConfiguration, SyncAssetsResult>
+public class SyncAssetsViewModel(IApplication application)
+    : BaseProcessViewModel<SyncAssetsConfiguration, SyncAssetsResult>
 {
     private ObservableCollection<SyncAssetsDirectoriesDefinition> _definitions = [];
 
@@ -45,7 +44,8 @@ public class SyncAssetsViewModel(IApplication application) : BaseProcessViewMode
 
     public override SyncAssetsConfiguration GetProcessConfiguration() => application.GetSyncAssetsConfiguration();
 
-    public override void SetProcessConfiguration(SyncAssetsConfiguration configuration) => application.SetSyncAssetsConfiguration(configuration);
+    public override void SetProcessConfiguration(SyncAssetsConfiguration configuration) =>
+        application.SetSyncAssetsConfiguration(configuration);
 
     public override async Task RunProcessAsync(ProcessStatusChangedCallback callback)
     {
