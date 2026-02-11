@@ -3,10 +3,10 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - '**'
+      - "**"
   pull_request:
     branches:
-      - '*'
+      - "*"
 
 jobs:
   build-windows:
@@ -36,12 +36,12 @@ jobs:
           Write-Host "Installing HEIF Image Extensions..."
           # The package ID 9PMMSR1CGPWG corresponds to "HEIF Image Extensions" from Microsoft
           winget install --id 9PMMSR1CGPWG --exact --silent --accept-package-agreements --accept-source-agreements
-          
+
           Write-Host "Installing HEVC Video Extensions..."
           # The HEVC codec has been downloaded from Microsoft Store via store.rg-adguard.net
           # The package ID 9N4WGH0Z6VHQ corresponds to "HEVC Video Extensions from Device Manufacturer" from Microsoft
           Add-AppxPackage -Path "${{ github.workspace }}/.github/codecs/hevc.AppxBundle"
-          
+
           # Give codecs time to register
           Write-Host "Waiting for codecs to register..."
           Start-Sleep -Seconds 5
@@ -68,10 +68,9 @@ jobs:
       - name: 🔨 Build
         run: dotnet build --no-restore --configuration Release ${{ env.PROJECT_NAME }}
 
-      # TODO: Fix the current errors to use it
       # Step 7: Run linting process
-      # - name: 🔨 Lint
-      #   run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
+      - name: 🔨 Lint
+        run: dotnet format ${{ env.PROJECT_NAME }} --severity warn --verify-no-changes
 
       # Step 8: Run tests and generate code coverage report
       - name: 🔨 Test with Coverage

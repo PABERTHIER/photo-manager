@@ -246,7 +246,7 @@ dotnet_diagnostic.CA1861.severity = warning
 # CA2208: Instantiate argument exceptions correctly
 dotnet_diagnostic.CA2208.severity = none
 
-# TODO: Enable it when lint fixed
+# TODO: Enable it later because it generates lots of warnings (need to configure some additional rules)
 # dotnet_analyzer_diagnostic.category-Style.severity = warning
 
 # NUnit2045: Use Assert.Multiple
