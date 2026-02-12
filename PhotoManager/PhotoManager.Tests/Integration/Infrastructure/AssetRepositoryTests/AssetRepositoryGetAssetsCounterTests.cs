@@ -142,7 +142,7 @@ public class AssetRepositoryGetAssetsCounterTests
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
             int assetsCounter = _assetRepository.GetAssetsCounter();
-            Assert.That(assetsCounter, Is.EqualTo(0));
+            Assert.That(assetsCounter, Is.Zero);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -198,7 +198,7 @@ public class AssetRepositoryGetAssetsCounterTests
         {
             int assetsCounter = _assetRepository!.GetAssetsCounter();
 
-            Assert.That(assetsCounter, Is.EqualTo(0));
+            Assert.That(assetsCounter, Is.Zero);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }

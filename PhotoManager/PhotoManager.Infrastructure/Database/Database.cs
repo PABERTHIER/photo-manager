@@ -1,33 +1,17 @@
 ﻿namespace PhotoManager.Infrastructure.Database;
 
-public class Database : IDatabase
+public class Database(IObjectListStorage objectListStorage, IBlobStorage blobStorage, IBackupStorage backupStorage)
+    : IDatabase
 {
     private const string DATA_FILE_FORMAT = "{0}.db";
 
-    public string DataDirectory { get; private set; }
+    public string DataDirectory { get; private set; } = string.Empty;
     public char Separator { get; private set; }
-    public Diagnostics Diagnostics { get; private set; }
-    protected string TablesDirectory { get; private set; }
-    protected string BlobsDirectory { get; private set; }
-    protected string BackupsDirectory { get; private set; }
-    protected Dictionary<string, DataTableProperties> DataTablePropertiesDictionary { get; private set; }
-
-    private readonly IObjectListStorage _objectListStorage;
-    private readonly IBlobStorage _blobStorage;
-    private readonly IBackupStorage _backupStorage;
-
-    public Database(IObjectListStorage objectListStorage, IBlobStorage blobStorage, IBackupStorage backupStorage)
-    {
-        _objectListStorage = objectListStorage;
-        _blobStorage = blobStorage;
-        _backupStorage = backupStorage;
-        DataDirectory = string.Empty;
-        TablesDirectory = string.Empty;
-        BlobsDirectory = string.Empty;
-        BackupsDirectory = string.Empty;
-        Diagnostics = new Diagnostics();
-        DataTablePropertiesDictionary = [];
-    }
+    public Diagnostics Diagnostics { get; private set; } = new();
+    protected string TablesDirectory { get; private set; } = string.Empty;
+    protected string BlobsDirectory { get; private set; } = string.Empty;
+    protected string BackupsDirectory { get; private set; } = string.Empty;
+    protected Dictionary<string, DataTableProperties> DataTablePropertiesDictionary { get; private set; } = [];
 
     public void Initialize(string dataDirectory, char separator, string tablesFolderName, string blobsFolderName)
     {
@@ -54,10 +38,12 @@ public class Database : IDatabase
 
         if (dataTableProperties.ColumnProperties.Any(c => string.IsNullOrWhiteSpace(c.ColumnName)))
         {
-            throw new ArgumentNullException(nameof(ColumnProperties.ColumnName), "All column properties should have a ColumnName");
+            throw new ArgumentNullException(nameof(ColumnProperties.ColumnName),
+                "All column properties should have a ColumnName");
         }
 
-        IGrouping<string, ColumnProperties>? group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName).FirstOrDefault(g => g.Count() > 1);
+        IGrouping<string, ColumnProperties>? group = dataTableProperties.ColumnProperties.GroupBy(c => c.ColumnName)
+            .FirstOrDefault(g => g.Count() > 1);
 
         if (group != null)
         {
@@ -74,16 +60,16 @@ public class Database : IDatabase
             string dataFilePath = ResolveTableFilePath(tableName);
             Diagnostics = new Diagnostics { LastReadFilePath = dataFilePath };
             DataTableProperties? properties = GetDataTableProperties(tableName);
-            _objectListStorage.Initialize(properties, Separator);
-            return _objectListStorage.ReadObjectList(dataFilePath, mapObjectFromCsvFields, Diagnostics);
+            objectListStorage.Initialize(properties, Separator);
+            return objectListStorage.ReadObjectList(dataFilePath, mapObjectFromCsvFields, Diagnostics);
         }
         catch (Exception ex)
         {
             throw new ArgumentException($"Error while trying to read data table {tableName}.\n" +
-                $"DataDirectory: {DataDirectory}\n" +
-                $"Separator: {Separator}\n" +
-                $"LastReadFilePath: {Diagnostics.LastReadFilePath}\n" +
-                $"LastReadFileRaw: {Diagnostics.LastReadFileRaw}",
+                                        $"DataDirectory: {DataDirectory}\n" +
+                                        $"Separator: {Separator}\n" +
+                                        $"LastReadFilePath: {Diagnostics.LastReadFilePath}\n" +
+                                        $"LastReadFileRaw: {Diagnostics.LastReadFileRaw}",
                 ex);
         }
     }
@@ -103,22 +89,25 @@ public class Database : IDatabase
         string dataFilePath = ResolveTableFilePath(tableName);
         Diagnostics = new Diagnostics { LastWriteFilePath = dataFilePath };
         DataTableProperties? properties = GetDataTableProperties(tableName);
-        _objectListStorage.Initialize(properties, Separator);
-        _objectListStorage.WriteObjectList(dataFilePath, list, mapCsvFieldIndexToCsvField, Diagnostics);
+        objectListStorage.Initialize(properties, Separator);
+        objectListStorage.WriteObjectList(dataFilePath, list, mapCsvFieldIndexToCsvField, Diagnostics);
     }
 
-    public Dictionary<string, byte[]>? ReadBlob(string blobName) // Key is imageName (string), value is the binary file -> image data (byte[])
+    public Dictionary<string, byte[]>?
+        ReadBlob(string blobName) // Key is imageName (string), value is the binary file -> image data (byte[])
     {
         string blobFilePath = ResolveBlobFilePath(blobName);
         Diagnostics = new Diagnostics { LastReadFilePath = blobFilePath };
-        return _blobStorage.ReadFromBinaryFile(blobFilePath);
+        return blobStorage.ReadFromBinaryFile(blobFilePath);
     }
 
-    public void WriteBlob(Dictionary<string, byte[]> blob, string blobName) // One Blob per folder, Key is imageName (string), value is the binary file -> image data (byte[])
+    public void
+        WriteBlob(Dictionary<string, byte[]> blob,
+            string blobName) // One Blob per folder, Key is imageName (string), value is the binary file -> image data (byte[])
     {
         string blobFilePath = ResolveBlobFilePath(blobName);
         Diagnostics = new Diagnostics { LastWriteFilePath = blobFilePath, LastWriteFileRaw = blob };
-        _blobStorage.WriteToBinaryFile(blob, blobFilePath);
+        blobStorage.WriteToBinaryFile(blob, blobFilePath);
     }
 
     // TODO: This method verifies if the folder has its .bin generated, but not if there are data in it or not
@@ -144,7 +133,7 @@ public class Database : IDatabase
         }
 
         Diagnostics = new Diagnostics { LastWriteFilePath = backupFilePath };
-        _backupStorage.WriteFolderToZipFile(DataDirectory, backupFilePath);
+        backupStorage.WriteFolderToZipFile(DataDirectory, backupFilePath);
 
         return true;
     }
@@ -157,13 +146,13 @@ public class Database : IDatabase
 
     public void DeleteOldBackups(ushort backupsToKeep)
     {
-        string[] filesPaths = _backupStorage.GetBackupFilesPaths(BackupsDirectory);
+        string[] filesPaths = backupStorage.GetBackupFilesPaths(BackupsDirectory);
         filesPaths = [.. filesPaths.OrderBy(f => f)];
         List<string> deletedBackupFilePaths = [];
 
         for (int i = 0; i < filesPaths.Length - backupsToKeep; i++)
         {
-            _backupStorage.DeleteBackupFile(filesPaths[i]);
+            backupStorage.DeleteBackupFile(filesPaths[i]);
             deletedBackupFilePaths.Add(filesPaths[i]);
         }
 
@@ -180,8 +169,7 @@ public class Database : IDatabase
 
     private DataTableProperties? GetDataTableProperties(string tableName)
     {
-        return DataTablePropertiesDictionary.ContainsKey(tableName) ?
-            DataTablePropertiesDictionary[tableName] : null;
+        return DataTablePropertiesDictionary.ContainsKey(tableName) ? DataTablePropertiesDictionary[tableName] : null;
     }
 
     private string GetTablesDirectory(string tablesFolderName)

@@ -4,11 +4,11 @@ namespace PhotoManager.Domain.Interfaces;
 
 public interface IUserConfigurationService
 {
-    public AssetSettings AssetSettings { get; }
-    public HashSettings HashSettings { get; }
-    public PathSettings PathSettings { get; }
-    public ProjectSettings ProjectSettings { get; }
-    public StorageSettings StorageSettings { get; }
+    AssetSettings AssetSettings { get; }
+    HashSettings HashSettings { get; }
+    PathSettings PathSettings { get; }
+    ProjectSettings ProjectSettings { get; }
+    StorageSettings StorageSettings { get; }
 
     AboutInformation GetAboutInformation(Assembly assembly);
     string[] GetRootCatalogFolderPaths();

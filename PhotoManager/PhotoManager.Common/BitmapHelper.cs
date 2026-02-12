@@ -280,20 +280,14 @@ public static class BitmapHelper
 
     private static void MagickImageApplyRotation(MagickImage magickImage, Rotation rotation, bool isClockwise)
     {
-        int rotationAngle = 0;
 
-        switch (rotation)
+        int rotationAngle = rotation switch
         {
-            case Rotation.Rotate90:
-                rotationAngle = isClockwise ? 90 : -90;
-                break;
-            case Rotation.Rotate180:
-                rotationAngle = isClockwise ? 180 : -180;
-                break;
-            case Rotation.Rotate270:
-                rotationAngle = isClockwise ? 270 : -270;
-                break;
-        }
+            Rotation.Rotate90 => isClockwise ? 90 : -90,
+            Rotation.Rotate180 => isClockwise ? 180 : -180,
+            Rotation.Rotate270 => isClockwise ? 270 : -270,
+            _ => 0
+        };
 
         if (rotationAngle != 0)
         {
