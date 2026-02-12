@@ -7,29 +7,25 @@ namespace PhotoManager.UI.ViewModels;
 
 public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewModel
 {
-    private List<DuplicatedSetViewModel> _duplicatedAssetSets = [];
-    private int _duplicatedAssetSetsPosition;
-    private int _duplicatedAssetPosition;
-
     public event MessageBoxInformationSentEventHandler? MessageBoxInformationSent;
 
     public List<DuplicatedSetViewModel> DuplicatedAssetSets
     {
-        get => _duplicatedAssetSets;
+        get;
         private set
         {
-            _duplicatedAssetSets = value;
+            field = value;
             NotifyPropertyChanged(nameof(DuplicatedAssetSets));
             DuplicatedAssetSetsPosition = 0;
         }
-    }
+    } = [];
 
     public int DuplicatedAssetSetsPosition
     {
-        get => _duplicatedAssetSetsPosition;
+        get;
         set
         {
-            _duplicatedAssetSetsPosition = value;
+            field = value;
             NotifyPropertyChanged(nameof(DuplicatedAssetSetsPosition), nameof(CurrentDuplicatedAssetSet));
             ResetDuplicatedAssetPosition();
         }
@@ -37,10 +33,10 @@ public class FindDuplicatedAssetsViewModel(IApplication application) : BaseViewM
 
     public int DuplicatedAssetPosition
     {
-        get => _duplicatedAssetPosition;
+        get;
         set
         {
-            _duplicatedAssetPosition = value;
+            field = value;
 
             if (CurrentDuplicatedAsset is { Asset.ImageData: null })
             {

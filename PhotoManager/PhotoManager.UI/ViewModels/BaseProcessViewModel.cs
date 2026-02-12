@@ -7,9 +7,6 @@ namespace PhotoManager.UI.ViewModels;
 
 public abstract class BaseProcessViewModel<TC, TR> : BaseViewModel
 {
-    private ProcessStep _step = ProcessStep.ViewDescription;
-    private ObservableCollection<TR> _results = [];
-
     public abstract string Description { get; }
 
     public abstract TC GetProcessConfiguration();
@@ -22,22 +19,22 @@ public abstract class BaseProcessViewModel<TC, TR> : BaseViewModel
 
     public ObservableCollection<TR> Results
     {
-        get => _results;
+        get;
         set
         {
-            _results = value;
+            field = value;
             NotifyPropertyChanged(nameof(Results));
             NotifyPropertyChanged(nameof(CanViewResults));
         }
-    }
+    } = [];
 
     public ProcessStep Step
     {
-        get => _step;
+        get;
 
         private set
         {
-            _step = value;
+            field = value;
             NotifyPropertyChanged(
                 nameof(Step),
                 nameof(DescriptionVisible),
@@ -46,7 +43,7 @@ public abstract class BaseProcessViewModel<TC, TR> : BaseViewModel
                 nameof(ResultsVisible),
                 nameof(CanConfigure));
         }
-    }
+    } = ProcessStep.ViewDescription;
 
     public Visibility DescriptionVisible =>
         Step == ProcessStep.ViewDescription ? Visibility.Visible : Visibility.Hidden;

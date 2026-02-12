@@ -7,8 +7,6 @@ namespace PhotoManager.UI.ViewModels;
 public class SyncAssetsViewModel(IApplication application)
     : BaseProcessViewModel<SyncAssetsConfiguration, SyncAssetsResult>
 {
-    private ObservableCollection<SyncAssetsDirectoriesDefinition> _definitions = [];
-
     public override string Description => "This process allows to sync new assets to the catalog. " +
                                           "You can configure one or multiple sync operations by entering a source path and a destination path. " +
                                           "You can specify if the sync operation should also include sub-folders. " +
@@ -16,13 +14,13 @@ public class SyncAssetsViewModel(IApplication application)
 
     public ObservableCollection<SyncAssetsDirectoriesDefinition> Definitions
     {
-        get => _definitions;
+        get;
         set
         {
-            _definitions = value;
+            field = value;
             NotifyPropertyChanged(nameof(Definitions));
         }
-    }
+    } = [];
 
     public void DeleteDefinition(SyncAssetsDirectoriesDefinition definition)
     {
