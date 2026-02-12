@@ -1,7 +1,6 @@
 ﻿using PhotoManager.Domain;
 using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace PhotoManager.UI.ViewModels;
@@ -49,7 +48,8 @@ public abstract class BaseProcessViewModel<TC, TR> : BaseViewModel
         }
     }
 
-    public Visibility DescriptionVisible => Step == ProcessStep.ViewDescription ? Visibility.Visible : Visibility.Hidden;
+    public Visibility DescriptionVisible =>
+        Step == ProcessStep.ViewDescription ? Visibility.Visible : Visibility.Hidden;
 
     public Visibility ConfigurationVisible => Step == ProcessStep.Configure ? Visibility.Visible : Visibility.Hidden;
 

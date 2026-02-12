@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -9,7 +9,7 @@ public class VisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return value.GetType().Name == "NamedObject" ? Visibility.Hidden : Visibility.Visible;
+        return value?.GetType().Name == "NamedObject" ? Visibility.Hidden : Visibility.Visible;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

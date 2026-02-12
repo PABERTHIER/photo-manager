@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 using System.Globalization;
 using System.Windows.Data;
 
@@ -25,29 +25,29 @@ public class FileSizeConverter : IValueConverter
         else
         {
             decimal bytes = fileSize;
-            decimal decimal_value;
+            decimal decimalValue;
             string unit;
 
-            bool sizeInKb = (fileSize >= ONE_KILOBYTE && fileSize < ONE_MEGABYTE && fileSize < ONE_GIGABYTE);
-            bool sizeInMb = (fileSize >= ONE_MEGABYTE && fileSize < ONE_GIGABYTE);
+            bool sizeInKb = fileSize < ONE_MEGABYTE; // The initial condition already checked values lower than Kb
+            bool sizeInMb = fileSize < ONE_GIGABYTE;
 
             if (sizeInKb)
             {
-                decimal_value = bytes / ONE_KILOBYTE;
+                decimalValue = bytes / ONE_KILOBYTE;
                 unit = KILOBYTE_UNIT;
             }
-            else if (!sizeInKb && sizeInMb)
+            else if (sizeInMb)
             {
-                decimal_value = bytes / ONE_MEGABYTE;
+                decimalValue = bytes / ONE_MEGABYTE;
                 unit = MEGABYTE_UNIT;
             }
             else
             {
-                decimal_value = bytes / ONE_GIGABYTE;
+                decimalValue = bytes / ONE_GIGABYTE;
                 unit = GIGABYTE_UNIT;
             }
 
-            result = decimal_value.ToString("0.0", culture) + " " + unit;
+            result = decimalValue.ToString("0.0", culture) + " " + unit;
         }
 
         return result;

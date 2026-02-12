@@ -24,7 +24,7 @@ public class FileSizeConverterTests
         FileSizeConverter fileSizeConverter = new();
         object? parameter = null;
 
-        string result = (string)fileSizeConverter.Convert(size, typeof(long), parameter!, CultureInfo.InvariantCulture);
+        string? result = (string?)fileSizeConverter.Convert(size, typeof(long), parameter!, CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(expected));
     }
 
@@ -35,7 +35,7 @@ public class FileSizeConverterTests
         string? input = null;
         object? parameter = null;
 
-        object result = fileSizeConverter.Convert(input!, typeof(long), parameter!, CultureInfo.InvariantCulture);
+        object? result = fileSizeConverter.Convert(input!, typeof(long), parameter!, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo("0 bytes"));
     }
@@ -47,7 +47,7 @@ public class FileSizeConverterTests
         const string input = "12345";
         object? parameter = null;
 
-        object result = fileSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        object? result = fileSizeConverter.Convert(input, typeof(string), parameter!, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo("12.1 KB"));
     }

@@ -3,12 +3,7 @@ using PhotoManager.Domain;
 using PhotoManager.Domain.Comparers;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -308,7 +303,9 @@ public class ApplicationViewModel : BaseViewModel
     {
         _previousSortCriteria = SortCriteria;
         SortCriteria = newSortCriteria;
-        SortAscending = (SortCriteria != _previousSortCriteria) || !SortAscending; // To change ascending order when clicking on the same criteria
+        SortAscending =
+            (SortCriteria != _previousSortCriteria) ||
+            !SortAscending; // To change ascending order when clicking on the same criteria
         SortAssets();
     }
 
@@ -366,7 +363,8 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) => await _application.CatalogAssetsAsync(callback, token);
+    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) =>
+        await _application.CatalogAssetsAsync(callback, token);
 
     public ushort GetCatalogCooldownMinutes() => _application.GetCatalogCooldownMinutes();
 
@@ -428,9 +426,12 @@ public class ApplicationViewModel : BaseViewModel
         {
             SortCriteria.FileName => new StringAssetComparer(SortAscending, asset => asset.FileName),
             SortCriteria.FileSize => new LongAssetComparer(SortAscending, asset => asset.FileProperties.Size),
-            SortCriteria.FileCreationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.FileProperties.Creation),
-            SortCriteria.FileModificationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.FileProperties.Modification),
-            SortCriteria.ThumbnailCreationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.ThumbnailCreationDateTime),
+            SortCriteria.FileCreationDateTime => new DateTimeAssetComparer(SortAscending,
+                asset => asset.FileProperties.Creation),
+            SortCriteria.FileModificationDateTime => new DateTimeAssetComparer(SortAscending,
+                asset => asset.FileProperties.Modification),
+            SortCriteria.ThumbnailCreationDateTime => new DateTimeAssetComparer(SortAscending,
+                asset => asset.ThumbnailCreationDateTime),
             _ => throw new ArgumentOutOfRangeException(nameof(SortCriteria), "Unknown sort criteria")
         };
 
@@ -463,8 +464,8 @@ public class ApplicationViewModel : BaseViewModel
 
     private void UpdateAsset(Asset asset)
     {
-        Asset? updatedAsset = _observableAssets.FirstOrDefault(
-            a => string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
+        Asset? updatedAsset = _observableAssets.FirstOrDefault(a =>
+            string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
 
         if (updatedAsset != null)
         {
@@ -481,5 +482,6 @@ public class ApplicationViewModel : BaseViewModel
 
     private void AddFolder(Folder folder) => FolderAdded?.Invoke(this, new FolderAddedEventArgs { Folder = folder });
 
-    private void RemoveFolder(Folder folder) => FolderRemoved?.Invoke(this, new FolderRemovedEventArgs { Folder = folder });
+    private void RemoveFolder(Folder folder) =>
+        FolderRemoved?.Invoke(this, new FolderRemovedEventArgs { Folder = folder });
 }

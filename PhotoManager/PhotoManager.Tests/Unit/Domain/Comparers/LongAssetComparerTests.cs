@@ -403,7 +403,7 @@ public class LongAssetComparerTests
 
         Asset? asset1 = null;
 
-        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(asset1, _asset2));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(asset1, _asset2));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'asset1')"));
         Assert.That(exception?.ParamName, Is.EqualTo(nameof(asset1)));
@@ -418,7 +418,7 @@ public class LongAssetComparerTests
 
         Asset? asset2 = null;
 
-        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(_asset1, asset2));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(_asset1, asset2));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'asset2')"));
         Assert.That(exception?.ParamName, Is.EqualTo(nameof(asset2)));

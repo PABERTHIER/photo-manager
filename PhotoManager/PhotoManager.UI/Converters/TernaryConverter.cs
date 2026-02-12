@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows.Data;
 
 namespace PhotoManager.UI.Converters;
@@ -16,4 +15,3 @@ public class TernaryConverter : IMultiValueConverter
         throw new NotImplementedException();
     }
 }
-

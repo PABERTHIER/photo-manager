@@ -4,10 +4,10 @@ public static class RecentPathsConfigs
 {
     public static ColumnProperties[] ConfigureDataTable()
     {
-        return new ColumnProperties[]
-        {
-            new ColumnProperties { ColumnName = "Path" }
-        };
+        return
+        [
+            new() { ColumnName = "Path" }
+        ];
     }
 
     public static string ReadFunc(string[] values)

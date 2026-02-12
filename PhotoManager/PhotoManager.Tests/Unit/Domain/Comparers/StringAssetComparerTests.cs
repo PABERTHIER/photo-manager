@@ -714,7 +714,7 @@ public class StringAssetComparerTests
         StringAssetComparer comparer = new(ascending, asset => asset.FileName);
         Asset? asset1 = null;
 
-        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(asset1, _asset8));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(asset1, _asset8));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'asset1')"));
         Assert.That(exception?.ParamName, Is.EqualTo(nameof(asset1)));
@@ -728,7 +728,7 @@ public class StringAssetComparerTests
         StringAssetComparer comparer = new(ascending, asset => asset.FileName);
         Asset? asset2 = null;
 
-        ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(_asset1, asset2!));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _ = comparer.Compare(_asset1, asset2!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'asset2')"));
         Assert.That(exception?.ParamName, Is.EqualTo(nameof(asset2)));

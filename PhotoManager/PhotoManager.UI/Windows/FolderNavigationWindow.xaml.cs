@@ -1,7 +1,6 @@
 ﻿using log4net;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
-using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -23,7 +22,7 @@ public partial class FolderNavigationWindow
             InitializeComponent();
 
             DataContext = viewModel;
-            folderTreeView.SelectedPath = viewModel.LastSelectedFolder != null
+            FolderTreeView.SelectedPath = viewModel.LastSelectedFolder != null
                 ? viewModel.LastSelectedFolder.Path
                 : viewModel.SourceFolder.Path;
         }
@@ -37,7 +36,7 @@ public partial class FolderNavigationWindow
 
     private void FolderTreeView_FolderSelected(object sender, EventArgs e)
     {
-        ViewModel.TargetPath = folderTreeView.SelectedPath;
+        ViewModel.TargetPath = FolderTreeView.SelectedPath;
     }
 
     private void Confirm_MouseLeftButtonDown(object sender, RoutedEventArgs e)

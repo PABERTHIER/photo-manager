@@ -29,7 +29,8 @@ public class StorageServiceTests
     [TestCase("1.0", "v1.0")]
     [TestCase("1.1", "v1.1")]
     [TestCase("2.0", "v2.0")]
-    public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(string storageVersion, string storageVersionPath)
+    public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(string storageVersion,
+        string storageVersionPath)
     {
         string expected = Path.Combine(_userConfigurationService!.PathSettings.BackupPath, storageVersionPath);
 
@@ -62,7 +63,8 @@ public class StorageServiceTests
     // [TestCase(null, 100, null)]
     // [TestCase(null, null, 100)]
     // [TestCase(null, null, null)]
-    public void LoadBitmapThumbnailImage_ValidBufferAndRotationAndWidthAndHeight_ReturnsBitmapImage(Rotation rotation, int width, int height)
+    public void LoadBitmapThumbnailImage_ValidBufferAndRotationAndWidthAndHeight_ReturnsBitmapImage(Rotation rotation,
+        int width, int height)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -83,7 +85,8 @@ public class StorageServiceTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        OverflowException? exception = Assert.Throws<OverflowException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000));
+        OverflowException? exception = Assert.Throws<OverflowException>(() =>
+            _storageService!.LoadBitmapThumbnailImage(buffer, Rotation.Rotate0, 1000000, 1000000));
 
         Assert.That(exception?.Message, Is.EqualTo("The image data generated an overflow during processing."));
     }
@@ -95,7 +98,8 @@ public class StorageServiceTests
         byte[]? buffer = null;
         const Rotation rotation = Rotation.Rotate90;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _storageService!.LoadBitmapThumbnailImage(buffer!, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
@@ -107,9 +111,11 @@ public class StorageServiceTests
         byte[] buffer = [];
         const Rotation rotation = Rotation.Rotate90;
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() =>
+            _storageService!.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -119,9 +125,11 @@ public class StorageServiceTests
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
         const Rotation rotation = Rotation.Rotate90;
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() =>
+            _storageService!.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -132,7 +140,8 @@ public class StorageServiceTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = (Rotation)999;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+            _storageService!.LoadBitmapThumbnailImage(buffer, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
@@ -175,7 +184,8 @@ public class StorageServiceTests
     // [TestCase(100, null, 100, 56)]
     // [TestCase(null, 100, 177, 100)]
     // [TestCase(null, null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
-    public void LoadBitmapThumbnailImageAssetRepository_ValidBufferAndWidthAndHeight_ReturnsBitmapImage(int width, int height, int expectedWidth, int expectedHeight)
+    public void LoadBitmapThumbnailImageAssetRepository_ValidBufferAndWidthAndHeight_ReturnsBitmapImage(int width,
+        int height, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -200,7 +210,8 @@ public class StorageServiceTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
 
-        OverflowException? exception = Assert.Throws<OverflowException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, 1000000, 1000000));
+        OverflowException? exception =
+            Assert.Throws<OverflowException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, 1000000, 1000000));
 
         Assert.That(exception?.Message, Is.EqualTo("The image data generated an overflow during processing."));
     }
@@ -211,7 +222,8 @@ public class StorageServiceTests
     {
         byte[]? buffer = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadBitmapThumbnailImage(buffer!, 100, 100));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => _storageService!.LoadBitmapThumbnailImage(buffer!, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
@@ -222,9 +234,11 @@ public class StorageServiceTests
     {
         byte[] buffer = [];
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, 100, 100));
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -233,9 +247,11 @@ public class StorageServiceTests
     {
         byte[] buffer = [];
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, 100, 100));
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapThumbnailImage(buffer, 100, 100));
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     // TODO: Migrate from MagickImage to BitmapImage ?
@@ -266,7 +282,8 @@ public class StorageServiceTests
     [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
-    public void LoadBitmapOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int expectedPixelWidth, int expectedPixelHeight)
+    public void LoadBitmapOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation,
+        int expectedPixelWidth, int expectedPixelHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -291,7 +308,8 @@ public class StorageServiceTests
         byte[]? buffer = null;
         const Rotation rotation = Rotation.Rotate90;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadBitmapOriginalImage(buffer!, rotation));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => _storageService!.LoadBitmapOriginalImage(buffer!, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
@@ -303,9 +321,11 @@ public class StorageServiceTests
         byte[] buffer = [];
         const Rotation rotation = Rotation.Rotate90;
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapOriginalImage(buffer, rotation));
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapOriginalImage(buffer, rotation));
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -315,9 +335,11 @@ public class StorageServiceTests
         byte[] buffer = [0x00, 0x01, 0x02, 0x03];
         const Rotation rotation = Rotation.Rotate90;
 
-        NotSupportedException? exception = Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapOriginalImage(buffer, rotation));
+        NotSupportedException? exception =
+            Assert.Throws<NotSupportedException>(() => _storageService!.LoadBitmapOriginalImage(buffer, rotation));
 
-        Assert.That(exception?.Message, Is.EqualTo("No imaging component suitable to complete this operation was found."));
+        Assert.That(exception?.Message,
+            Is.EqualTo("No imaging component suitable to complete this operation was found."));
     }
 
     [Test]
@@ -328,7 +350,8 @@ public class StorageServiceTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = (Rotation)999;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapOriginalImage(buffer, rotation));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapOriginalImage(buffer, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
@@ -347,7 +370,8 @@ public class StorageServiceTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Not.Null);
         Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+        Assert.That(image.Width,
+            Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
         Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
         Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
         Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
@@ -362,7 +386,8 @@ public class StorageServiceTests
     [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
     [TestCase(Rotation.Rotate270, PixelHeightAsset.IMAGE_1_JPG, PixelWidthAsset.IMAGE_1_JPG)]
     // [TestCase(null, PixelWidthAsset.IMAGE_1_JPG, PixelHeightAsset.IMAGE_1_JPG)]
-    public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith, int expectedHeight)
+    public void LoadBitmapImageFromPath_ValidRotationAndPath_ReturnsBitmapImage(Rotation rotation, int expectedWith,
+        int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
 
@@ -418,7 +443,8 @@ public class StorageServiceTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_1_JPG);
         const Rotation rotation = (Rotation)999;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapImageFromPath(filePath, rotation));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapImageFromPath(filePath, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
@@ -436,7 +462,8 @@ public class StorageServiceTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
         Assert.That(image.Rotation, Is.EqualTo(rotation));
-        Assert.That(image.Width, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
+        Assert.That(image.Width,
+            Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC)); // Wrong width (getting the height value instead)
         Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
         Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
         Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
@@ -446,12 +473,17 @@ public class StorageServiceTests
 
     [Test]
     [Category("From CatalogAssetsService for CreateAsset() to get the originalImage for HEIC")]
-    [TestCase(FileNames.IMAGE_11_HEIC, Rotation.Rotate0, Rotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, Rotation.Rotate90, PixelHeightAsset.IMAGE_11_HEIC, PixelWidthAsset.IMAGE_11_HEIC)]
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, Rotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, Rotation.Rotate270, PixelHeightAsset.IMAGE_11_HEIC, PixelWidthAsset.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_HEIC, Rotation.Rotate0, Rotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC,
+        PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, Rotation.Rotate90, PixelHeightAsset.IMAGE_11_HEIC,
+        PixelWidthAsset.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, Rotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC,
+        PixelHeightAsset.IMAGE_11_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, Rotation.Rotate270, PixelHeightAsset.IMAGE_11_HEIC,
+        PixelWidthAsset.IMAGE_11_HEIC)]
     // [TestCase(FileNames.IMAGE_11_HEIC, null, Rotation.Rotate0, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    public void LoadBitmapHeicOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(string fileName, Rotation rotation, Rotation expectedRotation, int expectedPixelWidth, int expectedPixelHeight)
+    public void LoadBitmapHeicOriginalImage_ValidBufferAndRotation_ReturnsBitmapImage(string fileName,
+        Rotation rotation, Rotation expectedRotation, int expectedPixelWidth, int expectedPixelHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -476,7 +508,8 @@ public class StorageServiceTests
         byte[]? buffer = null;
         const Rotation rotation = Rotation.Rotate90;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadBitmapHeicOriginalImage(buffer!, rotation));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => _storageService!.LoadBitmapHeicOriginalImage(buffer!, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
@@ -488,7 +521,8 @@ public class StorageServiceTests
         byte[] buffer = [];
         const Rotation rotation = Rotation.Rotate90;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicOriginalImage(buffer, rotation));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicOriginalImage(buffer, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
     }
@@ -517,7 +551,8 @@ public class StorageServiceTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = (Rotation)999;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicOriginalImage(buffer, rotation));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicOriginalImage(buffer, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
@@ -542,7 +577,8 @@ public class StorageServiceTests
     // [TestCase(null, 100, null, Rotation.Rotate0, 100, 133)]
     // [TestCase(null, null, 100, Rotation.Rotate0, 75, 100)]
     // [TestCase(null, null, null, Rotation.Rotate0, 1, 1)]
-    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int width, int height, Rotation expectedRotation, int expectedWidth, int expectedHeight)
+    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotation_ReturnsBitmapImage(Rotation rotation, int width,
+        int height, Rotation expectedRotation, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -565,7 +601,8 @@ public class StorageServiceTests
     [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, 100, 100, Rotation.Rotate90, 100, 75)]
     [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, 100, 100, Rotation.Rotate180, 75, 100)]
     [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, 100, 100, Rotation.Rotate270, 100, 75)]
-    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName, Rotation rotation, int width, int height, Rotation expectedRotation, int expectedWidth, int expectedHeight)
+    public void LoadBitmapHeicThumbnailImage_ValidBufferAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName,
+        Rotation rotation, int width, int height, Rotation expectedRotation, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -587,7 +624,8 @@ public class StorageServiceTests
     [Category("From CatalogAssetsService for CreateAsset() to get the thumbnailImage for HEIC")]
     [TestCase(-100, 100, 100, 133)]
     [TestCase(100, -100, 75, 100)]
-    public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height, int expectedWidth, int expectedHeight)
+    public void LoadBitmapHeicThumbnailImage_InvalidWidthOrHeightOrBoth_ThrowsArgumentException(int width, int height,
+        int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
@@ -646,7 +684,8 @@ public class StorageServiceTests
         byte[]? buffer = null;
         const Rotation rotation = Rotation.Rotate90;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => _storageService!.LoadBitmapHeicThumbnailImage(buffer!, rotation, 100, 100));
+        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() =>
+            _storageService!.LoadBitmapHeicThumbnailImage(buffer!, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'buffer')"));
     }
@@ -658,7 +697,8 @@ public class StorageServiceTests
         byte[] buffer = [];
         const Rotation rotation = Rotation.Rotate90;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+            _storageService!.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be empty. (Parameter 'stream')"));
     }
@@ -687,7 +727,8 @@ public class StorageServiceTests
         byte[] buffer = File.ReadAllBytes(filePath);
         const Rotation rotation = (Rotation)999;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
+        ArgumentException? exception = Assert.Throws<ArgumentException>(() =>
+            _storageService!.LoadBitmapHeicThumbnailImage(buffer, rotation, 100, 100));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
@@ -699,7 +740,8 @@ public class StorageServiceTests
     [TestCase(Rotation.Rotate180, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     [TestCase(Rotation.Rotate270, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
     // [TestCase(null, PixelWidthAsset.IMAGE_11_HEIC, PixelHeightAsset.IMAGE_11_HEIC)]
-    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(Rotation rotation, int expectedWidth, int expectedHeight)
+    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotationAndNotRotatedImage_ReturnsBitmapImage(
+        Rotation rotation, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
 
@@ -718,10 +760,14 @@ public class StorageServiceTests
 
     [Test]
     [Category("From ShowImage() in ViewerUserControl to open the image in fullscreen mode for Heic")]
-    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, PixelWidthAsset.IMAGE_11_90_DEG_HEIC, PixelHeightAsset.IMAGE_11_90_DEG_HEIC)]
-    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, PixelWidthAsset.IMAGE_11_180_DEG_HEIC, PixelHeightAsset.IMAGE_11_180_DEG_HEIC)]
-    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC, PixelHeightAsset.IMAGE_11_270_DEG_HEIC)]
-    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(string fileName, Rotation rotation, int expectedWidth, int expectedHeight)
+    [TestCase(FileNames.IMAGE_11_90_DEG_HEIC, Rotation.Rotate90, PixelWidthAsset.IMAGE_11_90_DEG_HEIC,
+        PixelHeightAsset.IMAGE_11_90_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_180_DEG_HEIC, Rotation.Rotate180, PixelWidthAsset.IMAGE_11_180_DEG_HEIC,
+        PixelHeightAsset.IMAGE_11_180_DEG_HEIC)]
+    [TestCase(FileNames.IMAGE_11_270_DEG_HEIC, Rotation.Rotate270, PixelWidthAsset.IMAGE_11_270_DEG_HEIC,
+        PixelHeightAsset.IMAGE_11_270_DEG_HEIC)]
+    public void LoadBitmapHeicImageFromPathViewerUserControl_ValidPathAndRotationAndRotatedImage_ReturnsBitmapImage(
+        string fileName, Rotation rotation, int expectedWidth, int expectedHeight)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
 
@@ -777,7 +823,8 @@ public class StorageServiceTests
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         const Rotation rotation = (Rotation)999;
 
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicImageFromPath(filePath, rotation));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => _storageService!.LoadBitmapHeicImageFromPath(filePath, rotation));
 
         Assert.That(exception?.Message, Is.EqualTo($"'{rotation}' is not a valid value for property 'Rotation'."));
     }
@@ -797,7 +844,8 @@ public class StorageServiceTests
     [TestCase((ushort)10000, Rotation.Rotate0)]
     [TestCase(ushort.MinValue, Rotation.Rotate0)]
     [TestCase(ushort.MaxValue, Rotation.Rotate0)]
-    public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation, Rotation expectedRotation)
+    public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation,
+        Rotation expectedRotation)
     {
         Rotation rotation = _storageService!.GetImageRotation(exifOrientation);
 
@@ -808,6 +856,7 @@ public class StorageServiceTests
     public void GetImageRotation_InvalidExifOrientation_ReturnsCorrectRotationValue()
     {
         int exifOrientation = -10;
+        // ReSharper disable once IntVariableOverflowInUncheckedContext
         Rotation rotation = _storageService!.GetImageRotation((ushort)exifOrientation);
 
         Assert.That(rotation, Is.EqualTo(Rotation.Rotate0));
@@ -818,7 +867,8 @@ public class StorageServiceTests
     {
         ushort? exifOrientation = null;
 
-        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => _storageService!.GetImageRotation((ushort)exifOrientation!));
+        InvalidOperationException? exception =
+            Assert.Throws<InvalidOperationException>(() => _storageService!.GetImageRotation((ushort)exifOrientation!));
 
         Assert.That(exception?.Message, Is.EqualTo("Nullable object must have a value."));
     }

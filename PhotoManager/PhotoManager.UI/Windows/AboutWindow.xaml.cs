@@ -1,7 +1,6 @@
 ﻿using log4net;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
-using System;
 using System.Reflection;
 using System.Windows;
 
