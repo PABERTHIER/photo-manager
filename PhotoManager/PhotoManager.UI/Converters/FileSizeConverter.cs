@@ -1,7 +1,7 @@
-﻿using System.Globalization;
+﻿#nullable disable
+using System.Globalization;
 using System.Windows.Data;
 
-#nullable disable
 namespace PhotoManager.UI.Converters;
 
 public class FileSizeConverter : IValueConverter
@@ -28,8 +28,8 @@ public class FileSizeConverter : IValueConverter
             decimal decimalValue;
             string unit;
 
-            bool sizeInKb = fileSize is >= ONE_KILOBYTE and < ONE_MEGABYTE;
-            bool sizeInMb = fileSize is >= ONE_MEGABYTE and < ONE_GIGABYTE;
+            bool sizeInKb = fileSize < ONE_MEGABYTE; // The initial condition already checked values lower than Kb
+            bool sizeInMb = fileSize < ONE_GIGABYTE;
 
             if (sizeInKb)
             {

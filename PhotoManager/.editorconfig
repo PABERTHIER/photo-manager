@@ -258,6 +258,7 @@ resharper_arrange_object_creation_when_type_not_evident_highlighting = none
 resharper_csharp_wrap_object_and_collection_initializer_style = chop_if_long
 resharper_csharp_keep_existing_initializer_arrangement = true
 resharper_csharp_place_simple_initializer_on_single_line = true
+resharper_for_can_be_converted_to_foreach_highlighting = none
 
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]

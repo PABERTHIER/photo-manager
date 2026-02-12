@@ -1,8 +1,8 @@
-﻿using PhotoManager.Domain;
+﻿#nullable disable
+using PhotoManager.Domain;
 using System.Globalization;
 using System.Windows.Data;
 
-#nullable disable
 namespace PhotoManager.UI.Converters;
 
 public class PixelSizeConverter : IValueConverter
