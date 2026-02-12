@@ -25,7 +25,7 @@ public class AssetRepository : IAssetRepository
     protected Dictionary<string, Dictionary<string, byte[]>> Thumbnails { get; private set; }
     private readonly Queue<string> recentThumbnailsQueue;
     private bool hasChanges;
-    private readonly object syncLock;
+    private readonly Lock syncLock;
     private readonly Subject<Unit> _assetsUpdatedSubject = new();
     public IObservable<Unit> AssetsUpdated => _assetsUpdatedSubject.AsObservable();
 
@@ -40,7 +40,7 @@ public class AssetRepository : IAssetRepository
         recentTargetPaths = [];
         recentThumbnailsQueue = new Queue<string>();
         Thumbnails = [];
-        syncLock = new object();
+        syncLock = new Lock();
         dataDirectory = _storageService.ResolveDataDirectory(_userConfigurationService.StorageSettings.StorageVersion);
         Initialize();
     }
