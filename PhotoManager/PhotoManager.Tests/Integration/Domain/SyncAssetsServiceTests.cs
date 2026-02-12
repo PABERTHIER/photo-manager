@@ -80,7 +80,7 @@ public class SyncAssetsServiceTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -315,7 +315,7 @@ public class SyncAssetsServiceTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -1050,7 +1050,7 @@ public class SyncAssetsServiceTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -1586,7 +1586,7 @@ public class SyncAssetsServiceTests
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[1].SyncedImages, Is.Zero);
             Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
             Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
@@ -1947,7 +1947,7 @@ public class SyncAssetsServiceTests
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[1].SyncedImages, Is.Zero);
             Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
             Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
@@ -2603,7 +2603,7 @@ public class SyncAssetsServiceTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"Source directory '{sourceDirectory}' not found."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -2645,7 +2645,7 @@ public class SyncAssetsServiceTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"Source directory '{sourceDirectory}' not found."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -2818,7 +2818,7 @@ public class SyncAssetsServiceTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
             Assert.That(statusChanges, Is.Empty);
         }

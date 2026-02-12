@@ -99,7 +99,7 @@ csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 csharp_style_prefer_extended_property_pattern = true
 csharp_style_prefer_not_pattern = true
 csharp_style_prefer_pattern_matching = true
-csharp_style_prefer_switch_expression = true
+csharp_style_prefer_switch_expression = true:suggestion
 
 # Null-checking preferences
 csharp_style_throw_expression = true:suggestion
@@ -141,6 +141,9 @@ csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimenta
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true
 csharp_style_allow_blank_lines_between_consecutive_braces_experimental = true
 csharp_style_allow_embedded_statements_on_same_line_experimental = true
+
+# Remove unnecessary expression value (IDE0058)
+csharp_style_unused_value_expression_statement_preference = false
 
 #### C# Formatting Rules ####
 
@@ -234,10 +237,22 @@ dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
 # IDE0008: Use explicit type instead of var
 dotnet_diagnostic.IDE0008.severity = warning
+# IDE0010: Add missing cases to switch statement
+dotnet_diagnostic.IDE0010.severity = none
+# IDE0022: Use expression body for methods
+dotnet_diagnostic.IDE0022.severity = none
 # IDE0028: Use collection initializers or expressions
 dotnet_diagnostic.IDE0028.severity = warning
+# IDE0045: Use conditional expression for assignment
+dotnet_diagnostic.IDE0045.severity = suggestion
+# IDE0046: Use conditional expression for return
+dotnet_diagnostic.IDE0046.severity = suggestion
+# IDE0047: Remove unnecessary parentheses
+dotnet_diagnostic.IDE0047.severity = none
 # IDE0063: Use simple 'using' statement
 dotnet_diagnostic.IDE0063.severity = none
+# IDE0072: Add missing cases to switch expression
+dotnet_diagnostic.IDE0072.severity = none
 # IDE0305: Collection initialization can be simplified
 dotnet_diagnostic.IDE0305.severity = warning
 
@@ -245,9 +260,11 @@ dotnet_diagnostic.IDE0305.severity = warning
 dotnet_diagnostic.CA1861.severity = warning
 # CA2208: Instantiate argument exceptions correctly
 dotnet_diagnostic.CA2208.severity = none
+# CS1591: Missing XML comment
+dotnet_diagnostic.CS1591.severity = none
 
-# TODO: Enable it later because it generates lots of warnings (need to configure some additional rules)
-# dotnet_analyzer_diagnostic.category-Style.severity = warning
+# To set the default severity for all code style rules
+dotnet_analyzer_diagnostic.category-Style.severity = warning
 
 # NUnit2045: Use Assert.Multiple
 dotnet_diagnostic.NUnit2045.severity = none

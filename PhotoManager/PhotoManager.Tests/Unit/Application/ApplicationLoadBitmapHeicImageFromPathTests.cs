@@ -77,8 +77,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That(image.Height, Is.EqualTo(expectedHeight));
             Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
             Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
         finally
         {
@@ -107,8 +107,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That(image.Height, Is.EqualTo(expectedHeight));
             Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
             Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
         finally
         {
@@ -131,8 +131,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That(image, Is.Not.Null);
             Assert.That(image.StreamSource, Is.Null);
             Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
         finally
         {
@@ -155,8 +155,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That(image, Is.Not.Null);
             Assert.That(image.StreamSource, Is.Null);
             Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
         finally
         {

@@ -9,8 +9,6 @@ public class FolderNavigationViewModel(
     List<string> recentTargetPaths)
     : BaseViewModel
 {
-    private string? _targetPath;
-
     public ApplicationViewModel ApplicationViewModel { get; } = applicationViewModel;
 
     public Folder SourceFolder { get; } = sourceFolder;
@@ -44,10 +42,10 @@ public class FolderNavigationViewModel(
 
     public string? TargetPath
     {
-        get => _targetPath;
+        get;
         set
         {
-            _targetPath = !string.IsNullOrWhiteSpace(value) && value.EndsWith('\\') ? value[..^1] : value;
+            field = !string.IsNullOrWhiteSpace(value) && value.EndsWith('\\') ? value[..^1] : value;
             NotifyPropertyChanged(nameof(TargetPath), nameof(SelectedFolder), nameof(CanConfirm));
         }
     }

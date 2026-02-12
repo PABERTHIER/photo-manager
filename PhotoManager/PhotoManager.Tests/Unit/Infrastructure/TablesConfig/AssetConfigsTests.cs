@@ -234,10 +234,10 @@ public class AssetConfigsTests
         Assert.That(result[0], Is.EqualTo(_folderId));
         Assert.That(result[1], Is.EqualTo("toto.jpg"));
         Assert.That(result[2], Is.EqualTo(Rotation.Rotate0));
-        Assert.That(result[3], Is.EqualTo(0));
-        Assert.That(result[4], Is.EqualTo(0));
-        Assert.That(result[5], Is.EqualTo(0));
-        Assert.That(result[6], Is.EqualTo(0));
+        Assert.That(result[3], Is.Zero);
+        Assert.That(result[4], Is.Zero);
+        Assert.That(result[5], Is.Zero);
+        Assert.That(result[6], Is.Zero);
         Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
         Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(result[9], Is.EqualTo("The asset is corrupted"));

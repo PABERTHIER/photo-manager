@@ -223,7 +223,7 @@ public class HashingHelperTests
     {
         int distance = HashingHelper.CalculateHammingDistance(hash, hash);
 
-        Assert.That(distance, Is.EqualTo(0));
+        Assert.That(distance, Is.Zero);
     }
 
     [Test]

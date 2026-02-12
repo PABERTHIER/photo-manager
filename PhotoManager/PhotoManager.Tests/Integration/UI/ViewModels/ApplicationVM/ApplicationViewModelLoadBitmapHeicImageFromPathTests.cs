@@ -213,8 +213,8 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             Assert.That(image1.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
             Assert.That(image1.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
             Assert.That(image1.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
-            Assert.That(image1.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image1.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image1.DecodePixelWidth, Is.Zero);
+            Assert.That(image1.DecodePixelHeight, Is.Zero);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -271,8 +271,8 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             Assert.That((int)image2.Height, Is.EqualTo(735)); // Should be _asset2.Pixel.Asset.Height -> 720 (weird result for png)
             Assert.That(image2.PixelWidth, Is.EqualTo(_asset2.Pixel.Asset.Width));
             Assert.That(image2.PixelHeight, Is.EqualTo(_asset2.Pixel.Asset.Height));
-            Assert.That(image2.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image2.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image2.DecodePixelWidth, Is.Zero);
+            Assert.That(image2.DecodePixelHeight, Is.Zero);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -335,8 +335,8 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             Assert.That((int)image3.Height, Is.EqualTo(735)); // Should be _asset3.Pixel.Asset.Height -> 720 (weird result for png)
             Assert.That(image3.PixelWidth, Is.EqualTo(_asset3.Pixel.Asset.Width));
             Assert.That(image3.PixelHeight, Is.EqualTo(_asset3.Pixel.Asset.Height));
-            Assert.That(image3.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image3.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image3.DecodePixelWidth, Is.Zero);
+            Assert.That(image3.DecodePixelHeight, Is.Zero);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -405,8 +405,8 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             Assert.That(image4.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));
             Assert.That(image4.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
             Assert.That(image4.PixelHeight, Is.EqualTo(_asset4.Pixel.Asset.Height));
-            Assert.That(image4.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image4.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image4.DecodePixelWidth, Is.Zero);
+            Assert.That(image4.DecodePixelHeight, Is.Zero);
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -556,7 +556,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
+        Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);

@@ -95,7 +95,7 @@ public class AssetRepositoryWriteBackupTests
             Assert.That(assetRepository.BackupExists(), Is.False);
 
             int filesInBackupDirectory = Directory.GetFiles(_databasePath! + "_Backups").Length;
-            Assert.That(filesInBackupDirectory, Is.EqualTo(0));
+            Assert.That(filesInBackupDirectory, Is.Zero);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }

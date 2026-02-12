@@ -240,7 +240,7 @@ public class FolderNavigationControlTests
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerPosition, Is.EqualTo(0));
+        Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ViewerPosition, Is.Zero);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.SelectedAssets, Is.Empty);
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_folderNavigationViewModel!.ApplicationViewModel.ObservableAssets, Is.Empty);
@@ -306,7 +306,7 @@ public class FolderNavigationControlTests
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerPosition, Is.EqualTo(0));
+        Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ViewerPosition, Is.Zero);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.SelectedAssets, Is.Empty);
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         Assert.That(folderNavigationViewModelInstance.ApplicationViewModel.ObservableAssets, Is.Empty);

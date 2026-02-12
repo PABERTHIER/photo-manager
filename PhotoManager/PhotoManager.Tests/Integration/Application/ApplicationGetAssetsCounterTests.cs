@@ -189,7 +189,7 @@ public class ApplicationGetAssetsCounterTests
         try
         {
             int assetsCounter = _application!.GetAssetsCounter();
-            Assert.That(assetsCounter, Is.EqualTo(0));
+            Assert.That(assetsCounter, Is.Zero);
 
             await _application!.CatalogAssetsAsync(_ => { });
 
@@ -234,7 +234,7 @@ public class ApplicationGetAssetsCounterTests
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
             int assetsCounter = _application!.GetAssetsCounter();
-            Assert.That(assetsCounter, Is.EqualTo(0));
+            Assert.That(assetsCounter, Is.Zero);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
 
@@ -312,7 +312,7 @@ public class ApplicationGetAssetsCounterTests
 
             int assetsCounter = _application!.GetAssetsCounter();
 
-            Assert.That(assetsCounter, Is.EqualTo(0));
+            Assert.That(assetsCounter, Is.Zero);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }

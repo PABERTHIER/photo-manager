@@ -13,14 +13,11 @@ public class ApplicationViewModel : BaseViewModel
 {
     private readonly IApplication _application;
 
-    private AppMode _appMode;
     private string _appTitle;
     private string _currentFolderPath;
-    private int _viewerPosition;
     private SortableObservableCollection<Asset> _observableAssets;
     private Asset[] _selectedAssets;
     private string _statusMessage;
-    private SortCriteria _sortCriteria;
     private SortCriteria _previousSortCriteria;
     private string _globalAssetsCounterWording;
     private string _executionTimeWording;
@@ -62,10 +59,10 @@ public class ApplicationViewModel : BaseViewModel
 
     public AppMode AppMode
     {
-        get => _appMode;
+        get;
         private set
         {
-            _appMode = value;
+            field = value;
             NotifyPropertyChanged(nameof(AppMode), nameof(ThumbnailsVisible), nameof(ViewerVisible));
             UpdateAppTitle();
         }
@@ -73,10 +70,10 @@ public class ApplicationViewModel : BaseViewModel
 
     public SortCriteria SortCriteria
     {
-        get => _sortCriteria;
+        get;
         private set
         {
-            _sortCriteria = value;
+            field = value;
             NotifyPropertyChanged(nameof(SortCriteria));
         }
     }
@@ -90,12 +87,12 @@ public class ApplicationViewModel : BaseViewModel
     // TODO: Rework ViewerPosition to make the setter private (xaml binding issues)
     public int ViewerPosition
     {
-        get => _viewerPosition;
+        get;
         set
         {
             // TODO: ViewerPosition is reset to -1 when moving and deleting assets from MainWindow
             // For this case, the best would be keeping the old ViewerPosition so that we can go to the nearest asset
-            _viewerPosition = value < 0 ? 0 : value;
+            field = value < 0 ? 0 : value;
 
             NotifyPropertyChanged(
                 nameof(ViewerPosition),

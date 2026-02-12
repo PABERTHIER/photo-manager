@@ -673,7 +673,7 @@ public class StringAssetComparerTests
 
         int result = comparer.Compare(_asset1, _asset1);
 
-        Assert.That(result, Is.EqualTo(0));
+        Assert.That(result, Is.Zero);
     }
 
     [Test]
@@ -703,7 +703,7 @@ public class StringAssetComparerTests
 
         int result = comparer.Compare(_asset1, _asset1);
 
-        Assert.That(result, Is.EqualTo(0));
+        Assert.That(result, Is.Zero);
     }
 
     [Test]

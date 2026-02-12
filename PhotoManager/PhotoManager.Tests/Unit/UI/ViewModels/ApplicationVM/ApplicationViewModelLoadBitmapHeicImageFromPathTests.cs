@@ -140,8 +140,8 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             Assert.That(image.Height, Is.EqualTo(expectedHeight));
             Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
             Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
 
             string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
@@ -243,8 +243,8 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             Assert.That(image.Height, Is.EqualTo(expectedHeight));
             Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
             Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
 
             string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
@@ -333,8 +333,8 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
             Assert.That(image, Is.Not.Null);
             Assert.That(image.StreamSource, Is.Null);
             Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
 
             string expectedStatusMessage = $"Image {asset.FullPath} added to catalog.";
 
@@ -484,7 +484,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
+        Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
@@ -518,7 +518,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
+        Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
