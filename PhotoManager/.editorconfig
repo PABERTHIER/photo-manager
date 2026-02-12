@@ -260,6 +260,8 @@ dotnet_diagnostic.IDE0305.severity = warning
 dotnet_diagnostic.CA1861.severity = warning
 # CA2208: Instantiate argument exceptions correctly
 dotnet_diagnostic.CA2208.severity = none
+# CS1591: Missing XML comment
+dotnet_diagnostic.CS1591.severity = none
 
 # To set the default severity for all code style rules
 dotnet_analyzer_diagnostic.category-Style.severity = warning
