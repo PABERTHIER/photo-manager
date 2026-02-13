@@ -8,7 +8,7 @@ public static class HashingHelper
 {
     public static string CalculateHash(byte[] imageBytes)
     {
-        Span<byte> hash = stackalloc byte[64];
+        Span<byte> hash = stackalloc byte[SHA512.HashSizeInBytes];
         SHA512.HashData(imageBytes, hash);
 
         return string.Create(128, hash, static (chars, hashBytes) =>
