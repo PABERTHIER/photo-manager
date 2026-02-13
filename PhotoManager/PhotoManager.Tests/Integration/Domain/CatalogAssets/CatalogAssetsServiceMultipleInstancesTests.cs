@@ -4,10 +4,10 @@ using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Domain.CatalogAssets;
 
@@ -18,7 +18,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
     private string? _databaseDirectory;
     private string? _databasePath;
     private string? _databaseBackupPath;
-    private string? _defaultAssetsDirectory;
+    // private string? _defaultAssetsDirectory;
 
     private CatalogAssetsService? _catalogAssetsService;
     private BlobStorage? _blobStorage;
@@ -32,7 +32,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
     private Asset? _asset3;
     private Asset? _asset4;
 
-    private Asset? _asset1Temp;
+    // private Asset? _asset1Temp;
     private Asset? _asset2Temp;
     private Asset? _asset3Temp;
     private Asset? _asset4Temp;
@@ -43,7 +43,7 @@ public class CatalogAssetsServiceMultipleInstancesTests
     private const int ASSET3_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_9_DUPLICATE_PNG;
     private const int ASSET4_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_11_HEIC;
 
-    private const int ASSET1_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_DUPLICATE_COPIED_JPG;
+    // private const int ASSET1_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_DUPLICATE_COPIED_JPG;
     private const int ASSET2_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.IMAGE_1_JPG;
     private const int ASSET3_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.HOMER_GIF;
     private const int ASSET4_TEMP_IMAGE_BYTE_SIZE = ImageByteSizes.HOMER_JPG;
@@ -56,14 +56,14 @@ public class CatalogAssetsServiceMultipleInstancesTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
         _databaseBackupPath = Path.Combine(_databaseDirectory, Constants.DATABASE_BACKUP_END_PATH);
-        _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
+        // _defaultAssetsDirectory = Path.Combine(_dataDirectory, Directories.DEFAULT_ASSETS);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
         _blobStorage = new();
-        _database = new (new ObjectListStorage(), _blobStorage, new BackupStorage());
+        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage());
     }
 
     [SetUp]
@@ -169,31 +169,31 @@ public class CatalogAssetsServiceMultipleInstancesTests
                 Rotated = new() { IsTrue = false, Message = null }
             }
         };
-        _asset1Temp = new()
-        {
-            FolderId = Guid.Empty, // Initialised later
-            Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FileName = FileNames.IMAGE_1_DUPLICATE_COPIED_JPG,
-            Pixel = new()
-            {
-                Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_COPIED_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_COPIED_JPG },
-                Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_COPIED_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_COPIED_JPG }
-            },
-            FileProperties = new()
-            {
-                Size = FileSize.IMAGE_1_DUPLICATE_COPIED_JPG,
-                Creation = DateTime.Now,
-                Modification = ModificationDate.Default
-            },
-            ThumbnailCreationDateTime = DateTime.Now,
-            ImageRotation = Rotation.Rotate0,
-            Hash = Hashes.IMAGE_1_DUPLICATE_COPIED_JPG,
-            Metadata = new()
-            {
-                Corrupted = new() { IsTrue = false, Message = null },
-                Rotated = new() { IsTrue = false, Message = null }
-            }
-        };
+        // _asset1Temp = new()
+        // {
+        //     FolderId = Guid.Empty, // Initialised later
+        //     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
+        //     FileName = FileNames.IMAGE_1_DUPLICATE_COPIED_JPG,
+        //     Pixel = new()
+        //     {
+        //         Asset = new() { Width = PixelWidthAsset.IMAGE_1_DUPLICATE_COPIED_JPG, Height = PixelHeightAsset.IMAGE_1_DUPLICATE_COPIED_JPG },
+        //         Thumbnail = new() { Width = ThumbnailWidthAsset.IMAGE_1_DUPLICATE_COPIED_JPG, Height = ThumbnailHeightAsset.IMAGE_1_DUPLICATE_COPIED_JPG }
+        //     },
+        //     FileProperties = new()
+        //     {
+        //         Size = FileSize.IMAGE_1_DUPLICATE_COPIED_JPG,
+        //         Creation = DateTime.Now,
+        //         Modification = ModificationDate.Default
+        //     },
+        //     ThumbnailCreationDateTime = DateTime.Now,
+        //     ImageRotation = Rotation.Rotate0,
+        //     Hash = Hashes.IMAGE_1_DUPLICATE_COPIED_JPG,
+        //     Metadata = new()
+        //     {
+        //         Corrupted = new() { IsTrue = false, Message = null },
+        //         Rotated = new() { IsTrue = false, Message = null }
+        //     }
+        // };
         _asset2Temp = new()
         {
             FolderId = Guid.Empty, // Initialised later
@@ -309,13 +309,13 @@ public class CatalogAssetsServiceMultipleInstancesTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
-        _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
-        StorageService storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        _userConfigurationService = new(configurationRootMock.Object);
+        _testableAssetRepository = new(_database!, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        _catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        _catalogAssetsService = new(_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
     }
 
     // TODO: Do same tests as CatalogAssetsServiceTests but with multiple instances instead of one

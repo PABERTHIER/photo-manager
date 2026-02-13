@@ -30,7 +30,7 @@ public class FileNameConverterTests
 
         object? parameter = null;
 
-        string result = (string)fileNameConverter.Convert(asset.FileName, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        string? result = (string?)fileNameConverter.Convert(asset.FileName, typeof(string), parameter!, CultureInfo.InvariantCulture);
         Assert.That(result, Is.EqualTo(expected));
     }
 
@@ -41,7 +41,7 @@ public class FileNameConverterTests
         string? fileName = null;
         object? parameter = null;
 
-        object result = fileNameConverter.Convert(fileName!, typeof(string), parameter!, CultureInfo.InvariantCulture);
+        object? result = fileNameConverter.Convert(fileName!, typeof(string), parameter!, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.Null);
     }
@@ -53,7 +53,7 @@ public class FileNameConverterTests
         const int input = 123;
         object? parameter = null;
 
-        object result = fileNameConverter.Convert(input, typeof(int), parameter!, CultureInfo.InvariantCulture);
+        object? result = fileNameConverter.Convert(input, typeof(int), parameter!, CultureInfo.InvariantCulture);
 
         Assert.That(result, Is.EqualTo(input));
     }

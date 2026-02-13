@@ -20,7 +20,7 @@ public class LoggingAssertsService
         BasicConfigurator.Configure(_memoryAppender);
     }
 
-    public void AssertLogExceptions (Exception[] expectedExceptions, Type typeOfService)
+    public void AssertLogExceptions(Exception[] expectedExceptions, Type typeOfService)
     {
         LoggingEvent[] loggingEvents = GetLoggingEvents();
 
@@ -45,7 +45,7 @@ public class LoggingAssertsService
         }
     }
 
-    public void AssertLogInfos (string[] expectedMessages, Type typeOfService)
+    public void AssertLogInfos(string[] expectedMessages, Type typeOfService)
     {
         LoggingEvent[] loggingEvents = GetLoggingEvents();
 

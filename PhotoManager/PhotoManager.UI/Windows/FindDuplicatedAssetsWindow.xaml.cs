@@ -2,11 +2,8 @@
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -47,7 +44,8 @@ public partial class FindDuplicatedAssetsWindow
     {
         try
         {
-            DuplicatedAssetViewModel duplicatedAssetViewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
+            DuplicatedAssetViewModel duplicatedAssetViewModel =
+                (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
 
             DeleteAssets([duplicatedAssetViewModel]);
         }
@@ -61,8 +59,10 @@ public partial class FindDuplicatedAssetsWindow
     {
         try
         {
-            DuplicatedAssetViewModel duplicatedAssetViewModel = (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
-            List<DuplicatedAssetViewModel> assetsToDelete = ViewModel.GetDuplicatedAssets(duplicatedAssetViewModel.Asset);
+            DuplicatedAssetViewModel duplicatedAssetViewModel =
+                (DuplicatedAssetViewModel)((FrameworkElement)e.Source).DataContext;
+            List<DuplicatedAssetViewModel> assetsToDelete =
+                ViewModel.GetDuplicatedAssets(duplicatedAssetViewModel.Asset);
 
             DeleteAssets(assetsToDelete);
         }
@@ -78,7 +78,8 @@ public partial class FindDuplicatedAssetsWindow
         {
             string exemptedFolderPath = GetExemptedFolderPath?.Invoke(this) ?? string.Empty;
 
-            List<DuplicatedAssetViewModel> assetsToDelete = ViewModel.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
+            List<DuplicatedAssetViewModel>
+                assetsToDelete = ViewModel.GetNotExemptedDuplicatedAssets(exemptedFolderPath);
 
             DeleteAssets(assetsToDelete);
         }
@@ -130,7 +131,7 @@ public partial class FindDuplicatedAssetsWindow
 
     private void DeleteAssets(List<DuplicatedAssetViewModel> assetsToDelete)
     {
-        DeleteDuplicatedAssets?.Invoke(this, assetsToDelete.Select(x => x.Asset).ToArray());
+        DeleteDuplicatedAssets?.Invoke(this, [.. assetsToDelete.Select(x => x.Asset)]);
 
         ViewModel.CollapseAssets(assetsToDelete);
     }

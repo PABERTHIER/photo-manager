@@ -39,23 +39,23 @@ public class ApplicationSyncAssetsAsyncTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
 
         _storageServiceMock = new Mock<IStorageService>();
         _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
-        _storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _assetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        _storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_assetRepository, _storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        _moveAssetsService = new (_assetRepository, _storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_assetRepository, _storageService, assetsComparator, _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_assetRepository, _storageService, _userConfigurationService);
-        _application = new (_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, _storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, _storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        _moveAssetsService = new(_assetRepository, _storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, _storageService, _userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, _storageService);
     }
 
     [Test]
@@ -92,7 +92,7 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -331,7 +331,7 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -1076,7 +1076,7 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"No images synced from '{sourceDirectory}' to '{destinationDirectory}'."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -1618,7 +1618,7 @@ public class ApplicationSyncAssetsAsyncTests
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[1].SyncedImages, Is.Zero);
             Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
             Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
@@ -1983,7 +1983,7 @@ public class ApplicationSyncAssetsAsyncTests
 
             Assert.That(result[1].SourceDirectory, Is.EqualTo(sourceSubDirectory1));
             Assert.That(result[1].DestinationDirectory, Is.EqualTo(destinationSubDirectory1));
-            Assert.That(result[1].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[1].SyncedImages, Is.Zero);
             Assert.That(result[1].Message, Is.EqualTo($"No images synced from '{sourceSubDirectory1}' to '{destinationSubDirectory1}'."));
 
             Assert.That(result[2].SourceDirectory, Is.EqualTo(sourceSubDirectory2));
@@ -2459,7 +2459,7 @@ public class ApplicationSyncAssetsAsyncTests
             SyncAssetsConfiguration syncAssetsConfigurationFromRepository = _application!.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfigurationFromRepository.Definitions, Has.Count.EqualTo(1));
-            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.EqualTo(null));
+            Assert.That(syncAssetsConfigurationFromRepository.Definitions[0], Is.Null);
 
             List<ProcessStatusChangedCallbackEventArgs> statusChanges = [];
 
@@ -2655,7 +2655,7 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"Source directory '{sourceDirectory}' not found."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -2700,7 +2700,7 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo($"Source directory '{sourceDirectory}' not found."));
             Assert.That(statusChanges, Is.Empty);
         }
@@ -2878,7 +2878,7 @@ public class ApplicationSyncAssetsAsyncTests
             Assert.That(result, Has.Count.EqualTo(1));
             Assert.That(result[0].SourceDirectory, Is.EqualTo(sourceDirectory));
             Assert.That(result[0].DestinationDirectory, Is.EqualTo(destinationDirectory));
-            Assert.That(result[0].SyncedImages, Is.EqualTo(0));
+            Assert.That(result[0].SyncedImages, Is.Zero);
             Assert.That(result[0].Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
             Assert.That(statusChanges, Is.Empty);
         }

@@ -1,6 +1,10 @@
 ﻿namespace PhotoManager.Domain;
 
-public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStorageService storageService, IUserConfigurationService userConfigurationService) : IFindDuplicatedAssetsService
+public class FindDuplicatedAssetsService(
+    IAssetRepository assetRepository,
+    IStorageService storageService,
+    IUserConfigurationService userConfigurationService)
+    : IFindDuplicatedAssetsService
 {
     /// <summary>
     /// Detects duplicated assets in the catalog.
@@ -14,14 +18,15 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
 
         if (userConfigurationService.AssetSettings.DetectThumbnails && userConfigurationService.HashSettings.UsingPHash)
         {
-            return GetDuplicatesBetweenOriginalAndThumbnail(assets, userConfigurationService.HashSettings.PHashThreshold);
+            return GetDuplicatesBetweenOriginalAndThumbnail(assets,
+                userConfigurationService.HashSettings.PHashThreshold);
         }
 
-        List<IGrouping<string, Asset>> assetGroups = assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1).ToList();
+        List<IGrouping<string, Asset>> assetGroups = [.. assets.GroupBy(a => a.Hash).Where(g => g.Count() > 1)];
 
         foreach (IGrouping<string, Asset> group in assetGroups)
         {
-            List<Asset> duplicatedSet = [..group];
+            List<Asset> duplicatedSet = [.. group];
             duplicatedSet.RemoveAll(asset => !storageService.FileExists(asset.FullPath));
 
             if (duplicatedSet.Count > 1)
@@ -56,7 +61,7 @@ public class FindDuplicatedAssetsService(IAssetRepository assetRepository, IStor
             bool addedToSet = false;
 
             // Check if the asset dictionary contains entries with similar Hash values
-            foreach ((string? hash2, List<Asset>? assetsAdded) in assetDictionary)
+            foreach ((string hash2, List<Asset> assetsAdded) in assetDictionary)
             {
                 // Calculate the Hamming distance between the Hash values
                 int hammingDistance = HashingHelper.CalculateHammingDistance(hash1, hash2);

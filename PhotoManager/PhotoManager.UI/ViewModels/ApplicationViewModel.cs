@@ -3,12 +3,7 @@ using PhotoManager.Domain;
 using PhotoManager.Domain.Comparers;
 using PhotoManager.UI.Models;
 using PhotoManager.UI.ViewModels.Enums;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -18,14 +13,11 @@ public class ApplicationViewModel : BaseViewModel
 {
     private readonly IApplication _application;
 
-    private AppMode _appMode;
     private string _appTitle;
     private string _currentFolderPath;
-    private int _viewerPosition;
     private SortableObservableCollection<Asset> _observableAssets;
     private Asset[] _selectedAssets;
     private string _statusMessage;
-    private SortCriteria _sortCriteria;
     private SortCriteria _previousSortCriteria;
     private string _globalAssetsCounterWording;
     private string _executionTimeWording;
@@ -67,10 +59,10 @@ public class ApplicationViewModel : BaseViewModel
 
     public AppMode AppMode
     {
-        get => _appMode;
+        get;
         private set
         {
-            _appMode = value;
+            field = value;
             NotifyPropertyChanged(nameof(AppMode), nameof(ThumbnailsVisible), nameof(ViewerVisible));
             UpdateAppTitle();
         }
@@ -78,10 +70,10 @@ public class ApplicationViewModel : BaseViewModel
 
     public SortCriteria SortCriteria
     {
-        get => _sortCriteria;
+        get;
         private set
         {
-            _sortCriteria = value;
+            field = value;
             NotifyPropertyChanged(nameof(SortCriteria));
         }
     }
@@ -95,12 +87,12 @@ public class ApplicationViewModel : BaseViewModel
     // TODO: Rework ViewerPosition to make the setter private (xaml binding issues)
     public int ViewerPosition
     {
-        get => _viewerPosition;
+        get;
         set
         {
             // TODO: ViewerPosition is reset to -1 when moving and deleting assets from MainWindow
             // For this case, the best would be keeping the old ViewerPosition so that we can go to the nearest asset
-            _viewerPosition = value < 0 ? 0 : value;
+            field = value < 0 ? 0 : value;
 
             NotifyPropertyChanged(
                 nameof(ViewerPosition),
@@ -217,7 +209,7 @@ public class ApplicationViewModel : BaseViewModel
             }
         }
 
-        _observableAssets = [..filteredAssets];
+        _observableAssets = [.. filteredAssets];
 
         if (_observableAssets.Count == 0)
         {
@@ -308,7 +300,9 @@ public class ApplicationViewModel : BaseViewModel
     {
         _previousSortCriteria = SortCriteria;
         SortCriteria = newSortCriteria;
-        SortAscending = (SortCriteria != _previousSortCriteria) || !SortAscending; // To change ascending order when clicking on the same criteria
+        SortAscending =
+            (SortCriteria != _previousSortCriteria) ||
+            !SortAscending; // To change ascending order when clicking on the same criteria
         SortAssets();
     }
 
@@ -366,7 +360,8 @@ public class ApplicationViewModel : BaseViewModel
         }
     }
 
-    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) => await _application.CatalogAssetsAsync(callback, token);
+    public async Task CatalogAssets(CatalogChangeCallback callback, CancellationToken? token = null) =>
+        await _application.CatalogAssetsAsync(callback, token);
 
     public ushort GetCatalogCooldownMinutes() => _application.GetCatalogCooldownMinutes();
 
@@ -428,9 +423,12 @@ public class ApplicationViewModel : BaseViewModel
         {
             SortCriteria.FileName => new StringAssetComparer(SortAscending, asset => asset.FileName),
             SortCriteria.FileSize => new LongAssetComparer(SortAscending, asset => asset.FileProperties.Size),
-            SortCriteria.FileCreationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.FileProperties.Creation),
-            SortCriteria.FileModificationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.FileProperties.Modification),
-            SortCriteria.ThumbnailCreationDateTime => new DateTimeAssetComparer(SortAscending, asset => asset.ThumbnailCreationDateTime),
+            SortCriteria.FileCreationDateTime => new DateTimeAssetComparer(SortAscending,
+                asset => asset.FileProperties.Creation),
+            SortCriteria.FileModificationDateTime => new DateTimeAssetComparer(SortAscending,
+                asset => asset.FileProperties.Modification),
+            SortCriteria.ThumbnailCreationDateTime => new DateTimeAssetComparer(SortAscending,
+                asset => asset.ThumbnailCreationDateTime),
             _ => throw new ArgumentOutOfRangeException(nameof(SortCriteria), "Unknown sort criteria")
         };
 
@@ -463,8 +461,8 @@ public class ApplicationViewModel : BaseViewModel
 
     private void UpdateAsset(Asset asset)
     {
-        Asset? updatedAsset = _observableAssets.FirstOrDefault(
-            a => string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
+        Asset? updatedAsset = _observableAssets.FirstOrDefault(a =>
+            string.Compare(a.FileName, asset.FileName, StringComparison.OrdinalIgnoreCase) == 0);
 
         if (updatedAsset != null)
         {
@@ -481,5 +479,6 @@ public class ApplicationViewModel : BaseViewModel
 
     private void AddFolder(Folder folder) => FolderAdded?.Invoke(this, new FolderAddedEventArgs { Folder = folder });
 
-    private void RemoveFolder(Folder folder) => FolderRemoved?.Invoke(this, new FolderRemovedEventArgs { Folder = folder });
+    private void RemoveFolder(Folder folder) =>
+        FolderRemoved?.Invoke(this, new FolderRemovedEventArgs { Folder = folder });
 }

@@ -3,10 +3,7 @@ using PhotoManager.Application;
 using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
-using System;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -90,6 +87,6 @@ public partial class ThumbnailsUserControl
 
     private void ThumbnailsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        ViewModel.SelectedAssets = ThumbnailsListView.SelectedItems.Cast<Asset>().ToArray();
+        ViewModel.SelectedAssets = [.. ThumbnailsListView.SelectedItems.Cast<Asset>()];
     }
 }

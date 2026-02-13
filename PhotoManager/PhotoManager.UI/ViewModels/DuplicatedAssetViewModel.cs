@@ -5,16 +5,14 @@ namespace PhotoManager.UI.ViewModels;
 
 public class DuplicatedAssetViewModel : BaseViewModel
 {
-    private Visibility _visible;
-
     public required Asset Asset { get; init; }
 
     public Visibility Visible
     {
-        get => _visible;
+        get;
         set
         {
-            _visible = value;
+            field = value;
             NotifyPropertyChanged(nameof(Visible));
             ParentViewModel.NotifyAssetChanged();
         }

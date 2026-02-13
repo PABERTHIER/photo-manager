@@ -3,12 +3,12 @@ using PhotoManager.UI.ViewModels.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
-using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
+using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Unit.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Unit.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Unit.UI.ViewModels.ApplicationVM;
 
@@ -21,11 +21,11 @@ public class ApplicationViewModelSetAssetsTests
 
     private ApplicationViewModel? _applicationViewModel;
 
-    private Asset _asset1;
-    private Asset _asset2;
-    private Asset _asset3;
-    private Asset _asset4;
-    private Asset _asset5;
+    private Asset? _asset1;
+    private Asset? _asset2;
+    private Asset? _asset3;
+    private Asset? _asset4;
+    private Asset? _asset5;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -55,10 +55,10 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = 2020,
-                Creation = new (2010, 1, 1, 20, 20, 20, 20, 20),
-                Modification = new (2011, 1, 1, 20, 20, 20, 20, 20)
+                Creation = new(2010, 1, 1, 20, 20, 20, 20, 20),
+                Modification = new(2011, 1, 1, 20, 20, 20, 20, 20)
             },
-            ThumbnailCreationDateTime = new (2010, 1, 1, 20, 20, 20, 20, 20),
+            ThumbnailCreationDateTime = new(2010, 1, 1, 20, 20, 20, 20, 20),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -80,10 +80,10 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = 2048,
-                Creation = new (2020, 6, 1),
-                Modification = new (2020, 7, 1)
+                Creation = new(2020, 6, 1),
+                Modification = new(2020, 7, 1)
             },
-            ThumbnailCreationDateTime = new (2020, 6, 1),
+            ThumbnailCreationDateTime = new(2020, 6, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -105,10 +105,10 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = 2000,
-                Creation = new (2010, 1, 1),
-                Modification = new (2011, 1, 1)
+                Creation = new(2010, 1, 1),
+                Modification = new(2011, 1, 1)
             },
-            ThumbnailCreationDateTime = new (2010, 1, 1),
+            ThumbnailCreationDateTime = new(2010, 1, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -130,10 +130,10 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = 2030,
-                Creation = new (2010, 8, 1),
-                Modification = new (2011, 9, 1)
+                Creation = new(2010, 8, 1),
+                Modification = new(2011, 9, 1)
             },
-            ThumbnailCreationDateTime = new (2010, 8, 1),
+            ThumbnailCreationDateTime = new(2010, 8, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -155,10 +155,10 @@ public class ApplicationViewModelSetAssetsTests
             FileProperties = new()
             {
                 Size = 2048,
-                Creation = new (2020, 6, 1),
-                Modification = new (2020, 7, 1)
+                Creation = new(2020, 6, 1),
+                Modification = new(2020, 7, 1)
             },
-            ThumbnailCreationDateTime = new (2020, 6, 1),
+            ThumbnailCreationDateTime = new(2020, 6, 1),
             Metadata = new()
             {
                 Corrupted = new() { IsTrue = false, Message = null },
@@ -180,24 +180,24 @@ public class ApplicationViewModelSetAssetsTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        AssetRepository assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        AssetRepository assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
-        _applicationViewModel = new (application);
+        CatalogAssetsService catalogAssetsService = new(assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, storageService, userConfigurationService);
+        PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        _applicationViewModel = new(application);
     }
 
     [Test]
@@ -215,12 +215,12 @@ public class ApplicationViewModelSetAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Asset[] assets = [_asset1, _asset2, _asset3];
+            Asset[] assets = [_asset1!, _asset2!, _asset3!];
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
-            Asset[] expectedAssets = [_asset1, _asset2, _asset3];
+            Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!];
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -274,9 +274,9 @@ public class ApplicationViewModelSetAssetsTests
             CheckBeforeChanges(_dataDirectory!);
 
             // Mock to update the path of each asset
-            _asset1 = _asset1.WithFolder(new() { Id = _asset1.FolderId, Path = otherDirectory });
-            _asset2 = _asset2.WithFolder(new() { Id = _asset2.FolderId, Path = otherDirectory });
-            _asset3 = _asset3.WithFolder(new() { Id = _asset3.FolderId, Path = otherDirectory });
+            _asset1 = _asset1!.WithFolder(new() { Id = _asset1.FolderId, Path = otherDirectory });
+            _asset2 = _asset2!.WithFolder(new() { Id = _asset2.FolderId, Path = otherDirectory });
+            _asset3 = _asset3!.WithFolder(new() { Id = _asset3.FolderId, Path = otherDirectory });
 
             Asset[] assets = [_asset1, _asset2, _asset3];
 
@@ -336,12 +336,12 @@ public class ApplicationViewModelSetAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
+            Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
             string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
-            Asset[] expectedAssets = [_asset1, _asset2, _asset3];
+            Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!];
 
             CheckAfterChanges(
                 _applicationViewModel!,
@@ -395,11 +395,11 @@ public class ApplicationViewModelSetAssetsTests
             CheckBeforeChanges(_dataDirectory!);
 
             // Mock to update the path of each asset
-            _asset1 = _asset1.WithFolder(new() { Id = _asset1.FolderId, Path = otherDirectory });
-            _asset2 = _asset2.WithFolder(new() { Id = _asset2.FolderId, Path = otherDirectory });
-            _asset3 = _asset3.WithFolder(new() { Id = _asset3.FolderId, Path = otherDirectory });
-            _asset4 = _asset4.WithFolder(new() { Id = _asset4.FolderId, Path = otherDirectory });
-            _asset5 = _asset5.WithFolder(new() { Id = _asset5.FolderId, Path = otherDirectory });
+            _asset1 = _asset1!.WithFolder(new() { Id = _asset1.FolderId, Path = otherDirectory });
+            _asset2 = _asset2!.WithFolder(new() { Id = _asset2.FolderId, Path = otherDirectory });
+            _asset3 = _asset3!.WithFolder(new() { Id = _asset3.FolderId, Path = otherDirectory });
+            _asset4 = _asset4!.WithFolder(new() { Id = _asset4.FolderId, Path = otherDirectory });
+            _asset5 = _asset5!.WithFolder(new() { Id = _asset5.FolderId, Path = otherDirectory });
 
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
@@ -461,12 +461,12 @@ public class ApplicationViewModelSetAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
+            Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
             string expectedAppTitle = $"PhotoManager {Constants.VERSION} - {otherDirectory} - image 1 of 3 - sorted by file name ascending";
-            Asset[] expectedAssets = [_asset1, _asset2, _asset3];
+            Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!];
 
             CheckAfterChangesOtherDirectory(
                 _applicationViewModel!,
@@ -521,7 +521,7 @@ public class ApplicationViewModelSetAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Asset[] assets = [_asset4, _asset5];
+            Asset[] assets = [_asset4!, _asset5!];
 
             _applicationViewModel!.SetAssets(_dataDirectory!, assets);
 
@@ -578,7 +578,7 @@ public class ApplicationViewModelSetAssetsTests
         {
             CheckBeforeChanges(_dataDirectory!);
 
-            Asset[] assets = [_asset4, _asset5];
+            Asset[] assets = [_asset4!, _asset5!];
 
             _applicationViewModel!.SetAssets(otherDirectory, assets);
 
@@ -858,7 +858,7 @@ public class ApplicationViewModelSetAssetsTests
         List<string> notifyPropertyChangedEvents = [];
         List<ApplicationViewModel> applicationViewModelInstances = [];
 
-        _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             applicationViewModelInstances.Add((ApplicationViewModel)sender!);
@@ -866,14 +866,14 @@ public class ApplicationViewModelSetAssetsTests
 
         List<Folder> folderAddedEvents = [];
 
-        _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        _applicationViewModel.FolderAdded += delegate (object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
         List<Folder> folderRemovedEvents = [];
 
-        _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        _applicationViewModel.FolderRemoved += delegate (object _, FolderRemovedEventArgs e)
         {
             folderRemovedEvents.Add(e.Folder);
         };
@@ -889,7 +889,7 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
+        Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
@@ -924,7 +924,7 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
+        Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedAssets, applicationViewModelInstance.ObservableAssets);
@@ -968,7 +968,7 @@ public class ApplicationViewModelSetAssetsTests
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
+        Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedAssets, applicationViewModelInstance.ObservableAssets);

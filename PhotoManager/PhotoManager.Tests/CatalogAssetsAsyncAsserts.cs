@@ -46,7 +46,7 @@ public static class CatalogAssetsAsyncAsserts
 
             Assert.That(File.Exists(blobFilePath), Is.True);
 
-            List<Asset> assetsFromRepositoryByFolder = [..assetsFromRepository.Where(x => x.FolderId == folder.Id)];
+            List<Asset> assetsFromRepositoryByFolder = [.. assetsFromRepository.Where(x => x.FolderId == folder.Id)];
 
             Dictionary<string, byte[]>? dataRead = blobStorage.ReadFromBinaryFile(blobFilePath);
             Assert.That(dataRead, Is.Not.Null);
@@ -354,7 +354,7 @@ public static class CatalogAssetsAsyncAsserts
         Assert.That(assetFromDatabase.FileName, Is.EqualTo(expectedAsset.FileName));
         Assert.That(assetFromDatabase.FolderId, Is.EqualTo(folderId));
         Assert.That(assetFromDatabase.Folder.Path, Is.EqualTo(string.Empty));  // Not saved in Db, loaded at the runtime
-        Assert.That(assetFromDatabase.FileProperties.Size, Is.EqualTo(0)); // Not saved in Db, loaded at the runtime
+        Assert.That(assetFromDatabase.FileProperties.Size, Is.Zero); // Not saved in Db, loaded at the runtime
         Assert.That(assetFromDatabase.Pixel.Asset.Width, Is.EqualTo(expectedAsset.Pixel.Asset.Width));
         Assert.That(assetFromDatabase.Pixel.Asset.Height, Is.EqualTo(expectedAsset.Pixel.Asset.Height));
         Assert.That(assetFromDatabase.Pixel.Thumbnail.Width, Is.EqualTo(expectedAsset.Pixel.Thumbnail.Width));

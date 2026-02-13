@@ -54,7 +54,7 @@ public class BackupStorageTests
         {
             Directory.Delete(backupDirectory);
         }
-        
+
     }
 
     [Test]

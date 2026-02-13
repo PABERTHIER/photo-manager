@@ -4,13 +4,9 @@ using PhotoManager.Domain;
 using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.ViewModels.Enums;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -26,8 +22,8 @@ public partial class MainWindow
 
     private readonly IApplication _application;
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private Task _backgroundWorkTask = new (() => {});
-    private Task _catalogTask = new (() => {});
+    private Task _backgroundWorkTask = new(() => { });
+    private Task _catalogTask = new(() => { });
 
     public MainWindow(ApplicationViewModel viewModel, IApplication application)
     {
@@ -36,12 +32,12 @@ public partial class MainWindow
             InitializeComponent();
             DataContext = viewModel;
 
-            FolderNavigationViewModel folderNavigationViewModel = new (
+            FolderNavigationViewModel folderNavigationViewModel = new(
                 ViewModel,
                 new() { Id = Guid.NewGuid(), Path = ViewModel.CurrentFolderPath },
                 application.GetRecentTargetPaths());
-            folderTreeView.DataContext = folderNavigationViewModel;
-            folderTreeView.SelectedPath = folderNavigationViewModel.SourceFolder.Path;
+            FolderTreeView.DataContext = folderNavigationViewModel;
+            FolderTreeView.SelectedPath = folderNavigationViewModel.SourceFolder.Path;
         }
         catch (Exception ex)
         {
@@ -142,7 +138,7 @@ public partial class MainWindow
     {
         try
         {
-            thumbnailsUserControl.GoToFolder(_application, folderTreeView.SelectedPath);
+            ThumbnailsUserControl.GoToFolder(_application, FolderTreeView.SelectedPath);
         }
         catch (Exception ex)
         {
@@ -158,9 +154,9 @@ public partial class MainWindow
 
             if (assetsSets.Count > 0)
             {
-                FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModel = new (_application);
+                FindDuplicatedAssetsViewModel findDuplicatedAssetsViewModel = new(_application);
                 findDuplicatedAssetsViewModel.SetDuplicates(assetsSets);
-                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new (findDuplicatedAssetsViewModel);
+                FindDuplicatedAssetsWindow findDuplicatedAssetsWindow = new(findDuplicatedAssetsViewModel);
 
                 findDuplicatedAssetsWindow.GetExemptedFolderPath += GetExemptedFolderPath;
                 findDuplicatedAssetsWindow.DeleteDuplicatedAssets += DeleteDuplicatedAssets;
@@ -170,7 +166,8 @@ public partial class MainWindow
             }
             else
             {
-                MessageBox.Show("No duplicates have been found.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("No duplicates have been found.", "Information", MessageBoxButton.OK,
+                    MessageBoxImage.Information);
             }
         }
         catch (Exception ex)
@@ -183,8 +180,8 @@ public partial class MainWindow
     {
         try
         {
-            SyncAssetsViewModel syncAssetsViewModel = new (_application);
-            SyncAssetsWindow syncAssetsWindow = new (syncAssetsViewModel);
+            SyncAssetsViewModel syncAssetsViewModel = new(_application);
+            SyncAssetsWindow syncAssetsWindow = new(syncAssetsViewModel);
             syncAssetsWindow.ShowDialog();
         }
         catch (Exception ex)
@@ -197,7 +194,7 @@ public partial class MainWindow
     {
         try
         {
-            AboutWindow aboutWindow = new (ViewModel.AboutInformation);
+            AboutWindow aboutWindow = new(ViewModel.AboutInformation);
             aboutWindow.ShowDialog();
         }
         catch (Exception ex)
@@ -296,7 +293,8 @@ public partial class MainWindow
             ViewModel.StatusMessage = $"Cataloging thumbnails for {ViewModel.CurrentFolderPath}";
 
             // The calling thread cannot access this object because a different thread owns it
-            await InitializeOnceAsync(stopwatch).ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
+            await InitializeOnceAsync(stopwatch)
+                .ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
 
             if (ViewModel.GetSyncAssetsEveryXMinutes()) // Disabling infinite loop to prevent reduced perf
             {
@@ -307,14 +305,18 @@ public partial class MainWindow
                 {
                     try
                     {
-                        await Task.Delay(delay, _cancellationTokenSource.Token).ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
+                        await Task.Delay(delay, _cancellationTokenSource.Token)
+                            .ConfigureAwait(
+                                true); // Due to the WPF context, need to set it true to prevent thread exceptions
                     }
                     catch (OperationCanceledException)
                     {
                         break;
                     }
 
-                    await InitializeOnceAsync(stopwatch).ConfigureAwait(true);  // Due to the WPF context, need to set it true to prevent thread exceptions
+                    await InitializeOnceAsync(stopwatch)
+                        .ConfigureAwait(
+                            true); // Due to the WPF context, need to set it true to prevent thread exceptions
                 }
             }
         }
@@ -339,7 +341,8 @@ public partial class MainWindow
 
         try
         {
-            await _catalogTask.ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
+            await _catalogTask
+                .ConfigureAwait(true); // Due to the WPF context, need to set it true to prevent thread exceptions
         }
         catch (OperationCanceledException ex)
         {
@@ -356,11 +359,11 @@ public partial class MainWindow
     {
         if (ViewModel.AppMode == AppMode.Viewer)
         {
-            viewerUserControl.ShowImage();
+            ViewerUserControl.ShowImage();
         }
         else
         {
-            thumbnailsUserControl.ShowImage();
+            ThumbnailsUserControl.ShowImage();
         }
     }
 
@@ -415,7 +418,7 @@ public partial class MainWindow
                         {
                             ViewModel.MoveAssetsLastSelectedFolder = folderNavigationWindow.ViewModel.SelectedFolder;
                             ViewModel.IsRefreshingFolders = true;
-                            folderTreeView.Initialize();
+                            FolderTreeView.Initialize();
                             ViewModel.IsRefreshingFolders = false;
 
                             if (!preserveOriginalFiles)
@@ -424,7 +427,7 @@ public partial class MainWindow
 
                                 if (ViewModel.AppMode == AppMode.Viewer)
                                 {
-                                    viewerUserControl.ShowImage();
+                                    ViewerUserControl.ShowImage();
                                 }
                             }
                         }

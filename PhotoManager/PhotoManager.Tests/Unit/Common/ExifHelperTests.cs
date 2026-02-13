@@ -19,7 +19,7 @@ public class ExifHelperTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [Test]
@@ -103,7 +103,7 @@ public class ExifHelperTests
     [Test]
     public void GetExifOrientation_InvalidFormat_ReturnsCorruptedOrientationValue()
     {
-        Bitmap image = new (10, 10);
+        Bitmap image = new(10, 10);
 
         using (MemoryStream ms = new())
         {

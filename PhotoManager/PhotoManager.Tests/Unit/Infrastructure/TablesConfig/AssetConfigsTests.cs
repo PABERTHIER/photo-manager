@@ -89,7 +89,7 @@ public class AssetConfigsTests
         Assert.That(asset.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
         Assert.That(asset.Metadata.Rotated.IsTrue, Is.False);
-        Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo(null));
+        Assert.That(asset.Metadata.Rotated.Message, Is.Null);
     }
 
     [Test]
@@ -110,7 +110,7 @@ public class AssetConfigsTests
         Assert.That(asset.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
         Assert.That(asset.Metadata.Rotated.IsTrue, Is.False);
-        Assert.That(asset.Metadata.Rotated.Message, Is.EqualTo(null));
+        Assert.That(asset.Metadata.Rotated.Message, Is.Null);
     }
 
     [Test]
@@ -173,7 +173,7 @@ public class AssetConfigsTests
                 Thumbnail = new() { Width = 120, Height = 60 }
             },
             FileProperties = new() { Size = 1000 },
-            ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
+            ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {
@@ -198,9 +198,9 @@ public class AssetConfigsTests
         Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
         Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(result[9], Is.EqualTo("The asset is corrupted"));
-        Assert.That(result[10], Is.EqualTo(true));
-        Assert.That(result[11], Is.EqualTo(null));
-        Assert.That(result[12], Is.EqualTo(false));
+        Assert.That(result[10], Is.True);
+        Assert.That(result[11], Is.Null);
+        Assert.That(result[12], Is.False);
     }
 
     [Test]
@@ -216,7 +216,7 @@ public class AssetConfigsTests
                 Asset = new(),
                 Thumbnail = new()
             },
-            ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
+            ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {
@@ -234,16 +234,16 @@ public class AssetConfigsTests
         Assert.That(result[0], Is.EqualTo(_folderId));
         Assert.That(result[1], Is.EqualTo("toto.jpg"));
         Assert.That(result[2], Is.EqualTo(Rotation.Rotate0));
-        Assert.That(result[3], Is.EqualTo(0));
-        Assert.That(result[4], Is.EqualTo(0));
-        Assert.That(result[5], Is.EqualTo(0));
-        Assert.That(result[6], Is.EqualTo(0));
+        Assert.That(result[3], Is.Zero);
+        Assert.That(result[4], Is.Zero);
+        Assert.That(result[5], Is.Zero);
+        Assert.That(result[6], Is.Zero);
         Assert.That(result[7], Is.EqualTo(new DateTime(2023, 08, 30, 12, 0, 0).ToString("M/dd/yyyy HH:mm:ss")));
         Assert.That(result[8], Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
         Assert.That(result[9], Is.EqualTo("The asset is corrupted"));
-        Assert.That(result[10], Is.EqualTo(false));
-        Assert.That(result[11], Is.EqualTo(null));
-        Assert.That(result[12], Is.EqualTo(false));
+        Assert.That(result[10], Is.False);
+        Assert.That(result[11], Is.Null);
+        Assert.That(result[12], Is.False);
     }
 
     [Test]
@@ -261,7 +261,7 @@ public class AssetConfigsTests
                 Thumbnail = new() { Width = 120, Height = 60 }
             },
             FileProperties = new() { Size = 1000 },
-            ThumbnailCreationDateTime = new (2023, 08, 30, 12, 0, 0),
+            ThumbnailCreationDateTime = new(2023, 08, 30, 12, 0, 0),
             Hash = "4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4",
             Metadata = new()
             {

@@ -1,6 +1,6 @@
 ﻿using ImageMagick;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace PhotoManager.Common;
 
@@ -8,24 +8,30 @@ public static class HashingHelper
 {
     public static string CalculateHash(byte[] imageBytes)
     {
-        StringBuilder hashBuilder = new();
-        byte[] hash = SHA512.HashData(imageBytes);
+        Span<byte> hash = stackalloc byte[SHA512.HashSizeInBytes];
+        SHA512.HashData(imageBytes, hash);
 
-        foreach (byte hashByte in hash)
+        return string.Create(128, hash, static (chars, hashBytes) =>
         {
-            hashBuilder.Append($"{hashByte:x2}");
-        }
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                byte b = hashBytes[i];
+                chars[i * 2] = GetHexChar(b >> 4);
+                chars[(i * 2) + 1] = GetHexChar(b & 0xF);
+            }
+        });
 
-        return hashBuilder.ToString();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static char GetHexChar(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
     }
 
     // Performances are decreased by 6 times with CalculatePHash
     public static string? CalculatePHash(string filePath)
     {
-        MagickImage image = new (filePath);
+        MagickImage image = new(filePath);
 
         // Resize the image
-        MagickGeometry geometry = new (32, 32);
+        MagickGeometry geometry = new(32, 32);
         image.Resize(geometry);
 
         // Convert the image to grayscale
@@ -37,7 +43,7 @@ public static class HashingHelper
         return phash;
     }
 
-    // For Gif or some heic file it returns "00000000000000"
+    // For GIF or some heic file it returns "00000000000000"
     public static string CalculateDHash(string? filePath)
     {
         bool isHeicFile = filePath?.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) ?? false;

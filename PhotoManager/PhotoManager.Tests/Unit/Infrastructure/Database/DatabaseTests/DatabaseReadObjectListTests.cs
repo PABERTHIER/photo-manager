@@ -25,7 +25,7 @@ public class DatabaseReadObjectListTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new (configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
 
         _csvEscapedTextWithSemicolon = "\"FolderId\";\"FileName\";\"ImageRotation\";\"PixelWidth\";\"PixelHeight\";\"ThumbnailPixelWidth\";\"ThumbnailPixelHeight\";\"ThumbnailCreationDateTime\";\"Hash\";\"CorruptedMessage\";\"IsCorrupted\";\"RotatedMessage\";\"IsRotated\"\r\n" +
             "\"876283c6-780e-4ad5-975c-be63044c087a\";\"20200720175810_3.jpg\";\"Rotate0\";\"1920\";\"1080\";\"200\";\"112\";\"8/19/2023 11:26:09\";\"4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4\";\"\";\"false\";\"\";\"false\"\r\n" +
@@ -53,7 +53,7 @@ public class DatabaseReadObjectListTests
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
     }
 
     [Test]
@@ -407,7 +407,7 @@ public class DatabaseReadObjectListTests
         {
             Mock<IObjectListStorage> objectListStorageMock = new();
             objectListStorageMock.Setup(x => x.ReadObjectList(It.IsAny<string>(), It.IsAny<Func<string[], Asset>>(), It.IsAny<Diagnostics>())).Throws(new Exception());
-            PhotoManager.Infrastructure.Database.Database database = new (objectListStorageMock.Object, new BlobStorage(), new BackupStorage());
+            PhotoManager.Infrastructure.Database.Database database = new(objectListStorageMock.Object, new BlobStorage(), new BackupStorage());
 
             database.Initialize(
                 directoryPath,
@@ -483,9 +483,9 @@ public class DatabaseReadObjectListTests
         Assert.That(asset1.Pixel.Thumbnail.Height, Is.EqualTo(112));
         Assert.That(asset1.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 19, 11, 26, 09)));
         Assert.That(asset1.Hash, Is.EqualTo("4e50d5c7f1a64b5d61422382ac822641ad4e5b943aca9ade955f4655f799558bb0ae9c342ee3ead0949b32019b25606bd16988381108f56bb6c6dd673edaa1e4"));
-        Assert.That(asset1.Metadata.Corrupted.IsTrue, Is.EqualTo(false));
+        Assert.That(asset1.Metadata.Corrupted.IsTrue, Is.False);
         Assert.That(asset1.Metadata.Corrupted.Message, Is.EqualTo(""));
-        Assert.That(asset1.Metadata.Rotated.IsTrue, Is.EqualTo(false));
+        Assert.That(asset1.Metadata.Rotated.IsTrue, Is.False);
         Assert.That(asset1.Metadata.Rotated.Message, Is.EqualTo(""));
 
         Asset asset2 = assets[1];
@@ -498,9 +498,9 @@ public class DatabaseReadObjectListTests
         Assert.That(asset2.Pixel.Thumbnail.Height, Is.EqualTo(112));
         Assert.That(asset2.ThumbnailCreationDateTime, Is.EqualTo(new DateTime(2023, 8, 19, 11, 26, 09)));
         Assert.That(asset2.Hash, Is.EqualTo("0af8f118b7d606e5d174643727bd3c0c6028b52c50481585274fd572110b108c7a0d7901227f75a72b44c89335e002a65e8137ff5b238ab1c0bba0505e783124"));
-        Assert.That(asset2.Metadata.Corrupted.IsTrue, Is.EqualTo(true));
+        Assert.That(asset2.Metadata.Corrupted.IsTrue, Is.True);
         Assert.That(asset2.Metadata.Corrupted.Message, Is.EqualTo("The asset is corrupted"));
-        Assert.That(asset2.Metadata.Rotated.IsTrue, Is.EqualTo(true));
+        Assert.That(asset2.Metadata.Rotated.IsTrue, Is.True);
         Assert.That(asset2.Metadata.Rotated.Message, Is.EqualTo("The asset has been rotated"));
 
         Assert.That(_database!.Diagnostics.LastReadFilePath, Is.EqualTo(filePath));

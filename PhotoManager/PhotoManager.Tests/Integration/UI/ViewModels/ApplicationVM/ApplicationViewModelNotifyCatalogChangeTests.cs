@@ -9,10 +9,10 @@ using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ImageByteSizes = PhotoManager.Tests.Integration.Constants.ImageByteSizes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.UI.ViewModels.ApplicationVM;
 
@@ -69,7 +69,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
         _blobStorage = new();
-        _database = new (new ObjectListStorage(), _blobStorage, new BackupStorage());
+        _database = new(new ObjectListStorage(), _blobStorage, new BackupStorage());
     }
 
     [SetUp]
@@ -315,18 +315,18 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        _userConfigurationService = new (configurationRootMock.Object);
-        _testableAssetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
-        StorageService storageService = new (_userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (_userConfigurationService);
-        AssetCreationService assetCreationService = new (_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        _userConfigurationService = new(configurationRootMock.Object);
+        _testableAssetRepository = new(_database!, _storageServiceMock!.Object, _userConfigurationService);
+        StorageService storageService = new(_userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
+        AssetCreationService assetCreationService = new(_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (_testableAssetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (_testableAssetRepository, storageService, _userConfigurationService);
-        _application = new (_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
-        _applicationViewModel = new (_application);
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, storageService, _userConfigurationService);
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        _applicationViewModel = new(_application);
     }
 
     // ADD SECTION (Start) ------------------------------------------------------------------------------------------------
@@ -925,7 +925,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!]} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
@@ -1516,7 +1516,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
-            CancellationToken cancellationToken = new (canceled);
+            CancellationToken cancellationToken = new(canceled);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
@@ -2468,7 +2468,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!]} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
@@ -4623,7 +4623,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssets[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!]} };
+            Dictionary<Folder, List<Asset>> folderToAssetsMapping = new() { { folder!, [_asset3Temp!, _asset2Temp!] } };
             Dictionary<string, int> assetNameToByteSizeMapping = new()
             {
                 { _asset3Temp!.FileName, ASSET3_TEMP_IMAGE_BYTE_SIZE },
@@ -6286,7 +6286,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Assert.That(File.Exists(destinationFilePathToCopy), Is.False);
 
-            CancellationToken cancellationToken = new (true);
+            CancellationToken cancellationToken = new(true);
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
             folder = _testableAssetRepository!.GetFolderByPath(assetsDirectory);
@@ -7776,7 +7776,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(folderAddedEvents[4], Is.EqualTo(videoFirstFrameFolder));
 
             Assert.That(folderRemovedEvents, Is.Empty);
-            
+
             // Second Sync
 
             File.Delete(imagePath2ToCopy);
@@ -8521,7 +8521,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(folderAddedEvents[4], Is.EqualTo(videoFirstFrameFolder));
 
             Assert.That(folderRemovedEvents, Is.Empty);
-            
+
             // Second Sync
 
             File.Delete(imagePath2ToCopy);
@@ -9264,7 +9264,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(folderAddedEvents[4], Is.EqualTo(subSubDirFolder));
 
             Assert.That(folderRemovedEvents, Is.Empty);
-            
+
             // Second Sync
 
             File.Delete(imagePath2ToCopy);
@@ -10058,7 +10058,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Assert.That(_testableAssetRepository.HasChanges(), Is.False);
 
             List<CatalogChangeCallbackEventArgs> catalogChanges = [];
-            CancellationToken cancellationToken = new (true);
+            CancellationToken cancellationToken = new(true);
 
             await _applicationViewModel!.CatalogAssets(catalogChanges.Add, cancellationToken);
 
@@ -11273,7 +11273,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             Folder[] foldersInRepository = _testableAssetRepository!.GetFolders();
 
-            UnauthorizedAccessException unauthorizedAccessException = new ($"Access to the path '{assetsDirectory}' is denied.");
+            UnauthorizedAccessException unauthorizedAccessException = new($"Access to the path '{assetsDirectory}' is denied.");
             Exception[] expectedExceptions = [unauthorizedAccessException];
             Type typeOfService = typeof(CatalogAssetsService);
 
@@ -11330,7 +11330,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         List<string> notifyPropertyChangedEvents = [];
         List<ApplicationViewModel> applicationViewModelInstances = [];
 
-        _applicationViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _applicationViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             applicationViewModelInstances.Add((ApplicationViewModel)sender!);
@@ -11338,14 +11338,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         List<Folder> folderAddedEvents = [];
 
-        _applicationViewModel.FolderAdded += delegate(object _, FolderAddedEventArgs e)
+        _applicationViewModel.FolderAdded += delegate (object _, FolderAddedEventArgs e)
         {
             folderAddedEvents.Add(e.Folder);
         };
 
         List<Folder> folderRemovedEvents = [];
 
-        _applicationViewModel.FolderRemoved += delegate(object _, FolderRemovedEventArgs e)
+        _applicationViewModel.FolderRemoved += delegate (object _, FolderRemovedEventArgs e)
         {
             folderRemovedEvents.Add(e.Folder);
         };
@@ -11361,7 +11361,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(_applicationViewModel!.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(_applicationViewModel!.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(_applicationViewModel!.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(_applicationViewModel!.ViewerPosition, Is.EqualTo(0));
+        Assert.That(_applicationViewModel!.ViewerPosition, Is.Zero);
         Assert.That(_applicationViewModel!.SelectedAssets, Is.Empty);
         Assert.That(_applicationViewModel!.CurrentFolderPath, Is.EqualTo(expectedRootDirectory));
         Assert.That(_applicationViewModel!.ObservableAssets, Is.Empty);
@@ -11395,7 +11395,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         Assert.That(applicationViewModelInstance.SortCriteria, Is.EqualTo(SortCriteria.FileName));
         Assert.That(applicationViewModelInstance.ThumbnailsVisible, Is.EqualTo(Visibility.Visible));
         Assert.That(applicationViewModelInstance.ViewerVisible, Is.EqualTo(Visibility.Hidden));
-        Assert.That(applicationViewModelInstance.ViewerPosition, Is.EqualTo(0));
+        Assert.That(applicationViewModelInstance.ViewerPosition, Is.Zero);
         Assert.That(applicationViewModelInstance.SelectedAssets, Is.Empty);
         Assert.That(applicationViewModelInstance.CurrentFolderPath, Is.EqualTo(expectedLastDirectoryInspected));
         AssertObservableAssets(expectedLastDirectoryInspected, expectedAssets, applicationViewModelInstance.ObservableAssets);
@@ -11801,7 +11801,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
         }
         else
         {
-            Assert.That(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData == null), Is.True); 
+            Assert.That(catalogChange.CataloguedAssetsByPath.All(asset => asset.ImageData == null), Is.True);
         }
     }
 

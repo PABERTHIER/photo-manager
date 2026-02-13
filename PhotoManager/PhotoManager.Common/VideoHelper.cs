@@ -107,7 +107,7 @@ public static class VideoHelper
 
     private static string FindProjectDirectory(string startPath, string projectFolderName)
     {
-        DirectoryInfo directoryInfo = new (startPath);
+        DirectoryInfo directoryInfo = new(startPath);
 
         // Traverse up the directory structure and return as soon as the project folder is found
         while (directoryInfo.GetDirectories(projectFolderName).Length == 0)

@@ -25,7 +25,7 @@ public class AssetRepository : IAssetRepository
     protected Dictionary<string, Dictionary<string, byte[]>> Thumbnails { get; private set; }
     private readonly Queue<string> recentThumbnailsQueue;
     private bool hasChanges;
-    private readonly object syncLock;
+    private readonly Lock syncLock;
     private readonly Subject<Unit> _assetsUpdatedSubject = new();
     public IObservable<Unit> AssetsUpdated => _assetsUpdatedSubject.AsObservable();
 
@@ -40,7 +40,7 @@ public class AssetRepository : IAssetRepository
         recentTargetPaths = [];
         recentThumbnailsQueue = new Queue<string>();
         Thumbnails = [];
-        syncLock = new object();
+        syncLock = new Lock();
         dataDirectory = _storageService.ResolveDataDirectory(_userConfigurationService.StorageSettings.StorageVersion);
         Initialize();
     }
@@ -87,7 +87,7 @@ public class AssetRepository : IAssetRepository
             log.Error(ex);
         }
 
-        return assetsList.ToArray();
+        return [.. assetsList];
     }
 
     // TODO: Return Asset created
@@ -160,7 +160,7 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            result = [..folders];
+            result = [.. folders];
         }
 
         return result;
@@ -173,7 +173,7 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            folderPaths = folders.Select(folder => folder.Path).ToHashSet();
+            folderPaths = [.. folders.Select(folder => folder.Path)];
         }
 
         return folderPaths;
@@ -181,7 +181,7 @@ public class AssetRepository : IAssetRepository
 
     public Folder[] GetSubFolders(Folder parentFolder)
     {
-        return folders.Where(parentFolder.IsParentOf).ToArray();
+        return [.. folders.Where(parentFolder.IsParentOf)];
     }
 
     public Folder? GetFolderByPath(string path)
@@ -259,7 +259,7 @@ public class AssetRepository : IAssetRepository
 
             if (folder != null)
             {
-                cataloguedAssets = assets.Where(a => a.FolderId == folder.Id).ToList();
+                cataloguedAssets = [.. assets.Where(a => a.FolderId == folder.Id)];
             }
         }
 
@@ -447,7 +447,7 @@ public class AssetRepository : IAssetRepository
     {
         lock (syncLock)
         {
-            List<string> recentTargetPathsUpdated = [..recentTargetPaths];
+            List<string> recentTargetPathsUpdated = [.. recentTargetPaths];
 
             if (recentTargetPathsUpdated.Contains(destinationFolder.Path))
             {
@@ -456,7 +456,7 @@ public class AssetRepository : IAssetRepository
 
             recentTargetPathsUpdated.Insert(0, destinationFolder.Path);
 
-            recentTargetPathsUpdated = recentTargetPathsUpdated.Take(RECENT_TARGET_PATHS_MAX_COUNT).ToList();
+            recentTargetPathsUpdated = [.. recentTargetPathsUpdated.Take(RECENT_TARGET_PATHS_MAX_COUNT)];
 
             SaveRecentTargetPaths(recentTargetPathsUpdated);
         }
@@ -641,7 +641,7 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
-            result = assets.Where(a => a.FolderId == folderId).ToList();
+            result = [.. assets.Where(a => a.FolderId == folderId)];
         }
 
         return result;

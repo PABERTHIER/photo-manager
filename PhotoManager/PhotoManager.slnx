@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Benchmarks/">
+    <Project Path="Benchmarks/PhotoManager.Benchmarks/PhotoManager.Benchmarks.csproj" />
+  </Folder>
+  <Project Path="PhotoManager.Application/PhotoManager.Application.csproj" />
+  <Project Path="PhotoManager.Common/PhotoManager.Common.csproj" />
+  <Project Path="PhotoManager.Domain/PhotoManager.Domain.csproj" />
+  <Project Path="PhotoManager.Infrastructure/PhotoManager.Infrastructure.csproj" />
+  <Project Path="PhotoManager.Tests/PhotoManager.Tests.csproj" />
+  <Project Path="PhotoManager.UI/PhotoManager.UI.csproj" />
+</Solution>

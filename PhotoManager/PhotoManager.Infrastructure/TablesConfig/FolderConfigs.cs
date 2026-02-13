@@ -4,11 +4,11 @@ public static class FolderConfigs
 {
     public static ColumnProperties[] ConfigureDataTable()
     {
-        return new ColumnProperties[]
-        {
-            new ColumnProperties { ColumnName = "Id" },
-            new ColumnProperties { ColumnName = "Path" }
-        };
+        return
+        [
+            new() { ColumnName = "Id" },
+            new() { ColumnName = "Path" }
+        ];
     }
 
     public static Folder ReadFunc(string[] values)

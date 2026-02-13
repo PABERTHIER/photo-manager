@@ -40,24 +40,24 @@ public class SyncAssetsWindowTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        AssetRepository assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
-        _storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (assetRepository, _storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        AssetRepository assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        _storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(assetRepository, _storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (assetRepository, _storageService, assetCreationService, userConfigurationService, assetsComparator);
-        _moveAssetsService = new (assetRepository, _storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (assetRepository, _storageService, assetsComparator, _moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, _storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new (assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, userConfigurationService, _storageService);
-        _syncAssetsViewModel = new (application);
+        CatalogAssetsService catalogAssetsService = new(assetRepository, _storageService, assetCreationService, userConfigurationService, assetsComparator);
+        _moveAssetsService = new(assetRepository, _storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, _storageService, assetsComparator, _moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, _storageService, userConfigurationService);
+        PhotoManager.Application.Application application = new(assetRepository, syncAssetsService, catalogAssetsService, _moveAssetsService, findDuplicatedAssetsService, userConfigurationService, _storageService);
+        _syncAssetsViewModel = new(application);
     }
 
     [Test]
@@ -99,7 +99,7 @@ public class SyncAssetsWindowTests
             Assert.That(syncAssetsConfiguration.Definitions[1].SourceDirectory, Is.EqualTo("C:\\Tutu\\Screenshots"));
             Assert.That(syncAssetsConfiguration.Definitions[1].DestinationDirectory, Is.EqualTo("C:\\Images\\Tutu"));
 
-            _syncAssetsViewModel!.Definitions = [..syncAssetsConfiguration.Definitions];
+            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfiguration.Definitions];
 
             CheckAfterChanges(
                 _syncAssetsViewModel!,
@@ -153,7 +153,7 @@ public class SyncAssetsWindowTests
 
             Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
 
-            _syncAssetsViewModel!.Definitions = [..syncAssetsConfiguration.Definitions];
+            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfiguration.Definitions];
 
             CheckAfterChanges(
                 _syncAssetsViewModel!,
@@ -318,7 +318,7 @@ public class SyncAssetsWindowTests
                     DeleteAssetsNotInSource = false
                 });
 
-            _syncAssetsViewModel!.Definitions = [..syncAssetsConfigurationToSave.Definitions];
+            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfigurationToSave.Definitions];
 
             SyncAssetsConfiguration configuration = new();
             configuration.Definitions.AddRange(_syncAssetsViewModel!.Definitions);
@@ -444,7 +444,7 @@ public class SyncAssetsWindowTests
                     DeleteAssetsNotInSource = false
                 });
 
-            _syncAssetsViewModel!.Definitions = [..syncAssetsConfigurationToSave.Definitions];
+            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfigurationToSave.Definitions];
 
             SyncAssetsConfiguration configuration = new();
             configuration.Definitions.AddRange(_syncAssetsViewModel!.Definitions);
@@ -690,7 +690,7 @@ public class SyncAssetsWindowTests
                     IncludeSubFolders = true
                 });
 
-            _syncAssetsViewModel!.Definitions = [..syncAssetsConfiguration.Definitions];
+            _syncAssetsViewModel!.Definitions = [.. syncAssetsConfiguration.Definitions];
 
             SyncAssetsConfiguration configuration = new();
             configuration.Definitions.AddRange(_syncAssetsViewModel!.Definitions);
@@ -1157,7 +1157,7 @@ public class SyncAssetsWindowTests
         List<string> notifyPropertyChangedEvents = [];
         List<SyncAssetsViewModel> syncAssetsViewModelInstances = [];
 
-        _syncAssetsViewModel!.PropertyChanged += delegate(object? sender, PropertyChangedEventArgs e)
+        _syncAssetsViewModel!.PropertyChanged += delegate (object? sender, PropertyChangedEventArgs e)
         {
             notifyPropertyChangedEvents.Add(e.PropertyName!);
             syncAssetsViewModelInstances.Add((SyncAssetsViewModel)sender!);

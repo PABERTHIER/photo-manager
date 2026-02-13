@@ -3,7 +3,6 @@
     <PackageReference Include="FFMpegCore" />
     <PackageReference Include="log4net" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" />
-    <PackageReference Include="System.Drawing.Common" />
   </ItemGroup>
 
   <!-- Reference the custom MSBuild task -->

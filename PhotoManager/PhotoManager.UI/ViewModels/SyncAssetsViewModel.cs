@@ -1,15 +1,12 @@
 ﻿using PhotoManager.Application;
 using PhotoManager.Domain;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace PhotoManager.UI.ViewModels;
 
-public class SyncAssetsViewModel(IApplication application) : BaseProcessViewModel<SyncAssetsConfiguration, SyncAssetsResult>
+public class SyncAssetsViewModel(IApplication application)
+    : BaseProcessViewModel<SyncAssetsConfiguration, SyncAssetsResult>
 {
-    private ObservableCollection<SyncAssetsDirectoriesDefinition> _definitions = [];
-
     public override string Description => "This process allows to sync new assets to the catalog. " +
                                           "You can configure one or multiple sync operations by entering a source path and a destination path. " +
                                           "You can specify if the sync operation should also include sub-folders. " +
@@ -17,13 +14,13 @@ public class SyncAssetsViewModel(IApplication application) : BaseProcessViewMode
 
     public ObservableCollection<SyncAssetsDirectoriesDefinition> Definitions
     {
-        get => _definitions;
+        get;
         set
         {
-            _definitions = value;
+            field = value;
             NotifyPropertyChanged(nameof(Definitions));
         }
-    }
+    } = [];
 
     public void DeleteDefinition(SyncAssetsDirectoriesDefinition definition)
     {
@@ -45,11 +42,12 @@ public class SyncAssetsViewModel(IApplication application) : BaseProcessViewMode
 
     public override SyncAssetsConfiguration GetProcessConfiguration() => application.GetSyncAssetsConfiguration();
 
-    public override void SetProcessConfiguration(SyncAssetsConfiguration configuration) => application.SetSyncAssetsConfiguration(configuration);
+    public override void SetProcessConfiguration(SyncAssetsConfiguration configuration) =>
+        application.SetSyncAssetsConfiguration(configuration);
 
     public override async Task RunProcessAsync(ProcessStatusChangedCallback callback)
     {
         List<SyncAssetsResult> results = await application.SyncAssetsAsync(callback);
-        Results = [..results];
+        Results = [.. results];
     }
 }

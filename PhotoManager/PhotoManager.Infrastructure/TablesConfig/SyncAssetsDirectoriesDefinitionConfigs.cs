@@ -4,13 +4,13 @@ public static class SyncAssetsDirectoriesDefinitionConfigs
 {
     public static ColumnProperties[] ConfigureDataTable()
     {
-        return new ColumnProperties[]
-        {
-            new ColumnProperties { ColumnName = "SourceDirectory" },
-            new ColumnProperties { ColumnName = "DestinationDirectory" },
-            new ColumnProperties { ColumnName = "IncludeSubFolders" },
-            new ColumnProperties { ColumnName = "DeleteAssetsNotInSource" }
-        };
+        return
+        [
+            new() { ColumnName = "SourceDirectory" },
+            new() { ColumnName = "DestinationDirectory" },
+            new() { ColumnName = "IncludeSubFolders" },
+            new() { ColumnName = "DeleteAssetsNotInSource" }
+        ];
     }
 
     public static SyncAssetsDirectoriesDefinition ReadFunc(string[] values)

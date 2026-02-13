@@ -1,7 +1,7 @@
 ﻿using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
-using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Unit.Constants.PixelHeightAsset;
+using PixelWidthAsset = PhotoManager.Tests.Unit.Constants.PixelWidthAsset;
 
 namespace PhotoManager.Tests.Unit.Common;
 
@@ -37,8 +37,8 @@ public class BitmapHelperTests
         Assert.That(image.Height, Is.EqualTo(expectedPixelHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedPixelWidth));
         Assert.That(image.PixelHeight, Is.EqualTo(expectedPixelHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -110,8 +110,8 @@ public class BitmapHelperTests
             Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
             Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
             Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0)); // We should have the width value
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0)); // We should have the height value
+            Assert.That(image.DecodePixelWidth, Is.Zero); // We should have the width value
+            Assert.That(image.DecodePixelHeight, Is.Zero); // We should have the height value
         }
     }
 
@@ -259,8 +259,8 @@ public class BitmapHelperTests
         Assert.That(image.Height, Is.EqualTo(expectedPixelHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedPixelWidth));
         Assert.That(image.PixelHeight, Is.EqualTo(expectedPixelHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -299,8 +299,8 @@ public class BitmapHelperTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -340,7 +340,7 @@ public class BitmapHelperTests
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC);
         byte[] buffer = File.ReadAllBytes(filePath);
-    
+
         BitmapImage image = BitmapHelper.LoadBitmapHeicThumbnailImage(buffer, rotation, width, height);
 
         Assert.That(image, Is.Not.Null);
@@ -350,8 +350,8 @@ public class BitmapHelperTests
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -373,8 +373,8 @@ public class BitmapHelperTests
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -396,8 +396,8 @@ public class BitmapHelperTests
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -412,8 +412,8 @@ public class BitmapHelperTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -429,8 +429,8 @@ public class BitmapHelperTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -469,8 +469,8 @@ public class BitmapHelperTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -506,8 +506,8 @@ public class BitmapHelperTests
         Assert.That(image.Height, Is.EqualTo(expectedHeight));
         Assert.That(image.PixelWidth, Is.EqualTo(expectedWith));
         Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -522,8 +522,8 @@ public class BitmapHelperTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -538,8 +538,8 @@ public class BitmapHelperTests
         Assert.That(image, Is.Not.Null);
         Assert.That(image.StreamSource, Is.Null);
         Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-        Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-        Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+        Assert.That(image.DecodePixelWidth, Is.Zero);
+        Assert.That(image.DecodePixelHeight, Is.Zero);
     }
 
     [Test]
@@ -573,8 +573,8 @@ public class BitmapHelperTests
             Assert.That(image.Height, Is.EqualTo(5376)); // Wrong height
             Assert.That(image.PixelWidth, Is.EqualTo(PixelWidthAsset.IMAGE_11_HEIC));
             Assert.That(image.PixelHeight, Is.EqualTo(PixelHeightAsset.IMAGE_11_HEIC));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
     }
 
@@ -600,8 +600,8 @@ public class BitmapHelperTests
             Assert.That(image.Height, Is.EqualTo(expectedHeight));
             Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
             Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
     }
 
@@ -625,8 +625,8 @@ public class BitmapHelperTests
             Assert.That(image.Height, Is.EqualTo(expectedHeight));
             Assert.That(image.PixelWidth, Is.EqualTo(expectedWidth));
             Assert.That(image.PixelHeight, Is.EqualTo(expectedHeight));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
     }
 
@@ -644,8 +644,8 @@ public class BitmapHelperTests
             Assert.That(image, Is.Not.Null);
             Assert.That(image.StreamSource, Is.Null);
             Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
     }
 
@@ -663,8 +663,8 @@ public class BitmapHelperTests
             Assert.That(image, Is.Not.Null);
             Assert.That(image.StreamSource, Is.Null);
             Assert.That(image.Rotation, Is.EqualTo(Rotation.Rotate0));
-            Assert.That(image.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image.DecodePixelWidth, Is.Zero);
+            Assert.That(image.DecodePixelHeight, Is.Zero);
         }
     }
 
@@ -840,7 +840,7 @@ public class BitmapHelperTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
 
@@ -918,7 +918,7 @@ public class BitmapHelperTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
 
@@ -996,7 +996,7 @@ public class BitmapHelperTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
 

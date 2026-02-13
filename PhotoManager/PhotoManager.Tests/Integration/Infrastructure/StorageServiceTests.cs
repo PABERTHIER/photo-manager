@@ -2,10 +2,10 @@
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure;
 
@@ -26,8 +26,8 @@ public class StorageServiceTests
         configurationRootMock.GetDefaultMockConfig();
         configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
 
-        _userConfigurationService = new (configurationRootMock.Object);
-        _storageService = new (_userConfigurationService);
+        _userConfigurationService = new(configurationRootMock.Object);
+        _storageService = new(_userConfigurationService);
     }
 
     [Test]
@@ -244,7 +244,7 @@ public class StorageServiceTests
     [Test]
     public void GetExifOrientation_InvalidFormat_ReturnsCorruptedOrientationValue()
     {
-        Bitmap image = new (10, 10);
+        Bitmap image = new(10, 10);
 
         using (MemoryStream ms = new())
         {
@@ -317,7 +317,7 @@ public class StorageServiceTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetJpegBitmapImage(image);
 
@@ -395,7 +395,7 @@ public class StorageServiceTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetPngBitmapImage(image);
 
@@ -473,7 +473,7 @@ public class StorageServiceTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new (new Uri(filePath));
+        BitmapImage image = new(new Uri(filePath));
 
         byte[] imageBuffer = _storageService!.GetGifBitmapImage(image);
 
@@ -769,19 +769,19 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.That(asset1.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset1.FileProperties.Size, Is.Zero);
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
-            Assert.That(asset2.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset2.FileProperties.Size, Is.Zero);
             Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
-            Assert.That(asset3.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset3.FileProperties.Size, Is.Zero);
             Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
-            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Size, Is.Zero);
             Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
-            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Size, Is.Zero);
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
 
@@ -927,19 +927,19 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.That(asset1.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset1.FileProperties.Size, Is.Zero);
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
-            Assert.That(asset2.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset2.FileProperties.Size, Is.Zero);
             Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
-            Assert.That(asset3.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset3.FileProperties.Size, Is.Zero);
             Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
-            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Size, Is.Zero);
             Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
-            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Size, Is.Zero);
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
 
@@ -947,19 +947,19 @@ public class StorageServiceTests
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
 
-            Assert.That(asset1.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset1.FileProperties.Size, Is.Zero);
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
-            Assert.That(asset2.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset2.FileProperties.Size, Is.Zero);
             Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
-            Assert.That(asset3.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset3.FileProperties.Size, Is.Zero);
             Assert.That(asset3.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset3.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
-            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Size, Is.Zero);
             Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
-            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Size, Is.Zero);
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
         }
@@ -1058,16 +1058,16 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.That(asset1.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset1.FileProperties.Size, Is.Zero);
             Assert.That(asset1.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset1.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
-            Assert.That(asset2.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset2.FileProperties.Size, Is.Zero);
             Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
-            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Size, Is.Zero);
             Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
-            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Size, Is.Zero);
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
 
@@ -1081,10 +1081,10 @@ public class StorageServiceTests
             Assert.That(asset2.FileProperties.Size, Is.EqualTo(FileSize.IMAGE_1_JPG));
             Assert.That(asset2.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset2.FileProperties.Modification.Date, Is.EqualTo(oldDateTime.Date));
-            Assert.That(asset4.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset4.FileProperties.Size, Is.Zero);
             Assert.That(asset4.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset4.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
-            Assert.That(asset5.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset5.FileProperties.Size, Is.Zero);
             Assert.That(asset5.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset5.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
         }
@@ -1130,7 +1130,7 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(DateTime.MinValue));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(DateTime.MinValue));
 
@@ -1174,13 +1174,13 @@ public class StorageServiceTests
             DateTime creationTime = default;
             DateTime modificationTime = default;
 
-            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
 
             _storageService!.UpdateAssetFileProperties(asset);
 
-            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
         }
@@ -1228,7 +1228,7 @@ public class StorageServiceTests
                 Hash = string.Empty
             };
 
-            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
 
@@ -1236,7 +1236,7 @@ public class StorageServiceTests
 
             Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path1')"));
 
-            Assert.That(asset.FileProperties.Size, Is.EqualTo(0));
+            Assert.That(asset.FileProperties.Size, Is.Zero);
             Assert.That(asset.FileProperties.Creation.Date, Is.EqualTo(creationTime.Date));
             Assert.That(asset.FileProperties.Modification.Date, Is.EqualTo(modificationTime.Date));
         }
@@ -1333,11 +1333,11 @@ public class StorageServiceTests
             configurationRootMock.GetDefaultMockConfig();
             configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, assetsDirectory);
 
-            UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
-            StorageService storageService = new (userConfigurationService);
+            UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+            StorageService storageService = new(userConfigurationService);
 
             int totalFilesCount = storageService.GetTotalFilesCount();
-            Assert.That(totalFilesCount, Is.EqualTo(0));
+            Assert.That(totalFilesCount, Is.Zero);
         }
         finally
         {

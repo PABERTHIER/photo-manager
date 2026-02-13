@@ -4,10 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PhotoManager.UI.Controls"
-        x:Name="window" x:Class="PhotoManager.UI.Windows.MainWindow"
+        x:Name="Window"
+        x:Class="PhotoManager.UI.Windows.MainWindow"
         mc:Ignorable="d"
-        Title="{Binding AppTitle}" Height="600" Width="800" Foreground="White" Background="Black" WindowState="Maximized"
-        Loaded="Window_Loaded" KeyDown="Window_KeyDown" Closing="Window_Closing">
+        Title="{Binding AppTitle}"
+        Height="600"
+        Width="800"
+        Foreground="White"
+        Background="Black"
+        WindowState="Maximized"
+        Loaded="Window_Loaded"
+        KeyDown="Window_KeyDown"
+        Closing="Window_Closing">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -42,13 +50,13 @@
                 <RowDefinition Height="30" />
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
-            <local:FolderNavigationControl x:Name="folderTreeView" Grid.Column="0" Grid.Row="0" FolderSelected="FolderTreeView_FolderSelected" Visibility="{Binding ThumbnailsVisible}"/>
-            <local:ViewerUserControl x:Name="viewerUserControl" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="2" ThumbnailSelected="ToggleImageView" Visibility="{Binding ViewerVisible}"/>
-            <local:ThumbnailsUserControl x:Name="thumbnailsUserControl" Grid.Column="1" Grid.Row="0" ThumbnailSelected="ToggleImageView" Visibility="{Binding ThumbnailsVisible}"/>
-            <Label x:Name="globalAssetsCounterWording" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding GlobalAssetsCounterWording}" Visibility="{Binding ThumbnailsVisible}"/>
-            <Label x:Name="totalFilesCountWording" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding TotalFilesCountWording}" Visibility="{Binding ThumbnailsVisible}"/>
-            <Label x:Name="statusLabel" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding StatusMessage}" Visibility="{Binding ThumbnailsVisible}" HorizontalContentAlignment="Left"/>
-            <Label x:Name="executionTimeWording" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding ExecutionTimeWording}" Visibility="{Binding ThumbnailsVisible}" HorizontalContentAlignment="Right"/>
+            <local:FolderNavigationControl x:Name="FolderTreeView" Grid.Column="0" Grid.Row="0" FolderSelected="FolderTreeView_FolderSelected" Visibility="{Binding ThumbnailsVisible}"/>
+            <local:ViewerUserControl x:Name="ViewerUserControl" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="2" ThumbnailSelected="ToggleImageView" Visibility="{Binding ViewerVisible}"/>
+            <local:ThumbnailsUserControl x:Name="ThumbnailsUserControl" Grid.Column="1" Grid.Row="0" ThumbnailSelected="ToggleImageView" Visibility="{Binding ThumbnailsVisible}"/>
+            <Label x:Name="GlobalAssetsCounterWording" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding GlobalAssetsCounterWording}" Visibility="{Binding ThumbnailsVisible}"/>
+            <Label x:Name="TotalFilesCountWording" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding TotalFilesCountWording}" Visibility="{Binding ThumbnailsVisible}"/>
+            <Label x:Name="StatusLabel" Grid.Column="1" Grid.Row="1" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding StatusMessage}" Visibility="{Binding ThumbnailsVisible}" HorizontalContentAlignment="Left"/>
+            <Label x:Name="ExecutionTimeWording" Grid.Column="1" Grid.Row="2" Foreground="#FFFFFFFF" Background="#FF3C3C3C" Content="{Binding ExecutionTimeWording}" Visibility="{Binding ThumbnailsVisible}" HorizontalContentAlignment="Right"/>
         </Grid>
     </DockPanel>
 </Window>

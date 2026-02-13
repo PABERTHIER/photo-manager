@@ -66,7 +66,7 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
     public void MoveUp_FirstItemAndDuplicateItemsInTheCollection_DoesNotMoveUpItem(string[] collection, string[] expectedCollection)
     {
-        ObservableCollection<string> items = [..collection];
+        ObservableCollection<string> items = [.. collection];
 
         Assert.That(items, Has.Count.EqualTo(3));
         Assert.That(items[0], Is.EqualTo(collection[0]));
@@ -88,7 +88,7 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
     public void MoveUp_NotFirstAndNotLastItemAndDuplicateItemsInTheCollection_MovesUpFirstItemDuplicate(string[] collection, string[] expectedCollection)
     {
-        ObservableCollection<string> items = [..collection];
+        ObservableCollection<string> items = [.. collection];
 
         Assert.That(items, Has.Count.EqualTo(3));
         Assert.That(items[0], Is.EqualTo(collection[0]));
@@ -110,7 +110,7 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "tutu", "toto" })]
     public void MoveUp_LastItemAndDuplicateItemsInTheCollection_MovesUpFirstItemDuplicate(string[] collection, string[] expectedCollection)
     {
-        ObservableCollection<string> items = [..collection];
+        ObservableCollection<string> items = [.. collection];
 
         Assert.That(items, Has.Count.EqualTo(3));
         Assert.That(items[0], Is.EqualTo(collection[0]));
@@ -254,7 +254,7 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
     public void MoveDown_FirstItemAndDuplicateItemsInTheCollection_DoesNotMoveDownItem(string[] collection, string[] expectedCollection)
     {
-        ObservableCollection<string> items = [..collection];
+        ObservableCollection<string> items = [.. collection];
 
         Assert.That(items, Has.Count.EqualTo(3));
         Assert.That(items[0], Is.EqualTo(collection[0]));
@@ -276,7 +276,7 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
     public void MoveDown_NotFirstAndNotLastItemAndDuplicateItemsInTheCollection_MovesDownFirstItemDuplicate(string[] collection, string[] expectedCollection)
     {
-        ObservableCollection<string> items = [..collection];
+        ObservableCollection<string> items = [.. collection];
 
         Assert.That(items, Has.Count.EqualTo(3));
         Assert.That(items[0], Is.EqualTo(collection[0]));
@@ -298,7 +298,7 @@ public class ViewModelExtensionsTests
     [TestCase(new[] { "toto", "toto", "tutu" }, new[] { "toto", "toto", "tutu" })] // Unchanged
     public void MoveDown_LastItemAndDuplicateItemsInTheCollection_MovesDownFirstItemDuplicate(string[] collection, string[] expectedCollection)
     {
-        ObservableCollection<string> items = [..collection];
+        ObservableCollection<string> items = [.. collection];
 
         Assert.That(items, Has.Count.EqualTo(3));
         Assert.That(items[0], Is.EqualTo(collection[0]));

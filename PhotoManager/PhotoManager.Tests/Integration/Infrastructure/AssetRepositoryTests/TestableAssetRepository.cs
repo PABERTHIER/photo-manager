@@ -1,10 +1,6 @@
 ﻿namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
-public class TestableAssetRepository : AssetRepository
+public class TestableAssetRepository(IDatabase database, IStorageService storageService, IUserConfigurationService userConfigurationService) : AssetRepository(database, storageService, userConfigurationService)
 {
     public Dictionary<string, Dictionary<string, byte[]>> GetThumbnails() => Thumbnails;
-
-    public TestableAssetRepository(IDatabase database, IStorageService storageService, IUserConfigurationService userConfigurationService) : base(database, storageService, userConfigurationService)
-    {
-    }
 }

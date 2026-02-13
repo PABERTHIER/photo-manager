@@ -1,14 +1,14 @@
-﻿using Reactive = System.Reactive;
-using Directories = PhotoManager.Tests.Integration.Constants.Directories;
+﻿using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
+using Reactive = System.Reactive;
 using Tables = PhotoManager.Tests.Integration.Constants.Tables;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
@@ -44,9 +44,9 @@ public class AssetRepositorySaveCatalogTests
     [SetUp]
     public void SetUp()
     {
-        _database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _userConfigurationService = new (_configurationRootMock!.Object);
-        _assetRepository = new (_database, _storageServiceMock!.Object, _userConfigurationService);
+        _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        _userConfigurationService = new(_configurationRootMock!.Object);
+        _assetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
 
         _asset1 = new()
         {
@@ -241,7 +241,7 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(_assetRepository.HasChanges(), Is.False);
 
             // New AssetRepository to test Initialize method with content in DB
-            AssetRepository assetRepository = new (_database!, _storageServiceMock!.Object, _userConfigurationService);
+            AssetRepository assetRepository = new(_database!, _storageServiceMock!.Object, _userConfigurationService);
 
             Assert.That(assetRepository.HasChanges(), Is.False);
 

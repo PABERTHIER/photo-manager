@@ -3,10 +3,10 @@ using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using FileSize = PhotoManager.Tests.Integration.Constants.FileSize;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
 using ModificationDate = PhotoManager.Tests.Integration.Constants.ModificationDate;
-using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using PixelHeightAsset = PhotoManager.Tests.Integration.Constants.PixelHeightAsset;
-using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
+using PixelWidthAsset = PhotoManager.Tests.Integration.Constants.PixelWidthAsset;
 using ThumbnailHeightAsset = PhotoManager.Tests.Integration.Constants.ThumbnailHeightAsset;
+using ThumbnailWidthAsset = PhotoManager.Tests.Integration.Constants.ThumbnailWidthAsset;
 
 namespace PhotoManager.Tests.Integration.Application;
 
@@ -146,23 +146,23 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, usingPHash.ToString());
         configurationRootMock.MockGetValue(UserConfigurationKeys.ANALYSE_VIDEOS, analyseVideos.ToString());
 
-        UserConfigurationService userConfigurationService = new (configurationRootMock.Object);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IStorageService> storageServiceMock = new();
         storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
         storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
 
-        Database database = new (new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        AssetRepository assetRepository = new (database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new (userConfigurationService);
-        AssetHashCalculatorService assetHashCalculatorService = new (userConfigurationService);
-        AssetCreationService assetCreationService = new (assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+        AssetRepository assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        StorageService storageService = new(userConfigurationService);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+        AssetCreationService assetCreationService = new(assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new (assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new (assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new (assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new (assetRepository, storageService, userConfigurationService);
-        _application = new (assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(assetRepository, storageService, assetCreationService);
+        SyncAssetsService syncAssetsService = new(assetRepository, storageService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService = new(assetRepository, storageService, userConfigurationService);
+        _application = new(assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
     }
 
     [Test]
@@ -174,7 +174,7 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
 
         try
         {
-            await _application!.CatalogAssetsAsync(_ => {});
+            await _application!.CatalogAssetsAsync(_ => { });
 
             Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
 
@@ -192,8 +192,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That(image1.Height, Is.EqualTo(_asset1.Pixel.Asset.Height));
             Assert.That(image1.PixelWidth, Is.EqualTo(_asset1.Pixel.Asset.Width));
             Assert.That(image1.PixelHeight, Is.EqualTo(_asset1.Pixel.Asset.Height));
-            Assert.That(image1.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image1.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image1.DecodePixelWidth, Is.Zero);
+            Assert.That(image1.DecodePixelHeight, Is.Zero);
 
             Assert.That(image2, Is.Not.Null);
             Assert.That(image2.StreamSource, Is.Not.Null);
@@ -202,8 +202,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That((int)image2.Height, Is.EqualTo(735)); // Should be _asset2.Pixel.Asset.Height -> 720 (weird result for png)
             Assert.That(image2.PixelWidth, Is.EqualTo(_asset2.Pixel.Asset.Width));
             Assert.That(image2.PixelHeight, Is.EqualTo(_asset2.Pixel.Asset.Height));
-            Assert.That(image2.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image2.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image2.DecodePixelWidth, Is.Zero);
+            Assert.That(image2.DecodePixelHeight, Is.Zero);
 
             Assert.That(image3, Is.Not.Null);
             Assert.That(image3.StreamSource, Is.Not.Null);
@@ -212,8 +212,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That((int)image3.Height, Is.EqualTo(735)); // Should be _asset3.Pixel.Asset.Height -> 720 (weird result for png)
             Assert.That(image3.PixelWidth, Is.EqualTo(_asset3.Pixel.Asset.Width));
             Assert.That(image3.PixelHeight, Is.EqualTo(_asset3.Pixel.Asset.Height));
-            Assert.That(image3.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image3.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image3.DecodePixelWidth, Is.Zero);
+            Assert.That(image3.DecodePixelHeight, Is.Zero);
 
             Assert.That(image4, Is.Not.Null);
             Assert.That(image4.StreamSource, Is.Not.Null);
@@ -222,8 +222,8 @@ public class ApplicationLoadBitmapHeicImageFromPathTests
             Assert.That(image4.Height, Is.EqualTo(_asset4.Pixel.Asset.Height));
             Assert.That(image4.PixelWidth, Is.EqualTo(_asset4.Pixel.Asset.Width));
             Assert.That(image4.PixelHeight, Is.EqualTo(_asset4.Pixel.Asset.Height));
-            Assert.That(image4.DecodePixelWidth, Is.EqualTo(0));
-            Assert.That(image4.DecodePixelHeight, Is.EqualTo(0));
+            Assert.That(image4.DecodePixelWidth, Is.Zero);
+            Assert.That(image4.DecodePixelHeight, Is.Zero);
         }
         finally
         {

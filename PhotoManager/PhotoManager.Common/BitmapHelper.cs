@@ -15,7 +15,7 @@ public static class BitmapHelper
         {
             BitmapImage image = new();
 
-            using (MemoryStream stream = new (buffer))
+            using (MemoryStream stream = new(buffer))
             {
                 image.BeginInit();
                 image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
@@ -41,7 +41,7 @@ public static class BitmapHelper
         {
             BitmapImage image = new();
 
-            using (MemoryStream stream = new (buffer))
+            using (MemoryStream stream = new(buffer))
             {
                 image.BeginInit();
                 image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
@@ -69,9 +69,9 @@ public static class BitmapHelper
 
         try
         {
-            using (MemoryStream stream = new (buffer))
+            using (MemoryStream stream = new(buffer))
             {
-                using (MagickImage magickImage = new (stream))
+                using (MagickImage magickImage = new(stream))
                 {
                     MagickImageApplyRotation(magickImage, rotation, true); // Apply Rotation because MagickImage does not rotate the image in-place
 
@@ -111,9 +111,9 @@ public static class BitmapHelper
 
         try
         {
-            using (MemoryStream stream = new (buffer))
+            using (MemoryStream stream = new(buffer))
             {
-                using (MagickImage magickImage = new (stream))
+                using (MagickImage magickImage = new(stream))
                 {
                     MagickImageApplyRotation(magickImage, rotation, false); // Apply Rotation because MagickImage does not rotate the image in-place
 
@@ -175,7 +175,7 @@ public static class BitmapHelper
 
         if (File.Exists(imagePath))
         {
-            using (MagickImage magickImage = new (imagePath))
+            using (MagickImage magickImage = new(imagePath))
             {
                 MagickImageApplyRotation(magickImage, rotation, false); // Apply Rotation because MagickImage does not rotate the image in-place
 
@@ -203,7 +203,7 @@ public static class BitmapHelper
         {
             BitmapImage thumbnailImage = new();
 
-            using (MemoryStream stream = new (buffer))
+            using (MemoryStream stream = new(buffer))
             {
                 thumbnailImage.BeginInit();
                 thumbnailImage.CacheOption = BitmapCacheOption.OnLoad;
@@ -229,14 +229,14 @@ public static class BitmapHelper
 
         if (File.Exists(imagePath))
         {
-            using (MagickImage magickImage = new (imagePath))
+            using (MagickImage magickImage = new(imagePath))
             {
                 // Convert the MagickImage to a byte array (supported format: JPG)
                 byte[] imageData = magickImage.ToByteArray(MagickFormat.Jpg);
 
-                using (MemoryStream stream = new (imageData))
+                using (MemoryStream stream = new(imageData))
                 {
-                    using (Bitmap bitmap = new (stream))
+                    using (Bitmap bitmap = new(stream))
                     {
                         // Create a copy of the Bitmap
                         // When the using block for the MemoryStream is exited, the stream is disposed of, which lead to have a default bitmap at the end and to lose all the data.
@@ -280,20 +280,14 @@ public static class BitmapHelper
 
     private static void MagickImageApplyRotation(MagickImage magickImage, Rotation rotation, bool isClockwise)
     {
-        int rotationAngle = 0;
 
-        switch (rotation)
+        int rotationAngle = rotation switch
         {
-            case Rotation.Rotate90:
-                rotationAngle = isClockwise ? 90 : -90;
-                break;
-            case Rotation.Rotate180:
-                rotationAngle = isClockwise ? 180 : -180;
-                break;
-            case Rotation.Rotate270:
-                rotationAngle = isClockwise ? 270 : -270;
-                break;
-        }
+            Rotation.Rotate90 => isClockwise ? 90 : -90,
+            Rotation.Rotate180 => isClockwise ? 180 : -180,
+            Rotation.Rotate270 => isClockwise ? 270 : -270,
+            _ => 0
+        };
 
         if (rotationAngle != 0)
         {

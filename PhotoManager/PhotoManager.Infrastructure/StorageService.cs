@@ -8,7 +8,7 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
 {
     public List<DirectoryInfo> GetSubDirectories(string directoryPath)
     {
-        return new DirectoryInfo(directoryPath).EnumerateDirectories().ToList();
+        return [.. new DirectoryInfo(directoryPath).EnumerateDirectories()];
     }
 
     public List<DirectoryInfo> GetRecursiveSubDirectories(string directoryPath)
@@ -46,7 +46,7 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
     public string[] GetFileNames(string directory)
     {
         string[] files = Directory.GetFiles(directory);
-        return files.Select(f => Path.GetFileName(f)).ToArray();
+        return [.. files.Select(f => Path.GetFileName(f))];
     }
 
     public byte[] GetFileBytes(string filePath)
@@ -157,7 +157,7 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
             return;
         }
 
-        FileInfo info = new (asset.FullPath);
+        FileInfo info = new(asset.FullPath);
 
         asset.FileProperties = new()
         {

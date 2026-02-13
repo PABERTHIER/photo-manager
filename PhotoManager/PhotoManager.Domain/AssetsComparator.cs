@@ -4,7 +4,7 @@ public class AssetsComparator : IAssetsComparator
 {
     public string[] GetNewFileNames(string[] fileNames, List<Asset> cataloguedAssets)
     {
-        return GetNewFileNamesList(fileNames, cataloguedAssets.Select(ca => ca.FileName).ToArray());
+        return GetNewFileNamesList(fileNames, [.. cataloguedAssets.Select(ca => ca.FileName)]);
     }
 
     public string[] GetNewFileNamesToSync(string[] sourceFileNames, string[] destinationFileNames)
@@ -19,22 +19,22 @@ public class AssetsComparator : IAssetsComparator
 
     public string[] GetUpdatedFileNames(List<Asset> cataloguedAssets)
     {
-        return cataloguedAssets.Where(IsUpdatedAsset()).Select(ca => ca.FileName).ToArray();
+        return [.. cataloguedAssets.Where(IsUpdatedAsset()).Select(ca => ca.FileName)];
     }
 
     public string[] GetDeletedFileNames(string[] fileNames, List<Asset> cataloguedAssets)
     {
-        return cataloguedAssets.Select(ca => ca.FileName).Except(fileNames).ToArray();
+        return [.. cataloguedAssets.Select(ca => ca.FileName).Except(fileNames)];
     }
 
     public string[] GetDeletedFileNamesToSync(string[] fileNames, string[] destinationFileNames)
     {
-        return destinationFileNames.Except(fileNames).ToArray();
+        return [.. destinationFileNames.Except(fileNames)];
     }
 
     private static string[] GetNewFileNamesList(string[] fileNames, string[] destinationFileNames)
     {
-        return fileNames.Except(destinationFileNames).Where(IsValidAsset).ToArray();
+        return [.. fileNames.Except(destinationFileNames).Where(IsValidAsset)];
     }
 
     private static bool IsValidAsset(string assetFileName)
@@ -65,6 +65,6 @@ public class AssetsComparator : IAssetsComparator
             }
         }
 
-        return (imageNames.ToArray(), videoNames.ToArray());
+        return ([.. imageNames], [.. videoNames]);
     }
 }
