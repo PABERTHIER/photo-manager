@@ -41,7 +41,7 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateHash_EmptyImageBytes_ReturnsSameHash()
+    public void CalculateHash_EmptyImageBytes_ReturnsDefaultHash()
     {
         byte[] imageBytes = [];
 
@@ -53,13 +53,15 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculateHash_NullImageBytes_ThrowsArgumentNullException()
+    public void CalculateHash_NullImageBytes_ReturnsDefaultHash()
     {
         byte[]? imageBytes = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateHash(imageBytes!));
+        string hash = HashingHelper.CalculateHash(imageBytes!);
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
     }
 
     [Test]
@@ -87,17 +89,22 @@ public class HashingHelperTests
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
 
-        MagickBlobErrorException? exception = Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(filePath));
+        MagickBlobErrorException? exception =
+            Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(filePath));
 
-        Assert.That(exception?.Message, Does.StartWith($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/"));
+        Assert.That(exception?.Message,
+            Does.StartWith($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/"));
     }
 
     [Test]
     public void CalculatePHash_ImagePathIsInvalid_ThrowsMagickMissingDelegateErrorException()
     {
-        MagickMissingDelegateErrorException? exception = Assert.Throws<MagickMissingDelegateErrorException>(() => HashingHelper.CalculatePHash(_dataDirectory!));
+        MagickMissingDelegateErrorException? exception =
+            Assert.Throws<MagickMissingDelegateErrorException>(() => HashingHelper.CalculatePHash(_dataDirectory!));
 
-        Assert.That(exception?.Message, Does.StartWith($"no decode delegate for this image format `{_dataDirectory!}' @ error/constitute.c/ReadImage/"));
+        Assert.That(exception?.Message,
+            Does.StartWith(
+                $"no decode delegate for this image format `{_dataDirectory!}' @ error/constitute.c/ReadImage/"));
     }
 
     [Test]
@@ -105,7 +112,8 @@ public class HashingHelperTests
     {
         string? filePath = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculatePHash(filePath!));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculatePHash(filePath!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null or empty. (Parameter 'fileName')"));
     }
@@ -156,7 +164,8 @@ public class HashingHelperTests
     [Test]
     public void CalculateDHash_ImagePathIsInvalid_ThrowsArgumentException()
     {
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_dataDirectory!));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateDHash(_dataDirectory!));
 
         Assert.That(exception?.Message, Is.EqualTo("Parameter is not valid."));
     }
@@ -166,7 +175,8 @@ public class HashingHelperTests
     {
         string? filePath = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateDHash(filePath!));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateDHash(filePath!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path')"));
     }
@@ -209,7 +219,8 @@ public class HashingHelperTests
     {
         byte[]? imageBytes = null;
 
-        ArgumentNullException? exception = Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateMD5Hash(imageBytes!));
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculateMD5Hash(imageBytes!));
 
         Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'source')"));
     }
@@ -231,7 +242,8 @@ public class HashingHelperTests
     [TestCase(PHashes.IMAGE_1_JPG, PHashes.IMAGE_10_PORTRAIT_PNG, 21)] // PHash
     [TestCase(DHashes.IMAGE_1_JPG, DHashes.IMAGE_10_PORTRAIT_PNG, 14)] // DHash
     [TestCase(MD5Hashes.IMAGE_1_JPG, MD5Hashes.IMAGE_1_90_DEG_JPG, 32)] // MD5Hash
-    public void CalculateHammingDistance_DifferentHashes_ReturnsCorrectDistance(string hash1, string hash2, int expectedDistance)
+    public void CalculateHammingDistance_DifferentHashes_ReturnsCorrectDistance(string hash1, string hash2,
+        int expectedDistance)
     {
         int distance = HashingHelper.CalculateHammingDistance(hash1, hash2);
 
@@ -247,7 +259,8 @@ public class HashingHelperTests
     [TestCase(null, null)]
     public void CalculateHammingDistance_IncorrectHashes_ThrowsArgumentException(string? hash1, string? hash2)
     {
-        ArgumentException? exception = Assert.Throws<ArgumentException>(() => HashingHelper.CalculateHammingDistance(hash1!, hash2!));
+        ArgumentException? exception =
+            Assert.Throws<ArgumentException>(() => HashingHelper.CalculateHammingDistance(hash1!, hash2!));
 
         Assert.That(exception?.Message, Is.EqualTo("Invalid arguments for hamming distance calculation."));
     }

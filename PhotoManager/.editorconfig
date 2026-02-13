@@ -249,6 +249,8 @@ dotnet_diagnostic.IDE0045.severity = suggestion
 dotnet_diagnostic.IDE0046.severity = suggestion
 # IDE0047: Remove unnecessary parentheses
 dotnet_diagnostic.IDE0047.severity = none
+# IDE0061: Use expression body for local functions
+dotnet_diagnostic.IDE0061.severity = none
 # IDE0063: Use simple 'using' statement
 dotnet_diagnostic.IDE0063.severity = none
 # IDE0072: Add missing cases to switch expression

@@ -256,3 +256,6 @@ __pycache__/
 *.pyc
 
 PhotoManager/tools
+
+# Benchmark results
+**/BenchmarkDotNet.Artifacts/

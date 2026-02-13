@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Benchmarks/">
+    <Project Path="Benchmarks/PhotoManager.Benchmarks/PhotoManager.Benchmarks.csproj" />
+  </Folder>
   <Project Path="PhotoManager.Application/PhotoManager.Application.csproj" />
   <Project Path="PhotoManager.Common/PhotoManager.Common.csproj" />
   <Project Path="PhotoManager.Domain/PhotoManager.Domain.csproj" />
