@@ -26,7 +26,6 @@ BenchmarkDotNet will provide:
 - **Mean**: Average execution time
 - **Error**: Half of the 99.9% confidence interval
 - **StdDev**: Standard deviation
-- **Median**: Median execution time
 - **Allocated**: Memory allocated per operation
 
 Look for:

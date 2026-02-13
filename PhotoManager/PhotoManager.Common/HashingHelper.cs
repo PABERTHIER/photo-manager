@@ -1,6 +1,6 @@
 ﻿using ImageMagick;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace PhotoManager.Common;
 
@@ -8,15 +8,21 @@ public static class HashingHelper
 {
     public static string CalculateHash(byte[] imageBytes)
     {
-        StringBuilder hashBuilder = new();
-        byte[] hash = SHA512.HashData(imageBytes);
+        Span<byte> hash = stackalloc byte[64];
+        SHA512.HashData(imageBytes, hash);
 
-        foreach (byte hashByte in hash)
+        return string.Create(128, hash, static (chars, hashBytes) =>
         {
-            hashBuilder.Append($"{hashByte:x2}");
-        }
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                byte b = hashBytes[i];
+                chars[i * 2] = GetHexChar(b >> 4);
+                chars[(i * 2) + 1] = GetHexChar(b & 0xF);
+            }
+        });
 
-        return hashBuilder.ToString();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static char GetHexChar(int value) => (char)(value < 10 ? '0' + value : 'a' + value - 10);
     }
 
     // Performances are decreased by 6 times with CalculatePHash
