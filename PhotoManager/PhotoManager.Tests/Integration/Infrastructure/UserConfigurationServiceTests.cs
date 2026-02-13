@@ -17,10 +17,11 @@ public class UserConfigurationServiceTests
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
         string configFilePath = Path.Combine(_dataDirectory, "appsettings.json");
 
-        IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile(configFilePath, optional: false, reloadOnChange: true);
+        IConfigurationBuilder builder =
+            new ConfigurationBuilder().AddJsonFile(configFilePath, optional: false, reloadOnChange: true);
         IConfigurationRoot configuration = builder.Build();
 
-        _userConfigurationService = new UserConfigurationService(configuration);
+        _userConfigurationService = new(configuration);
     }
 
     [Test]
@@ -50,7 +51,8 @@ public class UserConfigurationServiceTests
     public void GetAboutInformation_WithAssemblyWithoutProductAttribute_ReturnsDefaultProduct()
     {
         AssemblyName assemblyName = new("TestAssemblyWithoutProductAttribute");
-        AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+        AssemblyBuilder assemblyBuilder =
+            AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
         AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(assemblyBuilder);
 
@@ -217,8 +219,10 @@ public class UserConfigurationServiceTests
         Assert.That(assetsDirectory, Is.Not.Null);
         Assert.That(firstFrameVideosPath, Is.Not.Null);
 
-        Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine(assetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
-        Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine("E:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame")));
+        Assert.That(firstFrameVideosPath,
+            Is.EqualTo(Path.Combine(assetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
+        Assert.That(firstFrameVideosPath,
+            Is.EqualTo(Path.Combine("E:\\Workspace\\PhotoManager\\Test\\OutputVideoFirstFrame")));
     }
 
     [Test]
@@ -285,7 +289,8 @@ public class UserConfigurationServiceTests
     [Test]
     public void TablesSettingsAssetsTableName_CorrectValue_ReturnsTablesSettingsAssetsTableNameValue()
     {
-        string tablesSettingsAssetsTableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName;
+        string tablesSettingsAssetsTableName =
+            _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName;
 
         Assert.That(tablesSettingsAssetsTableName, Is.Not.Null);
         Assert.That(tablesSettingsAssetsTableName, Is.EqualTo("Assets"));
@@ -294,34 +299,41 @@ public class UserConfigurationServiceTests
     [Test]
     public void TablesSettingsFoldersTableName_CorrectValue_ReturnsTablesSettingsFoldersTableNameValue()
     {
-        string tablesSettingsFoldersTableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName;
+        string tablesSettingsFoldersTableName =
+            _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName;
 
         Assert.That(tablesSettingsFoldersTableName, Is.Not.Null);
         Assert.That(tablesSettingsFoldersTableName, Is.EqualTo("Folders"));
     }
 
     [Test]
-    public void TablesSettingsRecentTargetPathsTableName_CorrectValue_ReturnsTablesSettingsRecentTargetPathsTableNameValue()
+    public void
+        TablesSettingsRecentTargetPathsTableName_CorrectValue_ReturnsTablesSettingsRecentTargetPathsTableNameValue()
     {
-        string tablesSettingsRecentTargetPathsTableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName;
+        string tablesSettingsRecentTargetPathsTableName =
+            _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName;
 
         Assert.That(tablesSettingsRecentTargetPathsTableName, Is.Not.Null);
         Assert.That(tablesSettingsRecentTargetPathsTableName, Is.EqualTo("RecentTargetPaths"));
     }
 
     [Test]
-    public void TablesSettingsSyncAssetsDirectoriesDefinitionsTableName_CorrectValue_ReturnsTablesSettingsSyncAssetsDirectoriesDefinitionsTableNameValue()
+    public void
+        TablesSettingsSyncAssetsDirectoriesDefinitionsTableName_CorrectValue_ReturnsTablesSettingsSyncAssetsDirectoriesDefinitionsTableNameValue()
     {
-        string tablesSettingsSyncAssetsDirectoriesDefinitionsTableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
+        string tablesSettingsSyncAssetsDirectoriesDefinitionsTableName = _userConfigurationService!.StorageSettings
+            .TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
 
         Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName, Is.Not.Null);
-        Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName, Is.EqualTo("SyncAssetsDirectoriesDefinitions"));
+        Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName,
+            Is.EqualTo("SyncAssetsDirectoriesDefinitions"));
     }
 
     [Test]
     public void ThumbnailsDictionaryEntriesToKeep_CorrectValue_ReturnsThumbnailsDictionaryEntriesToKeepValue()
     {
-        ushort thumbnailsDictionaryEntriesToKeep = _userConfigurationService!.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
+        ushort thumbnailsDictionaryEntriesToKeep =
+            _userConfigurationService!.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
 
         Assert.That(thumbnailsDictionaryEntriesToKeep, Is.EqualTo(5));
     }
@@ -335,4 +347,3 @@ public class UserConfigurationServiceTests
         Assert.That(paths[0], Is.EqualTo("E:\\Workspace\\PhotoManager\\Test"));
     }
 }
-
