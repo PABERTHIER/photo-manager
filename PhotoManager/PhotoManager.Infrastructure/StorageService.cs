@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace PhotoManager.Infrastructure;
 
@@ -13,19 +13,13 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
 
     public List<DirectoryInfo> GetRecursiveSubDirectories(string directoryPath)
     {
-        List<DirectoryInfo> result = [];
-        GetRecursiveSubDirectories(directoryPath, result);
-
-        return result;
+        return [.. new DirectoryInfo(directoryPath).EnumerateDirectories("*", SearchOption.AllDirectories)];
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ResolveDataDirectory(string storageVersion)
     {
-        StringBuilder currentStorageVersion = new();
-        currentStorageVersion.Append('v');
-        currentStorageVersion.Append(storageVersion);
-
-        return Path.Combine(userConfigurationService.PathSettings.BackupPath, currentStorageVersion.ToString());
+        return Path.Combine(userConfigurationService.PathSettings.BackupPath, $"v{storageVersion}");
     }
 
     public void CreateDirectory(string directory)
@@ -195,19 +189,8 @@ public class StorageService(IUserConfigurationService userConfigurationService) 
         return directoryFileCounts.Sum(entry => entry.Value);
     }
 
-    private static int CountFilesInDirectory(string? directoryPath, SearchOption searchOption)
+    private static int CountFilesInDirectory(string directoryPath, SearchOption searchOption)
     {
-        return directoryPath == null ? 0 : Directory.EnumerateFiles(directoryPath, "*", searchOption).Count();
-    }
-
-    private void GetRecursiveSubDirectories(string directoryPath, List<DirectoryInfo> result)
-    {
-        List<DirectoryInfo> subDirectories = GetSubDirectories(directoryPath);
-        result.AddRange(subDirectories);
-
-        foreach (DirectoryInfo dir in subDirectories)
-        {
-            GetRecursiveSubDirectories(dir.FullName, result);
-        }
+        return Directory.EnumerateFiles(directoryPath, "*", searchOption).Count();
     }
 }
