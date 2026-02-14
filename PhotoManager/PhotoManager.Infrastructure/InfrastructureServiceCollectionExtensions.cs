@@ -4,20 +4,23 @@ namespace PhotoManager.Infrastructure;
 
 public static class InfrastructureServiceCollectionExtensions
 {
-    public static void AddInfrastructure(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddDatabase();
-        services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
-        services.AddSingleton<IStorageService, StorageService>();
-        services.AddSingleton<IAssetRepository, AssetRepository>();
-        services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
-    }
+        public void AddInfrastructure()
+        {
+            services.AddDatabase();
+            services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
+            services.AddSingleton<IStorageService, StorageService>();
+            services.AddSingleton<IAssetRepository, AssetRepository>();
+            services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
+        }
 
-    private static void AddDatabase(this IServiceCollection services)
-    {
-        services.AddSingleton<IObjectListStorage, ObjectListStorage>();
-        services.AddSingleton<IBlobStorage, BlobStorage>();
-        services.AddSingleton<IBackupStorage, BackupStorage>();
-        services.AddSingleton<IDatabase, Database.Database>();
+        private void AddDatabase()
+        {
+            services.AddSingleton<IObjectListStorage, ObjectListStorage>();
+            services.AddSingleton<IBlobStorage, BlobStorage>();
+            services.AddSingleton<IBackupStorage, BackupStorage>();
+            services.AddSingleton<IDatabase, Database.Database>();
+        }
     }
 }

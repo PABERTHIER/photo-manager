@@ -6,11 +6,11 @@ namespace PhotoManager.Infrastructure;
 
 public class UserConfigurationService : IUserConfigurationService
 {
-    public AssetSettings AssetSettings { get; private set; } = default!;
-    public HashSettings HashSettings { get; private set; } = default!;
-    public PathSettings PathSettings { get; private set; } = default!;
-    public ProjectSettings ProjectSettings { get; private set; } = default!;
-    public StorageSettings StorageSettings { get; private set; } = default!;
+    public AssetSettings AssetSettings { get; private set; } = null!;
+    public HashSettings HashSettings { get; private set; } = null!;
+    public PathSettings PathSettings { get; private set; } = null!;
+    public ProjectSettings ProjectSettings { get; private set; } = null!;
+    public StorageSettings StorageSettings { get; private set; } = null!;
 
     private readonly IConfigurationRoot _configuration;
 
@@ -25,7 +25,7 @@ public class UserConfigurationService : IUserConfigurationService
     {
         string? product = null;
         string version = "v" + GetProductVersion();
-        IEnumerable<Attribute> attrs = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute));
+        IEnumerable<Attribute> attrs = assembly.GetCustomAttributes<AssemblyProductAttribute>();
 
         if (attrs.SingleOrDefault() is AssemblyProductAttribute assemblyProduct)
         {
@@ -56,7 +56,8 @@ public class UserConfigurationService : IUserConfigurationService
         string? rotatedMessage = _configuration.GetValue<string>(UserConfigurationKeys.ASSET_ROTATED_MESSAGE);
         int catalogBatchSize = _configuration.GetValue<int>(UserConfigurationKeys.CATALOG_BATCH_SIZE);
         ushort catalogCooldownMinutes = _configuration.GetValue<ushort>(UserConfigurationKeys.CATALOG_COOLDOWN_MINUTES);
-        ushort corruptedImageOrientation = _configuration.GetValue<ushort>(UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION);
+        ushort corruptedImageOrientation =
+            _configuration.GetValue<ushort>(UserConfigurationKeys.CORRUPTED_IMAGE_ORIENTATION);
         ushort defaultExifOrientation = _configuration.GetValue<ushort>(UserConfigurationKeys.DEFAULT_EXIF_ORIENTATION);
         bool detectThumbnails = _configuration.GetValue<bool>(UserConfigurationKeys.DETECT_THUMBNAILS);
         bool syncAssetsEveryXMinutes = _configuration.GetValue<bool>(UserConfigurationKeys.SYNC_ASSETS_EVERY_X_MINUTES);
@@ -86,7 +87,8 @@ public class UserConfigurationService : IUserConfigurationService
         string? assetsDirectory = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_DIRECTORY);
         string? backupPath = _configuration.GetValue<string>(UserConfigurationKeys.BACKUP_PATH);
         string? exemptedFolderPath = _configuration.GetValue<string>(UserConfigurationKeys.EXEMPTED_FOLDER_PATH);
-        string? firstFrameVideosFolderName = _configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME);
+        string? firstFrameVideosFolderName =
+            _configuration.GetValue<string>(UserConfigurationKeys.FIRST_FRAME_VIDEOS_FOLDER_NAME);
 
         string firstFrameVideosPath = Path.Combine(assetsDirectory!, firstFrameVideosFolderName!);
 
@@ -103,18 +105,23 @@ public class UserConfigurationService : IUserConfigurationService
         string? folderNameTables = _configuration.GetValue<string>(UserConfigurationKeys.TABLES_FOLDER_NAME);
         FoldersNameSettings foldersNameSettings = new(folderNameBlobs!, folderNameTables!);
 
-        char? separator = _configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR)?.ToCharArray().First();
+        char separator = _configuration.GetValue<string>(UserConfigurationKeys.SEPARATOR)?.ToCharArray()[0] ?? '|';
         string? storageVersion = _configuration.GetValue<string>(UserConfigurationKeys.STORAGE_VERSION);
 
         string? assetsTableName = _configuration.GetValue<string>(UserConfigurationKeys.ASSETS_TABLE_NAME);
         string? foldersTableName = _configuration.GetValue<string>(UserConfigurationKeys.FOLDERS_TABLE_NAME);
-        string? recentTargetPathsTableName = _configuration.GetValue<string>(UserConfigurationKeys.RECENT_TARGET_PATHS_TABLE_NAME);
-        string? syncAssetsDirectoriesDefinitionsTableName = _configuration.GetValue<string>(UserConfigurationKeys.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME);
-        TablesSettings tablesSettings = new(assetsTableName!, foldersTableName!, recentTargetPathsTableName!, syncAssetsDirectoriesDefinitionsTableName!);
+        string? recentTargetPathsTableName =
+            _configuration.GetValue<string>(UserConfigurationKeys.RECENT_TARGET_PATHS_TABLE_NAME);
+        string? syncAssetsDirectoriesDefinitionsTableName =
+            _configuration.GetValue<string>(UserConfigurationKeys.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_TABLE_NAME);
+        TablesSettings tablesSettings = new(assetsTableName!, foldersTableName!, recentTargetPathsTableName!,
+            syncAssetsDirectoriesDefinitionsTableName!);
 
-        ushort thumbnailsDictionaryEntriesToKeep = _configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
+        ushort thumbnailsDictionaryEntriesToKeep =
+            _configuration.GetValue<ushort>(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP);
 
-        StorageSettings = new(backupsToKeep, foldersNameSettings, (char)separator!, storageVersion!, tablesSettings, thumbnailsDictionaryEntriesToKeep);
+        StorageSettings = new(backupsToKeep, foldersNameSettings, separator, storageVersion!, tablesSettings,
+            thumbnailsDictionaryEntriesToKeep);
     }
 
     private string? GetProductVersion()
