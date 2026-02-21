@@ -3113,7 +3113,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndTwoSetsOfDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!);
+        string exemptedFolderPath = _dataDirectory!;
 
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -3343,7 +3343,7 @@ public class FindDuplicatedAssetsViewModelGetNotExemptedDuplicatedAssetsTests
     [Test]
     public void GetNotExemptedDuplicatedAssets_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndOneSetOfDuplicates_ReturnsEmptyList()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!);
+        string exemptedFolderPath = _dataDirectory!;
 
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
 

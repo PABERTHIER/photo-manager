@@ -3399,7 +3399,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     [Test]
     public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndTwoSetsOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!);
+        string exemptedFolderPath = _dataDirectory!;
 
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
 
@@ -3649,7 +3649,7 @@ public class FindDuplicatedAssetsWindowDeleteNotExemptedDuplicatedAssetsLabelTes
     [Test]
     public void DeleteAllNotExemptedLabel_ExemptedFolderPathIsTheSameAsTheAssetsDirectoryAndOneSetOfDuplicates_SendsDeleteDuplicatedAssetsEventAndDoesNothing()
     {
-        string exemptedFolderPath = Path.Combine(_dataDirectory!);
+        string exemptedFolderPath = _dataDirectory!;
 
         ConfigureFindDuplicatedAssetsViewModel(100, _dataDirectory!, exemptedFolderPath, 200, 150, false, false, false, false);
 

@@ -463,7 +463,7 @@ public class FindDuplicatedAssetsViewModelMD5HashTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndMD5HashTypeAndAllDuplicatesSets_SetsDuplicates()
     {
-        string rootDirectory = Path.Combine(_dataDirectory!);
+        string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);

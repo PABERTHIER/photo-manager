@@ -196,15 +196,17 @@ public class AssetRepositorySaveCatalogTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!);
+            string folderPath1 = _dataDirectory!;
             string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
             _asset1 = _asset1!.WithFolder(addedFolder1);
+            string filePath = Path.Combine(folderPath1, _asset1.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
 
-            _assetRepository!.AddAsset(_asset1!, []);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);

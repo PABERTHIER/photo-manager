@@ -682,7 +682,7 @@ public class AssetRepositoryGetAssetsByPathTests
     }
 
     [Test]
-    public void GetAssetsByPath_ExceptionThrown_ReturnsAssetsWithPartialData()
+    public void GetAssetsByPath_ExceptionThrown_ReturnsAssetsWithPartialDataAndLogsIt()
     {
         Mock<IPathProviderService> pathProviderServiceMock = new();
         pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
@@ -697,6 +697,7 @@ public class AssetRepositoryGetAssetsByPathTests
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -720,47 +721,57 @@ public class AssetRepositoryGetAssetsByPathTests
             testableAssetRepository.AddAsset(_asset3, assetData1);
             testableAssetRepository.AddAsset(_asset2, assetData2);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(2));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset3.FileName));
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
+                Assert.That(cataloguedAssets, Has.Count.EqualTo(2));
+                Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset3.FileName));
+                Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+                Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
+                Assert.That(cataloguedAssets[1].ImageData, Is.Null);
 
-            Asset[] assets = testableAssetRepository.GetAssetsByPath(folderPath);
+                Asset[] assets = testableAssetRepository.GetAssetsByPath(folderPath);
 
-            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
+                Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+                Assert.That(cataloguedAssets[1].ImageData, Is.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
+                Assert.That(thumbnails, Has.Count.EqualTo(1));
+                Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
 
-            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
+                Assert.That(thumbnails[folderPath], Has.Count.EqualTo(2));
 
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset3.FileName), Is.True);
-            Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
+                Assert.That(thumbnails[folderPath].ContainsKey(_asset3.FileName), Is.True);
+                Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
 
-            Assert.That(thumbnails[folderPath][_asset3.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
+                Assert.That(thumbnails[folderPath][_asset3.FileName], Is.EqualTo(assetData1));
+                Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
-            Assert.That(assets, Has.Length.EqualTo(2));
-            Assert.That(assets[0].FileName, Is.EqualTo(_asset3.FileName));
-            Assert.That(assets[1].FileName, Is.EqualTo(_asset2.FileName));
+                Assert.That(assets, Has.Length.EqualTo(2));
+                Assert.That(assets[0].FileName, Is.EqualTo(_asset3.FileName));
+                Assert.That(assets[1].FileName, Is.EqualTo(_asset2.FileName));
 
-            imageProcessingServiceMock.Verify(x => x.LoadBitmapThumbnailImage(
-                It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+                imageProcessingServiceMock.Verify(x => x.LoadBitmapThumbnailImage(
+                    It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
 
-            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
-            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
+                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+                Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+
+                Exception exception = new("Exception of type 'System.Exception' was thrown.");
+                Exception[] expectedExceptions = [exception];
+                Type typeOfService = typeof(AssetRepository);
+
+                loggingAssertsService.AssertLogExceptions(expectedExceptions, typeOfService);
+            }
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 

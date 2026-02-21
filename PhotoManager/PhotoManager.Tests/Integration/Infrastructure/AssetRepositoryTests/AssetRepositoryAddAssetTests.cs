@@ -404,10 +404,12 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_AssetFolderIsDefault_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
+    public void AddAsset_AssetFolderIsDefault_AssetIsNotAddedAndAssetsUpdatedIsNotUpdatedAndLogsIt()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -426,11 +428,20 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            string[] messages =
+            [
+                $"The asset could not be added, folder path is null or empty, asset.FileName: {_asset1!.FileName}"
+            ];
+            Type typeOfService = typeof(AssetRepository);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 

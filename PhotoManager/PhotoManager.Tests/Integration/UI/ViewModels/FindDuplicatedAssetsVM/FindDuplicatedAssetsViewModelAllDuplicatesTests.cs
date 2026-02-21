@@ -474,7 +474,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_SetsDuplicates()
     {
-        string rootDirectory = Path.Combine(_dataDirectory!);
+        string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
@@ -876,7 +876,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
     [Test]
     public async Task CollapseAssets_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_CollapsesAssets()
     {
-        string rootDirectory = Path.Combine(_dataDirectory!);
+        string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
@@ -1782,7 +1782,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
     [Test]
     public async Task GetDuplicatedAssets_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_ReturnsOtherDuplicatedAssetsInTheSet()
     {
-        string rootDirectory = Path.Combine(_dataDirectory!);
+        string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
@@ -2438,7 +2438,7 @@ public class FindDuplicatedAssetsViewModelAllDuplicatesTests
     [Test]
     public async Task GetNotExemptedDuplicatedAssets_CataloguedAssetsAndBasicHashTypeAndAllDuplicatesSets_ReturnsOtherDuplicatedAssets()
     {
-        string rootDirectory = Path.Combine(_dataDirectory!);
+        string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);

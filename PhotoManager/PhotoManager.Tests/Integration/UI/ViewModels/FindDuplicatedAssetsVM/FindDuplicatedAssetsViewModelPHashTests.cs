@@ -959,7 +959,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndPHashTypeAndAllDuplicatesSetsAndDetectThumbnailsIsTrue_SetsDuplicates()
     {
-        string rootDirectory = Path.Combine(_dataDirectory!);
+        string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);
@@ -1477,7 +1477,7 @@ public class FindDuplicatedAssetsViewModelPHashTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndPHashTypeAndAllDuplicatesSetsAndDetectThumbnailsIsFalse_SetsDuplicates()
     {
-        string rootDirectory = Path.Combine(_dataDirectory!);
+        string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);

@@ -121,11 +121,7 @@ public class AssetRepositoryDeleteAssetTests
 
             Assert.That(assetDeleted2, Is.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(2));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails.ContainsKey(folderPath2), Is.True);
-            Assert.That(thumbnails[folderPath1], Is.Empty);
-            Assert.That(thumbnails[folderPath2], Is.Empty);
+            Assert.That(thumbnails, Is.Empty);
 
             assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
@@ -493,11 +489,7 @@ public class AssetRepositoryDeleteAssetTests
 
             Assert.That(assetDeleted2, Is.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(2));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails.ContainsKey(folderPath2), Is.True);
-            Assert.That(thumbnails[folderPath1], Is.Empty);
-            Assert.That(thumbnails[folderPath2], Is.Empty);
+            Assert.That(thumbnails, Is.Empty);
 
             assets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);

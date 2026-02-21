@@ -291,9 +291,7 @@ public class AssetRepositoryLoadThumbnailTests
             List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
             Assert.That(assets, Is.Empty);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
-            Assert.That(thumbnails[_dataDirectory!], Is.Empty);
+            Assert.That(thumbnails, Is.Empty);
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
 
