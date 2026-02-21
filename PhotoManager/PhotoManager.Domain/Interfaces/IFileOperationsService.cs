@@ -2,8 +2,8 @@
 
 public interface IFileOperationsService
 {
-    List<DirectoryInfo> GetSubDirectories(string directoryPath);
-    List<DirectoryInfo> GetRecursiveSubDirectories(string directoryPath);
+    DirectoryInfo[] GetSubDirectories(string directoryPath);
+    DirectoryInfo[] GetRecursiveSubDirectories(string directoryPath);
     void CreateDirectory(string directory);
     void DeleteFile(string directory, string fileName);
     string[] GetFileNames(string directory);

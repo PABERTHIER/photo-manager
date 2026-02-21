@@ -4,12 +4,12 @@ namespace PhotoManager.Infrastructure;
 
 public class FileOperationsService(IUserConfigurationService userConfigurationService) : IFileOperationsService
 {
-    public List<DirectoryInfo> GetSubDirectories(string directoryPath)
+    public DirectoryInfo[] GetSubDirectories(string directoryPath)
     {
         return [.. new DirectoryInfo(directoryPath).EnumerateDirectories()];
     }
 
-    public List<DirectoryInfo> GetRecursiveSubDirectories(string directoryPath)
+    public DirectoryInfo[] GetRecursiveSubDirectories(string directoryPath)
     {
         return [.. new DirectoryInfo(directoryPath).EnumerateDirectories("*", SearchOption.AllDirectories)];
     }

@@ -99,7 +99,7 @@ public class FileOperationsServiceBenchmarks
     }
 
     [Benchmark]
-    public List<DirectoryInfo> GetRecursiveSubDirectories_New()
+    public DirectoryInfo[] GetRecursiveSubDirectories_New()
     {
         return _fileOperationsService.GetRecursiveSubDirectories(_testDirectory);
     }

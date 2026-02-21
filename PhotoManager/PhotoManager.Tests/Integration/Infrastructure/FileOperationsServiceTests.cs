@@ -29,11 +29,11 @@ public class FileOperationsServiceTests
     }
 
     [Test]
-    public void GetSubDirectories_ValidDirectory_ReturnsListOfSubDirectories()
+    public void GetSubDirectories_ValidDirectory_ReturnsArrayOfSubDirectories()
     {
         string directoryPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        List<DirectoryInfo> subDirectories = _fileOperationsService!.GetSubDirectories(directoryPath);
+        DirectoryInfo[] subDirectories = _fileOperationsService!.GetSubDirectories(directoryPath);
 
         Assert.That(subDirectories, Is.Not.Null);
         Assert.That(subDirectories, Has.Exactly(3).Items);
@@ -57,13 +57,13 @@ public class FileOperationsServiceTests
     }
 
     [Test]
-    public void GetRecursiveSubDirectories_ValidDirectory_ReturnsListOfRecursiveSubDirectories()
+    public void GetRecursiveSubDirectories_ValidDirectory_ReturnsArrayOfRecursiveSubDirectories()
     {
         string directoryPath = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER);
 
-        List<DirectoryInfo> recursiveSubDirectories = _fileOperationsService!.GetRecursiveSubDirectories(directoryPath);
+        DirectoryInfo[] recursiveSubDirectories = _fileOperationsService!.GetRecursiveSubDirectories(directoryPath);
 
-        Assert.That(recursiveSubDirectories, Has.Count.EqualTo(4));
+        Assert.That(recursiveSubDirectories, Has.Length.EqualTo(4));
         Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_HIDDEN_SUB_FOLDER), Is.True);
         Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_1), Is.True);
         Assert.That(recursiveSubDirectories.Any(dir => dir.Name == Directories.TEST_SUB_FOLDER_2), Is.True);
@@ -76,7 +76,7 @@ public class FileOperationsServiceTests
     }
 
     [Test]
-    public void GetRecursiveSubDirectories_InvalidDirectory_ReturnsEmptyList()
+    public void GetRecursiveSubDirectories_InvalidDirectory_ThrowsDirectoryNotFoundException()
     {
         string directoryPath = Path.Combine(_dataDirectory!, Directories.NON_EXISTENT_FOLDER);
 

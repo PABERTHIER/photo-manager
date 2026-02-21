@@ -88,9 +88,9 @@ public class SyncAssetsService(
 
                 if (definition.IncludeSubFolders)
                 {
-                    List<DirectoryInfo> subdirectories = fileOperationsService.GetSubDirectories(definition.SourceDirectory);
+                    DirectoryInfo[] subdirectories = fileOperationsService.GetSubDirectories(definition.SourceDirectory);
 
-                    for (int i = 0; i < subdirectories.Count; i++)
+                    for (int i = 0; i < subdirectories.Length; i++)
                     {
                         SyncAssetsDirectoriesDefinition subDefinition = new()
                         {
@@ -114,9 +114,9 @@ public class SyncAssetsService(
 
     private string[] GetFilesNotAlreadyInDestinationSubDirectories(string[] newFileNames, string destinationDirectory)
     {
-        List<DirectoryInfo> destinationSubDirectories = fileOperationsService.GetRecursiveSubDirectories(destinationDirectory);
+        DirectoryInfo[] destinationSubDirectories = fileOperationsService.GetRecursiveSubDirectories(destinationDirectory);
 
-        for (int i = 0; i < destinationSubDirectories.Count; i++)
+        for (int i = 0; i < destinationSubDirectories.Length; i++)
         {
             string[] destinationFileNames = fileOperationsService.GetFileNames(destinationSubDirectories[i].FullName);
             newFileNames = assetsComparator.GetNewFileNamesToSync(newFileNames, destinationFileNames);
