@@ -51,7 +51,7 @@ public class AssetCreationService(
 
     private Asset? CreateAssetFromPng(string imagePath, string directoryName, byte[] imageBytes)
     {
-        if (!imageProcessingService.IsValidGDIPlusImage(imageBytes))
+        if (!imageProcessingService.IsValidGdiPlusImage(imageBytes))
         {
             return null;
         }
@@ -80,7 +80,7 @@ public class AssetCreationService(
 
     private Asset? CreateAssetFromGif(string imagePath, string directoryName, byte[] imageBytes)
     {
-        if (!imageProcessingService.IsValidGDIPlusImage(imageBytes))
+        if (!imageProcessingService.IsValidGdiPlusImage(imageBytes))
         {
             return null;
         }
@@ -138,7 +138,7 @@ public class AssetCreationService(
 
     private Asset? CreateAssetFromOtherFormat(string imagePath, string directoryName, byte[] imageBytes)
     {
-        if (!imageProcessingService.IsValidGDIPlusImage(imageBytes))
+        if (!imageProcessingService.IsValidGdiPlusImage(imageBytes))
         {
             return null;
         }

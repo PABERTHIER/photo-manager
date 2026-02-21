@@ -217,22 +217,22 @@ public class ExifHelperTests
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)]
     [TestCase(FileNames.HOMER_GIF)]
     [TestCase(FileNames.IMAGE_11_HEIC)]
-    public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
+    public void IsValidGdiPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
-        bool result = ExifHelper.IsValidGDIPlusImage(validImageData);
+        bool result = ExifHelper.IsValidGdiPlusImage(validImageData);
 
         Assert.That(result, Is.True);
     }
 
     [Test]
-    public void IsValidGDIPlusImage_EmptyImageData_ReturnsFalse()
+    public void IsValidGdiPlusImage_EmptyImageData_ReturnsFalse()
     {
         byte[] emptyHeicData = [];
 
-        bool result = ExifHelper.IsValidGDIPlusImage(emptyHeicData);
+        bool result = ExifHelper.IsValidGdiPlusImage(emptyHeicData);
 
         Assert.That(result, Is.False);
     }

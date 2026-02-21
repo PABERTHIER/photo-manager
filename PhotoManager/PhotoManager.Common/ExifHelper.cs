@@ -102,7 +102,7 @@ public static class ExifHelper
         return rotation;
     }
 
-    public static bool IsValidGDIPlusImage(byte[] imageData)
+    public static bool IsValidGdiPlusImage(byte[] imageData)
     {
         try
         {

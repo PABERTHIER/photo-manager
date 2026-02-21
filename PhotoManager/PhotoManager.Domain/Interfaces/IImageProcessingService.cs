@@ -12,6 +12,6 @@ public interface IImageProcessingService
     byte[] GetJpegBitmapImage(BitmapImage thumbnailImage);
     byte[] GetPngBitmapImage(BitmapImage thumbnailImage);
     byte[] GetGifBitmapImage(BitmapImage thumbnailImage);
-    bool IsValidGDIPlusImage(byte[] imageData);
+    bool IsValidGdiPlusImage(byte[] imageData);
     bool IsValidHeic(byte[] imageData);
 }

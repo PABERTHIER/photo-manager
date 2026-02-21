@@ -34,7 +34,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService.IsValidGDIPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -63,7 +63,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService.IsValidGDIPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_JPEG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -114,7 +114,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService.IsValidGDIPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -143,7 +143,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService.IsValidGDIPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_PNG);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -194,7 +194,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService.IsValidGDIPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -223,7 +223,7 @@ public class ImageProcessingServiceTests
 
         try
         {
-            Assert.That(_imageProcessingService.IsValidGDIPlusImage(imageBuffer), Is.True);
+            Assert.That(_imageProcessingService.IsValidGdiPlusImage(imageBuffer), Is.True);
             Directory.CreateDirectory(destinationNewFileDirectory);
             string destinationNewFilePath = Path.Combine(destinationNewFileDirectory, FileNames.IMAGE_CONVERTED_GIF);
             File.WriteAllBytes(destinationNewFilePath, imageBuffer);
@@ -263,22 +263,22 @@ public class ImageProcessingServiceTests
     [TestCase(FileNames.IMAGE_10_PORTRAIT_PNG)]
     [TestCase(FileNames.HOMER_GIF)]
     [TestCase(FileNames.IMAGE_11_HEIC)]
-    public void IsValidGDIPlusImage_ValidImageData_ReturnsTrue(string fileName)
+    public void IsValidGdiPlusImage_ValidImageData_ReturnsTrue(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
         byte[] validImageData = File.ReadAllBytes(filePath);
 
-        bool result = _imageProcessingService!.IsValidGDIPlusImage(validImageData);
+        bool result = _imageProcessingService!.IsValidGdiPlusImage(validImageData);
 
         Assert.That(result, Is.True);
     }
 
     [Test]
-    public void IsValidGDIPlusImage_EmptyImageData_ReturnsFalse()
+    public void IsValidGdiPlusImage_EmptyImageData_ReturnsFalse()
     {
         byte[] emptyHeicData = [];
 
-        bool result = _imageProcessingService!.IsValidGDIPlusImage(emptyHeicData);
+        bool result = _imageProcessingService!.IsValidGdiPlusImage(emptyHeicData);
 
         Assert.That(result, Is.False);
     }

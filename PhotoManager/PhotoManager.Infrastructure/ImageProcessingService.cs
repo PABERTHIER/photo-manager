@@ -59,9 +59,9 @@ public class ImageProcessingService : IImageProcessingService
         return BitmapHelper.GetGifBitmapImage(thumbnailImage);
     }
 
-    public bool IsValidGDIPlusImage(byte[] imageData)
+    public bool IsValidGdiPlusImage(byte[] imageData)
     {
-        return ExifHelper.IsValidGDIPlusImage(imageData);
+        return ExifHelper.IsValidGdiPlusImage(imageData);
     }
 
     public bool IsValidHeic(byte[] imageData)
