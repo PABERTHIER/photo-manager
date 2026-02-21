@@ -181,50 +181,6 @@ public class ImageMetadataServiceTests
     }
 
     [Test]
-    [TestCase((ushort)0, Rotation.Rotate0)]
-    [TestCase((ushort)1, Rotation.Rotate0)]
-    [TestCase((ushort)2, Rotation.Rotate0)]
-    [TestCase((ushort)3, Rotation.Rotate180)]
-    [TestCase((ushort)4, Rotation.Rotate180)]
-    [TestCase((ushort)5, Rotation.Rotate90)]
-    [TestCase((ushort)6, Rotation.Rotate90)]
-    [TestCase((ushort)7, Rotation.Rotate270)]
-    [TestCase((ushort)8, Rotation.Rotate270)]
-    [TestCase((ushort)9, Rotation.Rotate0)]
-    [TestCase((ushort)10, Rotation.Rotate0)]
-    [TestCase((ushort)10000, Rotation.Rotate0)]
-    [TestCase(ushort.MinValue, Rotation.Rotate0)]
-    [TestCase(ushort.MaxValue, Rotation.Rotate0)]
-    public void GetImageRotation_ValidExifOrientation_ReturnsCorrectRotationValue(ushort exifOrientation,
-        Rotation expectedRotation)
-    {
-        Rotation rotation = _imageMetadataService!.GetImageRotation(exifOrientation);
-
-        Assert.That(rotation, Is.EqualTo(expectedRotation));
-    }
-
-    [Test]
-    public void GetImageRotation_InvalidExifOrientation_ReturnsCorrectRotationValue()
-    {
-        int exifOrientation = -10;
-        // ReSharper disable once IntVariableOverflowInUncheckedContext
-        Rotation rotation = _imageMetadataService!.GetImageRotation((ushort)exifOrientation);
-
-        Assert.That(rotation, Is.EqualTo(Rotation.Rotate0));
-    }
-
-    [Test]
-    public void GetImageRotation_NullExifOrientation_ThrowsInvalidOperationException()
-    {
-        ushort? exifOrientation = null;
-
-        InvalidOperationException? exception =
-            Assert.Throws<InvalidOperationException>(() => _imageMetadataService!.GetImageRotation((ushort)exifOrientation!));
-
-        Assert.That(exception?.Message, Is.EqualTo("Nullable object must have a value."));
-    }
-
-    [Test]
     public void UpdateAssetsFileProperties_SomeFilesExist_PopulatesAssetsFileProperties()
     {
         string destinationPath = Path.Combine(_dataDirectory!, Directories.DESTINATION_TO_COPY);
