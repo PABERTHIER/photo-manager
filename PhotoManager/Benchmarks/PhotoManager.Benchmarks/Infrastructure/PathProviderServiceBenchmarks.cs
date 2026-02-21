@@ -1,10 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Order;
-using Microsoft.Extensions.Configuration;
-using PhotoManager.Infrastructure;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Runtime.CompilerServices;
 
 namespace PhotoManager.Benchmarks.Infrastructure;
 

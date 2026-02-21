@@ -1,10 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Order;
-using Microsoft.Extensions.Configuration;
-using PhotoManager.Infrastructure;
-using System.IO;
-
-namespace PhotoManager.Benchmarks.Infrastructure;
+﻿namespace PhotoManager.Benchmarks.Infrastructure;
 
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
