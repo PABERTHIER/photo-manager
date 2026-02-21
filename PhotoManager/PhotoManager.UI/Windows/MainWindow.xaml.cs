@@ -1,11 +1,11 @@
 ﻿using log4net;
 using PhotoManager.Application;
 using PhotoManager.Domain;
-using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using PhotoManager.UI.ViewModels.Enums;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
