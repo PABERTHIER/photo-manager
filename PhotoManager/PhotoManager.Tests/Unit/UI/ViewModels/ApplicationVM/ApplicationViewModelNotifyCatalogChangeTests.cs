@@ -184,28 +184,29 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
-        Mock<IStorageService> storageServiceMock = new();
-        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
-        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()))
-            .Returns(new BitmapImage());
+        Mock<IPathProviderService> pathProviderServiceMock = new();
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new(userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
+            imageMetadataService, userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
-        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService,
-            userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService,
-            userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService);
         SyncAssetsService syncAssetsService =
-            new(_assetRepository, storageService, assetsComparator, moveAssetsService);
+            new(_assetRepository, fileOperationsService, assetsComparator, moveAssetsService);
         FindDuplicatedAssetsService findDuplicatedAssetsService =
-            new(_assetRepository, storageService, userConfigurationService);
+            new(_assetRepository, fileOperationsService, userConfigurationService);
         PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
             catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
-            storageService);
+            fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
     }
 
@@ -223,12 +224,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 6 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -251,14 +254,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             };
 
             // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository.AddAsset(newAsset, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!, newAsset];
 
             string statusMessage = $"Image {newAsset.Folder.Path} added to catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -272,7 +276,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -291,7 +295,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -323,12 +327,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 6 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -351,14 +357,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             };
 
             // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository.AddAsset(newAsset, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!, newAsset];
 
             string statusMessage = $"Image {newAsset.Folder.Path} added to catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -374,7 +381,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -393,7 +400,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -425,12 +432,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 6 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 6 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
@@ -453,14 +462,15 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             };
 
             // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository.AddAsset(newAsset, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!, newAsset];
 
             string statusMessage = $"Image {newAsset.Folder.Path} added to catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -473,7 +483,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -492,7 +502,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -523,12 +533,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 1 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);
@@ -539,12 +551,21 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
             // To Mock the ImageData because the assets are only notified and the files do not exist
-            byte[] assetData = [1, 2, 3];
-            _assetRepository.AddAsset(_asset1, assetData);
-            _assetRepository.AddAsset(_asset2, assetData);
-            _assetRepository.AddAsset(_asset3, assetData);
-            _assetRepository.AddAsset(_asset4, assetData);
-            _assetRepository.AddAsset(_asset5, assetData);
+            string filePath1 = Path.Combine(folderPath, _asset1!.FileName);
+            string filePath2 = Path.Combine(folderPath, _asset2!.FileName);
+            string filePath3 = Path.Combine(folderPath, _asset3!.FileName);
+            string filePath4 = Path.Combine(folderPath, _asset4!.FileName);
+            string filePath5 = Path.Combine(folderPath, _asset5!.FileName);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
+            byte[] assetData2 = File.ReadAllBytes(filePath2);
+            byte[] assetData3 = File.ReadAllBytes(filePath3);
+            byte[] assetData4 = File.ReadAllBytes(filePath4);
+            byte[] assetData5 = File.ReadAllBytes(filePath5);
+            _assetRepository.AddAsset(_asset1, assetData1);
+            _assetRepository.AddAsset(_asset2, assetData2);
+            _assetRepository.AddAsset(_asset3, assetData3);
+            _assetRepository.AddAsset(_asset4, assetData4);
+            _assetRepository.AddAsset(_asset5, assetData5);
 
             // First NotifyCatalogChange
             Asset[] expectedAssets = [_asset1];
@@ -563,7 +584,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -581,7 +602,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets = [_asset1, _asset2];
 
             expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 2 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 2 - sorted by file name ascending";
             statusMessage = $"Image {_asset2.Folder.Path} added to catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -596,7 +617,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -618,7 +639,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets = [_asset1, _asset2, _asset3];
 
             expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 3 - sorted by file name ascending";
             statusMessage = $"Image {_asset3.Folder.Path} added to catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -633,7 +654,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -659,7 +680,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets = [_asset1, _asset2, _asset3, _asset4];
 
             expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 4 - sorted by file name ascending";
             statusMessage = $"Image {_asset4.Folder.Path} added to catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -674,7 +695,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -704,7 +725,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
             expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 5 - sorted by file name ascending";
             statusMessage = $"Image {_asset5.Folder.Path} added to catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -719,7 +740,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -751,7 +772,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -782,12 +803,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 1 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             Asset newAsset = new()
             {
@@ -808,7 +831,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             };
 
             // To Mock the ImageData because the newAsset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository.AddAsset(newAsset, assetData);
 
             Asset[] expectedAssets = [newAsset];
@@ -827,7 +851,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -843,7 +867,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1043,22 +1067,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset3!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!, _asset3!];
 
             string statusMessage = $"Image {_asset3!.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1072,7 +1099,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1093,7 +1120,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1125,27 +1152,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset3!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!, _asset3!];
 
             string statusMessage = $"Image {_asset3!.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
                 Asset = _asset3,
-                Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! },
+                Folder = new() { Id = Guid.NewGuid(), Path = folderPath },
                 CataloguedAssetsByPath = [.. expectedAssets],
                 Reason = CatalogChangeReason.AssetUpdated,
                 Message = statusMessage,
@@ -1156,7 +1186,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1177,7 +1207,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1209,22 +1239,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 5 - sorted by file name ascending";
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset3!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!, _asset3!];
 
             string statusMessage = $"Image {_asset3!.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1237,7 +1270,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1258,7 +1291,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1290,12 +1323,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 5 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 5 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);
@@ -1306,14 +1341,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
             // To Mock the ImageData because the assets are only notified and the files do not exist
-            byte[] assetData = [1, 2, 3];
-            _assetRepository.AddAsset(_asset1, assetData);
-            _assetRepository.AddAsset(_asset2, assetData);
-            _assetRepository.AddAsset(_asset3, assetData);
-            _assetRepository.AddAsset(_asset4, assetData);
-            _assetRepository.AddAsset(_asset5, assetData);
+            string filePath1 = Path.Combine(folderPath, _asset1!.FileName);
+            string filePath2 = Path.Combine(folderPath, _asset2!.FileName);
+            string filePath3 = Path.Combine(folderPath, _asset3!.FileName);
+            string filePath4 = Path.Combine(folderPath, _asset4!.FileName);
+            string filePath5 = Path.Combine(folderPath, _asset5!.FileName);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
+            byte[] assetData2 = File.ReadAllBytes(filePath2);
+            byte[] assetData3 = File.ReadAllBytes(filePath3);
+            byte[] assetData4 = File.ReadAllBytes(filePath4);
+            byte[] assetData5 = File.ReadAllBytes(filePath5);
+            _assetRepository.AddAsset(_asset1, assetData1);
+            _assetRepository.AddAsset(_asset2, assetData2);
+            _assetRepository.AddAsset(_asset3, assetData3);
+            _assetRepository.AddAsset(_asset4, assetData4);
+            _assetRepository.AddAsset(_asset5, assetData5);
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             // First NotifyCatalogChange
             Asset[] expectedAssets = [_asset1, _asset2, _asset4, _asset5, _asset3];
@@ -1332,7 +1376,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1368,7 +1412,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1410,7 +1454,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1443,7 +1487,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1475,20 +1519,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 1 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 1 - sorted by file name ascending";
 
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository!.AddAsset(_asset1!, assetData);
 
             Asset[] expectedAssets = [_asset1!];
 
             string statusMessage = $"Image {_asset1!.Folder.Path} updated in catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, expectedAssets);
+            _applicationViewModel!.SetAssets(folderPath, expectedAssets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1502,7 +1549,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1523,7 +1570,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1554,12 +1601,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 0 of 0 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             Asset asset = new()
             {
@@ -1576,7 +1625,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             };
 
             // To Mock the ImageData because the updated asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository.AddAsset(asset, assetData);
 
             string statusMessage = $"Image {asset.Folder.Path} updated in catalog.";
@@ -1593,7 +1643,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 [],
@@ -1607,7 +1657,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 [],
@@ -1807,22 +1857,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 4 - sorted by file name ascending";
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset3!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!];
 
             string statusMessage = $"Image {_asset3!.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1836,7 +1889,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1855,7 +1908,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1887,27 +1940,30 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 4 - sorted by file name ascending";
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset3!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!];
 
             string statusMessage = $"Image {_asset3!.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
                 Asset = _asset3,
-                Folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! },
+                Folder = new() { Id = Guid.NewGuid(), Path = folderPath },
                 CataloguedAssetsByPath = [.. expectedAssets],
                 Reason = CatalogChangeReason.AssetDeleted,
                 Message = statusMessage,
@@ -1918,7 +1974,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1937,7 +1993,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -1969,22 +2025,25 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 4 - sorted by file name ascending";
 
             Asset[] assets = [_asset1!, _asset2!, _asset3!, _asset4!, _asset5!];
 
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset3!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository!.AddAsset(_asset3!, assetData);
 
             Asset[] expectedAssets = [_asset1!, _asset2!, _asset4!, _asset5!];
 
             string statusMessage = $"Image {_asset3!.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -1997,7 +2056,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -2016,7 +2075,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -2048,12 +2107,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 4 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 4 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
             _asset2 = _asset2!.WithFolder(folder);
@@ -2064,14 +2125,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             Asset[] assets = [_asset1, _asset2, _asset3, _asset4, _asset5];
 
             // To Mock the ImageData because the assets are only notified and the files do not exist
-            byte[] assetData = [1, 2, 3];
-            _assetRepository.AddAsset(_asset1, assetData);
-            _assetRepository.AddAsset(_asset2, assetData);
-            _assetRepository.AddAsset(_asset3, assetData);
-            _assetRepository.AddAsset(_asset4, assetData);
-            _assetRepository.AddAsset(_asset5, assetData);
+            string filePath1 = Path.Combine(folderPath, _asset1!.FileName);
+            string filePath2 = Path.Combine(folderPath, _asset2!.FileName);
+            string filePath3 = Path.Combine(folderPath, _asset3!.FileName);
+            string filePath4 = Path.Combine(folderPath, _asset4!.FileName);
+            string filePath5 = Path.Combine(folderPath, _asset5!.FileName);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
+            byte[] assetData2 = File.ReadAllBytes(filePath2);
+            byte[] assetData3 = File.ReadAllBytes(filePath3);
+            byte[] assetData4 = File.ReadAllBytes(filePath4);
+            byte[] assetData5 = File.ReadAllBytes(filePath5);
+            _assetRepository.AddAsset(_asset1, assetData1);
+            _assetRepository.AddAsset(_asset2, assetData2);
+            _assetRepository.AddAsset(_asset3, assetData3);
+            _assetRepository.AddAsset(_asset4, assetData4);
+            _assetRepository.AddAsset(_asset5, assetData5);
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             // First NotifyCatalogChange
             Asset[] expectedAssets = [_asset1, _asset2, _asset4, _asset5];
@@ -2090,7 +2160,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -2111,7 +2181,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets = [_asset2, _asset4, _asset5];
 
             expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 3 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 3 - sorted by file name ascending";
             statusMessage = $"Image {_asset1.Folder.Path} deleted from catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -2126,7 +2196,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -2151,7 +2221,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             expectedAssets = [_asset2, _asset4];
 
             expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 1 of 2 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 1 of 2 - sorted by file name ascending";
             statusMessage = $"Image {_asset5.Folder.Path} deleted from catalog.";
 
             catalogChangeCallbackEventArgs = new()
@@ -2166,7 +2236,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -2193,7 +2263,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 expectedAssets,
@@ -2225,20 +2295,23 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 0 of 0 - sorted by file name ascending";
 
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository!.AddAsset(_asset1!, assetData);
 
             Asset[] assets = [_asset1!];
 
             string statusMessage = $"Image {_asset1!.Folder.Path} deleted from catalog.";
 
-            _applicationViewModel!.SetAssets(_dataDirectory!, assets);
+            _applicationViewModel!.SetAssets(folderPath, assets);
 
             CatalogChangeCallbackEventArgs catalogChangeCallbackEventArgs = new()
             {
@@ -2252,7 +2325,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 [],
@@ -2271,7 +2344,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 [],
@@ -2302,12 +2375,14 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
         try
         {
-            CheckBeforeChanges(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+
+            CheckBeforeChanges(folderPath);
 
             string expectedAppTitle =
-                $"PhotoManager {Constants.VERSION} - {_dataDirectory} - image 0 of 0 - sorted by file name ascending";
+                $"PhotoManager {Constants.VERSION} - {folderPath} - image 0 of 0 - sorted by file name ascending";
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             Asset asset = new()
             {
@@ -2324,7 +2399,8 @@ public class ApplicationViewModelNotifyCatalogChangeTests
             };
 
             // To Mock the ImageData because the deleted asset is the only one notified and the file does not exist
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
             _assetRepository.AddAsset(asset, assetData);
 
             string statusMessage = $"Image {asset.Folder.Path} deleted from catalog.";
@@ -2341,7 +2417,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckAfterChanges(
                 _applicationViewModel!,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 [],
@@ -2355,7 +2431,7 @@ public class ApplicationViewModelNotifyCatalogChangeTests
 
             CheckInstance(
                 applicationViewModelInstances,
-                _dataDirectory!,
+                folderPath,
                 expectedAppTitle,
                 statusMessage,
                 [],

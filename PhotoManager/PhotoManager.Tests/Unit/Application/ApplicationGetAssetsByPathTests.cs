@@ -83,7 +83,8 @@ public class ApplicationGetAssetsByPathTests
         Mock<IMoveAssetsService> moveAssetsServiceMock = new();
         Mock<IFindDuplicatedAssetsService> findDuplicatedAssetsServiceMock = new();
         Mock<IUserConfigurationService> userConfigurationServiceMock = new();
-        Mock<IStorageService> storageServiceMock = new();
+        Mock<IFileOperationsService> fileOperationsServiceMock = new();
+        Mock<IImageProcessingService> imageProcessingServiceMock = new();
 
         PhotoManager.Application.Application application = new(
             assetRepositoryMock.Object,
@@ -92,7 +93,8 @@ public class ApplicationGetAssetsByPathTests
             moveAssetsServiceMock.Object,
             findDuplicatedAssetsServiceMock.Object,
             userConfigurationServiceMock.Object,
-            storageServiceMock.Object);
+            fileOperationsServiceMock.Object,
+            imageProcessingServiceMock.Object);
 
         Asset[] assets = application.GetAssetsByPath(directory);
 
@@ -175,7 +177,8 @@ public class ApplicationGetAssetsByPathTests
         Mock<IMoveAssetsService> moveAssetsServiceMock = new();
         Mock<IFindDuplicatedAssetsService> findDuplicatedAssetsServiceMock = new();
         Mock<IUserConfigurationService> userConfigurationServiceMock = new();
-        Mock<IStorageService> storageServiceMock = new();
+        Mock<IFileOperationsService> fileOperationsServiceMock = new();
+        Mock<IImageProcessingService> imageProcessingServiceMock = new();
 
         PhotoManager.Application.Application application = new(
             assetRepositoryMock.Object,
@@ -184,7 +187,8 @@ public class ApplicationGetAssetsByPathTests
             moveAssetsServiceMock.Object,
             findDuplicatedAssetsServiceMock.Object,
             userConfigurationServiceMock.Object,
-            storageServiceMock.Object);
+            fileOperationsServiceMock.Object,
+            imageProcessingServiceMock.Object);
 
         Asset[] assets = application.GetAssetsByPath(directory);
 
@@ -216,7 +220,8 @@ public class ApplicationGetAssetsByPathTests
         Mock<IMoveAssetsService> moveAssetsServiceMock = new();
         Mock<IFindDuplicatedAssetsService> findDuplicatedAssetsServiceMock = new();
         Mock<IUserConfigurationService> userConfigurationServiceMock = new();
-        Mock<IStorageService> storageServiceMock = new();
+        Mock<IFileOperationsService> fileOperationsServiceMock = new();
+        Mock<IImageProcessingService> imageProcessingServiceMock = new();
 
         PhotoManager.Application.Application application = new(
             assetRepositoryMock.Object,
@@ -225,7 +230,8 @@ public class ApplicationGetAssetsByPathTests
             moveAssetsServiceMock.Object,
             findDuplicatedAssetsServiceMock.Object,
             userConfigurationServiceMock.Object,
-            storageServiceMock.Object);
+            fileOperationsServiceMock.Object,
+            imageProcessingServiceMock.Object);
 
         ArgumentException? exception = Assert.Throws<ArgumentException>(() => application.GetAssetsByPath(directory!));
 

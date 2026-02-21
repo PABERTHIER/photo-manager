@@ -48,21 +48,29 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
-        Mock<IStorageService> storageServiceMock = new();
-        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
-        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        Mock<IPathProviderService> pathProviderServiceMock = new();
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new(userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
+            imageMetadataService, userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
-        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService);
+        SyncAssetsService syncAssetsService =
+            new(_assetRepository, fileOperationsService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService =
+            new(_assetRepository, fileOperationsService, userConfigurationService);
+        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+            catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
+            fileOperationsService, imageProcessingService);
         _applicationViewModel = new(application);
     }
 
@@ -117,7 +125,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 }
             };
 
-            byte[] assetData = [1, 2, 3];
+            byte[] assetData = File.ReadAllBytes(filePath);
 
             _assetRepository.AddAsset(asset, assetData);
 
@@ -220,7 +228,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 }
             };
 
-            byte[] assetData = [1, 2, 3];
+            byte[] assetData = File.ReadAllBytes(filePath);
 
             _assetRepository.AddAsset(asset, assetData);
 
@@ -314,7 +322,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 }
             };
 
-            byte[] assetData = [1, 2, 3];
+            byte[] assetData = File.ReadAllBytes(Path.Combine(_dataDirectory!, FileNames.IMAGE_11_HEIC));
 
             _assetRepository.AddAsset(asset, assetData);
 
@@ -404,7 +412,7 @@ public class ApplicationViewModelLoadBitmapHeicImageFromPathTests
                 }
             };
 
-            byte[] assetData = [1, 2, 3];
+            byte[] assetData = File.ReadAllBytes(filePath);
 
             _assetRepository.AddAsset(asset, assetData);
 

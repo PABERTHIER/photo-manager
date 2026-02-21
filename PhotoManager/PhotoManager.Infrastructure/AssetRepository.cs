@@ -15,7 +15,8 @@ public class AssetRepository : IAssetRepository
     public bool IsInitialized { get; private set; }
     private readonly string dataDirectory;
     private readonly IDatabase _database;
-    private readonly IStorageService _storageService;
+    private readonly IImageProcessingService _imageProcessingService;
+    private readonly IImageMetadataService _imageMetadataService;
     private readonly IUserConfigurationService _userConfigurationService;
 
     private List<Asset> assets;
@@ -29,10 +30,16 @@ public class AssetRepository : IAssetRepository
     private readonly Subject<Unit> _assetsUpdatedSubject = new();
     public IObservable<Unit> AssetsUpdated => _assetsUpdatedSubject.AsObservable();
 
-    public AssetRepository(IDatabase database, IStorageService storageService, IUserConfigurationService userConfigurationService)
+    public AssetRepository(
+        IDatabase database,
+        IPathProviderService pathProviderService,
+        IImageProcessingService imageProcessingService,
+        IImageMetadataService imageMetadataService,
+        IUserConfigurationService userConfigurationService)
     {
         _database = database;
-        _storageService = storageService;
+        _imageProcessingService = imageProcessingService;
+        _imageMetadataService = imageMetadataService;
         _userConfigurationService = userConfigurationService;
         assets = [];
         folders = [];
@@ -41,7 +48,7 @@ public class AssetRepository : IAssetRepository
         recentThumbnailsQueue = new Queue<string>();
         Thumbnails = [];
         syncLock = new Lock();
-        dataDirectory = _storageService.ResolveDataDirectory(_userConfigurationService.StorageSettings.StorageVersion);
+        dataDirectory = pathProviderService.ResolveDataDirectory(_userConfigurationService.StorageSettings.StorageVersion);
         Initialize();
     }
 
@@ -72,7 +79,7 @@ public class AssetRepository : IAssetRepository
                         {
                             if (Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail) && thumbnail.ContainsKey(asset.FileName))
                             {
-                                asset.ImageData = _storageService.LoadBitmapThumbnailImage(thumbnail[asset.FileName], asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
+                                asset.ImageData = _imageProcessingService.LoadBitmapThumbnailImage(thumbnail[asset.FileName], asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
                             }
                         }
 
@@ -129,6 +136,9 @@ public class AssetRepository : IAssetRepository
 
         lock (syncLock)
         {
+            // TODO: To prevent side effect with duplicates for same path, need to check first GetFolderByPath(string path)
+            // If not null, then we return this folder instead of adding it twice with different Id and same Path
+            // Need to update some tests + add theses cases + update Application.GetRootCatalogFolders() and ApplicationVM ctor
             folder = new()
             {
                 Id = Guid.NewGuid(),
@@ -202,7 +212,7 @@ public class AssetRepository : IAssetRepository
         {
             if (hasChanges)
             {
-                WriteAssets(assets);
+                WriteAssets(assets); // TODO: Parameters are useless
                 WriteFolders(folders);
                 WriteSyncAssetsDirectoriesDefinitions(syncAssetsConfiguration.Definitions);
                 WriteRecentTargetPaths(recentTargetPaths);
@@ -382,7 +392,7 @@ public class AssetRepository : IAssetRepository
 
             if (Thumbnails.TryGetValue(directoryName, out Dictionary<string, byte[]>? thumbnail) && thumbnail.ContainsKey(fileName))
             {
-                result = _storageService.LoadBitmapThumbnailImage(thumbnail[fileName], width, height);
+                result = _imageProcessingService.LoadBitmapThumbnailImage(thumbnail[fileName], width, height);
             }
             else
             {
@@ -527,7 +537,7 @@ public class AssetRepository : IAssetRepository
             assets[i].Folder = GetFolderById(assets[i].FolderId)!; // If the folder is not found, that means the DB has been modified manually
 
             // Not saved in DB because it is computed each time to detect file update
-            _storageService.UpdateAssetFileProperties(assets[i]);
+            _imageMetadataService.UpdateAssetFileProperties(assets[i]);
         }
     }
 

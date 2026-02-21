@@ -10,7 +10,10 @@ public static class InfrastructureServiceCollectionExtensions
         {
             services.AddDatabase();
             services.AddSingleton<IUserConfigurationService, UserConfigurationService>();
-            services.AddSingleton<IStorageService, StorageService>();
+            services.AddSingleton<IPathProviderService, PathProviderService>();
+            services.AddSingleton<IFileOperationsService, FileOperationsService>();
+            services.AddSingleton<IImageProcessingService, ImageProcessingService>();
+            services.AddSingleton<IImageMetadataService, ImageMetadataService>();
             services.AddSingleton<IAssetRepository, AssetRepository>();
             services.AddSingleton<IAssetHashCalculatorService, AssetHashCalculatorService>();
         }

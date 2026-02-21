@@ -3,22 +3,21 @@ using BenchmarkDotNet.Order;
 using Microsoft.Extensions.Configuration;
 using PhotoManager.Infrastructure;
 using System.IO;
-using System.Text;
 
 namespace PhotoManager.Benchmarks.Infrastructure;
 
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [RankColumn]
-public class StorageServiceBenchmarks
+public class FileOperationsServiceBenchmarks
 {
     private string _testDirectory = null!;
-    private StorageService _storageService = null!;
+    private FileOperationsService _fileOperationsService = null!;
 
     [GlobalSetup]
     public void Setup()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), "StorageServiceBenchmark_" + Guid.NewGuid().ToString("N"));
+        _testDirectory = Path.Combine(Path.GetTempPath(), "FileOperationsServiceBenchmark_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_testDirectory);
 
         // Create nested directory structure for recursive tests
@@ -87,7 +86,7 @@ public class StorageServiceBenchmarks
 
         IConfigurationRoot mockConfig = new ConfigurationBuilder().AddInMemoryCollection(configDict).Build();
         UserConfigurationService userConfigService = new(mockConfig);
-        _storageService = new StorageService(userConfigService);
+        _fileOperationsService = new FileOperationsService(userConfigService);
     }
 
     [GlobalCleanup]
@@ -99,36 +98,16 @@ public class StorageServiceBenchmarks
         }
     }
 
-    [Benchmark(Baseline = true)]
-    public string ResolveDataDirectory_New()
-    {
-        return _storageService.ResolveDataDirectory("1.0");
-    }
-
-    [Benchmark]
-    public string ResolveDataDirectory_Old()
-    {
-        return OldResolveDataDirectory("1.0");
-    }
-
     [Benchmark]
     public List<DirectoryInfo> GetRecursiveSubDirectories_New()
     {
-        return _storageService.GetRecursiveSubDirectories(_testDirectory);
+        return _fileOperationsService.GetRecursiveSubDirectories(_testDirectory);
     }
 
     [Benchmark]
     public List<DirectoryInfo> GetRecursiveSubDirectories_Old()
     {
         return GetRecursiveSubDirectories(_testDirectory);
-    }
-
-    private string OldResolveDataDirectory(string storageVersion)
-    {
-        StringBuilder currentStorageVersion = new();
-        currentStorageVersion.Append('v');
-        currentStorageVersion.Append(storageVersion);
-        return Path.Combine(_testDirectory, "Backup", currentStorageVersion.ToString());
     }
 
     private List<DirectoryInfo> GetRecursiveSubDirectories(string directoryPath)

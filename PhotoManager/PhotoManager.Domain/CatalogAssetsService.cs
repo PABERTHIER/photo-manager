@@ -6,7 +6,8 @@ namespace PhotoManager.Domain;
 public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 {
     private readonly IAssetRepository _assetRepository;
-    private readonly IStorageService _storageService;
+    private readonly IFileOperationsService _fileOperationsService;
+    private readonly IImageMetadataService _imageMetadataService;
     private readonly IAssetCreationService _assetCreationService;
     private readonly IUserConfigurationService _userConfigurationService;
     private readonly IAssetsComparator _assetsComparator;
@@ -20,13 +21,15 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
     public CatalogAssetsService(
         IAssetRepository assetRepository,
-        IStorageService storageService,
+        IFileOperationsService fileOperationsService,
+        IImageMetadataService imageMetadataService,
         IAssetCreationService assetCreationService,
         IUserConfigurationService userConfigurationService,
         IAssetsComparator assetsComparator)
     {
         _assetRepository = assetRepository;
-        _storageService = storageService;
+        _fileOperationsService = fileOperationsService;
+        _imageMetadataService = imageMetadataService;
         _assetCreationService = assetCreationService;
         _userConfigurationService = userConfigurationService;
         _assetsComparator = assetsComparator;
@@ -148,11 +151,11 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         _currentFolderPath = directory;
         UpdateAssets(); // Needed when having multiple actions on the same instance
 
-        if (_storageService.FolderExists(directory))
+        if (_fileOperationsService.FolderExists(directory))
         {
             CatalogExistingFolder(directory, callback, ref cataloguedAssetsBatchCount, batchSize, visitedDirectories, token);
         }
-        else if (!string.IsNullOrEmpty(directory) && !_storageService.FolderExists(directory))
+        else if (!string.IsNullOrEmpty(directory) && !_fileOperationsService.FolderExists(directory))
         {
             CatalogNonExistingFolder(directory, callback, ref cataloguedAssetsBatchCount, batchSize, token);
         }
@@ -190,11 +193,11 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             Message = $"Inspecting folder {directory}."
         });
 
-        string[] fileNames = _storageService.GetFileNames(directory);
+        string[] fileNames = _fileOperationsService.GetFileNames(directory);
 
         CatalogNewAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, fileNames, token);
 
-        _storageService.UpdateAssetsFileProperties(_cataloguedAssetsByPath);
+        _imageMetadataService.UpdateAssetsFileProperties(_cataloguedAssetsByPath);
         string[] updatedFileNames = _assetsComparator.GetUpdatedFileNames(_cataloguedAssetsByPath);
 
         CatalogUpdatedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, updatedFileNames, token);

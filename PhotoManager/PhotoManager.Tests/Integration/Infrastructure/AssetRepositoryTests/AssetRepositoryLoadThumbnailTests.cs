@@ -22,7 +22,8 @@ public class AssetRepositoryLoadThumbnailTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private Mock<IStorageService>? _storageServiceMock;
+
+    private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? _asset1;
@@ -34,12 +35,11 @@ public class AssetRepositoryLoadThumbnailTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
-        _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        _pathProviderServiceMock = new();
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
     }
 
     [SetUp]
@@ -47,7 +47,11 @@ public class AssetRepositoryLoadThumbnailTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
+            imageMetadataService, _userConfigurationService);
 
         _asset1 = new()
         {
@@ -84,9 +88,11 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            byte[] assetData = [1, 2, 3];
+            string folderPath = _dataDirectory!;
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
 
-            Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(addedFolder);
 
@@ -103,7 +109,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             BitmapImage? bitmapImage = _testableAssetRepository!.LoadThumbnail(
-                _dataDirectory!,
+                folderPath,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
@@ -146,13 +152,15 @@ public class AssetRepositoryLoadThumbnailTests
         try
         {
             const string fileName = FileNames.NON_EXISTENT_IMAGE_PNG;
-            byte[] assetData1 = [1, 2, 3];
-            byte[] assetData2 = [4, 5, 6];
+
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
 
             Dictionary<string, byte[]> blobToWrite = new()
             {
-                { _asset1!.FileName, assetData1 },
-                { fileName, assetData2 }
+                { _asset1!.FileName, assetData },
+                { fileName, assetData }
             };
 
             Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
@@ -177,7 +185,7 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
             Assert.That(thumbnails[_dataDirectory!], Has.Count.EqualTo(2));
             Assert.That(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_dataDirectory!][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[_dataDirectory!][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
 
@@ -203,7 +211,11 @@ public class AssetRepositoryLoadThumbnailTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
-        TestableAssetRepository testableAssetRepository = new(_database!, _storageServiceMock!.Object, userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object, imageProcessingService,
+            imageMetadataService, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -307,26 +319,28 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
+            string folderPath = _dataDirectory!;
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
+
             Guid folderId = Guid.NewGuid();
 
-            _asset1 = _asset1!.WithFolder(new() { Id = folderId, Path = _dataDirectory! });
-
-            byte[] assetData = [];
+            _asset1 = _asset1!.WithFolder(new() { Id = folderId, Path = folderPath });
 
             _testableAssetRepository!.AddAsset(_asset1!, assetData);
 
             Dictionary<string, Dictionary<string, byte[]>> thumbnails = _testableAssetRepository!.GetThumbnails();
             Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
-            Assert.That(thumbnails[_dataDirectory!], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_dataDirectory!][_asset1.FileName], Is.EqualTo(assetData));
+            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
+            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
             BitmapImage? bitmapImage = _testableAssetRepository!.LoadThumbnail(
-                _dataDirectory!,
+                folderPath,
                 _asset1!.FileName,
                 _asset1.Pixel.Thumbnail.Width,
                 _asset1.Pixel.Thumbnail.Height);
@@ -337,10 +351,10 @@ public class AssetRepositoryLoadThumbnailTests
             Assert.That(assets, Has.Count.EqualTo(1));
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(_dataDirectory!), Is.True);
-            Assert.That(thumbnails[_dataDirectory!], Has.Count.EqualTo(1));
-            Assert.That(thumbnails[_dataDirectory!].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[_dataDirectory!][_asset1.FileName], Is.EqualTo(assetData));
+            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
+            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.False);
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.False);
@@ -477,9 +491,11 @@ public class AssetRepositoryLoadThumbnailTests
 
         try
         {
-            byte[] assetData = [1, 2, 3];
+            string folderPath = _dataDirectory!;
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
 
-            Folder addedFolder = _testableAssetRepository!.AddFolder(_dataDirectory!);
+            Folder addedFolder = _testableAssetRepository!.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(addedFolder);
 
@@ -502,17 +518,17 @@ public class AssetRepositoryLoadThumbnailTests
             // Simulate concurrent access
             Parallel.Invoke(
                 () => bitmapImage1 = _testableAssetRepository!.LoadThumbnail(
-                    _dataDirectory!,
+                    folderPath,
                     _asset1!.FileName,
                     _asset1.Pixel.Thumbnail.Width,
                     _asset1.Pixel.Thumbnail.Height),
                 () => bitmapImage2 = _testableAssetRepository!.LoadThumbnail(
-                    _dataDirectory!,
+                    folderPath,
                     _asset1!.FileName,
                     _asset1.Pixel.Thumbnail.Width,
                     _asset1.Pixel.Thumbnail.Height),
                 () => bitmapImage3 = _testableAssetRepository!.LoadThumbnail(
-                    _dataDirectory!,
+                    folderPath,
                     _asset1!.FileName,
                     _asset1.Pixel.Thumbnail.Width,
                     _asset1.Pixel.Thumbnail.Height)

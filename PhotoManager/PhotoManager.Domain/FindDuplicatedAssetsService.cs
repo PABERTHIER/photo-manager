@@ -2,7 +2,7 @@
 
 public class FindDuplicatedAssetsService(
     IAssetRepository assetRepository,
-    IStorageService storageService,
+    IFileOperationsService fileOperationsService,
     IUserConfigurationService userConfigurationService)
     : IFindDuplicatedAssetsService
 {
@@ -27,7 +27,7 @@ public class FindDuplicatedAssetsService(
         foreach (IGrouping<string, Asset> group in assetGroups)
         {
             List<Asset> duplicatedSet = [.. group];
-            duplicatedSet.RemoveAll(asset => !storageService.FileExists(asset.FullPath));
+            duplicatedSet.RemoveAll(asset => !fileOperationsService.FileExists(asset.FullPath));
 
             if (duplicatedSet.Count > 1)
             {
@@ -50,7 +50,7 @@ public class FindDuplicatedAssetsService(
         // Create a dictionary to store assets by their Hash values
         Dictionary<string, List<Asset>> assetDictionary = [];
 
-        assets.RemoveAll(asset => !storageService.FileExists(asset.FullPath));
+        assets.RemoveAll(asset => !fileOperationsService.FileExists(asset.FullPath));
 
         for (int i = 0; i < assets.Count; i++)
         {

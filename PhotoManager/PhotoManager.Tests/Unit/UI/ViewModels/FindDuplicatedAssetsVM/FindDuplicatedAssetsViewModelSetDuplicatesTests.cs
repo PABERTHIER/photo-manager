@@ -188,21 +188,29 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
-        Mock<IStorageService> storageServiceMock = new();
-        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
-        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        Mock<IPathProviderService> pathProviderServiceMock = new();
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new(userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
+            imageMetadataService, userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
-        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService);
+        SyncAssetsService syncAssetsService =
+            new(_assetRepository, fileOperationsService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService =
+            new(_assetRepository, fileOperationsService, userConfigurationService);
+        PhotoManager.Application.Application application = new(_assetRepository, syncAssetsService,
+            catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
+            fileOperationsService, imageProcessingService);
         _findDuplicatedAssetsViewModel = new(application);
     }
 
@@ -757,7 +765,8 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
         {
             CheckBeforeChanges();
 
-            Folder folder = _assetRepository!.AddFolder(_dataDirectory!);
+            string folderPath = _dataDirectory!;
+            Folder folder = _assetRepository!.AddFolder(folderPath);
 
             const string hash1 = Hashes.IMAGE_1_JPG;
             const string hash2 = Hashes.IMAGE_9_DUPLICATE_PNG;
@@ -769,13 +778,23 @@ public class FindDuplicatedAssetsViewModelSetDuplicatesTests
             _asset4 = _asset4!.WithFolder(folder).WithHash(hash2);
             _asset5 = _asset5!.WithFolder(folder).WithHash(hash2);
 
-            byte[] assetData = [1, 2, 3];
+            string filePath1 = Path.Combine(folderPath, _asset1.FileName);
+            string filePath2 = Path.Combine(folderPath, _asset2.FileName);
+            string filePath3 = Path.Combine(folderPath, _asset3.FileName);
+            string filePath4 = Path.Combine(folderPath, _asset4.FileName);
+            string filePath5 = Path.Combine(folderPath, _asset5.FileName);
 
-            _assetRepository!.AddAsset(_asset1, assetData);
-            _assetRepository!.AddAsset(_asset2, assetData);
-            _assetRepository!.AddAsset(_asset3, assetData);
-            _assetRepository!.AddAsset(_asset4, assetData);
-            _assetRepository!.AddAsset(_asset5, assetData);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
+            byte[] assetData2 = File.ReadAllBytes(filePath2);
+            byte[] assetData3 = File.ReadAllBytes(filePath3);
+            byte[] assetData4 = File.ReadAllBytes(filePath4);
+            byte[] assetData5 = File.ReadAllBytes(filePath5);
+
+            _assetRepository!.AddAsset(_asset1, assetData1);
+            _assetRepository!.AddAsset(_asset2, assetData2);
+            _assetRepository!.AddAsset(_asset3, assetData3);
+            _assetRepository!.AddAsset(_asset4, assetData4);
+            _assetRepository!.AddAsset(_asset5, assetData5);
 
             // Mock like the ImageData of _asset1 has become null
             _asset1.ImageData = null;
