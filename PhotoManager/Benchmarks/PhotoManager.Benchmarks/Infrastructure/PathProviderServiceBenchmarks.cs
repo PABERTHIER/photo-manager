@@ -3,6 +3,7 @@ using BenchmarkDotNet.Order;
 using Microsoft.Extensions.Configuration;
 using PhotoManager.Infrastructure;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace PhotoManager.Benchmarks.Infrastructure;
@@ -74,13 +75,25 @@ public class PathProviderServiceBenchmarks
     [Benchmark(Baseline = true)]
     public string ResolveDataDirectory_New()
     {
-        return _pathProviderService.ResolveDataDirectory("1.0");
+        return _pathProviderService.ResolveDataDirectory();
+    }
+
+    [Benchmark]
+    public string ResolveDataDirectory_AggressiveInlining()
+    {
+        return ResolveDataDirectoryAggressiveInlining("1.0");
     }
 
     [Benchmark]
     public string ResolveDataDirectory_Old()
     {
         return OldResolveDataDirectory("1.0");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private string ResolveDataDirectoryAggressiveInlining(string storageVersion)
+    {
+        return Path.Combine(_testDirectory, "Backup", $"v{storageVersion}");
     }
 
     private string OldResolveDataDirectory(string storageVersion)

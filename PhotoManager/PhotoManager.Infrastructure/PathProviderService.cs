@@ -1,12 +1,13 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace PhotoManager.Infrastructure;
+﻿namespace PhotoManager.Infrastructure;
 
 public class PathProviderService(IUserConfigurationService userConfigurationService) : IPathProviderService
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string ResolveDataDirectory(string storageVersion)
+    private readonly string _dataDirectory = Path.Combine(
+        userConfigurationService.PathSettings.BackupPath,
+        $"v{userConfigurationService.StorageSettings.StorageVersion}");
+
+    public string ResolveDataDirectory()
     {
-        return Path.Combine(userConfigurationService.PathSettings.BackupPath, $"v{storageVersion}");
+        return _dataDirectory;
     }
 }

@@ -185,7 +185,7 @@ public class ApplicationGetDuplicatedAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         _pathProviderServiceMock = new Mock<IPathProviderService>();
-        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         ImageProcessingService imageProcessingService = new();
@@ -538,7 +538,7 @@ public class ApplicationGetDuplicatedAssetsTests
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         _pathProviderServiceMock = new Mock<IPathProviderService>();
-        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         ImageProcessingService imageProcessingService = new();

@@ -1029,7 +1029,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
         _userConfigurationService = new(configurationRootMock.Object);
 
         Mock<IPathProviderService> pathProviderServiceMock = new();
-        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         ImageProcessingService imageProcessingService = new();

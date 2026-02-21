@@ -2,5 +2,5 @@
 
 public interface IPathProviderService
 {
-    string ResolveDataDirectory(string storageVersion);
+    string ResolveDataDirectory();
 }

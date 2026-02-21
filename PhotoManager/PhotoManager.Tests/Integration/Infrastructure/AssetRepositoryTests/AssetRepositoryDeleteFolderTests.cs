@@ -38,7 +38,7 @@ public class AssetRepositoryDeleteFolderTests
         _configurationRootMock.GetDefaultMockConfig();
 
         _pathProviderServiceMock = new();
-        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]

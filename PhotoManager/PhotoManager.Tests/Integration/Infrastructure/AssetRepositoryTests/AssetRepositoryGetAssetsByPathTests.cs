@@ -44,7 +44,7 @@ public class AssetRepositoryGetAssetsByPathTests
     public void SetUp()
     {
         _pathProviderServiceMock = new();
-        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
@@ -228,7 +228,7 @@ public class AssetRepositoryGetAssetsByPathTests
     {
         BitmapImage? bitmapImage = null;
         Mock<IPathProviderService> pathProviderServiceMock = new();
-        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         Mock<IImageProcessingService> imageProcessingServiceMock = new();
         imageProcessingServiceMock.Setup(x =>
@@ -685,7 +685,7 @@ public class AssetRepositoryGetAssetsByPathTests
     public void GetAssetsByPath_ExceptionThrown_ReturnsAssetsWithPartialData()
     {
         Mock<IPathProviderService> pathProviderServiceMock = new();
-        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         Mock<IImageProcessingService> imageProcessingServiceMock = new();
         imageProcessingServiceMock.Setup(x =>

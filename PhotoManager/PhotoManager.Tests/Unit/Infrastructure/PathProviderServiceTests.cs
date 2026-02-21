@@ -7,20 +7,10 @@ public class PathProviderServiceTests
 {
     private string? _dataDirectory;
 
-    private PathProviderService? _pathProviderService;
-    private UserConfigurationService? _userConfigurationService;
-
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
-
-        Mock<IConfigurationRoot> configurationRootMock = new();
-        configurationRootMock.GetDefaultMockConfig();
-        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory);
-
-        _userConfigurationService = new(configurationRootMock.Object);
-        _pathProviderService = new(_userConfigurationService);
     }
 
     [Test]
@@ -30,9 +20,17 @@ public class PathProviderServiceTests
     public void ResolveDataDirectory_ValidStorageVersion_ReturnsCorrectPath(string storageVersion,
         string storageVersionPath)
     {
-        string expected = Path.Combine(_userConfigurationService!.PathSettings.BackupPath, storageVersionPath);
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock.MockGetValue(UserConfigurationKeys.ASSETS_DIRECTORY, _dataDirectory!);
+        configurationRootMock.MockGetValue(UserConfigurationKeys.STORAGE_VERSION, storageVersion);
 
-        string result = _pathProviderService!.ResolveDataDirectory(storageVersion);
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+        PathProviderService pathProviderService = new(userConfigurationService);
+
+        string expected = Path.Combine(userConfigurationService.PathSettings.BackupPath, storageVersionPath);
+
+        string result = pathProviderService.ResolveDataDirectory();
 
         Assert.That(string.IsNullOrWhiteSpace(result), Is.False);
         Assert.That(result, Is.EqualTo(expected));

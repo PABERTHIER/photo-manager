@@ -48,7 +48,7 @@ public class AssetRepository : IAssetRepository
         recentThumbnailsQueue = new Queue<string>();
         Thumbnails = [];
         syncLock = new Lock();
-        dataDirectory = pathProviderService.ResolveDataDirectory(_userConfigurationService.StorageSettings.StorageVersion);
+        dataDirectory = pathProviderService.ResolveDataDirectory();
         Initialize();
     }
 
