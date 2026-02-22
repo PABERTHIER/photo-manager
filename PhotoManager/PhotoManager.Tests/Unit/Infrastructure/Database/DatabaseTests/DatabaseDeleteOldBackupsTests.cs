@@ -24,7 +24,7 @@ public class DatabaseDeleteOldBackupsTests
     [SetUp]
     public void SetUp()
     {
-        _backupStorageMock = new Mock<IBackupStorage>();
+        _backupStorageMock = new();
     }
 
     [Test]

@@ -23,6 +23,6 @@ public class SortableObservableCollection<T> : ObservableCollection<T>
         }
 
         // Raise a Reset notification so that UI bindings refresh.
-        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        OnCollectionChanged(new(NotifyCollectionChangedAction.Reset));
     }
 }

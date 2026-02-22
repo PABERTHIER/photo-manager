@@ -10,7 +10,7 @@ public abstract class BaseViewModel : INotifyPropertyChanged
     {
         foreach (string propertyName in propertyNames)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

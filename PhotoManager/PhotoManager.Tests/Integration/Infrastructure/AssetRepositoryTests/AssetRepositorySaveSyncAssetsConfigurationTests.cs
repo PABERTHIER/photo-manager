@@ -51,7 +51,7 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
         {
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -59,7 +59,7 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",
@@ -78,7 +78,7 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
 
-            _assetRepository!.SaveSyncAssetsConfiguration(new SyncAssetsConfiguration());
+            _assetRepository!.SaveSyncAssetsConfiguration(new());
             syncAssetsConfiguration = _assetRepository.GetSyncAssetsConfiguration();
 
             Assert.That(syncAssetsConfiguration.Definitions, Is.Empty);
@@ -104,7 +104,7 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
         {
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -112,7 +112,7 @@ public class AssetRepositorySaveSyncAssetsConfigurationTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",

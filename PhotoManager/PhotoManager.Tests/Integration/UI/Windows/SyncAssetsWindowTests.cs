@@ -81,7 +81,7 @@ public class SyncAssetsWindowTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -89,7 +89,7 @@ public class SyncAssetsWindowTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",
@@ -310,7 +310,7 @@ public class SyncAssetsWindowTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -318,7 +318,7 @@ public class SyncAssetsWindowTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",
@@ -436,7 +436,7 @@ public class SyncAssetsWindowTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -444,7 +444,7 @@ public class SyncAssetsWindowTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",

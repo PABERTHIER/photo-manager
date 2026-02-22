@@ -54,7 +54,7 @@ public class PathProviderServiceBenchmarks
 
         IConfigurationRoot mockConfig = new ConfigurationBuilder().AddInMemoryCollection(configDict).Build();
         UserConfigurationService userConfigService = new(mockConfig);
-        _pathProviderService = new PathProviderService(userConfigService);
+        _pathProviderService = new(userConfigService);
     }
 
     [GlobalCleanup]

@@ -158,7 +158,7 @@ public class ApplicationGetAssetsByPathTests
 
         _userConfigurationService = new(configurationRootMock.Object);
 
-        _pathProviderServiceMock = new Mock<IPathProviderService>();
+        _pathProviderServiceMock = new();
         _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());

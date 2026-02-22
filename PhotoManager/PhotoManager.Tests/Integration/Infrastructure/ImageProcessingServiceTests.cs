@@ -23,7 +23,7 @@ public class ImageProcessingServiceTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new(new Uri(filePath));
+        BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = _imageProcessingService!.GetJpegBitmapImage(image);
 
@@ -103,7 +103,7 @@ public class ImageProcessingServiceTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new(new Uri(filePath));
+        BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = _imageProcessingService!.GetPngBitmapImage(image);
 
@@ -183,7 +183,7 @@ public class ImageProcessingServiceTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new(new Uri(filePath));
+        BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = _imageProcessingService!.GetGifBitmapImage(image);
 

@@ -54,7 +54,7 @@ public class AssetRepositoryDeleteAssetTests
         _asset1 = new()
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()

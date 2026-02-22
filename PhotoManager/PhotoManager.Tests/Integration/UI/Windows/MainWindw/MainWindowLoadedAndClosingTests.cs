@@ -1201,7 +1201,7 @@ public class MainWindowLoadedAndClosingTests
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            Log.Error(ex, new Exception("Unexpected error in background work"));
+            Log.Error(ex, new("Unexpected error in background work"));
         }
     }
 
@@ -1235,7 +1235,7 @@ public class MainWindowLoadedAndClosingTests
         {
             if (task.IsFaulted)
             {
-                Log.Error(task.Exception, new Exception("BackgroundWorkTask faulted during shutdown"));
+                Log.Error(task.Exception, new("BackgroundWorkTask faulted during shutdown"));
             }
         }, TaskScheduler.Default);
 

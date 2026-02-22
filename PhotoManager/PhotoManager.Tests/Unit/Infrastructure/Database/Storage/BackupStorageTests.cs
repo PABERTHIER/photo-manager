@@ -15,7 +15,7 @@ public class BackupStorageTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        _backupStorage = new BackupStorage();
+        _backupStorage = new();
     }
 
     [Test]

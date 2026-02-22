@@ -278,7 +278,7 @@ public partial class MainWindow
         {
             if (task.IsFaulted)
             {
-                Log.Error(task.Exception, new Exception("BackgroundWorkTask faulted during shutdown"));
+                Log.Error(task.Exception, new("BackgroundWorkTask faulted during shutdown"));
             }
         }, TaskScheduler.Default);
 
@@ -322,7 +322,7 @@ public partial class MainWindow
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            Log.Error(ex, new Exception("Unexpected error in background work"));
+            Log.Error(ex, new("Unexpected error in background work"));
         }
     }
 
@@ -400,7 +400,7 @@ public partial class MainWindow
             if (assets.Length > 0)
             {
                 FolderNavigationWindow folderNavigationWindow = new(
-                    new FolderNavigationViewModel(
+                    new(
                         ViewModel,
                         assets[0].Folder,
                         _application.GetRecentTargetPaths()));

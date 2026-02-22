@@ -111,7 +111,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
 
         _asset1 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_BOTTOM_LEFT_PART_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -136,7 +136,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset2 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_BOTTOM_PART_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -161,7 +161,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset3 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_BOTTOM_RIGHT_PART_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -186,7 +186,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset4 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_LEFT_PART_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -211,7 +211,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset5 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_ORIGINAL_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -236,7 +236,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset6 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_RIGHT_PART_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -261,7 +261,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset7 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_TOP_LEFT_PART_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -286,7 +286,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset8 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_TOP_PART_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -311,7 +311,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset9 = new()
         {
-            FolderId = new Guid("5126101a-c970-4c87-92ee-ab415ff659f3"),
+            FolderId = new("5126101a-c970-4c87-92ee-ab415ff659f3"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames._1336_TOP_RIGHT_PART_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -336,7 +336,7 @@ public class FindDuplicatedAssetsServiceThumbnailPartTests
         };
         _asset10 = new() // Another asset completely different from the actual asset
         {
-            FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
+            FolderId = new("5b506904-45af-4eaf-b402-53f6d0012075"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,

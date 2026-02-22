@@ -114,7 +114,7 @@ public class DatabaseWriteObjectListTests
             [
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -135,7 +135,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -190,7 +190,7 @@ public class DatabaseWriteObjectListTests
             [
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -211,7 +211,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -238,7 +238,7 @@ public class DatabaseWriteObjectListTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            _database!.SetDataTableProperties(new DataTableProperties
+            _database!.SetDataTableProperties(new()
             {
                 TableName = tableName,
                 ColumnProperties =
@@ -285,7 +285,7 @@ public class DatabaseWriteObjectListTests
             [
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -306,7 +306,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -333,7 +333,7 @@ public class DatabaseWriteObjectListTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            _database!.SetDataTableProperties(new DataTableProperties
+            _database!.SetDataTableProperties(new()
             {
                 TableName = tableName,
                 ColumnProperties =
@@ -388,7 +388,7 @@ public class DatabaseWriteObjectListTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            _database!.SetDataTableProperties(new DataTableProperties
+            _database!.SetDataTableProperties(new()
             {
                 TableName = tableName,
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
@@ -421,7 +421,7 @@ public class DatabaseWriteObjectListTests
             [
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -442,7 +442,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -469,7 +469,7 @@ public class DatabaseWriteObjectListTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            _database!.SetDataTableProperties(new DataTableProperties
+            _database!.SetDataTableProperties(new()
             {
                 TableName = tableName,
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
@@ -501,7 +501,7 @@ public class DatabaseWriteObjectListTests
             [
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175810_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -522,7 +522,7 @@ public class DatabaseWriteObjectListTests
                 },
                 new()
                 {
-                    FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                    FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                     Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                     FileName = "20200720175816_3.jpg",
                     ImageRotation = Rotation.Rotate0,
@@ -550,7 +550,7 @@ public class DatabaseWriteObjectListTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
             ArgumentNullException? exception1 = Assert.Throws<ArgumentNullException>(() =>
-                _database!.SetDataTableProperties(new DataTableProperties
+                _database!.SetDataTableProperties(new()
                 {
                     TableName = tableName!,
                     ColumnProperties = AssetConfigs.ConfigureDataTable()
@@ -576,7 +576,7 @@ public class DatabaseWriteObjectListTests
         [
             new()
             {
-                FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                 Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                 FileName = "20200720175810_3.jpg",
                 ImageRotation = Rotation.Rotate0,
@@ -597,7 +597,7 @@ public class DatabaseWriteObjectListTests
             },
             new()
             {
-                FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+                FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
                 Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
                 FileName = "20200720175816_3.jpg",
                 ImageRotation = Rotation.Rotate0,
@@ -624,7 +624,7 @@ public class DatabaseWriteObjectListTests
             _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
             _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-        _database!.SetDataTableProperties(new DataTableProperties
+        _database!.SetDataTableProperties(new()
         {
             TableName = tableName,
             ColumnProperties =

@@ -65,7 +65,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                     // token?.ThrowIfCancellationRequested();
 
                     CatalogFolders(path, callback, ref cataloguedAssetsBatchCount, visitedDirectories, token);
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Reason = CatalogChangeReason.FolderInspectionCompleted, Message = $"Folder inspection for {path}, subfolders included, has been completed." });
+                    callback?.Invoke(new() { Reason = CatalogChangeReason.FolderInspectionCompleted, Message = $"Folder inspection for {path}, subfolders included, has been completed." });
                 }
 
                 _directories.UnionWith(visitedDirectories);
@@ -73,11 +73,11 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 if (!_assetRepository.BackupExists() || !_backupHasSameContent)
                 {
                     callback?.Invoke(!_assetRepository.BackupExists()
-                        ? new CatalogChangeCallbackEventArgs { Reason = CatalogChangeReason.BackupCreationStarted, Message = "Creating catalog backup..." }
+                        ? new() { Reason = CatalogChangeReason.BackupCreationStarted, Message = "Creating catalog backup..." }
                         : new CatalogChangeCallbackEventArgs { Reason = CatalogChangeReason.BackupUpdateStarted, Message = "Updating catalog backup..." });
 
                     _assetRepository.WriteBackup();
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs
+                    callback?.Invoke(new()
                     {
                         Reason = CatalogChangeReason.BackupCompleted,
                         Message = "Backup completed successfully."
@@ -87,7 +87,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 }
                 else
                 {
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs { Reason = CatalogChangeReason.NoBackupChangesDetected, Message = "No changes made to the backup." });
+                    callback?.Invoke(new() { Reason = CatalogChangeReason.NoBackupChangesDetected, Message = "No changes made to the backup." });
                 }
             }
             catch (OperationCanceledException)
@@ -100,7 +100,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 Folder? currentFolder = _assetRepository.GetFolderByPath(_currentFolderPath);
                 _assetRepository.SaveCatalog(currentFolder);
 
-                callback?.Invoke(new CatalogChangeCallbackEventArgs
+                callback?.Invoke(new()
                 {
                     Reason = CatalogChangeReason.CatalogProcessCancelled,
                     Message = "The catalog process has been cancelled."
@@ -111,7 +111,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             catch (Exception ex)
             {
                 Log.Error(ex);
-                callback?.Invoke(new CatalogChangeCallbackEventArgs
+                callback?.Invoke(new()
                 {
                     Reason = CatalogChangeReason.CatalogProcessFailed,
                     Message = "The catalog process has failed.",
@@ -120,7 +120,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
             finally
             {
-                callback?.Invoke(new CatalogChangeCallbackEventArgs
+                callback?.Invoke(new()
                 {
                     Reason = CatalogChangeReason.CatalogProcessEnded,
                     Message = "The catalog process has ended."
@@ -176,7 +176,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
         {
             folder = _assetRepository.AddFolder(directory);
 
-            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            callback?.Invoke(new()
             {
                 Folder = folder,
                 Reason = CatalogChangeReason.FolderCreated,
@@ -186,7 +186,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
         folder = _assetRepository.GetFolderByPath(directory);
 
-        callback?.Invoke(new CatalogChangeCallbackEventArgs
+        callback?.Invoke(new()
         {
             Folder = folder,
             Reason = CatalogChangeReason.FolderInspectionInProgress,
@@ -255,7 +255,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             _backupHasSameContent = false;
             cataloguedAssetsBatchCount++;
 
-            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            callback?.Invoke(new()
             {
                 Asset = asset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
@@ -269,7 +269,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             _assetRepository.DeleteFolder(folder);
             _directories.Remove(folder.Path);
 
-            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            callback?.Invoke(new()
             {
                 Folder = folder,
                 Reason = CatalogChangeReason.FolderDeleted,
@@ -313,7 +313,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             {
                 if (!isAssetVideo)
                 {
-                    callback?.Invoke(new CatalogChangeCallbackEventArgs
+                    callback?.Invoke(new()
                     {
                         CataloguedAssetsByPath = _cataloguedAssetsByPath,
                         Reason = CatalogChangeReason.AssetNotCreated,
@@ -324,7 +324,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
                 continue;
             }
 
-            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            callback?.Invoke(new()
             {
                 Asset = newAsset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
@@ -354,7 +354,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
             if (updatedAsset == null)
             {
-                callback?.Invoke(new CatalogChangeCallbackEventArgs
+                callback?.Invoke(new()
                 {
                     Asset = deletedAsset,
                     CataloguedAssetsByPath = _cataloguedAssetsByPath,
@@ -366,7 +366,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
             }
 
             string fullPath = Path.Combine(directory, fileName);
-            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            callback?.Invoke(new()
             {
                 Asset = updatedAsset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,
@@ -390,7 +390,7 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
             Asset? deletedAsset = _assetRepository.DeleteAsset(directory, fileName);
 
-            callback?.Invoke(new CatalogChangeCallbackEventArgs
+            callback?.Invoke(new()
             {
                 Asset = deletedAsset,
                 CataloguedAssetsByPath = _cataloguedAssetsByPath,

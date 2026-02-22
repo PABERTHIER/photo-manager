@@ -55,7 +55,7 @@ public class AssetRepositoryConcurrentAccessTests
 
         _asset1 = new()
         {
-            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -80,7 +80,7 @@ public class AssetRepositoryConcurrentAccessTests
         };
         _asset2 = new()
         {
-            FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
+            FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_9_PNG,
             ImageRotation = Rotation.Rotate90,
@@ -105,7 +105,7 @@ public class AssetRepositoryConcurrentAccessTests
         };
         _asset3 = new()
         {
-            FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
+            FolderId = new("f91b8c81-6938-431a-a689-d86c7c4db126"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
@@ -135,7 +135,7 @@ public class AssetRepositoryConcurrentAccessTests
     {
         Asset asset4 = new()
         {
-            FolderId = new Guid("cf9293ad-d835-4126-8a76-17c7bbfe626e"),
+            FolderId = new("cf9293ad-d835-4126-8a76-17c7bbfe626e"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_2_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -160,7 +160,7 @@ public class AssetRepositoryConcurrentAccessTests
         };
         Asset asset5 = new()
         {
-            FolderId = new Guid("1e3c2274-bc11-482a-a7b4-e86e5aeb17f1"),
+            FolderId = new("1e3c2274-bc11-482a-a7b4-e86e5aeb17f1"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_3_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -213,7 +213,7 @@ public class AssetRepositoryConcurrentAccessTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -221,7 +221,7 @@ public class AssetRepositoryConcurrentAccessTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",

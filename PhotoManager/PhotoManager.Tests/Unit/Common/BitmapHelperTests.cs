@@ -840,7 +840,7 @@ public class BitmapHelperTests
     public void GetJpegBitmapImage_ValidImage_ReturnsJpegByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new(new Uri(filePath));
+        BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetJpegBitmapImage(image);
 
@@ -918,7 +918,7 @@ public class BitmapHelperTests
     public void GetPngBitmapImage_ValidImage_ReturnsPngByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new(new Uri(filePath));
+        BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetPngBitmapImage(image);
 
@@ -996,7 +996,7 @@ public class BitmapHelperTests
     public void GetGifBitmapImage_ValidImage_ReturnsGifByteArray(string fileName)
     {
         string filePath = Path.Combine(_dataDirectory!, fileName);
-        BitmapImage image = new(new Uri(filePath));
+        BitmapImage image = new(new(filePath));
 
         byte[] imageBuffer = BitmapHelper.GetGifBitmapImage(image);
 

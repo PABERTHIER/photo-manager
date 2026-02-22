@@ -13,7 +13,7 @@ public class DuplicatedSetViewModel : List<DuplicatedAssetViewModel>, INotifyPro
     {
         foreach (string propertyName in propertyNames)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 

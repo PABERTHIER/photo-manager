@@ -80,7 +80,7 @@ public class FileOperationsServiceBenchmarks
 
         IConfigurationRoot mockConfig = new ConfigurationBuilder().AddInMemoryCollection(configDict).Build();
         UserConfigurationService userConfigService = new(mockConfig);
-        _fileOperationsService = new FileOperationsService(userConfigService);
+        _fileOperationsService = new(userConfigService);
     }
 
     [GlobalCleanup]

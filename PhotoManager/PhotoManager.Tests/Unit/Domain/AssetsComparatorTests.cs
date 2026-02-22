@@ -33,7 +33,7 @@ public class AssetsComparatorTests
     {
         _asset1 = new()
         {
-            FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
+            FolderId = new("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
             Folder = new() { Id = Guid.Empty, Path = "" },
             FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -53,7 +53,7 @@ public class AssetsComparatorTests
         };
         _asset2 = new()
         {
-            FolderId = new Guid("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
+            FolderId = new("010233a2-8ea6-4cb0-86e4-156fef7cd772"),
             Folder = new() { Id = Guid.Empty, Path = "" },
             FileName = FileNames.IMAGE_9_PNG,
             ImageRotation = Rotation.Rotate90,

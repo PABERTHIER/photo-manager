@@ -55,7 +55,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
         try
         {
             string dataFilePath = ResolveTableFilePath(tableName);
-            Diagnostics = new Diagnostics { LastReadFilePath = dataFilePath };
+            Diagnostics = new() { LastReadFilePath = dataFilePath };
             DataTableProperties? properties = GetDataTableProperties(tableName);
             objectListStorage.Initialize(properties, Separator);
             return objectListStorage.ReadObjectList(dataFilePath, mapObjectFromCsvFields, Diagnostics);
@@ -81,7 +81,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
         }
 
         string dataFilePath = ResolveTableFilePath(tableName);
-        Diagnostics = new Diagnostics { LastWriteFilePath = dataFilePath };
+        Diagnostics = new() { LastWriteFilePath = dataFilePath };
         DataTableProperties? properties = GetDataTableProperties(tableName);
         objectListStorage.Initialize(properties, Separator);
         objectListStorage.WriteObjectList(dataFilePath, list, mapCsvFieldIndexToCsvField, Diagnostics);
@@ -91,7 +91,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
         ReadBlob(string blobName) // Key is imageName (string), value is the binary file -> image data (byte[])
     {
         string blobFilePath = ResolveBlobFilePath(blobName);
-        Diagnostics = new Diagnostics { LastReadFilePath = blobFilePath };
+        Diagnostics = new() { LastReadFilePath = blobFilePath };
         return blobStorage.ReadFromBinaryFile(blobFilePath);
     }
 
@@ -100,7 +100,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
             string blobName) // One Blob per folder, Key is imageName (string), value is the binary file -> image data (byte[])
     {
         string blobFilePath = ResolveBlobFilePath(blobName);
-        Diagnostics = new Diagnostics { LastWriteFilePath = blobFilePath, LastWriteFileRaw = blob };
+        Diagnostics = new() { LastWriteFilePath = blobFilePath, LastWriteFileRaw = blob };
         blobStorage.WriteToBinaryFile(blob, blobFilePath);
     }
 
@@ -125,7 +125,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
             File.Delete(backupFilePath);
         }
 
-        Diagnostics = new Diagnostics { LastWriteFilePath = backupFilePath };
+        Diagnostics = new() { LastWriteFilePath = backupFilePath };
         backupStorage.WriteFolderToZipFile(DataDirectory, backupFilePath);
 
         return true;
@@ -149,7 +149,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
             deletedBackupFilePaths.Add(filesPaths[i]);
         }
 
-        Diagnostics = new Diagnostics { LastDeletedBackupFilePaths = [.. deletedBackupFilePaths] };
+        Diagnostics = new() { LastDeletedBackupFilePaths = [.. deletedBackupFilePaths] };
     }
 
     private void InitializeDirectory()

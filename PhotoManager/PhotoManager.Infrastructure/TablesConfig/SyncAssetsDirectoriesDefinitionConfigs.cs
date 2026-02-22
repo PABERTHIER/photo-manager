@@ -15,7 +15,7 @@ public static class SyncAssetsDirectoriesDefinitionConfigs
 
     public static SyncAssetsDirectoriesDefinition ReadFunc(string[] values)
     {
-        return new SyncAssetsDirectoriesDefinition
+        return new()
         {
             SourceDirectory = values[0],
             DestinationDirectory = values[1],

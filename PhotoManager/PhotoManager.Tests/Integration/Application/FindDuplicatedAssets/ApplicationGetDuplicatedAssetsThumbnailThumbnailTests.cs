@@ -69,7 +69,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
     {
         _asset1 = new()
         {
-            FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
+            FolderId = new("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1336_MINI_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -94,7 +94,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
         };
         _asset2 = new()
         {
-            FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
+            FolderId = new("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1336_ORIGINAL_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -119,7 +119,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
         };
         _asset3 = new()
         {
-            FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
+            FolderId = new("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1336_SHIT_QUALITY_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -144,7 +144,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
         };
         _asset4 = new()
         {
-            FolderId = new Guid("ff140210-e4db-4c2c-96c1-85faed197aa7"),
+            FolderId = new("ff140210-e4db-4c2c-96c1-85faed197aa7"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1336_SMALL_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -169,7 +169,7 @@ public class ApplicationGetDuplicatedAssetsThumbnailThumbnailTests
         };
         _asset5 = new() // Another asset completely different from the actual asset
         {
-            FolderId = new Guid("5b506904-45af-4eaf-b402-53f6d0012075"),
+            FolderId = new("5b506904-45af-4eaf-b402-53f6d0012075"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,

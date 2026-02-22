@@ -17,7 +17,7 @@ public class BlobStorageTests
     {
         _dataDirectory = Path.Combine(TestContext.CurrentContext.TestDirectory, Directories.TEST_FILES);
 
-        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
 
         _userConfigurationService = new(_configurationRootMock!.Object);

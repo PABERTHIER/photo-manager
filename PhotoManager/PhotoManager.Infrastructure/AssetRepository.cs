@@ -43,11 +43,11 @@ public class AssetRepository : IAssetRepository
         _userConfigurationService = userConfigurationService;
         _assets = [];
         _folders = [];
-        _syncAssetsConfiguration = new SyncAssetsConfiguration();
+        _syncAssetsConfiguration = new();
         _recentTargetPaths = [];
-        _recentThumbnailsQueue = new Queue<string>();
+        _recentThumbnailsQueue = new();
         Thumbnails = [];
-        _syncLock = new Lock();
+        _syncLock = new();
         _dataDirectory = pathProviderService.ResolveDataDirectory();
         Initialize();
     }
@@ -505,25 +505,25 @@ public class AssetRepository : IAssetRepository
             _userConfigurationService.StorageSettings.FoldersNameSettings.Tables,
             _userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
 
-        _database.SetDataTableProperties(new DataTableProperties
+        _database.SetDataTableProperties(new()
         {
             TableName = _userConfigurationService.StorageSettings.TablesSettings.FoldersTableName,
             ColumnProperties = FolderConfigs.ConfigureDataTable()
         });
 
-        _database.SetDataTableProperties(new DataTableProperties
+        _database.SetDataTableProperties(new()
         {
             TableName = _userConfigurationService.StorageSettings.TablesSettings.AssetsTableName,
             ColumnProperties = AssetConfigs.ConfigureDataTable()
         });
 
-        _database.SetDataTableProperties(new DataTableProperties
+        _database.SetDataTableProperties(new()
         {
             TableName = _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
             ColumnProperties = SyncAssetsDirectoriesDefinitionConfigs.ConfigureDataTable()
         });
 
-        _database.SetDataTableProperties(new DataTableProperties
+        _database.SetDataTableProperties(new()
         {
             TableName = _userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName,
             ColumnProperties = RecentPathsConfigs.ConfigureDataTable()

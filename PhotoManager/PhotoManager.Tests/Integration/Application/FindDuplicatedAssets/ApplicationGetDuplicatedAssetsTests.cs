@@ -45,7 +45,7 @@ public class ApplicationGetDuplicatedAssetsTests
     {
         _asset1 = new()
         {
-            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -70,7 +70,7 @@ public class ApplicationGetDuplicatedAssetsTests
         };
         _asset2 = new()
         {
-            FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_9_PNG,
             ImageRotation = Rotation.Rotate90,
@@ -95,7 +95,7 @@ public class ApplicationGetDuplicatedAssetsTests
         };
         _asset3 = new()
         {
-            FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_1_DUPLICATE_JPG,
             ImageRotation = Rotation.Rotate0,
@@ -120,7 +120,7 @@ public class ApplicationGetDuplicatedAssetsTests
         };
         _asset4 = new()
         {
-            FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_9_DUPLICATE_PNG,
             Pixel = new()
@@ -144,7 +144,7 @@ public class ApplicationGetDuplicatedAssetsTests
         };
         _asset5 = new()
         {
-            FolderId = new Guid("886283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("886283c6-780e-4ad5-975c-be63044c087a"),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
@@ -184,7 +184,7 @@ public class ApplicationGetDuplicatedAssetsTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
-        _pathProviderServiceMock = new Mock<IPathProviderService>();
+        _pathProviderServiceMock = new();
         _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
@@ -537,7 +537,7 @@ public class ApplicationGetDuplicatedAssetsTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
-        _pathProviderServiceMock = new Mock<IPathProviderService>();
+        _pathProviderServiceMock = new();
         _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
