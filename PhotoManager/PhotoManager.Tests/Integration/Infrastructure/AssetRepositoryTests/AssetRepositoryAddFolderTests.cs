@@ -57,10 +57,10 @@ public class AssetRepositoryAddFolderTests
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
             Assert.That(addedFolder1.Path, Is.EqualTo(folderPath1));
-            Assert.That(addedFolder1.Id == _defaultGuid, Is.False);
+            Assert.That(addedFolder1.Id, Is.Not.EqualTo(_defaultGuid));
 
             Assert.That(addedFolder2.Path, Is.EqualTo(folderPath2));
-            Assert.That(addedFolder2.Id == _defaultGuid, Is.False);
+            Assert.That(addedFolder2.Id, Is.Not.EqualTo(_defaultGuid));
 
             Assert.That(addedFolder2.Path, Is.Not.EqualTo(addedFolder1.Path));
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
@@ -110,10 +110,10 @@ public class AssetRepositoryAddFolderTests
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath1);
 
             Assert.That(addedFolder1.Path, Is.EqualTo(folderPath1));
-            Assert.That(addedFolder1.Id == _defaultGuid, Is.False);
+            Assert.That(addedFolder1.Id, Is.Not.EqualTo(_defaultGuid));
 
             Assert.That(addedFolder2.Path, Is.EqualTo(folderPath1));
-            Assert.That(addedFolder2.Id == _defaultGuid, Is.False);
+            Assert.That(addedFolder2.Id, Is.Not.EqualTo(_defaultGuid));
 
             Assert.That(addedFolder2.Path, Is.EqualTo(addedFolder1.Path));
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
@@ -170,10 +170,10 @@ public class AssetRepositoryAddFolderTests
             );
 
             Assert.That(addedFolder1.Path, Is.EqualTo(folderPath1));
-            Assert.That(addedFolder1.Id == _defaultGuid, Is.False);
+            Assert.That(addedFolder1.Id, Is.Not.EqualTo(_defaultGuid));
 
             Assert.That(addedFolder2.Path, Is.EqualTo(folderPath2));
-            Assert.That(addedFolder2.Id == _defaultGuid, Is.False);
+            Assert.That(addedFolder2.Id, Is.Not.EqualTo(_defaultGuid));
 
             Assert.That(addedFolder2.Path, Is.Not.EqualTo(addedFolder1.Path));
             Assert.That(addedFolder2.Id, Is.Not.EqualTo(addedFolder1.Id));
