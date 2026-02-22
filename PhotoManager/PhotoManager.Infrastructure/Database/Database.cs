@@ -104,17 +104,16 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
         blobStorage.WriteToBinaryFile(blob, blobFilePath);
     }
 
-    // TODO: This method verifies if the folder has its .bin generated, but not if there are data in it or not
-    public bool FolderHasThumbnails(string blobName) // Folder.Id + ".bin"
+    public bool IsBlobFileExists(string blobName) // Folder.Id + ".bin"
     {
         string blobFilePath = ResolveBlobFilePath(blobName);
         return File.Exists(blobFilePath);
     }
 
-    public void DeleteThumbnails(string blobName) // Folder.Id + ".bin"
+    public void DeleteBlobFile(string blobName) // Folder.Id + ".bin"
     {
-        string thumbnailsFilePath = ResolveBlobFilePath(blobName);
-        File.Delete(thumbnailsFilePath);
+        string blobFilePath = ResolveBlobFilePath(blobName);
+        File.Delete(blobFilePath);
     }
 
     public bool WriteBackup(DateTime backupDate)

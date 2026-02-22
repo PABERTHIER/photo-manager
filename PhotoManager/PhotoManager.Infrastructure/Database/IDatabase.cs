@@ -8,8 +8,8 @@ public interface IDatabase
     void WriteObjectList<T>(List<T> list, string tableName, Func<T, int, object> mapCsvFieldIndexToCsvField);
     Dictionary<string, byte[]>? ReadBlob(string blobName);
     void WriteBlob(Dictionary<string, byte[]> blob, string blobName);
-    bool FolderHasThumbnails(string blobName);
-    void DeleteThumbnails(string blobName);
+    bool IsBlobFileExists(string blobName);
+    void DeleteBlobFile(string blobName);
     bool WriteBackup(DateTime backupDate);
     bool BackupExists(DateTime backupDate);
     void DeleteOldBackups(ushort backupsToKeep);

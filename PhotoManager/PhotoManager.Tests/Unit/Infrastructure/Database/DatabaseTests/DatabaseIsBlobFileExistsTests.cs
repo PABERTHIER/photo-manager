@@ -4,7 +4,7 @@ using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 namespace PhotoManager.Tests.Unit.Infrastructure.Database.DatabaseTests;
 
 [TestFixture]
-public class DatabaseDeleteThumbnailsTests
+public class DatabaseIsBlobFileExistsTests
 {
     private string? _dataDirectory;
 
@@ -29,11 +29,10 @@ public class DatabaseDeleteThumbnailsTests
     }
 
     [Test]
-    public void DeleteThumbnails_BlobExists_DeleteFile()
+    public void IsBlobFileExists_BlobExists_ReturnsTrue()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
         Dictionary<string, byte[]> blobToWrite = new()
         {
             { FileNames.IMAGE1_JPG, [1, 2, 3]},
@@ -50,11 +49,9 @@ public class DatabaseDeleteThumbnailsTests
 
             _database!.WriteBlob(blobToWrite, blobName);
 
-            Assert.That(File.Exists(blobFilePath), Is.True);
+            bool isBlobFileExists = _database!.IsBlobFileExists(blobName);
 
-            _database!.DeleteThumbnails(blobName);
-
-            Assert.That(File.Exists(blobFilePath), Is.False);
+            Assert.That(isBlobFileExists, Is.True);
         }
         finally
         {
@@ -64,11 +61,10 @@ public class DatabaseDeleteThumbnailsTests
     }
 
     [Test]
-    public void DeleteThumbnails_BlobDoesNotExist_DoesNotDeleteFile()
+    public void IsBlobFileExists_BlobDoesNotExist_ReturnsFalse()
     {
         string blobName = Guid.NewGuid() + ".bin"; // The blobName is always like this: Folder.Id + ".bin"
         string directoryPath = Path.Combine(_dataDirectory!, Directories.DATABASE_TESTS);
-        string blobFilePath = Path.Combine(directoryPath, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, blobName);
 
         try
         {
@@ -78,11 +74,9 @@ public class DatabaseDeleteThumbnailsTests
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
                 _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs);
 
-            Assert.That(File.Exists(blobFilePath), Is.False);
+            bool isBlobFileExists = _database!.IsBlobFileExists(blobName);
 
-            _database!.DeleteThumbnails(blobName);
-
-            Assert.That(File.Exists(blobFilePath), Is.False);
+            Assert.That(isBlobFileExists, Is.False);
         }
         finally
         {

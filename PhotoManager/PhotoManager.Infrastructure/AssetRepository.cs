@@ -319,7 +319,7 @@ public class AssetRepository : IAssetRepository
             if (thumbnails.Count == 0)
             {
                 Thumbnails.Remove(folder.Path);
-                _database.DeleteThumbnails(folder.ThumbnailsFilename);
+                _database.DeleteBlobFile(folder.ThumbnailsFilename);
             }
 
             if (assetToDelete != null)
@@ -339,9 +339,9 @@ public class AssetRepository : IAssetRepository
         {
             Thumbnails.Remove(folder.Path);
 
-            if (FolderHasThumbnails(folder))
+            if (IsBlobFileExists(folder.ThumbnailsFilename))
             {
-                _database.DeleteThumbnails(folder.ThumbnailsFilename);
+                _database.DeleteBlobFile(folder.ThumbnailsFilename);
             }
 
             _folders.Remove(folder);
@@ -412,10 +412,9 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
-    // TODO: Rename to FolderHasBlobs or something like this (Thumbnails has been used too much wrongly)
-    public bool FolderHasThumbnails(Folder folder)
+    public bool IsBlobFileExists(string blobName)
     {
-        return _database.FolderHasThumbnails(folder.ThumbnailsFilename);
+        return _database.IsBlobFileExists(blobName);
     }
 
     public SyncAssetsConfiguration GetSyncAssetsConfiguration()

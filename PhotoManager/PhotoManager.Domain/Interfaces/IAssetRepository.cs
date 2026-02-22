@@ -24,7 +24,7 @@ public interface IAssetRepository
     bool HasChanges();
     bool ContainsThumbnail(string directoryName, string fileName);
     BitmapImage? LoadThumbnail(string directoryName, string fileName, int width, int height);
-    bool FolderHasThumbnails(Folder folder);
+    bool IsBlobFileExists(string blobName);
     SyncAssetsConfiguration GetSyncAssetsConfiguration();
     void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfiguration);
     List<string> GetRecentTargetPaths();

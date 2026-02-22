@@ -206,9 +206,9 @@ public sealed class CatalogAssetsService : ICatalogAssetsService, IDisposable
 
         CatalogDeletedAssets(directory, callback, ref cataloguedAssetsBatchCount, batchSize, deletedFileNames, token);
 
-        bool folderHasThumbnails = folder != null && _assetRepository.FolderHasThumbnails(folder);
+        bool isBlobFileExists = folder != null && _assetRepository.IsBlobFileExists(folder.ThumbnailsFilename);
 
-        if (_assetRepository.HasChanges() || !folderHasThumbnails)
+        if (_assetRepository.HasChanges() || !isBlobFileExists)
         {
             _assetRepository.SaveCatalog(folder);
         }
