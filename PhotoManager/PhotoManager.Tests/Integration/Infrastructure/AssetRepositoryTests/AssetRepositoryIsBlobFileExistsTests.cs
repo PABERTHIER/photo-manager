@@ -90,7 +90,7 @@ public class AssetRepositoryIsBlobFileExistsTests
     }
 
     [Test]
-    public void IsBlobFileExists_BlobNameIsNull_ThrowsNullReferenceException()
+    public void IsBlobFileExists_BlobNameIsNull_ThrowsArgumentNullException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -99,9 +99,10 @@ public class AssetRepositoryIsBlobFileExistsTests
         {
             string? blobName = null;
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetRepository!.IsBlobFileExists(blobName!));
+            ArgumentNullException? exception =
+                Assert.Throws<ArgumentNullException>(() => _assetRepository!.IsBlobFileExists(blobName!));
 
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path2')"));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
