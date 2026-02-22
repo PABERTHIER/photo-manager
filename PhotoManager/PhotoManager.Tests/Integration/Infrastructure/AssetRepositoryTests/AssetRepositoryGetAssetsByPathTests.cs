@@ -421,6 +421,83 @@ public class AssetRepositoryGetAssetsByPathTests
     }
 
     [Test]
+    public void GetAssetsByPath_ThumbnailsAndFolderExistButThumbnailsDictionaryEntriesToKeepIs0_ReturnsEmptyArray()
+    {
+        List<Reactive.Unit> assetsUpdatedEvents = [];
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+
+        try
+        {
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
+
+            _asset1 = _asset1!.WithFolder(folder);
+            string filePath = Path.Combine(folderPath, _asset1.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
+
+            List<Asset> cataloguedAssets1 = _testableAssetRepository!.GetCataloguedAssets();
+            Assert.That(cataloguedAssets1, Is.Empty);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails1 = _testableAssetRepository!.GetThumbnails();
+            Assert.That(thumbnails1, Is.Empty);
+
+            _testableAssetRepository.AddAsset(_asset1, assetData);
+
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            Assert.That(cataloguedAssets1, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets1[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets1[0].ImageData, Is.Null);
+
+            _testableAssetRepository.SaveCatalog(folder);
+
+            // Create a new repository with ThumbnailsDictionaryEntriesToKeep = 0 using a fresh database
+            // pointing to the same directory (data already persisted above via SaveCatalog)
+            // This ensures Thumbnails[folder.Path] is loaded then immediately evicted by
+            // RemoveOldThumbnailsDictionaryEntries, making Thumbnails.TryGetValue return false
+            Mock<IConfigurationRoot> configurationRootMock = new();
+            configurationRootMock.GetDefaultMockConfig();
+            configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
+
+            Mock<IPathProviderService> pathProviderServiceMock = new();
+            pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+
+            UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+            ImageProcessingService imageProcessingService = new();
+            FileOperationsService fileOperationsService = new(userConfigurationService);
+            ImageMetadataService imageMetadataService = new(fileOperationsService);
+            PhotoManager.Infrastructure.Database.Database database = new(
+                new ObjectListStorage(), new BlobStorage(), new BackupStorage());
+            TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
+                imageProcessingService, imageMetadataService, userConfigurationService);
+
+            List<Asset> cataloguedAssets2 = testableAssetRepository.GetCataloguedAssets();
+            Assert.That(cataloguedAssets2, Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets2[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets2[0].ImageData, Is.Null);
+
+            Dictionary<string, Dictionary<string, byte[]>> thumbnails2 = testableAssetRepository.GetThumbnails();
+            Assert.That(thumbnails2, Is.Empty);
+
+            Asset[] assets = testableAssetRepository.GetAssetsByPath(folderPath);
+
+            Assert.That(cataloguedAssets2[0].ImageData, Is.Null);
+            Assert.That(thumbnails2, Is.Empty);
+            Assert.That(assets, Is.Empty);
+
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+        }
+        finally
+        {
+            Directory.Delete(_databaseDirectory!, true);
+            assetsUpdatedSubscription.Dispose();
+        }
+    }
+
+    [Test]
     public void GetAssetsByPath_AssetFolderIsDefault_ReturnsEmptyArray()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
@@ -721,20 +798,20 @@ public class AssetRepositoryGetAssetsByPathTests
             testableAssetRepository.AddAsset(_asset3, assetData1);
             testableAssetRepository.AddAsset(_asset2, assetData2);
 
+            Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
+            Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+            Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
+
+            Assert.That(cataloguedAssets, Has.Count.EqualTo(2));
+            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset3.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
+
+            Asset[] assets = testableAssetRepository.GetAssetsByPath(folderPath);
+
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
-                Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-                Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
-
-                Assert.That(cataloguedAssets, Has.Count.EqualTo(2));
-                Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset3.FileName));
-                Assert.That(cataloguedAssets[0].ImageData, Is.Null);
-                Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-                Assert.That(cataloguedAssets[1].ImageData, Is.Null);
-
-                Asset[] assets = testableAssetRepository.GetAssetsByPath(folderPath);
-
                 Assert.That(cataloguedAssets[0].ImageData, Is.Null);
                 Assert.That(cataloguedAssets[1].ImageData, Is.Null);
 
