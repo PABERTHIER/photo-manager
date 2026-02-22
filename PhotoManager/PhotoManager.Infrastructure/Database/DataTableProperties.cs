@@ -2,6 +2,6 @@
 
 public class DataTableProperties
 {
-    public required string TableName { get; set; }
-    public required ColumnProperties[] ColumnProperties { get; set; }
+    public required string TableName { get; init; }
+    public required ColumnProperties[] ColumnProperties { get; init; }
 }

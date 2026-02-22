@@ -3,8 +3,8 @@
 public abstract class BaseCsvStorage
 {
     protected const char QUOTE = '"';
-    protected DataTableProperties? Properties { get; set; }
-    protected char Separator { get; set; }
+    protected DataTableProperties? Properties { get; private set; }
+    protected char Separator { get; private set; }
 
     public void Initialize(DataTableProperties? properties, char separator)
     {

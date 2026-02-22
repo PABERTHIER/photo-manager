@@ -26,10 +26,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
 
     public void SetDataTableProperties(DataTableProperties dataTableProperties)
     {
-        if (dataTableProperties == null)
-        {
-            throw new ArgumentNullException(nameof(dataTableProperties));
-        }
+        ArgumentNullException.ThrowIfNull(dataTableProperties);
 
         if (dataTableProperties.ColumnProperties == null || dataTableProperties.ColumnProperties.Length == 0)
         {
@@ -76,10 +73,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
 
     public void WriteObjectList<T>(List<T> list, string tableName, Func<T, int, object> mapCsvFieldIndexToCsvField)
     {
-        if (list == null)
-        {
-            throw new ArgumentNullException(nameof(list));
-        }
+        ArgumentNullException.ThrowIfNull(list);
 
         if (string.IsNullOrWhiteSpace(tableName))
         {
@@ -169,7 +163,7 @@ public class Database(IObjectListStorage objectListStorage, IBlobStorage blobSto
 
     private DataTableProperties? GetDataTableProperties(string tableName)
     {
-        return DataTablePropertiesDictionary.ContainsKey(tableName) ? DataTablePropertiesDictionary[tableName] : null;
+        return DataTablePropertiesDictionary.GetValueOrDefault(tableName);
     }
 
     private string GetTablesDirectory(string tablesFolderName)

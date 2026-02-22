@@ -7,23 +7,25 @@ public class BlobStorage : IBlobStorage
     {
         Dictionary<string, byte[]>? result = null;
 
-        if (File.Exists(binaryFilePath))
+        if (!File.Exists(binaryFilePath))
         {
-            using (FileStream fileStream = new(binaryFilePath, FileMode.Open))
+            return result;
+        }
+
+        using (FileStream fileStream = new(binaryFilePath, FileMode.Open))
+        {
+            using (BinaryReader reader = new(fileStream))
             {
-                using (BinaryReader reader = new(fileStream))
+                int itemCount = reader.ReadInt32();
+                result = new Dictionary<string, byte[]>(itemCount);
+
+                for (int i = 0; i < itemCount; i++)
                 {
-                    int itemCount = reader.ReadInt32();
-                    result = new Dictionary<string, byte[]>(itemCount);
+                    string key = reader.ReadString();
+                    int valueLength = reader.ReadInt32();
+                    byte[] value = reader.ReadBytes(valueLength);
 
-                    for (int i = 0; i < itemCount; i++)
-                    {
-                        string key = reader.ReadString();
-                        int valueLength = reader.ReadInt32();
-                        byte[] value = reader.ReadBytes(valueLength);
-
-                        result[key] = value;
-                    }
+                    result[key] = value;
                 }
             }
         }

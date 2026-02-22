@@ -1,7 +1,7 @@
 ﻿namespace PhotoManager.Infrastructure.Database;
 
-public class ColumnProperties
+public readonly struct ColumnProperties
 {
-    public required string ColumnName { get; set; }
-    public bool EscapeText { get; set; }
+    public required string ColumnName { get; init; }
+    public bool EscapeText { get; init; }
 }
