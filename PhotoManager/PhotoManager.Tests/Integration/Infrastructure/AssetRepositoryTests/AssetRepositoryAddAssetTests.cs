@@ -21,7 +21,7 @@ public class AssetRepositoryAddAssetTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
 
-    private Mock<IStorageService>? _storageServiceMock;
+    private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? _asset1;
@@ -34,11 +34,11 @@ public class AssetRepositoryAddAssetTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
+        _pathProviderServiceMock = new();
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
@@ -46,7 +46,11 @@ public class AssetRepositoryAddAssetTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
+            imageMetadataService, userConfigurationService);
 
         _asset1 = new()
         {
@@ -108,7 +112,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath);
             Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath };
 
@@ -219,7 +223,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
@@ -261,7 +265,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
 
@@ -315,14 +319,18 @@ public class AssetRepositoryAddAssetTests
         configurationRootMock.MockGetValue(UserConfigurationKeys.THUMBNAILS_DICTIONARY_ENTRIES_TO_KEEP, "0");
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
-        TestableAssetRepository testableAssetRepository = new(_database!, _storageServiceMock!.Object, userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        TestableAssetRepository testableAssetRepository = new(_database!, _pathProviderServiceMock!.Object,
+            imageProcessingService, imageMetadataService, userConfigurationService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
             byte[] assetData = [1, 2, 3];
@@ -396,10 +404,12 @@ public class AssetRepositoryAddAssetTests
     }
 
     [Test]
-    public void AddAsset_AssetFolderIsDefault_AssetIsNotAddedAndAssetsUpdatedIsNotUpdated()
+    public void AddAsset_AssetFolderIsDefault_AssetIsNotAddedAndAssetsUpdatedIsNotUpdatedAndLogsIt()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
-        IDisposable assetsUpdatedSubscription = _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        IDisposable assetsUpdatedSubscription =
+            _testableAssetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
+        LoggingAssertsService loggingAssertsService = new();
 
         try
         {
@@ -418,11 +428,20 @@ public class AssetRepositoryAddAssetTests
             Assert.That(thumbnails, Is.Empty);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            string[] messages =
+            [
+                $"The asset could not be added, folder path is null or empty, asset.FileName: {_asset1!.FileName}"
+            ];
+            Type typeOfService = typeof(AssetRepository);
+
+            loggingAssertsService.AssertLogInfos(messages, typeOfService);
         }
         finally
         {
             Directory.Delete(_databaseDirectory!, true);
             assetsUpdatedSubscription.Dispose();
+            loggingAssertsService.LoggingAssertTearDown();
         }
     }
 
@@ -467,7 +486,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
             _asset1 = _asset1!.WithFolder(folder);
             byte[]? assetData = null;
@@ -509,7 +528,7 @@ public class AssetRepositoryAddAssetTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder1 = _testableAssetRepository!.AddFolder(folderPath);
             Folder folder2 = new() { Id = Guid.NewGuid(), Path = folderPath };
 

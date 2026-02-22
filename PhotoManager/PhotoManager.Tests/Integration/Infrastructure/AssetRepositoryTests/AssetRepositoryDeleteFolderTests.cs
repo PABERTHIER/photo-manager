@@ -21,7 +21,8 @@ public class AssetRepositoryDeleteFolderTests
     private TestableAssetRepository? _testableAssetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private Mock<IStorageService>? _storageServiceMock;
+
+    private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? _asset1;
@@ -33,11 +34,11 @@ public class AssetRepositoryDeleteFolderTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
+        _pathProviderServiceMock = new();
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
@@ -45,7 +46,11 @@ public class AssetRepositoryDeleteFolderTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new(_configurationRootMock!.Object);
-        _testableAssetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
+            imageMetadataService, _userConfigurationService);
 
         _asset1 = new()
         {
@@ -136,6 +141,11 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(assetData));
 
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.True);
+
             _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
@@ -146,6 +156,11 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.False);
         }
         finally
         {
@@ -182,6 +197,11 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(thumbnails, Is.Empty);
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.False);
 
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.False);
+
             _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
@@ -191,6 +211,11 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.False);
         }
         finally
         {
@@ -232,6 +257,11 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(thumbnails.ContainsKey(_asset1!.Folder.Path), Is.True);
             Assert.That(thumbnails[_asset1!.Folder.Path], Is.Empty);
 
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.True);
+
             _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
@@ -241,6 +271,11 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.False);
         }
         finally
         {
@@ -279,11 +314,17 @@ public class AssetRepositoryDeleteFolderTests
 
             _database!.WriteBlob([], _asset1!.Folder.ThumbnailsFilename);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.True);
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.True);
 
             _testableAssetRepository!.DeleteFolder(_asset1!.Folder);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.False);
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
 
@@ -319,6 +360,11 @@ public class AssetRepositoryDeleteFolderTests
                 Id = Guid.NewGuid(),
             };
 
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.False);
+
             _testableAssetRepository!.DeleteFolder(folder);
 
             Folder[] folders = _testableAssetRepository!.GetFolders();
@@ -327,6 +373,11 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(_testableAssetRepository.HasChanges(), Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
+
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.False);
         }
         finally
         {
@@ -375,6 +426,11 @@ public class AssetRepositoryDeleteFolderTests
             Assert.That(thumbnails[_asset1!.Folder.Path].ContainsKey(_asset1.FileName), Is.True);
             Assert.That(thumbnails[_asset1!.Folder.Path][_asset1.FileName], Is.EqualTo(assetData));
 
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.True);
+
             // Simulate concurrent access
             Parallel.Invoke(
                 () => _testableAssetRepository!.DeleteFolder(_asset1!.Folder),
@@ -390,6 +446,11 @@ public class AssetRepositoryDeleteFolderTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
+
+            Assert.That(
+                File.Exists(Path.Combine(_databasePath!,
+                    _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                    folder.ThumbnailsFilename)), Is.False);
         }
         finally
         {

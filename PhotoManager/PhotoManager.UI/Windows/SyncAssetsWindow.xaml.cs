@@ -1,8 +1,8 @@
 ﻿using log4net;
 using PhotoManager.Domain;
-using PhotoManager.Infrastructure;
 using PhotoManager.UI.ViewModels;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;

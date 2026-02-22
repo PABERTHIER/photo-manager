@@ -20,8 +20,8 @@ public class FindDuplicatedAssetsServiceThumbnailTests
 
     private FindDuplicatedAssetsService? _findDuplicatedAssetsService;
     private AssetRepository? _assetRepository;
-    private StorageService? _storageService;
-    private Mock<IStorageService>? _storageServiceMock;
+
+    private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? _asset1;
@@ -37,13 +37,13 @@ public class FindDuplicatedAssetsServiceThumbnailTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
         _configurationRootMock.MockGetValue(UserConfigurationKeys.DETECT_THUMBNAILS, "true");
         _configurationRootMock.MockGetValue(UserConfigurationKeys.USING_PHASH, "true");
 
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
+        _pathProviderServiceMock = new();
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
@@ -51,9 +51,12 @@ public class FindDuplicatedAssetsServiceThumbnailTests
     {
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new(database, _storageServiceMock!.Object, userConfigurationService);
-        _storageService = new(userConfigurationService);
-        _findDuplicatedAssetsService = new(_assetRepository!, _storageService!, userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(database, _pathProviderServiceMock!.Object, imageProcessingService,
+            imageMetadataService, userConfigurationService);
+        _findDuplicatedAssetsService = new(_assetRepository!, fileOperationsService, userConfigurationService);
 
         _asset1 = new()
         {

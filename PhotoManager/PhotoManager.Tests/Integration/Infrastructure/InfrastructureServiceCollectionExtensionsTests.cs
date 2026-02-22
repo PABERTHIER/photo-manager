@@ -25,8 +25,21 @@ public class InfrastructureServiceCollectionExtensionsTests
         ServiceDescriptor? userConfigurationServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IUserConfigurationService));
         Assert.That(userConfigurationServiceDescriptor, Is.Null);
 
-        ServiceDescriptor? storageServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IStorageService));
-        Assert.That(storageServiceDescriptor, Is.Null);
+        ServiceDescriptor? pathProviderServiceDescriptor = services.FirstOrDefault(x =>
+            x.ServiceType == typeof(IPathProviderService));
+        Assert.That(pathProviderServiceDescriptor, Is.Null);
+
+        ServiceDescriptor? fileOperationsServiceDescriptor = services.FirstOrDefault(x =>
+            x.ServiceType == typeof(IFileOperationsService));
+        Assert.That(fileOperationsServiceDescriptor, Is.Null);
+
+        ServiceDescriptor? imageProcessingServiceDescriptor = services.FirstOrDefault(x =>
+            x.ServiceType == typeof(IImageProcessingService));
+        Assert.That(imageProcessingServiceDescriptor, Is.Null);
+
+        ServiceDescriptor? imageMetadataServiceDescriptor = services.FirstOrDefault(x =>
+            x.ServiceType == typeof(IImageMetadataService));
+        Assert.That(imageMetadataServiceDescriptor, Is.Null);
 
         ServiceDescriptor? assetRepositoryDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IAssetRepository));
         Assert.That(assetRepositoryDescriptor, Is.Null);
@@ -38,7 +51,7 @@ public class InfrastructureServiceCollectionExtensionsTests
 
         services.AddInfrastructure();
 
-        Assert.That(services, Has.Count.EqualTo(8));
+        Assert.That(services, Has.Count.EqualTo(11));
 
         objectListStorageDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IObjectListStorage));
         Assert.That(objectListStorageDescriptor, Is.Not.Null);
@@ -75,23 +88,44 @@ public class InfrastructureServiceCollectionExtensionsTests
         Assert.That(userConfigurationServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(userConfigurationServiceDescriptor.ImplementationType, Is.EqualTo(typeof(UserConfigurationService)));
 
-        storageServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IStorageService));
-        Assert.That(storageServiceDescriptor, Is.Not.Null);
-        Assert.That(storageServiceDescriptor, Is.EqualTo(services[5]));
-        Assert.That(storageServiceDescriptor.ImplementationInstance, Is.Null);
-        Assert.That(storageServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
-        Assert.That(storageServiceDescriptor.ImplementationType, Is.EqualTo(typeof(StorageService)));
+        pathProviderServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IPathProviderService));
+        Assert.That(pathProviderServiceDescriptor, Is.Not.Null);
+        Assert.That(pathProviderServiceDescriptor, Is.EqualTo(services[5]));
+        Assert.That(pathProviderServiceDescriptor.ImplementationInstance, Is.Null);
+        Assert.That(pathProviderServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        Assert.That(pathProviderServiceDescriptor.ImplementationType, Is.EqualTo(typeof(PathProviderService)));
+
+        fileOperationsServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IFileOperationsService));
+        Assert.That(fileOperationsServiceDescriptor, Is.Not.Null);
+        Assert.That(fileOperationsServiceDescriptor, Is.EqualTo(services[6]));
+        Assert.That(fileOperationsServiceDescriptor.ImplementationInstance, Is.Null);
+        Assert.That(fileOperationsServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        Assert.That(fileOperationsServiceDescriptor.ImplementationType, Is.EqualTo(typeof(FileOperationsService)));
+
+        imageProcessingServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IImageProcessingService));
+        Assert.That(imageProcessingServiceDescriptor, Is.Not.Null);
+        Assert.That(imageProcessingServiceDescriptor, Is.EqualTo(services[7]));
+        Assert.That(imageProcessingServiceDescriptor.ImplementationInstance, Is.Null);
+        Assert.That(imageProcessingServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        Assert.That(imageProcessingServiceDescriptor.ImplementationType, Is.EqualTo(typeof(ImageProcessingService)));
+
+        imageMetadataServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IImageMetadataService));
+        Assert.That(imageMetadataServiceDescriptor, Is.Not.Null);
+        Assert.That(imageMetadataServiceDescriptor, Is.EqualTo(services[8]));
+        Assert.That(imageMetadataServiceDescriptor.ImplementationInstance, Is.Null);
+        Assert.That(imageMetadataServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
+        Assert.That(imageMetadataServiceDescriptor.ImplementationType, Is.EqualTo(typeof(ImageMetadataService)));
 
         assetRepositoryDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IAssetRepository));
         Assert.That(assetRepositoryDescriptor, Is.Not.Null);
-        Assert.That(assetRepositoryDescriptor, Is.EqualTo(services[6]));
+        Assert.That(assetRepositoryDescriptor, Is.EqualTo(services[9]));
         Assert.That(assetRepositoryDescriptor.ImplementationInstance, Is.Null);
         Assert.That(assetRepositoryDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(assetRepositoryDescriptor.ImplementationType, Is.EqualTo(typeof(AssetRepository)));
 
         assetHashCalculatorServiceDescriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IAssetHashCalculatorService));
         Assert.That(assetHashCalculatorServiceDescriptor, Is.Not.Null);
-        Assert.That(assetHashCalculatorServiceDescriptor, Is.EqualTo(services[7]));
+        Assert.That(assetHashCalculatorServiceDescriptor, Is.EqualTo(services[10]));
         Assert.That(assetHashCalculatorServiceDescriptor.ImplementationInstance, Is.Null);
         Assert.That(assetHashCalculatorServiceDescriptor.Lifetime, Is.EqualTo(ServiceLifetime.Singleton));
         Assert.That(assetHashCalculatorServiceDescriptor.ImplementationType, Is.EqualTo(typeof(AssetHashCalculatorService)));

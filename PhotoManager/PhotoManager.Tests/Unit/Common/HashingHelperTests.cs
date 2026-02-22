@@ -1,5 +1,4 @@
-﻿using ImageMagick;
-using DHashes = PhotoManager.Tests.Unit.Constants.DHashes;
+﻿using DHashes = PhotoManager.Tests.Unit.Constants.DHashes;
 using Directories = PhotoManager.Tests.Unit.Constants.Directories;
 using FileNames = PhotoManager.Tests.Unit.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Unit.Constants.Hashes;
@@ -85,37 +84,31 @@ public class HashingHelperTests
     }
 
     [Test]
-    public void CalculatePHash_ImageDoesNotExist_ThrowsMagickBlobErrorException()
+    public void CalculatePHash_ImageDoesNotExist_ReturnsNull()
     {
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
 
-        MagickBlobErrorException? exception =
-            Assert.Throws<MagickBlobErrorException>(() => HashingHelper.CalculatePHash(filePath));
+        string? phash = HashingHelper.CalculatePHash(filePath);
 
-        Assert.That(exception?.Message,
-            Does.StartWith($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/"));
+        Assert.That(phash, Is.Null);
     }
 
     [Test]
-    public void CalculatePHash_ImagePathIsInvalid_ThrowsMagickMissingDelegateErrorException()
+    public void CalculatePHash_ImagePathIsInvalid_ReturnsNull()
     {
-        MagickMissingDelegateErrorException? exception =
-            Assert.Throws<MagickMissingDelegateErrorException>(() => HashingHelper.CalculatePHash(_dataDirectory!));
+        string? phash = HashingHelper.CalculatePHash(_dataDirectory!);
 
-        Assert.That(exception?.Message,
-            Does.StartWith(
-                $"no decode delegate for this image format `{_dataDirectory!}' @ error/constitute.c/ReadImage/"));
+        Assert.That(phash, Is.Null);
     }
 
     [Test]
-    public void CalculatePHash_ImagePathIsNull_ThrowsArgumentNullException()
+    public void CalculatePHash_ImagePathIsNull_ReturnsNull()
     {
         string? filePath = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() => HashingHelper.CalculatePHash(filePath!));
+        string? phash = HashingHelper.CalculatePHash(filePath!);
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null or empty. (Parameter 'fileName')"));
+        Assert.That(phash, Is.Null);
     }
 
     [Test]

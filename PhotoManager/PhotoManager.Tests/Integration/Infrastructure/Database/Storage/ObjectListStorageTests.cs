@@ -708,4 +708,19 @@ public class ObjectListStorageTests
         Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
         Assert.That(File.Exists(dataFilePath), Is.False);
     }
+
+    [Test]
+    public void EscapeText_PropertiesIsNull_ReturnsFalse()
+    {
+        TestableBaseCsvStorage testableBaseCsvStorage = new();
+
+        bool result = testableBaseCsvStorage.EscapeTextTest("UnknownColumnName");
+
+        Assert.That(result, Is.False);
+    }
+
+    private class TestableBaseCsvStorage : BaseCsvStorage
+    {
+        public bool EscapeTextTest(string columnName) => EscapeText(columnName);
+    }
 }

@@ -43,12 +43,15 @@ public class DuplicatedAssetViewModelTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
-        Mock<IStorageService> storageServiceMock = new();
-        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
-        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        Mock<IPathProviderService> pathProviderServiceMock = new();
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new(database, storageServiceMock.Object, userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService,
+            imageMetadataService, userConfigurationService);
 
         DateTime actualDate = DateTime.Now;
 

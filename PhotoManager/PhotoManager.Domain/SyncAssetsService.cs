@@ -2,7 +2,7 @@
 
 public class SyncAssetsService(
     IAssetRepository assetRepository,
-    IStorageService storageService,
+    IFileOperationsService fileOperationsService,
     IAssetsComparator assetsComparator,
     IMoveAssetsService moveAssetsService) : ISyncAssetsService
 {
@@ -33,7 +33,7 @@ public class SyncAssetsService(
             DestinationDirectory = definition.DestinationDirectory
         };
 
-        if (!storageService.FolderExists(definition.SourceDirectory))
+        if (!fileOperationsService.FolderExists(definition.SourceDirectory))
         {
             syncAssetsResult.Message = $"Source directory '{definition.SourceDirectory}' not found.";
             result.Add(syncAssetsResult);
@@ -42,13 +42,13 @@ public class SyncAssetsService(
         {
             try
             {
-                if (!storageService.FolderExists(definition.DestinationDirectory))
+                if (!fileOperationsService.FolderExists(definition.DestinationDirectory))
                 {
-                    storageService.CreateDirectory(definition.DestinationDirectory);
+                    fileOperationsService.CreateDirectory(definition.DestinationDirectory);
                 }
 
-                string[] sourceFileNames = storageService.GetFileNames(definition.SourceDirectory);
-                string[] destinationFileNames = storageService.GetFileNames(definition.DestinationDirectory);
+                string[] sourceFileNames = fileOperationsService.GetFileNames(definition.SourceDirectory);
+                string[] destinationFileNames = fileOperationsService.GetFileNames(definition.DestinationDirectory);
                 string[] newFileNames = assetsComparator.GetNewFileNamesToSync(sourceFileNames, destinationFileNames);
                 newFileNames = GetFilesNotAlreadyInDestinationSubDirectories(newFileNames, definition.DestinationDirectory);
 
@@ -71,7 +71,7 @@ public class SyncAssetsService(
                     foreach (string deletedImage in deletedFileNames)
                     {
                         string destinationPath = Path.Combine(definition.DestinationDirectory, deletedImage);
-                        storageService.DeleteFile(definition.DestinationDirectory, deletedImage);
+                        fileOperationsService.DeleteFile(definition.DestinationDirectory, deletedImage);
                         syncAssetsResult.SyncedImages++;
                         callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"Deleted '{destinationPath}'" });
                     }
@@ -88,9 +88,9 @@ public class SyncAssetsService(
 
                 if (definition.IncludeSubFolders)
                 {
-                    List<DirectoryInfo> subdirectories = storageService.GetSubDirectories(definition.SourceDirectory);
+                    DirectoryInfo[] subdirectories = fileOperationsService.GetSubDirectories(definition.SourceDirectory);
 
-                    for (int i = 0; i < subdirectories.Count; i++)
+                    for (int i = 0; i < subdirectories.Length; i++)
                     {
                         SyncAssetsDirectoriesDefinition subDefinition = new()
                         {
@@ -114,11 +114,11 @@ public class SyncAssetsService(
 
     private string[] GetFilesNotAlreadyInDestinationSubDirectories(string[] newFileNames, string destinationDirectory)
     {
-        List<DirectoryInfo> destinationSubDirectories = storageService.GetRecursiveSubDirectories(destinationDirectory);
+        DirectoryInfo[] destinationSubDirectories = fileOperationsService.GetRecursiveSubDirectories(destinationDirectory);
 
-        for (int i = 0; i < destinationSubDirectories.Count; i++)
+        for (int i = 0; i < destinationSubDirectories.Length; i++)
         {
-            string[] destinationFileNames = storageService.GetFileNames(destinationSubDirectories[i].FullName);
+            string[] destinationFileNames = fileOperationsService.GetFileNames(destinationSubDirectories[i].FullName);
             newFileNames = assetsComparator.GetNewFileNamesToSync(newFileNames, destinationFileNames);
         }
 

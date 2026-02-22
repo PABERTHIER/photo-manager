@@ -1028,21 +1028,28 @@ public class FindDuplicatedAssetsViewModelDHashTests
 
         _userConfigurationService = new(configurationRootMock.Object);
 
-        Mock<IStorageService> storageServiceMock = new();
-        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
-        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        Mock<IPathProviderService> pathProviderServiceMock = new();
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _assetRepository = new(database, storageServiceMock.Object, _userConfigurationService);
-        StorageService storageService = new(_userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(database, pathProviderServiceMock.Object, imageProcessingService, imageMetadataService,
+            _userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        AssetCreationService assetCreationService = new(_assetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        AssetCreationService assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_assetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(_assetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new(_assetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_assetRepository, storageService, _userConfigurationService);
-        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_assetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_assetRepository, fileOperationsService, assetCreationService);
+        SyncAssetsService syncAssetsService =
+            new(_assetRepository, fileOperationsService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService =
+            new(_assetRepository, fileOperationsService, _userConfigurationService);
+        _application = new(_assetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+            findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
         _applicationViewModel = new(_application);
         _findDuplicatedAssetsViewModel = new(_application);
     }
@@ -1050,7 +1057,7 @@ public class FindDuplicatedAssetsViewModelDHashTests
     [Test]
     public async Task SetDuplicates_CataloguedAssetsAndDHashTypeAndAllDuplicatesSets_SetsDuplicates()
     {
-        string rootDirectory = Path.Combine(_dataDirectory!);
+        string rootDirectory = _dataDirectory!;
         string duplicatesDirectory = Path.Combine(rootDirectory, Directories.DUPLICATES);
         string directoryNewFolder1 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_1);
         string directoryNewFolder2 = Path.Combine(duplicatesDirectory, Directories.NEW_FOLDER_2);

@@ -22,7 +22,10 @@ public class AssetRepositorySaveCatalogTests
     private AssetRepository? _assetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
     private UserConfigurationService? _userConfigurationService;
-    private Mock<IStorageService>? _storageServiceMock;
+    private ImageProcessingService? _imageProcessingService;
+    private ImageMetadataService? _imageMetadataService;
+
+    private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     private Asset? _asset1;
@@ -34,11 +37,11 @@ public class AssetRepositorySaveCatalogTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
+        _pathProviderServiceMock = new();
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
@@ -46,7 +49,11 @@ public class AssetRepositorySaveCatalogTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
+        _imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        _imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(_database, _pathProviderServiceMock!.Object, _imageProcessingService,
+            _imageMetadataService, _userConfigurationService);
 
         _asset1 = new()
         {
@@ -160,6 +167,10 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(assets, Has.Count.EqualTo(1));
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);
             Assert.That(asset?.FileName == _asset1.FileName && asset.FolderId == _asset1.FolderId, Is.True);
+            // Because not stored
+            Assert.That(asset?.FileProperties.Size, Is.Zero);
+            Assert.That(asset?.FileProperties.Creation, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset?.FileProperties.Modification, Is.EqualTo(DateTime.MinValue));
 
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(2));
             Assert.That(syncAssetsDirectoriesDefinitions.Any(x => x.SourceDirectory == "C:\\Toto\\Screenshots"), Is.True);
@@ -169,8 +180,6 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-
-            _storageServiceMock!.Verify(x => x.UpdateAssetFileProperties(It.IsAny<Asset>()), Times.Never);
         }
         finally
         {
@@ -187,15 +196,17 @@ public class AssetRepositorySaveCatalogTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_1);
+            string folderPath1 = _dataDirectory!;
             string folderPath2 = Path.Combine(_dataDirectory!, Directories.TEST_FOLDER_2);
 
             Folder addedFolder1 = _assetRepository!.AddFolder(folderPath1);
             Folder addedFolder2 = _assetRepository!.AddFolder(folderPath2);
 
             _asset1 = _asset1!.WithFolder(addedFolder1);
+            string filePath = Path.Combine(folderPath1, _asset1.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
 
-            _assetRepository!.AddAsset(_asset1!, []);
+            _assetRepository!.AddAsset(_asset1!, assetData);
 
             Assert.That(_assetRepository.HasChanges(), Is.True);
             Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, _asset1.Folder.ThumbnailsFilename)), Is.False);
@@ -241,7 +252,8 @@ public class AssetRepositorySaveCatalogTests
             Assert.That(_assetRepository.HasChanges(), Is.False);
 
             // New AssetRepository to test Initialize method with content in DB
-            AssetRepository assetRepository = new(_database!, _storageServiceMock!.Object, _userConfigurationService);
+            AssetRepository assetRepository = new(_database!, _pathProviderServiceMock!.Object,
+                _imageProcessingService!, _imageMetadataService!, _userConfigurationService);
 
             Assert.That(assetRepository.HasChanges(), Is.False);
 
@@ -270,11 +282,21 @@ public class AssetRepositorySaveCatalogTests
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);
             Assert.That(asset?.FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(asset?.FolderId, Is.EqualTo(_asset1.FolderId));
-            // TODO: When ResolveDataDirectory has been removed from StorageService
-            // // Before and after ?
-            //Assert.That(asset?.FileProperties.Size, Is.EqualTo(0));
-            //Assert.That(asset?.FileProperties.Creation, Is.EqualTo(DateTime.MinValue));
-            //Assert.That(asset?.FileProperties.Modification, Is.EqualTo(DateTime.MinValue));
+            // Because not stored
+            Assert.That(asset?.FileProperties.Size, Is.Zero);
+            Assert.That(asset?.FileProperties.Creation, Is.EqualTo(DateTime.MinValue));
+            Assert.That(asset?.FileProperties.Modification, Is.EqualTo(DateTime.MinValue));
+
+            // Loaded at init
+            Asset[] assetsFromRepositoryByPath = assetRepository.GetAssetsByPath(folderPath1);
+            Assert.That(assetsFromRepositoryByPath, Has.Length.EqualTo(1));
+            Assert.That(assetsFromRepositoryByPath[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assetsFromRepositoryByPath[0].FolderId, Is.EqualTo(_asset1.FolderId));
+            Assert.That(assetsFromRepositoryByPath[0].FileProperties.Size, Is.EqualTo(_asset1.FileProperties.Size));
+            Assert.That(assetsFromRepositoryByPath[0].FileProperties.Creation.Date,
+                Is.EqualTo(_asset1.FileProperties.Creation.Date));
+            Assert.That(assetsFromRepositoryByPath[0].FileProperties.Modification.Date,
+                Is.EqualTo(_asset1.FileProperties.Modification.Date));
 
             Assert.That(syncAssetsDirectoriesDefinitions, Has.Count.EqualTo(2));
             Assert.That(syncAssetsDirectoriesDefinitions.Any(x => x.SourceDirectory == "C:\\Toto\\Screenshots"), Is.True);
@@ -284,8 +306,6 @@ public class AssetRepositorySaveCatalogTests
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
-
-            _storageServiceMock!.Verify(x => x.UpdateAssetFileProperties(It.IsAny<Asset>()), Times.Exactly(1));
         }
         finally
         {

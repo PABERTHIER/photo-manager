@@ -18,9 +18,9 @@ public class MoveAssetsServiceTests
     private UserConfigurationService? _userConfigurationService;
     private AssetRepository? _assetRepository;
     private Database? _database;
-    private StorageService? _storageService;
     private AssetCreationService? _assetCreationService;
-    private Mock<IStorageService>? _storageServiceMock;
+
+    private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
@@ -30,12 +30,11 @@ public class MoveAssetsServiceTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
-        _storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        _pathProviderServiceMock = new();
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
@@ -43,11 +42,15 @@ public class MoveAssetsServiceTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         _userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
-        _storageService = new(_userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
+            imageMetadataService, _userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        _assetCreationService = new(_assetRepository, _storageService, assetHashCalculatorService, _userConfigurationService);
-        _moveAssetsService = new(_assetRepository, _storageService, _assetCreationService);
+        _assetCreationService = new(_assetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
+        _moveAssetsService = new(_assetRepository, fileOperationsService, _assetCreationService);
     }
 
     [Test]

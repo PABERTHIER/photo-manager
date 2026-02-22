@@ -22,7 +22,8 @@ public class ApplicationGetAssetsByPathTests
     private TestableAssetRepository? _testableAssetRepository;
     private UserConfigurationService? _userConfigurationService;
     private Database? _database;
-    private Mock<IStorageService>? _storageServiceMock;
+
+    private Mock<IPathProviderService>? _pathProviderServiceMock;
 
     private Asset? _asset1;
     private Asset? _asset2;
@@ -157,21 +158,28 @@ public class ApplicationGetAssetsByPathTests
 
         _userConfigurationService = new(configurationRootMock.Object);
 
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
-        _storageServiceMock!.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(new BitmapImage());
+        _pathProviderServiceMock = new Mock<IPathProviderService>();
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
 
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        _testableAssetRepository = new(_database, _storageServiceMock!.Object, _userConfigurationService);
-        StorageService storageService = new(_userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(_userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _testableAssetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
+            imageMetadataService, _userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(_userConfigurationService);
-        AssetCreationService assetCreationService = new(_testableAssetRepository, storageService, assetHashCalculatorService, _userConfigurationService);
+        AssetCreationService assetCreationService = new(_testableAssetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, _userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, storageService, assetCreationService, _userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(_testableAssetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new(_testableAssetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(_testableAssetRepository, storageService, _userConfigurationService);
-        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, _userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(_testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, _userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(_testableAssetRepository, fileOperationsService, assetCreationService);
+        SyncAssetsService syncAssetsService =
+            new(_testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService =
+            new(_testableAssetRepository, fileOperationsService, _userConfigurationService);
+        _application = new(_testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService,
+            findDuplicatedAssetsService, _userConfigurationService, fileOperationsService, imageProcessingService);
     }
 
     [Test]
@@ -195,17 +203,24 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(cataloguedAssets, Has.Count.EqualTo(4));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1!.FileName));
             Assert.That(cataloguedAssets[0].Hash, Is.EqualTo(_asset1!.Hash));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
             Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(cataloguedAssets[1].Hash, Is.EqualTo(_asset2!.Hash));
+            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
             Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
             Assert.That(cataloguedAssets[2].Hash, Is.EqualTo(_asset3!.Hash));
+            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
             Assert.That(cataloguedAssets[3].FileName, Is.EqualTo(_asset4!.FileName));
             Assert.That(cataloguedAssets[3].Hash, Is.EqualTo(_asset4!.Hash));
+            Assert.That(cataloguedAssets[3].ImageData, Is.Null);
 
             Asset[] assetsInRepository = _testableAssetRepository.GetAssetsByPath(assetsDirectory);
             Assert.That(assetsInRepository, Has.Length.EqualTo(4));
 
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(4));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets[3].ImageData, Is.Not.Null);
 
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(_asset1!.FileName));
             Assert.That(assetsInRepository[0].Hash, Is.EqualTo(_asset1!.Hash));
@@ -236,23 +251,25 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets[0].Folder.Path, Is.EqualTo(_asset1!.Folder.Path));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1!.FileName));
             Assert.That(assets[0].Hash, Is.EqualTo(_asset1!.Hash));
+            Assert.That(assets[0].ImageData, Is.Not.Null);
 
             Assert.That(assets[1].FolderId, Is.EqualTo(_asset2!.FolderId));
             Assert.That(assets[1].Folder.Path, Is.EqualTo(_asset2!.Folder.Path));
             Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
             Assert.That(assets[1].Hash, Is.EqualTo(_asset2!.Hash));
+            Assert.That(assets[1].ImageData, Is.Not.Null);
 
             Assert.That(assets[2].FolderId, Is.EqualTo(_asset3!.FolderId));
             Assert.That(assets[2].Folder.Path, Is.EqualTo(_asset3!.Folder.Path));
             Assert.That(assets[2].FileName, Is.EqualTo(_asset3!.FileName));
             Assert.That(assets[2].Hash, Is.EqualTo(_asset3!.Hash));
+            Assert.That(assets[2].ImageData, Is.Not.Null);
 
             Assert.That(assets[3].FolderId, Is.EqualTo(_asset4!.FolderId));
             Assert.That(assets[3].Folder.Path, Is.EqualTo(_asset4!.Folder.Path));
             Assert.That(assets[3].FileName, Is.EqualTo(_asset4!.FileName));
             Assert.That(assets[3].Hash, Is.EqualTo(_asset4!.Hash));
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(8));
+            Assert.That(assets[3].ImageData, Is.Not.Null);
 
             CheckThumbnail(assetsDirectory, _asset1!.FileName, _asset1!.Pixel.Thumbnail.Width, _asset1!.Pixel.Thumbnail.Height);
             CheckThumbnail(assetsDirectory, _asset2!.FileName, _asset2!.Pixel.Thumbnail.Width, _asset2!.Pixel.Thumbnail.Height);
@@ -288,7 +305,13 @@ public class ApplicationGetAssetsByPathTests
             await _application!.CatalogAssetsAsync(_ => { });
 
             cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
+
             Assert.That(cataloguedAssets, analyseVideos ? Has.Count.EqualTo(52) : Has.Count.EqualTo(51));
+
+            for (int i = 0; i < cataloguedAssets.Count; i++)
+            {
+                Assert.That(cataloguedAssets[i].ImageData, Is.Null);
+            }
 
             // rootDirectory
             bool folderExists = _testableAssetRepository!.FolderExists(rootDirectory);
@@ -298,7 +321,6 @@ public class ApplicationGetAssetsByPathTests
             Asset[] assetsInRepository = _testableAssetRepository.GetAssetsByPath(rootDirectory);
 
             Assert.That(assetsInRepository, Has.Length.EqualTo(20));
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(20));
 
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(FileNames.HOMER_GIF));
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
@@ -320,6 +342,11 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsInRepository[17].FileName, Is.EqualTo(FileNames.IMAGE_11_270_DEG_HEIC));
             Assert.That(assetsInRepository[18].FileName, Is.EqualTo(FileNames.IMAGE_11_90_DEG_HEIC));
             Assert.That(assetsInRepository[19].FileName, Is.EqualTo(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG));
+
+            for (int i = 0; i < assetsInRepository.Length; i++)
+            {
+                Assert.That(assetsInRepository[i].ImageData, Is.Not.Null);
+            }
 
             Asset[] assets = _application!.GetAssetsByPath(rootDirectory);
 
@@ -346,8 +373,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets[18].FileName, Is.EqualTo(FileNames.IMAGE_11_90_DEG_HEIC));
             Assert.That(assets[19].FileName, Is.EqualTo(FileNames.IMAGE_WITH_UPPERCASE_NAME_JPG));
 
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(40));
-
             // duplicatesDirectory
             folderExists = _testableAssetRepository!.FolderExists(duplicatesDirectory);
 
@@ -356,13 +381,10 @@ public class ApplicationGetAssetsByPathTests
             assetsInRepository = _testableAssetRepository.GetAssetsByPath(duplicatesDirectory);
 
             Assert.That(assetsInRepository, Is.Empty);
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(40));
 
             assets = _application!.GetAssetsByPath(duplicatesDirectory);
 
             Assert.That(assets, Is.Empty);
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(40));
 
             // duplicatesNewFolder1Directory
             folderExists = _testableAssetRepository!.FolderExists(duplicatesNewFolder1Directory);
@@ -372,17 +394,16 @@ public class ApplicationGetAssetsByPathTests
             assetsInRepository = _testableAssetRepository.GetAssetsByPath(duplicatesNewFolder1Directory);
 
             Assert.That(assetsInRepository, Has.Length.EqualTo(1));
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(41));
 
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
+            Assert.That(assetsInRepository[0].ImageData, Is.Not.Null);
 
             assets = _application!.GetAssetsByPath(duplicatesNewFolder1Directory);
 
             Assert.That(assets, Has.Length.EqualTo(1));
 
             Assert.That(assets[0].FileName, Is.EqualTo(FileNames.IMAGE_1_JPG));
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(42));
+            Assert.That(assets[0].ImageData, Is.Not.Null);
 
             // duplicatesNewFolder2Directory
             folderExists = _testableAssetRepository!.FolderExists(duplicatesNewFolder2Directory);
@@ -392,23 +413,28 @@ public class ApplicationGetAssetsByPathTests
             assetsInRepository = _testableAssetRepository.GetAssetsByPath(duplicatesNewFolder2Directory);
 
             Assert.That(assetsInRepository, Has.Length.EqualTo(4));
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(46));
 
             Assert.That(assetsInRepository[0].FileName, Is.EqualTo(_asset1!.FileName));
+            Assert.That(assetsInRepository[0].ImageData, Is.Not.Null);
             Assert.That(assetsInRepository[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(assetsInRepository[1].ImageData, Is.Not.Null);
             Assert.That(assetsInRepository[2].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(assetsInRepository[2].ImageData, Is.Not.Null);
             Assert.That(assetsInRepository[3].FileName, Is.EqualTo(_asset4!.FileName));
+            Assert.That(assetsInRepository[3].ImageData, Is.Not.Null);
 
             assets = _application!.GetAssetsByPath(duplicatesNewFolder2Directory);
 
             Assert.That(assets, Has.Length.EqualTo(4));
 
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1!.FileName));
+            Assert.That(assets[0].ImageData, Is.Not.Null);
             Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(assets[1].ImageData, Is.Not.Null);
             Assert.That(assets[2].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(assets[2].ImageData, Is.Not.Null);
             Assert.That(assets[3].FileName, Is.EqualTo(_asset4!.FileName));
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(50));
+            Assert.That(assets[3].ImageData, Is.Not.Null);
 
             // testFolderDirectory
             folderExists = _testableAssetRepository!.FolderExists(testFolderDirectory);
@@ -418,16 +444,12 @@ public class ApplicationGetAssetsByPathTests
             assetsInRepository = _testableAssetRepository.GetAssetsByPath(testFolderDirectory);
 
             Assert.That(assetsInRepository, Is.Empty);
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(50));
 
             assets = _application!.GetAssetsByPath(testFolderDirectory);
 
             Assert.That(assets, Is.Empty);
 
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(50));
-
             // outputVideoFirstFrameDirectory
-
             folderExists = _testableAssetRepository!.FolderExists(outputVideoFirstFrameDirectory);
 
             if (analyseVideos)
@@ -437,23 +459,20 @@ public class ApplicationGetAssetsByPathTests
                 assetsInRepository = _testableAssetRepository.GetAssetsByPath(outputVideoFirstFrameDirectory);
 
                 Assert.That(assetsInRepository, Has.Length.EqualTo(1));
-                _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(51));
 
                 Assert.That(assetsInRepository[0].FileName, Is.EqualTo(FileNames.HOMER_JPG));
+                Assert.That(assetsInRepository[0].ImageData, Is.Not.Null);
 
                 assets = _application!.GetAssetsByPath(outputVideoFirstFrameDirectory);
 
                 Assert.That(assets, Has.Length.EqualTo(1));
 
                 Assert.That(assets[0].FileName, Is.EqualTo(FileNames.HOMER_JPG));
-
-                _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(52));
+                Assert.That(assets[0].ImageData, Is.Not.Null);
             }
             else
             {
                 Assert.That(folderExists, Is.False);
-
-                _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(50));
             }
 
             CheckThumbnail(rootDirectory, FileNames.HOMER_GIF, ThumbnailWidthAsset.HOMER_GIF, ThumbnailHeightAsset.HOMER_GIF);
@@ -523,7 +542,6 @@ public class ApplicationGetAssetsByPathTests
             Asset[] assetsInRepository = _testableAssetRepository.GetAssetsByPath(assetsDirectory);
 
             Assert.That(assetsInRepository, Is.Empty);
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
 
             Assert.That(assets, Is.Empty); // Because folder added but assets not catalogued yet
 
@@ -561,6 +579,7 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(asset.FileName));
             Assert.That(cataloguedAssets[0].Hash, Is.EqualTo(asset.Hash));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
             Assert.That(File.Exists(asset.FullPath), Is.True);
 
@@ -571,8 +590,7 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets[0].Folder.Path, Is.EqualTo(asset.Folder.Path));
             Assert.That(assets[0].FileName, Is.EqualTo(asset.FileName));
             Assert.That(assets[0].Hash, Is.EqualTo(asset.Hash));
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            Assert.That(assets[0].ImageData, Is.Not.Null);
 
             CheckThumbnail(assetsDirectory, asset.FileName, asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
         }
@@ -609,8 +627,6 @@ public class ApplicationGetAssetsByPathTests
 
             Asset[] assets = _application!.GetAssetsByPath(assetsDirectory);
             Assert.That(assets, Is.Empty);
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
         }
         finally
         {
@@ -640,8 +656,6 @@ public class ApplicationGetAssetsByPathTests
             ArgumentException? exception = Assert.Throws<ArgumentException>(() => _application!.GetAssetsByPath(directory!));
 
             Assert.That(exception?.Message, Is.EqualTo("Directory cannot be null or empty."));
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
         }
         finally
         {
@@ -659,19 +673,20 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
-            Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
-            Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
-            _asset1 = _asset1!.WithFolder(folder1);
-            byte[] assetData1 = [1, 2, 3];
+            _asset1 = _asset1!.WithFolder(folder);
+            string filePath1 = Path.Combine(folderPath, _asset1.FileName);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
 
-            _asset2 = _asset2!.WithFolder(folder1);
-            byte[] assetData2 = [];
+            _asset2 = _asset2!.WithFolder(folder);
+            string filePath2 = Path.Combine(folderPath, _asset2.FileName);
+            byte[] assetData2 = File.ReadAllBytes(filePath2);
 
-            _asset3 = _asset3!.WithFolder(folder2);
-            byte[] assetData3 = [4, 5, 6];
+            _asset3 = _asset3!.WithFolder(folder);
+            string filePath3 = Path.Combine(folderPath, _asset3.FileName);
+            byte[] assetData3 = File.ReadAllBytes(filePath3);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -688,37 +703,38 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
 
-            Asset[] assets1 = _application!.GetAssetsByPath(folderPath1);
-            Asset[] assets2 = _application!.GetAssetsByPath(folderPath2);
-
             Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
             Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
             Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(2));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails.ContainsKey(folderPath2), Is.True);
+            Asset[] assets = _application!.GetAssetsByPath(folderPath);
 
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(2));
-            Assert.That(thumbnails[folderPath2], Has.Count.EqualTo(1));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
 
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath2].ContainsKey(_asset3.FileName), Is.True);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
 
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(assetData2));
-            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(assetData3));
+            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(3));
 
-            Assert.That(assets1, Has.Length.EqualTo(2));
-            Assert.That(assets2, Has.Length.EqualTo(1));
+            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
+            Assert.That(thumbnails[folderPath].ContainsKey(_asset3.FileName), Is.True);
 
-            Assert.That(assets1[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(assets1[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets2[0].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
+            Assert.That(thumbnails[folderPath][_asset3.FileName], Is.EqualTo(assetData3));
 
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
+            Assert.That(assets, Has.Length.EqualTo(3));
+
+            Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(assets[2].FileName, Is.EqualTo(_asset3!.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -741,28 +757,40 @@ public class ApplicationGetAssetsByPathTests
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
         BitmapImage? bitmapImage = null;
-        Mock<IStorageService> storageServiceMock = new();
-        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
-        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
+        Mock<IPathProviderService> pathProviderServiceMock = new();
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+
+        Mock<IImageProcessingService> imageProcessingServiceMock = new();
+        imageProcessingServiceMock.Setup(x =>
+            x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Returns(bitmapImage!);
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        TestableAssetRepository testableAssetRepository = new(database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new(userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
+            imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
-        AssetCreationService assetCreationService = new(testableAssetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService, imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(testableAssetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new(testableAssetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(testableAssetRepository, storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService, imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService);
+        SyncAssetsService syncAssetsService =
+            new(testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService =
+            new(testableAssetRepository, fileOperationsService, userConfigurationService);
+        PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService,
+            catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
+            fileOperationsService, imageProcessingService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
@@ -779,10 +807,13 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            Asset[] assets = application.GetAssetsByPath(folderPath);
-
             Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+
+            Asset[] assets = application.GetAssetsByPath(folderPath);
+
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
@@ -791,7 +822,8 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(assets, Is.Empty);
 
-            storageServiceMock.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            imageProcessingServiceMock.Verify(x => x.LoadBitmapThumbnailImage(
+                It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -813,20 +845,22 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            byte[] assetData1 = [1, 2, 3];
-            byte[] assetData2 = [4, 5, 6];
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
+
+            string filePath1 = Path.Combine(folderPath2, _asset1!.FileName);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
+            string filePath2 = Path.Combine(folderPath2, _asset2!.FileName);
+            byte[] assetData2 = File.ReadAllBytes(filePath2);
+
+            _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
 
             Dictionary<string, byte[]> blobToWrite = new()
             {
                 { _asset1!.FileName, assetData1 },
                 { _asset2!.FileName, assetData2 }
             };
-
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
-            Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
-
-            _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
 
             _database!.WriteBlob(blobToWrite, _asset1!.Folder.ThumbnailsFilename);
 
@@ -841,10 +875,13 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            Asset[] assets = _application!.GetAssetsByPath(folderPath1);
-
             Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+
+            Asset[] assets = _application!.GetAssetsByPath(folderPath1);
+
+            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
 
             Assert.That(thumbnails, Has.Count.EqualTo(2));
             Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
@@ -866,8 +903,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
 
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
-
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
         }
@@ -888,12 +923,13 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
+            string folderPath1 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_1);
+            string folderPath2 = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath1);
 
             _asset1 = _asset1!.WithFolder(new() { Id = folder.Id, Path = folderPath2 });
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(folderPath2, _asset1.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -906,10 +942,13 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            Asset[] assets = _application!.GetAssetsByPath(folderPath1);
-
             Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+
+            Asset[] assets = _application!.GetAssetsByPath(folderPath1);
+
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
             Assert.That(thumbnails, Has.Count.EqualTo(2));
             Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
@@ -921,8 +960,6 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(assets, Has.Length.EqualTo(1));
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -944,8 +981,9 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
-            byte[] assetData = [1, 2, 3];
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            string filePath = Path.Combine(folderPath, _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -966,8 +1004,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(thumbnails[folderPath], Is.Empty);
 
             Assert.That(assets, Is.Empty);
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -993,7 +1029,9 @@ public class ApplicationGetAssetsByPathTests
             Folder folder = new() { Id = folderId, Path = folderPath };
 
             _asset1 = _asset1!.WithFolder(folder);
-            byte[] assetData = [1, 2, 3];
+            string filePath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2,
+                _asset1!.FileName);
+            byte[] assetData = File.ReadAllBytes(filePath);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -1006,10 +1044,13 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
 
-            Asset[] assets = _application!.GetAssetsByPath(folderPath);
-
             Assert.That(cataloguedAssets, Has.Count.EqualTo(1));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+
+            Asset[] assets = _application!.GetAssetsByPath(folderPath);
+
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
@@ -1018,8 +1059,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData));
 
             Assert.That(assets, Is.Empty);
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(1));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -1041,7 +1080,7 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             _testableAssetRepository!.AddFolder(folderPath);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
@@ -1059,8 +1098,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(thumbnails[folderPath], Is.Empty);
 
             Assert.That(assets, Is.Empty);
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -1081,8 +1118,9 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER);
             Folder folder = _testableAssetRepository!.AddFolder(folderPath);
+
             byte[] assetData1 = [1, 2, 3];
             byte[] assetData2 = [];
 
@@ -1113,8 +1151,6 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
 
             Assert.That(assets, Is.Empty);
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -1153,8 +1189,6 @@ public class ApplicationGetAssetsByPathTests
 
             Assert.That(assets, Is.Empty);
 
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
-
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
         finally
@@ -1172,35 +1206,51 @@ public class ApplicationGetAssetsByPathTests
 
         UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
 
-        Mock<IStorageService> storageServiceMock = new();
-        storageServiceMock.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath!);
-        storageServiceMock.Setup(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
+        Mock<IPathProviderService> pathProviderServiceMock = new();
+        pathProviderServiceMock.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath!);
+
+        Mock<IImageProcessingService> imageProcessingServiceMock = new();
+        imageProcessingServiceMock.Setup(x =>
+            x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>())).Throws(new Exception());
 
         Database database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
-        TestableAssetRepository testableAssetRepository = new(database, storageServiceMock.Object, userConfigurationService);
-        StorageService storageService = new(userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        TestableAssetRepository testableAssetRepository = new(database, pathProviderServiceMock.Object,
+            imageProcessingServiceMock.Object, imageMetadataService, userConfigurationService);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
-        AssetCreationService assetCreationService = new(testableAssetRepository, storageService, assetHashCalculatorService, userConfigurationService);
+        AssetCreationService assetCreationService = new(testableAssetRepository, fileOperationsService,
+            imageProcessingService,
+            imageMetadataService, assetHashCalculatorService, userConfigurationService);
         AssetsComparator assetsComparator = new();
-        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, storageService, assetCreationService, userConfigurationService, assetsComparator);
-        MoveAssetsService moveAssetsService = new(testableAssetRepository, storageService, assetCreationService);
-        SyncAssetsService syncAssetsService = new(testableAssetRepository, storageService, assetsComparator, moveAssetsService);
-        FindDuplicatedAssetsService findDuplicatedAssetsService = new(testableAssetRepository, storageService, userConfigurationService);
-        PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService, catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService, storageService);
+        CatalogAssetsService catalogAssetsService = new(testableAssetRepository, fileOperationsService,
+            imageMetadataService,
+            assetCreationService, userConfigurationService, assetsComparator);
+        MoveAssetsService moveAssetsService = new(testableAssetRepository, fileOperationsService, assetCreationService);
+        SyncAssetsService syncAssetsService =
+            new(testableAssetRepository, fileOperationsService, assetsComparator, moveAssetsService);
+        FindDuplicatedAssetsService findDuplicatedAssetsService =
+            new(testableAssetRepository, fileOperationsService, userConfigurationService);
+        PhotoManager.Application.Application application = new(testableAssetRepository, syncAssetsService,
+            catalogAssetsService, moveAssetsService, findDuplicatedAssetsService, userConfigurationService,
+            fileOperationsService, imageProcessingService);
 
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = testableAssetRepository.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            string folderPath = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
             Folder folder = testableAssetRepository.AddFolder(folderPath);
 
             _asset1 = _asset1!.WithFolder(folder);
-            byte[] assetData1 = [1, 2, 3];
+            string filePath1 = Path.Combine(folderPath, _asset1.FileName);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
 
             _asset2 = _asset2!.WithFolder(folder);
-            byte[] assetData2 = [];
+            string filePath2 = Path.Combine(folderPath, _asset2.FileName);
+            byte[] assetData2 = File.ReadAllBytes(filePath2);
 
             List<Asset> cataloguedAssets = testableAssetRepository.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -1215,11 +1265,16 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
 
-            Asset[] assets = application.GetAssetsByPath(folderPath);
-
             Assert.That(cataloguedAssets, Has.Count.EqualTo(2));
             Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
             Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
+
+            Asset[] assets = application.GetAssetsByPath(folderPath);
+
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
 
             Assert.That(thumbnails, Has.Count.EqualTo(1));
             Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
@@ -1236,7 +1291,8 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assets[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets[1].FileName, Is.EqualTo(_asset2.FileName));
 
-            storageServiceMock.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            imageProcessingServiceMock.Verify(x => x.LoadBitmapThumbnailImage(
+                It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -1259,19 +1315,20 @@ public class ApplicationGetAssetsByPathTests
 
         try
         {
-            string folderPath1 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_1);
-            string folderPath2 = Path.Combine(_dataDirectory!, Directories.NEW_FOLDER_2);
-            Folder folder1 = _testableAssetRepository!.AddFolder(folderPath1);
-            Folder folder2 = _testableAssetRepository!.AddFolder(folderPath2);
+            string folderPath = Path.Combine(_dataDirectory!, Directories.DUPLICATES, Directories.NEW_FOLDER_2);
+            Folder folder = _testableAssetRepository!.AddFolder(folderPath);
 
-            _asset1 = _asset1!.WithFolder(folder1);
-            byte[] assetData1 = [1, 2, 3];
+            _asset1 = _asset1!.WithFolder(folder);
+            string filePath1 = Path.Combine(folderPath, _asset1.FileName);
+            byte[] assetData1 = File.ReadAllBytes(filePath1);
 
-            _asset2 = _asset2!.WithFolder(folder1);
-            byte[] assetData2 = [];
+            _asset2 = _asset2!.WithFolder(folder);
+            string filePath2 = Path.Combine(folderPath, _asset2.FileName);
+            byte[] assetData2 = File.ReadAllBytes(filePath2);
 
-            _asset3 = _asset3!.WithFolder(folder2);
-            byte[] assetData3 = [4, 5, 6];
+            _asset3 = _asset3!.WithFolder(folder);
+            string filePath3 = Path.Combine(folderPath, _asset3.FileName);
+            byte[] assetData3 = File.ReadAllBytes(filePath3);
 
             List<Asset> cataloguedAssets = _testableAssetRepository!.GetCataloguedAssets();
             Assert.That(cataloguedAssets, Is.Empty);
@@ -1288,43 +1345,49 @@ public class ApplicationGetAssetsByPathTests
             Assert.That(assetsUpdatedEvents[1], Is.EqualTo(Reactive.Unit.Default));
             Assert.That(assetsUpdatedEvents[2], Is.EqualTo(Reactive.Unit.Default));
 
+            Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
+            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Null);
+            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(cataloguedAssets[1].ImageData, Is.Null);
+            Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(cataloguedAssets[2].ImageData, Is.Null);
+
             Asset[] assets1 = [];
             Asset[] assets2 = [];
 
             // Simulate concurrent access
             Parallel.Invoke(
-                () => assets1 = _application!.GetAssetsByPath(folderPath1),
-                () => assets2 = _application!.GetAssetsByPath(folderPath2)
+                () => assets1 = _application!.GetAssetsByPath(folderPath),
+                () => assets2 = _application!.GetAssetsByPath(folderPath)
             );
 
-            Assert.That(cataloguedAssets, Has.Count.EqualTo(3));
-            Assert.That(cataloguedAssets[0].FileName, Is.EqualTo(_asset1.FileName));
-            Assert.That(cataloguedAssets[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(cataloguedAssets[2].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(cataloguedAssets[0].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets[1].ImageData, Is.Not.Null);
+            Assert.That(cataloguedAssets[2].ImageData, Is.Not.Null);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(2));
-            Assert.That(thumbnails.ContainsKey(folderPath1), Is.True);
-            Assert.That(thumbnails.ContainsKey(folderPath2), Is.True);
+            Assert.That(thumbnails, Has.Count.EqualTo(1));
+            Assert.That(thumbnails.ContainsKey(folderPath), Is.True);
 
-            Assert.That(thumbnails[folderPath1], Has.Count.EqualTo(2));
-            Assert.That(thumbnails[folderPath2], Has.Count.EqualTo(1));
+            Assert.That(thumbnails[folderPath], Has.Count.EqualTo(3));
 
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset1.FileName), Is.True);
-            Assert.That(thumbnails[folderPath1].ContainsKey(_asset2.FileName), Is.True);
-            Assert.That(thumbnails[folderPath2].ContainsKey(_asset3.FileName), Is.True);
+            Assert.That(thumbnails[folderPath].ContainsKey(_asset1.FileName), Is.True);
+            Assert.That(thumbnails[folderPath].ContainsKey(_asset2.FileName), Is.True);
+            Assert.That(thumbnails[folderPath].ContainsKey(_asset3.FileName), Is.True);
 
-            Assert.That(thumbnails[folderPath1][_asset1.FileName], Is.EqualTo(assetData1));
-            Assert.That(thumbnails[folderPath1][_asset2.FileName], Is.EqualTo(assetData2));
-            Assert.That(thumbnails[folderPath2][_asset3.FileName], Is.EqualTo(assetData3));
+            Assert.That(thumbnails[folderPath][_asset1.FileName], Is.EqualTo(assetData1));
+            Assert.That(thumbnails[folderPath][_asset2.FileName], Is.EqualTo(assetData2));
+            Assert.That(thumbnails[folderPath][_asset3.FileName], Is.EqualTo(assetData3));
 
-            Assert.That(assets1, Has.Length.EqualTo(2));
-            Assert.That(assets2, Has.Length.EqualTo(1));
+            Assert.That(assets1, Has.Length.EqualTo(3));
+            Assert.That(assets2, Has.Length.EqualTo(3));
 
             Assert.That(assets1[0].FileName, Is.EqualTo(_asset1.FileName));
             Assert.That(assets1[1].FileName, Is.EqualTo(_asset2!.FileName));
-            Assert.That(assets2[0].FileName, Is.EqualTo(_asset3!.FileName));
-
-            _storageServiceMock!.Verify(x => x.LoadBitmapThumbnailImage(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
+            Assert.That(assets1[2].FileName, Is.EqualTo(_asset3!.FileName));
+            Assert.That(assets2[0].FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets2[1].FileName, Is.EqualTo(_asset2!.FileName));
+            Assert.That(assets2[2].FileName, Is.EqualTo(_asset3!.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(3));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));

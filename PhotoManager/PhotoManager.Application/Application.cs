@@ -12,7 +12,8 @@ public class Application(
     IMoveAssetsService moveAssetsService,
     IFindDuplicatedAssetsService findDuplicatedAssetsService,
     IUserConfigurationService userConfigurationService,
-    IStorageService storageService)
+    IFileOperationsService fileOperationsService,
+    IImageProcessingService imageProcessingService)
     : IApplication
 {
     // Catalog
@@ -76,14 +77,15 @@ public class Application(
 
     public AboutInformation GetAboutInformation(Assembly assembly) => userConfigurationService.GetAboutInformation(assembly);
 
-    // StorageService
-    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) => storageService.LoadBitmapImageFromPath(imagePath, rotation);
+    // ImageProcessingService
+    public BitmapImage LoadBitmapImageFromPath(string imagePath, Rotation rotation) => imageProcessingService.LoadBitmapImageFromPath(imagePath, rotation);
 
-    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) => storageService.LoadBitmapHeicImageFromPath(imagePath, rotation);
+    public BitmapImage LoadBitmapHeicImageFromPath(string imagePath, Rotation rotation) => imageProcessingService.LoadBitmapHeicImageFromPath(imagePath, rotation);
 
-    public bool FileExists(string fullPath) => storageService.FileExists(fullPath);
+    // FileOperationsService
+    public bool FileExists(string fullPath) => fileOperationsService.FileExists(fullPath);
 
-    public int GetTotalFilesCount() => storageService.GetTotalFilesCount();
+    public int GetTotalFilesCount() => fileOperationsService.GetTotalFilesCount();
 
     // MoveAssetsService
     public bool MoveAssets(Asset[] assets, Folder destinationFolder, bool preserveOriginalFiles) => moveAssetsService.MoveAssets(assets, destinationFolder, preserveOriginalFiles);

@@ -4,7 +4,7 @@ using Reactive = System.Reactive;
 namespace PhotoManager.Tests.Integration.Infrastructure.AssetRepositoryTests;
 
 [TestFixture]
-public class AssetRepositoryFolderHasThumbnailsTests
+public class AssetRepositoryIsBlobFileExistsTests
 {
     private string? _dataDirectory;
     private string? _databaseDirectory;
@@ -12,7 +12,8 @@ public class AssetRepositoryFolderHasThumbnailsTests
 
     private AssetRepository? _assetRepository;
     private PhotoManager.Infrastructure.Database.Database? _database;
-    private Mock<IStorageService>? _storageServiceMock;
+
+    private Mock<IPathProviderService>? _pathProviderServiceMock;
     private Mock<IConfigurationRoot>? _configurationRootMock;
 
     [OneTimeSetUp]
@@ -22,11 +23,11 @@ public class AssetRepositoryFolderHasThumbnailsTests
         _databaseDirectory = Path.Combine(_dataDirectory, Directories.DATABASE_TESTS);
         _databasePath = Path.Combine(_databaseDirectory, Constants.DATABASE_END_PATH);
 
-        _configurationRootMock = new Mock<IConfigurationRoot>();
+        _configurationRootMock = new();
         _configurationRootMock.GetDefaultMockConfig();
 
-        _storageServiceMock = new Mock<IStorageService>();
-        _storageServiceMock!.Setup(x => x.ResolveDataDirectory(It.IsAny<string>())).Returns(_databasePath);
+        _pathProviderServiceMock = new();
+        _pathProviderServiceMock!.Setup(x => x.ResolveDataDirectory()).Returns(_databasePath);
     }
 
     [SetUp]
@@ -34,11 +35,15 @@ public class AssetRepositoryFolderHasThumbnailsTests
     {
         _database = new(new ObjectListStorage(), new BlobStorage(), new BackupStorage());
         UserConfigurationService userConfigurationService = new(_configurationRootMock!.Object);
-        _assetRepository = new(_database, _storageServiceMock!.Object, userConfigurationService);
+        ImageProcessingService imageProcessingService = new();
+        FileOperationsService fileOperationsService = new(userConfigurationService);
+        ImageMetadataService imageMetadataService = new(fileOperationsService);
+        _assetRepository = new(_database, _pathProviderServiceMock!.Object, imageProcessingService,
+            imageMetadataService, userConfigurationService);
     }
 
     [Test]
-    public void FolderHasThumbnails_ThumbnailsExist_ReturnsTrue()
+    public void IsBlobFileExists_BlobExists_ReturnsTrue()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -48,9 +53,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
             Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
             _database!.WriteBlob([], folder.ThumbnailsFilename);
 
-            bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
+            bool isBlobFileExists = _assetRepository!.IsBlobFileExists(folder.ThumbnailsFilename);
 
-            Assert.That(folderHasThumbnails, Is.True);
+            Assert.That(isBlobFileExists, Is.True);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -62,7 +67,7 @@ public class AssetRepositoryFolderHasThumbnailsTests
     }
 
     [Test]
-    public void FolderHasThumbnails_ThumbnailsDoNotExist_ReturnsFalse()
+    public void IsBlobFileExists_BlobDoesNotExist_ReturnsFalse()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
@@ -71,9 +76,9 @@ public class AssetRepositoryFolderHasThumbnailsTests
         {
             Folder folder = new() { Id = Guid.NewGuid(), Path = _dataDirectory! };
 
-            bool folderHasThumbnails = _assetRepository!.FolderHasThumbnails(folder);
+            bool isBlobFileExists = _assetRepository!.IsBlobFileExists(folder.ThumbnailsFilename);
 
-            Assert.That(folderHasThumbnails, Is.False);
+            Assert.That(isBlobFileExists, Is.False);
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }
@@ -85,18 +90,19 @@ public class AssetRepositoryFolderHasThumbnailsTests
     }
 
     [Test]
-    public void FolderHasThumbnails_FolderIsNull_ThrowsNullReferenceException()
+    public void IsBlobFileExists_BlobNameIsNull_ThrowsArgumentNullException()
     {
         List<Reactive.Unit> assetsUpdatedEvents = [];
         IDisposable assetsUpdatedSubscription = _assetRepository!.AssetsUpdated.Subscribe(assetsUpdatedEvents.Add);
 
         try
         {
-            Folder? folder = null;
+            string? blobName = null;
 
-            NullReferenceException? exception = Assert.Throws<NullReferenceException>(() => _assetRepository!.FolderHasThumbnails(folder!));
+            ArgumentNullException? exception =
+                Assert.Throws<ArgumentNullException>(() => _assetRepository!.IsBlobFileExists(blobName!));
 
-            Assert.That(exception?.Message, Is.EqualTo("Object reference not set to an instance of an object."));
+            Assert.That(exception?.Message, Is.EqualTo("Value cannot be null. (Parameter 'path2')"));
 
             Assert.That(assetsUpdatedEvents, Is.Empty);
         }

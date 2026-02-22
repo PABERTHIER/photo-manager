@@ -10,49 +10,56 @@ public class AssetRepository : IAssetRepository
 {
     private const int RECENT_TARGET_PATHS_MAX_COUNT = 20;
 
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
 
-    public bool IsInitialized { get; private set; }
-    private readonly string dataDirectory;
+    private readonly string _dataDirectory;
     private readonly IDatabase _database;
-    private readonly IStorageService _storageService;
+    private readonly IImageProcessingService _imageProcessingService;
+    private readonly IImageMetadataService _imageMetadataService;
     private readonly IUserConfigurationService _userConfigurationService;
 
-    private List<Asset> assets;
-    private List<Folder> folders;
-    private SyncAssetsConfiguration syncAssetsConfiguration;
-    private List<string> recentTargetPaths;
-    protected Dictionary<string, Dictionary<string, byte[]>> Thumbnails { get; private set; }
-    private readonly Queue<string> recentThumbnailsQueue;
-    private bool hasChanges;
-    private readonly Lock syncLock;
+    private List<Asset> _assets;
+    private List<Folder> _folders;
+    private SyncAssetsConfiguration _syncAssetsConfiguration;
+    private List<string> _recentTargetPaths;
+    protected Dictionary<string, Dictionary<string, byte[]>> Thumbnails { get; }
+    private readonly Queue<string> _recentThumbnailsQueue;
+    private bool IsInitialized { get; set; }
+    private bool _hasChanges;
+    private readonly Lock _syncLock;
     private readonly Subject<Unit> _assetsUpdatedSubject = new();
     public IObservable<Unit> AssetsUpdated => _assetsUpdatedSubject.AsObservable();
 
-    public AssetRepository(IDatabase database, IStorageService storageService, IUserConfigurationService userConfigurationService)
+    public AssetRepository(
+        IDatabase database,
+        IPathProviderService pathProviderService,
+        IImageProcessingService imageProcessingService,
+        IImageMetadataService imageMetadataService,
+        IUserConfigurationService userConfigurationService)
     {
         _database = database;
-        _storageService = storageService;
+        _imageProcessingService = imageProcessingService;
+        _imageMetadataService = imageMetadataService;
         _userConfigurationService = userConfigurationService;
-        assets = [];
-        folders = [];
-        syncAssetsConfiguration = new SyncAssetsConfiguration();
-        recentTargetPaths = [];
-        recentThumbnailsQueue = new Queue<string>();
+        _assets = [];
+        _folders = [];
+        _syncAssetsConfiguration = new SyncAssetsConfiguration();
+        _recentTargetPaths = [];
+        _recentThumbnailsQueue = new Queue<string>();
         Thumbnails = [];
-        syncLock = new Lock();
-        dataDirectory = _storageService.ResolveDataDirectory(_userConfigurationService.StorageSettings.StorageVersion);
+        _syncLock = new Lock();
+        _dataDirectory = pathProviderService.ResolveDataDirectory();
         Initialize();
     }
 
     public Asset[] GetAssetsByPath(string directory)
     {
-        List<Asset> assetsList = []; // TODO: Why array at the end ?
+        List<Asset> assetsList = [];
         bool isNewFile = false;
 
         try
         {
-            lock (syncLock)
+            lock (_syncLock)
             {
                 Folder? folder = GetFolderByPath(directory);
 
@@ -70,9 +77,13 @@ public class AssetRepository : IAssetRepository
                     {
                         foreach (Asset asset in assetsList)
                         {
-                            if (Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail) && thumbnail.ContainsKey(asset.FileName))
+                            if (Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail)
+                                && thumbnail.TryGetValue(asset.FileName, out byte[]? buffer))
                             {
-                                asset.ImageData = _storageService.LoadBitmapThumbnailImage(thumbnail[asset.FileName], asset.Pixel.Thumbnail.Width, asset.Pixel.Thumbnail.Height);
+                                asset.ImageData = _imageProcessingService.LoadBitmapThumbnailImage(
+                                    buffer,
+                                    asset.Pixel.Thumbnail.Width,
+                                    asset.Pixel.Thumbnail.Height);
                             }
                         }
 
@@ -84,22 +95,23 @@ public class AssetRepository : IAssetRepository
         }
         catch (Exception ex)
         {
-            log.Error(ex);
+            Log.Error(ex);
         }
 
         return [.. assetsList];
     }
 
-    // TODO: Return Asset created
+    // TODO: Return created Asset
     public void AddAsset(Asset asset, byte[] thumbnailData)
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
             Folder? folder = GetFolderById(asset.FolderId);
 
             if (string.IsNullOrWhiteSpace(asset.Folder.Path))
             {
-                return; // TODO: log.Error($"The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}");
+                Log.Error($"The asset could not be added, folder path is null or empty, asset.FileName: {asset.FileName}");
+                return;
             }
 
             if (folder == null)
@@ -116,8 +128,8 @@ public class AssetRepository : IAssetRepository
             if (Thumbnails.TryGetValue(asset.Folder.Path, out Dictionary<string, byte[]>? folderThumbnails))
             {
                 folderThumbnails[asset.FileName] = thumbnailData;
-                assets.Add(asset);
-                hasChanges = true;
+                _assets.Add(asset);
+                _hasChanges = true;
                 _assetsUpdatedSubject.OnNext(Unit.Default);
             }
         }
@@ -127,16 +139,19 @@ public class AssetRepository : IAssetRepository
     {
         Folder folder;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
+            // TODO: To prevent side effect with duplicates for same path, need to check first GetFolderByPath(string path)
+            // If not null, then we return this folder instead of adding it twice with different Id and same Path
+            // Need to update some tests + add theses cases + update Application.GetRootCatalogFolders() and ApplicationVM ctor
             folder = new()
             {
                 Id = Guid.NewGuid(),
                 Path = path
             };
 
-            folders.Add(folder);
-            hasChanges = true;
+            _folders.Add(folder);
+            _hasChanges = true;
         }
 
         return folder;
@@ -146,9 +161,9 @@ public class AssetRepository : IAssetRepository
     {
         bool result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            result = folders.Any(f => f.Path == path);
+            result = _folders.Any(f => f.Path == path);
         }
 
         return result;
@@ -158,9 +173,9 @@ public class AssetRepository : IAssetRepository
     {
         Folder[] result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            result = [.. folders];
+            result = [.. _folders];
         }
 
         return result;
@@ -171,9 +186,9 @@ public class AssetRepository : IAssetRepository
     {
         HashSet<string> folderPaths;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            folderPaths = [.. folders.Select(folder => folder.Path)];
+            folderPaths = [.. _folders.Select(folder => folder.Path)];
         }
 
         return folderPaths;
@@ -181,16 +196,16 @@ public class AssetRepository : IAssetRepository
 
     public Folder[] GetSubFolders(Folder parentFolder)
     {
-        return [.. folders.Where(parentFolder.IsParentOf)];
+        return [.. _folders.Where(parentFolder.IsParentOf)];
     }
 
     public Folder? GetFolderByPath(string path)
     {
         Folder? result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            result = folders.FirstOrDefault(f => f.Path == path);
+            result = _folders.FirstOrDefault(f => f.Path == path);
         }
 
         return result;
@@ -198,28 +213,28 @@ public class AssetRepository : IAssetRepository
 
     public void SaveCatalog(Folder? folder)
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
-            if (hasChanges)
+            if (_hasChanges)
             {
-                WriteAssets(assets);
-                WriteFolders(folders);
-                WriteSyncAssetsDirectoriesDefinitions(syncAssetsConfiguration.Definitions);
-                WriteRecentTargetPaths(recentTargetPaths);
+                WriteAssets();
+                WriteFolders();
+                WriteSyncAssetsDirectoriesDefinitions();
+                WriteRecentTargetPaths();
 
-                hasChanges = false;
+                _hasChanges = false;
             }
 
-            if (folder != null && Thumbnails.ContainsKey(folder.Path))
+            if (folder != null && Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail))
             {
-                SaveThumbnails(Thumbnails[folder.Path], folder.ThumbnailsFilename);
+                SaveThumbnails(thumbnail, folder.ThumbnailsFilename);
             }
         }
     }
 
     public bool BackupExists()
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
             return _database.BackupExists(DateTime.Now.Date);
         }
@@ -227,7 +242,7 @@ public class AssetRepository : IAssetRepository
 
     public void WriteBackup()
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
             if (_database.WriteBackup(DateTime.Now.Date))
             {
@@ -240,26 +255,26 @@ public class AssetRepository : IAssetRepository
     {
         List<Asset>? cataloguedAssets;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            cataloguedAssets = assets;
+            cataloguedAssets = _assets;
         }
 
         return cataloguedAssets;
     }
 
-    // TODO: Improve it by having a Dict instead Dictionary<string, List<Asset>>
+    // TODO: Improve it by having a Dict instead: Dictionary<string, List<Asset>>
     public List<Asset> GetCataloguedAssetsByPath(string directory)
     {
         List<Asset> cataloguedAssets = [];
 
-        lock (syncLock)
+        lock (_syncLock)
         {
             Folder? folder = GetFolderByPath(directory);
 
             if (folder != null)
             {
-                cataloguedAssets = [.. assets.Where(a => a.FolderId == folder.Id)];
+                cataloguedAssets = [.. _assets.Where(a => a.FolderId == folder.Id)];
             }
         }
 
@@ -270,7 +285,7 @@ public class AssetRepository : IAssetRepository
     {
         bool result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
             Folder? folder = GetFolderByPath(directoryName);
             result = folder != null && GetAssetByFolderIdAndFileName(folder.Id, fileName) != null;
@@ -281,57 +296,56 @@ public class AssetRepository : IAssetRepository
 
     public Asset? DeleteAsset(string directory, string fileName)
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
             Folder? folder = GetFolderByPath(directory);
 
-            if (folder != null)
+            if (folder == null)
             {
-                Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.Id, fileName);
-
-                if (!Thumbnails.ContainsKey(folder.Path))
-                {
-                    Thumbnails[folder.Path] = GetThumbnails(folder, out _);
-                    RemoveOldThumbnailsDictionaryEntries(folder);
-                }
-
-                if (Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnail))
-                {
-                    thumbnail.Remove(fileName);
-                }
-
-                //if (Thumbnails[folder.Path].Count == 0) // TODO: when tested above, uncomment it -> to clean up Thumbnails that containing 0 values, no need to store these Thumbnails
-                //{
-                //    Thumbnails.Remove(folder.Path);
-                //}
-
-                if (assetToDelete != null)
-                {
-                    assets.Remove(assetToDelete);
-                    hasChanges = true;
-                    _assetsUpdatedSubject.OnNext(Unit.Default);
-                }
-
-                return assetToDelete;
+                return null;
             }
 
-            return null;
+            Asset? assetToDelete = GetAssetByFolderIdAndFileName(folder.Id, fileName);
+
+            if (!Thumbnails.TryGetValue(folder.Path, out Dictionary<string, byte[]>? thumbnails))
+            {
+                thumbnails = GetThumbnails(folder, out _);
+                Thumbnails[folder.Path] = thumbnails;
+                RemoveOldThumbnailsDictionaryEntries(folder);
+            }
+
+            thumbnails.Remove(fileName);
+
+            if (thumbnails.Count == 0)
+            {
+                Thumbnails.Remove(folder.Path);
+                _database.DeleteBlobFile(folder.ThumbnailsFilename);
+            }
+
+            if (assetToDelete != null)
+            {
+                _assets.Remove(assetToDelete);
+                _hasChanges = true;
+                _assetsUpdatedSubject.OnNext(Unit.Default);
+            }
+
+            return assetToDelete;
         }
     }
 
     public void DeleteFolder(Folder folder)
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
             Thumbnails.Remove(folder.Path);
 
-            if (FolderHasThumbnails(folder))
+            if (IsBlobFileExists(folder.ThumbnailsFilename))
             {
-                _database.DeleteThumbnails(folder.ThumbnailsFilename);
+                _database.DeleteBlobFile(folder.ThumbnailsFilename);
             }
 
-            folders.Remove(folder);
-            hasChanges = true;
+            _folders.Remove(folder);
+            _hasChanges = true;
         }
     }
 
@@ -339,9 +353,9 @@ public class AssetRepository : IAssetRepository
     {
         bool result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            result = hasChanges;
+            result = _hasChanges;
         }
 
         return result;
@@ -352,7 +366,7 @@ public class AssetRepository : IAssetRepository
     {
         bool result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
             if (!Thumbnails.ContainsKey(directoryName))
             {
@@ -361,7 +375,9 @@ public class AssetRepository : IAssetRepository
                 RemoveOldThumbnailsDictionaryEntries(folder);
             }
 
-            result = !string.IsNullOrEmpty(fileName) && Thumbnails.TryGetValue(directoryName, out Dictionary<string, byte[]>? thumbnail) && thumbnail.ContainsKey(fileName);
+            result = !string.IsNullOrEmpty(fileName)
+                     && Thumbnails.TryGetValue(directoryName, out Dictionary<string, byte[]>? thumbnail)
+                     && thumbnail.ContainsKey(fileName);
         }
 
         return result;
@@ -371,7 +387,7 @@ public class AssetRepository : IAssetRepository
     {
         BitmapImage? result = null;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
             if (!Thumbnails.ContainsKey(directoryName))
             {
@@ -380,9 +396,10 @@ public class AssetRepository : IAssetRepository
                 RemoveOldThumbnailsDictionaryEntries(folder);
             }
 
-            if (Thumbnails.TryGetValue(directoryName, out Dictionary<string, byte[]>? thumbnail) && thumbnail.ContainsKey(fileName))
+            if (Thumbnails.TryGetValue(directoryName, out Dictionary<string, byte[]>? thumbnail)
+                && thumbnail.TryGetValue(fileName, out byte[]? buffer))
             {
-                result = _storageService.LoadBitmapThumbnailImage(thumbnail[fileName], width, height);
+                result = _imageProcessingService.LoadBitmapThumbnailImage(buffer, width, height);
             }
             else
             {
@@ -395,19 +412,18 @@ public class AssetRepository : IAssetRepository
         return result;
     }
 
-    // TODO: Rename to FolderHasBlobs or something like this (Thumbnails has been used too much wrongly)
-    public bool FolderHasThumbnails(Folder folder)
+    public bool IsBlobFileExists(string blobName)
     {
-        return _database.FolderHasThumbnails(folder.ThumbnailsFilename);
+        return _database.IsBlobFileExists(blobName);
     }
 
     public SyncAssetsConfiguration GetSyncAssetsConfiguration()
     {
         SyncAssetsConfiguration result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            result = syncAssetsConfiguration;
+            result = _syncAssetsConfiguration;
         }
 
         return result;
@@ -415,10 +431,10 @@ public class AssetRepository : IAssetRepository
 
     public void SaveSyncAssetsConfiguration(SyncAssetsConfiguration syncAssetsConfig)
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
-            syncAssetsConfiguration = syncAssetsConfig;
-            hasChanges = true;
+            _syncAssetsConfiguration = syncAssetsConfig;
+            _hasChanges = true;
         }
     }
 
@@ -426,9 +442,9 @@ public class AssetRepository : IAssetRepository
     {
         List<string> result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            result = recentTargetPaths;
+            result = _recentTargetPaths;
         }
 
         return result;
@@ -436,18 +452,18 @@ public class AssetRepository : IAssetRepository
 
     public void SaveRecentTargetPaths(List<string> paths)
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
-            recentTargetPaths = paths;
-            hasChanges = true;
+            _recentTargetPaths = paths;
+            _hasChanges = true;
         }
     }
 
     public void UpdateTargetPathToRecent(Folder destinationFolder)
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
-            List<string> recentTargetPathsUpdated = [.. recentTargetPaths];
+            List<string> recentTargetPathsUpdated = [.. _recentTargetPaths];
 
             if (recentTargetPathsUpdated.Contains(destinationFolder.Path))
             {
@@ -464,9 +480,9 @@ public class AssetRepository : IAssetRepository
 
     public int GetAssetsCounter()
     {
-        lock (syncLock)
+        lock (_syncLock)
         {
-            return assets.Count;
+            return _assets.Count;
         }
     }
 
@@ -484,7 +500,7 @@ public class AssetRepository : IAssetRepository
     private void InitializeDatabase()
     {
         _database.Initialize(
-            dataDirectory,
+            _dataDirectory,
             _userConfigurationService.StorageSettings.Separator,
             _userConfigurationService.StorageSettings.FoldersNameSettings.Tables,
             _userConfigurationService.StorageSettings.FoldersNameSettings.Blobs);
@@ -516,29 +532,32 @@ public class AssetRepository : IAssetRepository
 
     private void ReadCatalog()
     {
-        assets = ReadAssets();
-        folders = ReadFolders();
-        syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
-        recentTargetPaths = ReadRecentTargetPaths();
+        _assets = ReadAssets();
+        _folders = ReadFolders();
+        _syncAssetsConfiguration.Definitions.AddRange(ReadSyncAssetsDirectoriesDefinitions());
+        _recentTargetPaths = ReadRecentTargetPaths();
 
-        for (int i = 0; i < assets.Count; i++)
+        for (int i = 0; i < _assets.Count; i++)
         {
             // TODO: Improve the mapping for perf
-            assets[i].Folder = GetFolderById(assets[i].FolderId)!; // If the folder is not found, that means the DB has been modified manually
+            _assets[i].Folder = GetFolderById(_assets[i].FolderId)!; // If the folder is not found, that means the DB has been modified manually
 
             // Not saved in DB because it is computed each time to detect file update
-            _storageService.UpdateAssetFileProperties(assets[i]);
+            _imageMetadataService.UpdateAssetFileProperties(_assets[i]);
         }
-    }
-
-    private List<Folder> ReadFolders()
-    {
-        return _database.ReadObjectList(_userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.ReadFunc);
     }
 
     private List<Asset> ReadAssets()
     {
-        return _database.ReadObjectList(_userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.ReadFunc);
+        return _database.ReadObjectList(_userConfigurationService.StorageSettings.TablesSettings.AssetsTableName,
+            AssetConfigs.ReadFunc);
+    }
+
+    private List<Folder> ReadFolders()
+    {
+        return _database.ReadObjectList(
+            _userConfigurationService.StorageSettings.TablesSettings.FoldersTableName,
+            FolderConfigs.ReadFunc);
     }
 
     private List<SyncAssetsDirectoriesDefinition> ReadSyncAssetsDirectoriesDefinitions()
@@ -550,29 +569,41 @@ public class AssetRepository : IAssetRepository
 
     private List<string> ReadRecentTargetPaths()
     {
-        return _database.ReadObjectList(_userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
+        return _database.ReadObjectList(
+            _userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName,
+            RecentPathsConfigs.ReadFunc);
     }
 
-    private void WriteFolders(List<Folder> foldersToWrite)
-    {
-        _database.WriteObjectList(foldersToWrite, _userConfigurationService.StorageSettings.TablesSettings.FoldersTableName, FolderConfigs.WriteFunc);
-    }
-
-    private void WriteAssets(List<Asset> assetsToWrite)
-    {
-        _database.WriteObjectList(assetsToWrite, _userConfigurationService.StorageSettings.TablesSettings.AssetsTableName, AssetConfigs.WriteFunc);
-    }
-
-    private void WriteSyncAssetsDirectoriesDefinitions(List<SyncAssetsDirectoriesDefinition> definitionsToWrite)
+    private void WriteAssets()
     {
         _database.WriteObjectList(
-            definitionsToWrite,
-            _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName, SyncAssetsDirectoriesDefinitionConfigs.WriteFunc);
+            _assets,
+            _userConfigurationService.StorageSettings.TablesSettings.AssetsTableName,
+            AssetConfigs.WriteFunc);
     }
 
-    private void WriteRecentTargetPaths(List<string> recentTargetPathsToWrite)
+    private void WriteFolders()
     {
-        _database.WriteObjectList(recentTargetPathsToWrite, _userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.WriteFunc);
+        _database.WriteObjectList(
+            _folders,
+            _userConfigurationService.StorageSettings.TablesSettings.FoldersTableName,
+            FolderConfigs.WriteFunc);
+    }
+
+    private void WriteSyncAssetsDirectoriesDefinitions()
+    {
+        _database.WriteObjectList(
+            _syncAssetsConfiguration.Definitions,
+            _userConfigurationService.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName,
+            SyncAssetsDirectoriesDefinitionConfigs.WriteFunc);
+    }
+
+    private void WriteRecentTargetPaths()
+    {
+        _database.WriteObjectList(
+            _recentTargetPaths,
+            _userConfigurationService.StorageSettings.TablesSettings.RecentTargetPathsTableName,
+            RecentPathsConfigs.WriteFunc);
     }
 
     private Dictionary<string, byte[]> GetThumbnails(Folder? folder, out bool isNewFile)
@@ -585,7 +616,8 @@ public class AssetRepository : IAssetRepository
             return thumbnails;
         }
 
-        thumbnails = _database.ReadBlob(folder.ThumbnailsFilename); // ReadBlob returns a dict with the key as the image name and the value the byte[] (image data)
+        // ReadBlob returns a dict with the key as the image name and the value the byte[] (image data)
+        thumbnails = _database.ReadBlob(folder.ThumbnailsFilename);
 
         if (thumbnails == null)
         {
@@ -605,14 +637,14 @@ public class AssetRepository : IAssetRepository
 
         ushort entriesToKeep = _userConfigurationService.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
 
-        if (!recentThumbnailsQueue.Contains(folder.Path))
+        if (!_recentThumbnailsQueue.Contains(folder.Path))
         {
-            recentThumbnailsQueue.Enqueue(folder.Path);
+            _recentThumbnailsQueue.Enqueue(folder.Path);
         }
 
-        if (recentThumbnailsQueue.Count > entriesToKeep)
+        if (_recentThumbnailsQueue.Count > entriesToKeep)
         {
-            string pathToRemove = recentThumbnailsQueue.Dequeue();
+            string pathToRemove = _recentThumbnailsQueue.Dequeue();
             Thumbnails.Remove(pathToRemove);
         }
     }
@@ -627,9 +659,9 @@ public class AssetRepository : IAssetRepository
     {
         Folder? result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            result = folders.FirstOrDefault(f => f.Id == folderId);
+            result = _folders.FirstOrDefault(f => f.Id == folderId);
         }
 
         return result;
@@ -639,9 +671,9 @@ public class AssetRepository : IAssetRepository
     {
         List<Asset> result;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            result = [.. assets.Where(a => a.FolderId == folderId)];
+            result = [.. _assets.Where(a => a.FolderId == folderId)];
         }
 
         return result;
@@ -651,9 +683,9 @@ public class AssetRepository : IAssetRepository
     {
         Asset? asset;
 
-        lock (syncLock)
+        lock (_syncLock)
         {
-            asset = assets.FirstOrDefault(a => a.FolderId == folderId && a.FileName == fileName);
+            asset = _assets.FirstOrDefault(a => a.FolderId == folderId && a.FileName == fileName);
         }
 
         return asset;

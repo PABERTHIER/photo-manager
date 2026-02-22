@@ -16,7 +16,7 @@ public class UserConfigurationServiceTests
         Mock<IConfigurationRoot> configurationRootMock = new();
         configurationRootMock.GetDefaultMockConfig();
 
-        _userConfigurationService = new UserConfigurationService(configurationRootMock.Object);
+        _userConfigurationService = new(configurationRootMock.Object);
     }
 
     [Test]
@@ -46,7 +46,8 @@ public class UserConfigurationServiceTests
     public void GetAboutInformation_WithAssemblyWithoutProductAttribute_ReturnsDefaultProduct()
     {
         AssemblyName assemblyName = new("TestAssemblyWithoutProductAttribute");
-        AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+        AssemblyBuilder assemblyBuilder =
+            AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
 
         AboutInformation aboutInformation = _userConfigurationService!.GetAboutInformation(assemblyBuilder);
 
@@ -213,7 +214,8 @@ public class UserConfigurationServiceTests
         Assert.That(assetsDirectory, Is.Not.Null);
         Assert.That(firstFrameVideosPath, Is.Not.Null);
 
-        Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine(assetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
+        Assert.That(firstFrameVideosPath,
+            Is.EqualTo(Path.Combine(assetsDirectory, Directories.OUTPUT_VIDEO_FIRST_FRAME)));
         Assert.That(firstFrameVideosPath, Is.EqualTo(Path.Combine("C:\\Path\\OutputVideoFirstFrame")));
     }
 
@@ -270,6 +272,18 @@ public class UserConfigurationServiceTests
     }
 
     [Test]
+    public void Separator_NullValue_ReturnsDefaultSeparatorValue()
+    {
+        Mock<IConfigurationRoot> configurationRootMock = new();
+        configurationRootMock.GetDefaultMockConfig();
+        configurationRootMock.MockGetValue(UserConfigurationKeys.SEPARATOR, null!);
+
+        UserConfigurationService userConfigurationService = new(configurationRootMock.Object);
+
+        Assert.That(userConfigurationService.StorageSettings.Separator, Is.EqualTo('|'));
+    }
+
+    [Test]
     public void StorageVersion_CorrectValue_ReturnsStorageVersionValue()
     {
         string storageVersion = _userConfigurationService!.StorageSettings.StorageVersion;
@@ -281,7 +295,8 @@ public class UserConfigurationServiceTests
     [Test]
     public void TablesSettingsAssetsTableName_CorrectValue_ReturnsTablesSettingsAssetsTableNameValue()
     {
-        string tablesSettingsAssetsTableName = _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName;
+        string tablesSettingsAssetsTableName =
+            _userConfigurationService!.StorageSettings.TablesSettings.AssetsTableName;
 
         Assert.That(tablesSettingsAssetsTableName, Is.Not.Null);
         Assert.That(tablesSettingsAssetsTableName, Is.EqualTo("Assets"));
@@ -290,34 +305,41 @@ public class UserConfigurationServiceTests
     [Test]
     public void TablesSettingsFoldersTableName_CorrectValue_ReturnsTablesSettingsFoldersTableNameValue()
     {
-        string tablesSettingsFoldersTableName = _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName;
+        string tablesSettingsFoldersTableName =
+            _userConfigurationService!.StorageSettings.TablesSettings.FoldersTableName;
 
         Assert.That(tablesSettingsFoldersTableName, Is.Not.Null);
         Assert.That(tablesSettingsFoldersTableName, Is.EqualTo("Folders"));
     }
 
     [Test]
-    public void TablesSettingsRecentTargetPathsTableName_CorrectValue_ReturnsTablesSettingsRecentTargetPathsTableNameValue()
+    public void
+        TablesSettingsRecentTargetPathsTableName_CorrectValue_ReturnsTablesSettingsRecentTargetPathsTableNameValue()
     {
-        string tablesSettingsRecentTargetPathsTableName = _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName;
+        string tablesSettingsRecentTargetPathsTableName =
+            _userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName;
 
         Assert.That(tablesSettingsRecentTargetPathsTableName, Is.Not.Null);
         Assert.That(tablesSettingsRecentTargetPathsTableName, Is.EqualTo("RecentTargetPaths"));
     }
 
     [Test]
-    public void TablesSettingsSyncAssetsDirectoriesDefinitionsTableName_CorrectValue_ReturnsTablesSettingsSyncAssetsDirectoriesDefinitionsTableNameValue()
+    public void
+        TablesSettingsSyncAssetsDirectoriesDefinitionsTableName_CorrectValue_ReturnsTablesSettingsSyncAssetsDirectoriesDefinitionsTableNameValue()
     {
-        string tablesSettingsSyncAssetsDirectoriesDefinitionsTableName = _userConfigurationService!.StorageSettings.TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
+        string tablesSettingsSyncAssetsDirectoriesDefinitionsTableName = _userConfigurationService!.StorageSettings
+            .TablesSettings.SyncAssetsDirectoriesDefinitionsTableName;
 
         Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName, Is.Not.Null);
-        Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName, Is.EqualTo("SyncAssetsDirectoriesDefinitions"));
+        Assert.That(tablesSettingsSyncAssetsDirectoriesDefinitionsTableName,
+            Is.EqualTo("SyncAssetsDirectoriesDefinitions"));
     }
 
     [Test]
     public void ThumbnailsDictionaryEntriesToKeep_CorrectValue_ReturnsThumbnailsDictionaryEntriesToKeepValue()
     {
-        ushort thumbnailsDictionaryEntriesToKeep = _userConfigurationService!.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
+        ushort thumbnailsDictionaryEntriesToKeep =
+            _userConfigurationService!.StorageSettings.ThumbnailsDictionaryEntriesToKeep;
 
         Assert.That(thumbnailsDictionaryEntriesToKeep, Is.EqualTo(5));
     }

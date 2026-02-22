@@ -5,7 +5,7 @@ namespace PhotoManager.Domain;
 
 public class MoveAssetsService(
     IAssetRepository assetRepository,
-    IStorageService storageService,
+    IFileOperationsService fileOperationsService,
     IAssetCreationService assetCreationService)
     : IMoveAssetsService
 {
@@ -109,7 +109,7 @@ public class MoveAssetsService(
                 throw new ArgumentNullException(nameof(asset.Folder), "asset.Folder cannot be null.");
             }
 
-            if (!storageService.FileExists(asset.Folder, asset))
+            if (!fileOperationsService.FileExists(asset.Folder, asset))
             {
                 throw new FileNotFoundException($"File does not exist: '{asset.FullPath}'.");
             }
@@ -119,29 +119,29 @@ public class MoveAssetsService(
     private void DeleteAsset(Asset asset)
     {
         _ = assetRepository.DeleteAsset(asset.Folder.Path, asset.FileName);
-        storageService.DeleteFile(asset.Folder.Path, asset.FileName);
+        fileOperationsService.DeleteFile(asset.Folder.Path, asset.FileName);
     }
 
     private bool Copy(string sourceFilePath, string destinationFilePath)
     {
         try
         {
-            if (storageService.FileExists(destinationFilePath))
+            if (fileOperationsService.FileExists(destinationFilePath))
             {
                 Log.Error($"Cannot copy '{sourceFilePath}' into '{destinationFilePath}' because the file already exists in the destination.");
-                return storageService.FileExists(sourceFilePath);
+                return fileOperationsService.FileExists(sourceFilePath);
             }
 
             string destinationFolderPath = new FileInfo(destinationFilePath).Directory!.FullName;
 
             if (!Directory.Exists(destinationFolderPath))
             {
-                storageService.CreateDirectory(destinationFolderPath);
+                fileOperationsService.CreateDirectory(destinationFolderPath);
             }
 
             File.Copy(sourceFilePath, destinationFilePath);
 
-            return storageService.FileExists(sourceFilePath) && storageService.FileExists(destinationFilePath);
+            return fileOperationsService.FileExists(sourceFilePath) && fileOperationsService.FileExists(destinationFilePath);
         }
         catch (FileNotFoundException)
         {
