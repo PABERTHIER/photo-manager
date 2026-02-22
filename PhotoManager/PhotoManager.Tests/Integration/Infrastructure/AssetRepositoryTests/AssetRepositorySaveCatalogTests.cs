@@ -162,7 +162,7 @@ public class AssetRepositorySaveCatalogTests
             List<string> recentTargetPaths = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
 
             Assert.That(folders, Has.Count.EqualTo(2));
-            Assert.That(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name == _asset1.Folder.Name, Is.True);
+            Assert.That(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name, Is.EqualTo(_asset1.Folder.Name));
 
             Assert.That(assets, Has.Count.EqualTo(1));
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);
@@ -276,7 +276,7 @@ public class AssetRepositorySaveCatalogTests
             List<string> recentTargetPaths = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
 
             Assert.That(folders, Has.Count.EqualTo(2));
-            Assert.That(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name == _asset1.Folder.Name, Is.True);
+            Assert.That(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name, Is.EqualTo(_asset1.Folder.Name));
 
             Assert.That(assets, Has.Count.EqualTo(1));
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);
@@ -510,7 +510,7 @@ public class AssetRepositorySaveCatalogTests
             List<string> recentTargetPaths = _database!.ReadObjectList(_userConfigurationService!.StorageSettings.TablesSettings.RecentTargetPathsTableName, RecentPathsConfigs.ReadFunc);
 
             Assert.That(folders, Has.Count.EqualTo(2));
-            Assert.That(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name == _asset1.Folder.Name, Is.True);
+            Assert.That(folders.FirstOrDefault(x => x.Id == _asset1.FolderId)?.Name, Is.EqualTo(_asset1.Folder.Name));
 
             Assert.That(assets, Has.Count.EqualTo(1));
             Asset? asset = assets.FirstOrDefault(x => x.Hash == _asset1.Hash);

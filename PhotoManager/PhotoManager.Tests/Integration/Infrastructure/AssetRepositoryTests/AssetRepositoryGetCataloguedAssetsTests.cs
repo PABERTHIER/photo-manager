@@ -130,8 +130,8 @@ public class AssetRepositoryGetCataloguedAssetsTests
 
             Assert.That(assets, Is.Not.Empty);
             Assert.That(assets, Has.Count.EqualTo(2));
-            Assert.That(assets.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName == _asset1.FileName, Is.True);
-            Assert.That(assets.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName == _asset2.FileName, Is.True);
+            Assert.That(assets.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
@@ -201,18 +201,18 @@ public class AssetRepositoryGetCataloguedAssetsTests
 
             Assert.That(assets1, Is.Not.Empty);
             Assert.That(assets1, Has.Count.EqualTo(2));
-            Assert.That(assets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName == _asset1.FileName, Is.True);
-            Assert.That(assets1.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName == _asset2.FileName, Is.True);
+            Assert.That(assets1.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets1.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
             Assert.That(assets2, Is.Not.Empty);
             Assert.That(assets2, Has.Count.EqualTo(2));
-            Assert.That(assets2.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName == _asset1.FileName, Is.True);
-            Assert.That(assets2.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName == _asset2.FileName, Is.True);
+            Assert.That(assets2.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets2.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
             Assert.That(assets3, Is.Not.Empty);
             Assert.That(assets3, Has.Count.EqualTo(2));
-            Assert.That(assets3.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName == _asset1.FileName, Is.True);
-            Assert.That(assets3.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName == _asset2.FileName, Is.True);
+            Assert.That(assets3.FirstOrDefault(x => x.Hash == _asset1.Hash)?.FileName, Is.EqualTo(_asset1.FileName));
+            Assert.That(assets3.FirstOrDefault(x => x.Hash == _asset2.Hash)?.FileName, Is.EqualTo(_asset2.FileName));
 
             Assert.That(assetsUpdatedEvents, Has.Count.EqualTo(2));
             Assert.That(assetsUpdatedEvents[0], Is.EqualTo(Reactive.Unit.Default));
