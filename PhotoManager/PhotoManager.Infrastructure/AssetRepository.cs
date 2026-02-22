@@ -319,6 +319,7 @@ public class AssetRepository : IAssetRepository
             if (thumbnails.Count == 0)
             {
                 Thumbnails.Remove(folder.Path);
+                _database.DeleteThumbnails(folder.ThumbnailsFilename);
             }
 
             if (assetToDelete != null)

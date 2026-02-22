@@ -615,7 +615,7 @@ public class ApplicationLoadThumbnailTests
     }
 
     [Test]
-    public void LoadThumbnail_AssetDoesNotExistButBinNotContainingTheAssetExists_DoesNotSetBitmapImageToTheAssetAndWritesBlobAndDbFiles()
+    public void LoadThumbnail_AssetDoesNotExistButBinNotContainingTheAssetExists_DoesNotSetBitmapImageToTheAssetAndRemovesBlobAndWritesDbFile()
     {
         string assetsDirectory = Path.Combine(_dataDirectory!, $"{Directories.DUPLICATES}\\{Directories.NEW_FOLDER_2}");
 
@@ -639,23 +639,39 @@ public class ApplicationLoadThumbnailTests
 
             _application!.LoadThumbnail(_asset1);
 
-            Assert.That(_asset1!.ImageData, Is.Null);
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(_asset1!.ImageData, Is.Null);
 
-            List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
-            Assert.That(assets, Is.Empty);
+                List<Asset> assets = _testableAssetRepository.GetCataloguedAssets();
+                Assert.That(assets, Is.Empty);
 
-            Assert.That(thumbnails, Has.Count.EqualTo(1));
-            Assert.That(thumbnails.ContainsKey(assetsDirectory), Is.True);
-            Assert.That(thumbnails[assetsDirectory], Is.Empty);
+                Assert.That(thumbnails, Is.Empty);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs, addedFolder.ThumbnailsFilename)), Is.True);
+                Assert.That(
+                    File.Exists(Path.Combine(_databasePath!,
+                        _userConfigurationService!.StorageSettings.FoldersNameSettings.Blobs,
+                        addedFolder.ThumbnailsFilename)), Is.False);
 
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
-            Assert.That(File.Exists(Path.Combine(_databasePath!, _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.RECENT_TARGET_PATHS_DB)), Is.True);
+                Assert.That(
+                    File.Exists(Path.Combine(_databasePath!,
+                        _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.ASSETS_DB)),
+                    Is.True);
+                Assert.That(
+                    File.Exists(Path.Combine(_databasePath!,
+                        _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables, Tables.FOLDERS_DB)),
+                    Is.True);
+                Assert.That(
+                    File.Exists(Path.Combine(_databasePath!,
+                        _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                        Tables.SYNC_ASSETS_DIRECTORIES_DEFINITIONS_DB)), Is.True);
+                Assert.That(
+                    File.Exists(Path.Combine(_databasePath!,
+                        _userConfigurationService!.StorageSettings.FoldersNameSettings.Tables,
+                        Tables.RECENT_TARGET_PATHS_DB)), Is.True);
 
-            Assert.That(assetsUpdatedEvents, Is.Empty);
+                Assert.That(assetsUpdatedEvents, Is.Empty);
+            }
         }
         finally
         {

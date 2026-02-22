@@ -5872,7 +5872,7 @@ public class ApplicationCatalogAssetsAsyncTests
             }
 
             List<Folder> folders = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, subSubDirFolder!, videoFirstFrameFolder!];
-            List<Folder> foldersContainingAssets = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
+            List<Folder> foldersContainingAssetsFirstSync = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new()
             {
                 { rootFolder!, [_asset4!]},
@@ -5891,7 +5891,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 { _asset5Temp!.FileName, ASSET5_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync, foldersContainingAssets, thumbnails, assetsImageByteSizeFirstSync);
+            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync, foldersContainingAssetsFirstSync, thumbnails, assetsImageByteSizeFirstSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
                 _blobStorage!,
                 _database!,
@@ -5899,7 +5899,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsFirstSync,
                 assetsFromRepository,
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
@@ -5916,7 +5916,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsFirstSync,
                 assetsFromRepository,
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
@@ -5970,6 +5970,8 @@ public class ApplicationCatalogAssetsAsyncTests
             _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
+            List<Folder> foldersContainingAssetsSecondSync =
+                [rootFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
                 { rootFolder!, [_asset4!]},
@@ -6064,7 +6066,8 @@ public class ApplicationCatalogAssetsAsyncTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
+            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync,
+                foldersContainingAssetsSecondSync, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
                 _blobStorage!,
                 _database!,
@@ -6072,7 +6075,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsSecondSync,
                 assetsFromRepository,
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
@@ -6089,7 +6092,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsSecondSync,
                 assetsFromRepository,
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
@@ -6363,7 +6366,7 @@ public class ApplicationCatalogAssetsAsyncTests
             }
 
             List<Folder> folders = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, subSubDirFolder!, videoFirstFrameFolder!];
-            List<Folder> foldersContainingAssets = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
+            List<Folder> foldersContainingAssetsFirstSync = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new()
             {
                 { rootFolder!, [_asset4!]},
@@ -6381,7 +6384,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync, foldersContainingAssets, thumbnails, assetsImageByteSizeFirstSync);
+            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync, foldersContainingAssetsFirstSync, thumbnails, assetsImageByteSizeFirstSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
                 _blobStorage!,
                 _database!,
@@ -6389,7 +6392,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsFirstSync,
                 assetsFromRepository,
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
@@ -6406,7 +6409,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsFirstSync,
                 assetsFromRepository,
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
@@ -6456,6 +6459,8 @@ public class ApplicationCatalogAssetsAsyncTests
             _asset2Temp.FileProperties = _asset2Temp.FileProperties with { Modification = DateTime.Now.AddDays(10) };
             File.SetLastWriteTime(imagePath3ToCopy, _asset2Temp.FileProperties.Modification);
 
+            List<Folder> foldersContainingAssetsSecondSync =
+                [rootFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
                 { rootFolder!, [_asset4!]},
@@ -6547,7 +6552,8 @@ public class ApplicationCatalogAssetsAsyncTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
+            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync,
+                foldersContainingAssetsSecondSync, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
                 _blobStorage!,
                 _database!,
@@ -6555,7 +6561,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsSecondSync,
                 assetsFromRepository,
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
@@ -6572,7 +6578,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsSecondSync,
                 assetsFromRepository,
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
@@ -6845,7 +6851,7 @@ public class ApplicationCatalogAssetsAsyncTests
             }
 
             List<Folder> folders = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, subSubDirFolder!, videoFirstFrameFolder!];
-            List<Folder> foldersContainingAssets = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
+            List<Folder> foldersContainingAssetsFirstSync = [rootFolder!, imageDeletedFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingFirstSync = new()
             {
                 { rootFolder!, [_asset4!]},
@@ -6863,7 +6869,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 { _asset4Temp!.FileName, ASSET4_TEMP_IMAGE_BYTE_SIZE }
             };
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync, foldersContainingAssets, thumbnails, assetsImageByteSizeFirstSync);
+            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingFirstSync, foldersContainingAssetsFirstSync, thumbnails, assetsImageByteSizeFirstSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
                 _blobStorage!,
                 _database!,
@@ -6871,7 +6877,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsFirstSync,
                 assetsFromRepository,
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
@@ -6888,7 +6894,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsFirstSync,
                 assetsFromRepository,
                 folderToAssetsMappingFirstSync,
                 assetNameToByteSizeMappingFirstSync);
@@ -6983,6 +6989,8 @@ public class ApplicationCatalogAssetsAsyncTests
             _asset5Temp = _asset5Temp!.WithFolder(videoFirstFrameFolder!);
 
             List<Asset> expectedAssetsSecondSync = [_asset4!, _asset4Temp!, _asset3Temp!, _asset2Temp!, _asset5Temp!];
+            List<Folder> foldersContainingAssetsSecondSync =
+                [rootFolder!, imageUpdatedFolder!, subDirFolder!, videoFirstFrameFolder!];
             Dictionary<Folder, List<Asset>> folderToAssetsMappingSecondSync = new()
             {
                 { rootFolder!, [_asset4!]},
@@ -7031,7 +7039,8 @@ public class ApplicationCatalogAssetsAsyncTests
                 CatalogAssetsAsyncAsserts.AssertAssetPropertyValidityAndImageData(assetsFromRepository[i], expectedAssetsSecondSync[i], assetPathsAfterSync[i], expectedDirectories[i], expectedFolders[i]);
             }
 
-            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync, foldersContainingAssets, thumbnails, assetsImageByteSizeSecondSync);
+            CatalogAssetsAsyncAsserts.AssertThumbnailsValidity(assetsFromRepository, folderToAssetsMappingSecondSync,
+                foldersContainingAssetsSecondSync, thumbnails, assetsImageByteSizeSecondSync);
             CatalogAssetsAsyncAsserts.CheckBlobsAndTablesAfterSaveCatalog(
                 _blobStorage!,
                 _database!,
@@ -7039,7 +7048,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsSecondSync,
                 assetsFromRepository,
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
@@ -7056,7 +7065,7 @@ public class ApplicationCatalogAssetsAsyncTests
                 blobsPath,
                 tablesPath,
                 folders,
-                foldersContainingAssets,
+                foldersContainingAssetsSecondSync,
                 assetsFromRepository,
                 folderToAssetsMappingSecondSync,
                 assetNameToByteSizeMappingSecondSync);
