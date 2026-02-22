@@ -8,7 +8,7 @@ public class SyncAssetsConfigurationTests
     [SetUp]
     public void SetUp()
     {
-        _syncAssetsConfiguration = new SyncAssetsConfiguration();
+        _syncAssetsConfiguration = new();
     }
 
     [Test]

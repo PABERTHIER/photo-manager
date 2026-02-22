@@ -17,7 +17,7 @@ public class BlobStorage : IBlobStorage
             using (BinaryReader reader = new(fileStream))
             {
                 int itemCount = reader.ReadInt32();
-                result = new Dictionary<string, byte[]>(itemCount);
+                result = new(itemCount);
 
                 for (int i = 0; i < itemCount; i++)
                 {

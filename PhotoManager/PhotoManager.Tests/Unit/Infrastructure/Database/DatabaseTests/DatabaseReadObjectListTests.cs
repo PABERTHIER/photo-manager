@@ -187,7 +187,7 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            _database!.SetDataTableProperties(new DataTableProperties
+            _database!.SetDataTableProperties(new()
             {
                 TableName = tableName,
                 ColumnProperties =
@@ -238,7 +238,7 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            _database!.SetDataTableProperties(new DataTableProperties
+            _database!.SetDataTableProperties(new()
             {
                 TableName = tableName,
                 ColumnProperties =
@@ -374,7 +374,7 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            _database!.SetDataTableProperties(new DataTableProperties
+            _database!.SetDataTableProperties(new()
             {
                 TableName = tableName,
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
@@ -417,7 +417,7 @@ public class DatabaseReadObjectListTests
 
             File.WriteAllText(filePath, csv);
 
-            database.SetDataTableProperties(new DataTableProperties
+            database.SetDataTableProperties(new()
             {
                 TableName = tableName,
                 ColumnProperties = AssetConfigs.ConfigureDataTable()
@@ -443,7 +443,7 @@ public class DatabaseReadObjectListTests
 
         File.WriteAllText(filePath, csv);
 
-        _database!.SetDataTableProperties(new DataTableProperties
+        _database!.SetDataTableProperties(new()
         {
             TableName = tableName,
             ColumnProperties =

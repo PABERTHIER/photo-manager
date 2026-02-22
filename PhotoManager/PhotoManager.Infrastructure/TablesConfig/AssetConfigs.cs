@@ -33,9 +33,9 @@ public static class AssetConfigs
             thumbnailCreationDateTime = DateTime.Now;
         }
 
-        return new Asset
+        return new()
         {
-            FolderId = new Guid(values[0]),
+            FolderId = new(values[0]),
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
             FileName = values[1],
             ImageRotation = (Rotation)Enum.Parse(typeof(Rotation), values[2]),

@@ -58,7 +58,7 @@ public class AssetRepositorySaveCatalogTests
         _asset1 = new()
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -110,7 +110,7 @@ public class AssetRepositorySaveCatalogTests
             // Just to fill the syncassetsdirectoriesdefinitions.db and the recenttargetpaths.db files
             SyncAssetsConfiguration syncAssetsConfiguration = new();
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -118,7 +118,7 @@ public class AssetRepositorySaveCatalogTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",
@@ -218,7 +218,7 @@ public class AssetRepositorySaveCatalogTests
             // Just to fill the syncassetsdirectoriesdefinitions.db and the recenttargetpaths.db files
             SyncAssetsConfiguration syncAssetsConfiguration = new();
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -226,7 +226,7 @@ public class AssetRepositorySaveCatalogTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",
@@ -458,7 +458,7 @@ public class AssetRepositorySaveCatalogTests
             // Just to fill the syncassetsdirectoriesdefinitions.db and the recenttargetpaths.db files
             SyncAssetsConfiguration syncAssetsConfiguration = new();
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -466,7 +466,7 @@ public class AssetRepositorySaveCatalogTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfiguration.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",

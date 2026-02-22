@@ -91,7 +91,7 @@ public class ObjectListStorage : BaseCsvStorage, IObjectListStorage
 
         if (Properties == null)
         {
-            throw new Exception($"Properties must be defined for the columns in the table {tableName}.");
+            throw new($"Properties must be defined for the columns in the table {tableName}.");
         }
 
         for (int i = 0; i < Properties.ColumnProperties.Length; i++)

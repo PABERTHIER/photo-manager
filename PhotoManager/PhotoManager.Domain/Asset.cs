@@ -17,7 +17,7 @@ public class Asset
     // Used for tests only, to make FolderId and Folder properties immutable
     public Asset WithFolder(Folder folder)
     {
-        return new Asset
+        return new()
         {
             FolderId = folder.Id,
             Folder = folder,
@@ -35,7 +35,7 @@ public class Asset
     // Used for tests only, to make Hash property immutable
     public Asset WithHash(string hash)
     {
-        return new Asset
+        return new()
         {
             FolderId = FolderId,
             Folder = Folder,

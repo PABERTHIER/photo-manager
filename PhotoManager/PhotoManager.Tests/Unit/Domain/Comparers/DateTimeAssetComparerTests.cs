@@ -152,10 +152,10 @@ public class DateTimeAssetComparerTests
             FileProperties = new()
             {
                 Size = 35000,
-                Creation = new DateTime(2020, 12, 31),
-                Modification = new DateTime(2020, 12, 31)
+                Creation = new(2020, 12, 31),
+                Modification = new(2020, 12, 31)
             },
-            ThumbnailCreationDateTime = new DateTime(2020, 12, 31),
+            ThumbnailCreationDateTime = new(2020, 12, 31),
             Hash = "e2ab4b48e17e3e8cca3a349514f49251e377075c756a0687f7db7ccee6aa4f658dcb7341a859a728ee20b9bd1c3ed44ecba352753770ce5c0738c4d851920335"
         };
         _asset8 = new()
@@ -171,10 +171,10 @@ public class DateTimeAssetComparerTests
             FileProperties = new()
             {
                 Size = 36000,
-                Creation = new DateTime(2005, 02, 15),
-                Modification = new DateTime(2005, 02, 15)
+                Creation = new(2005, 02, 15),
+                Modification = new(2005, 02, 15)
             },
-            ThumbnailCreationDateTime = new DateTime(2005, 02, 15),
+            ThumbnailCreationDateTime = new(2005, 02, 15),
             Hash = "ff51412ee4982849d4db953b794e20ce6335277b7c8426543e955b9ae448c94541322e0f59aa88612abb3db166129cfe60aaa6cc20daff6aac2ae9ad896fcc01"
         };
     }

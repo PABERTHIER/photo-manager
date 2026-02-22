@@ -57,7 +57,7 @@ public class AssetRepositoryGetAssetsByPathTests
         _asset1 = new()
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FolderId = new Guid("876283c6-780e-4ad5-975c-be63044c087a"),
+            FolderId = new("876283c6-780e-4ad5-975c-be63044c087a"),
             FileName = FileNames.IMAGE_1_JPG,
             ImageRotation = Rotation.Rotate0,
             Pixel = new()
@@ -82,7 +82,7 @@ public class AssetRepositoryGetAssetsByPathTests
         _asset2 = new()
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FolderId = new Guid("68493435-e299-4bb5-9e02-214da41d0256"),
+            FolderId = new("68493435-e299-4bb5-9e02-214da41d0256"),
             FileName = FileNames.IMAGE_9_PNG,
             ImageRotation = Rotation.Rotate90,
             Pixel = new()
@@ -107,7 +107,7 @@ public class AssetRepositoryGetAssetsByPathTests
         _asset3 = new()
         {
             Folder = new() { Id = Guid.Empty, Path = "" }, // Initialised later
-            FolderId = new Guid("f91b8c81-6938-431a-a689-d86c7c4db126"),
+            FolderId = new("f91b8c81-6938-431a-a689-d86c7c4db126"),
             FileName = FileNames.IMAGE_11_HEIC,
             Pixel = new()
             {

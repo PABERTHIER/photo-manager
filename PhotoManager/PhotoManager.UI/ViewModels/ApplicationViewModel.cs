@@ -477,8 +477,8 @@ public class ApplicationViewModel : BaseViewModel
         UpdateAppTitle();
     }
 
-    private void AddFolder(Folder folder) => FolderAdded?.Invoke(this, new FolderAddedEventArgs { Folder = folder });
+    private void AddFolder(Folder folder) => FolderAdded?.Invoke(this, new() { Folder = folder });
 
     private void RemoveFolder(Folder folder) =>
-        FolderRemoved?.Invoke(this, new FolderRemovedEventArgs { Folder = folder });
+        FolderRemoved?.Invoke(this, new() { Folder = folder });
 }

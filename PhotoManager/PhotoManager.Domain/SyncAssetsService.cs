@@ -60,7 +60,7 @@ public class SyncAssetsService(
                     if (moveAssetsService.CopyAsset(sourceFilePath, destinationFilePath))
                     {
                         syncAssetsResult.SyncedImages++;
-                        callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"'{sourceFilePath}' => '{destinationFilePath}'" });
+                        callback(new() { NewStatus = $"'{sourceFilePath}' => '{destinationFilePath}'" });
                     }
                 }
 
@@ -73,7 +73,7 @@ public class SyncAssetsService(
                         string destinationPath = Path.Combine(definition.DestinationDirectory, deletedImage);
                         fileOperationsService.DeleteFile(definition.DestinationDirectory, deletedImage);
                         syncAssetsResult.SyncedImages++;
-                        callback(new ProcessStatusChangedCallbackEventArgs { NewStatus = $"Deleted '{destinationPath}'" });
+                        callback(new() { NewStatus = $"Deleted '{destinationPath}'" });
                     }
                 }
 

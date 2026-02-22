@@ -56,7 +56,7 @@ public static class HashingHelper
     {
         bool isHeicFile = filePath?.EndsWith(".heic", StringComparison.OrdinalIgnoreCase) ?? false;
 
-        Bitmap? image = isHeicFile ? BitmapHelper.LoadBitmapFromPath(filePath!) : new Bitmap(filePath!);
+        Bitmap? image = isHeicFile ? BitmapHelper.LoadBitmapFromPath(filePath!) : new(filePath!);
 
         ulong hash = 0UL;
         ulong mask = 1UL;
@@ -91,6 +91,7 @@ public static class HashingHelper
     {
         if (hash1 == null || hash2 == null || hash1.Length != hash2.Length)
         {
+            // TODO: Check for ArgumentException. - .net 8) to not throw
             throw new ArgumentException("Invalid arguments for hamming distance calculation.");
         }
 

@@ -74,7 +74,7 @@ public class ApplicationGetSyncAssetsConfigurationTests
         {
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -82,7 +82,7 @@ public class ApplicationGetSyncAssetsConfigurationTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",
@@ -144,7 +144,7 @@ public class ApplicationGetSyncAssetsConfigurationTests
         {
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -152,7 +152,7 @@ public class ApplicationGetSyncAssetsConfigurationTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",

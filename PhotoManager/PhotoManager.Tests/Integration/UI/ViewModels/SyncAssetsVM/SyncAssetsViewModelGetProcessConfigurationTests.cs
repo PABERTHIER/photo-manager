@@ -76,7 +76,7 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -84,7 +84,7 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",
@@ -154,7 +154,7 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
 
             SyncAssetsConfiguration syncAssetsConfigurationToSave = new();
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Toto\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Toto",
@@ -162,7 +162,7 @@ public class SyncAssetsViewModelGetProcessConfigurationTests
                     DeleteAssetsNotInSource = false
                 });
             syncAssetsConfigurationToSave.Definitions.Add(
-                new SyncAssetsDirectoriesDefinition
+                new()
                 {
                     SourceDirectory = "C:\\Tutu\\Screenshots",
                     DestinationDirectory = "C:\\Images\\Tutu",

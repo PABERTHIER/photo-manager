@@ -159,7 +159,7 @@ public static class BitmapHelper
             image.BeginInit();
             image.CacheOption = BitmapCacheOption.OnLoad; // To keep the imageData after dispose of the using block
             image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            image.UriSource = new Uri(imagePath);
+            image.UriSource = new(imagePath);
             image.Rotation = rotation;
             image.EndInit();
             image.Freeze();
@@ -240,7 +240,7 @@ public static class BitmapHelper
                     {
                         // Create a copy of the Bitmap
                         // When the using block for the MemoryStream is exited, the stream is disposed of, which lead to have a default bitmap at the end and to lose all the data.
-                        image = new Bitmap(bitmap);
+                        image = new(bitmap);
                     }
                 }
             }
