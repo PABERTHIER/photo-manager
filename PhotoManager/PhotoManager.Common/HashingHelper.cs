@@ -28,19 +28,27 @@ public static class HashingHelper
     // Performances are decreased by 6 times with CalculatePHash
     public static string? CalculatePHash(string filePath)
     {
-        MagickImage image = new(filePath);
+        try
+        {
+            MagickImage image = new(filePath);
 
-        // Resize the image
-        MagickGeometry geometry = new(32, 32);
-        image.Resize(geometry);
+            // Resize the image
+            MagickGeometry geometry = new(32, 32);
+            image.Resize(geometry);
 
-        // Convert the image to grayscale
-        image.Grayscale(PixelIntensityMethod.Average);
+            // Convert the image to grayscale
+            image.Grayscale(PixelIntensityMethod.Average);
 
-        // Calculate the PHash of the image
-        string? phash = image.PerceptualHash()?.ToString();
+            // Calculate the PHash of the image
+            string? phash = image.PerceptualHash()?.ToString();
 
-        return phash;
+            return phash;
+        }
+        catch
+        {
+            // TODO: Log the error once the log system has been reworked
+            return null;
+        }
     }
 
     // For GIF or some heic file it returns "00000000000000"

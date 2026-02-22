@@ -1,5 +1,4 @@
-﻿using ImageMagick;
-using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
+﻿using DHashes = PhotoManager.Tests.Integration.Constants.DHashes;
 using Directories = PhotoManager.Tests.Integration.Constants.Directories;
 using FileNames = PhotoManager.Tests.Integration.Constants.FileNames;
 using Hashes = PhotoManager.Tests.Integration.Constants.Hashes;
@@ -236,53 +235,68 @@ public class AssetHashCalculatorServiceTests
     }
 
     [Test]
-    public void CalculateHash_PHashAndImageDoesNotExist_ThrowsMagickBlobErrorException()
+    public void CalculateHash_PHashAndImageDoesNotExist_ReturnsTheDefaultHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
-        byte[]? imageBytes = null;
+        byte[] imageBytes = [];
         string filePath = Path.Combine(_dataDirectory!, FileNames.NON_EXISTENT_IMAGE_PNG);
 
-        MagickBlobErrorException? exception =
-            Assert.Throws<MagickBlobErrorException>(() =>
-                assetHashCalculatorService.CalculateHash(imageBytes!, filePath));
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath);
 
-        Assert.That(exception?.Message,
-            Does.StartWith($"unable to open image '{filePath}': No such file or directory @ error/blob.c/OpenBlob/"));
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
     }
 
     [Test]
-    public void CalculateHash_PHashAndImagePathIsInvalid_ThrowsMagickMissingDelegateErrorException()
+    public void CalculateHash_PHashAndImagePathIsInvalid_ReturnsHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
-        byte[]? imageBytes = null;
+        string directoryPath = _dataDirectory!;
 
-        MagickMissingDelegateErrorException? exception =
-            Assert.Throws<MagickMissingDelegateErrorException>(() =>
-                assetHashCalculatorService.CalculateHash(imageBytes!, _dataDirectory!));
+        string filePath = Path.Combine(directoryPath, FileNames.IMAGE_1_JPG);
+        byte[] imageBytes = File.ReadAllBytes(filePath);
 
-        Assert.That(exception?.Message,
-            Does.StartWith(
-                $"no decode delegate for this image format `{_dataDirectory!}' @ error/constitute.c/ReadImage/"));
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes, directoryPath);
+
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(Hashes.IMAGE_1_JPG));
     }
 
     [Test]
-    public void CalculateHash_PHashAndImagePathIsNull_ThrowsArgumentNullException()
+    public void CalculateHash_PHashAndEmptyImageBytesAndImagePathIsInvalid_ReturnsTheDefaultHash()
     {
         UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
         AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
 
-        byte[]? imageBytes = null;
+        byte[] imageBytes = [];
+
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes, _dataDirectory!);
+
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
+    }
+
+    [Test]
+    public void CalculateHash_PHashAndImagePathIsNull_ReturnsTheDefaultHash()
+    {
+        UserConfigurationService userConfigurationService = GetUserConfigurationService(true, false, false);
+        AssetHashCalculatorService assetHashCalculatorService = new(userConfigurationService);
+
+        byte[] imageBytes = [];
         string? filePath = null;
 
-        ArgumentNullException? exception =
-            Assert.Throws<ArgumentNullException>(() =>
-                assetHashCalculatorService.CalculateHash(imageBytes!, filePath!));
+        string hash = assetHashCalculatorService.CalculateHash(imageBytes, filePath!);
 
-        Assert.That(exception?.Message, Is.EqualTo("Value cannot be null or empty. (Parameter 'fileName')"));
+        Assert.That(string.IsNullOrWhiteSpace(hash), Is.False);
+        Assert.That(hash, Has.Length.EqualTo(Hashes.LENGTH));
+        Assert.That(hash.ToLower(), Is.EqualTo(Hashes.EMPTY_IMAGE));
     }
 
     [Test]
